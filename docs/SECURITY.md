@@ -13,8 +13,10 @@ and how, so a reviewer (or a future session) can check each control. Decisions a
   origin, an `ALLOWED_ORIGINS` entry, or the request's own (checked) host. Invite links use `PUBLIC_URL`, never the
   request's Host header. [#220]
 - **Isolation.** Every query is scoped to the person. Memories are private unless a person shares one with a group
-  (which asks first). Admins can *view* chats and Library items for oversight — read-only and audited — never change
-  them. [#13, #36, #50]
+  (which asks first). Admins can *view* other people's chats, projects, Library items and voice notes only when "Let admins
+  read other people's chats" is on (Admin → People; off for a new install). Then it is read-only and every chat view is
+  audited, and everyone is told: on the invite page, under their chat box and on their You page. Off, those things don't
+  exist for the admin (404). [#13, #36, #50, #219]
 - **Mail and calendar accounts** are usable only by their owner — not even an admin's chat can reach them. Their
   passwords are sealed with AES-256-GCM under a per-install key in `.env` (`JESSBOT_SECRET`); a copied database or
   backup alone does not reveal them. [#78]

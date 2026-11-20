@@ -76,8 +76,9 @@ no telemetry and no account with us. What leaves your machine:
   map services), and feed polling;
 - **your mail and calendar servers**, if you connect them, and **Web Push** through your browser's push service.
 
-In the current version the admin can open other people's chats and Library items (read-only, every view audited, and
-people are told so). Making this a setting that is off by default is on the list below.
+Each person's chats, projects, Library and voice notes are theirs. An admin can read them only if "Let admins read other
+people's chats" is turned on (Admin → People, off for a new install); then it is read-only, every chat view is logged, and
+everyone sees a line saying so in their chat and on their You page.
 
 ## Install
 
@@ -143,7 +144,6 @@ person caps what each person can spend.
 
 Honest list, roughly in order:
 
-- **Admin access to other people's chats** as a setting, off by default and visible to everyone when on.
 - **Account hardening for internet exposure**: optional two-factor sign-in for admins, rate limits that survive a
   restart, a password reset flow.
 - **Install options**: a Docker image (non-root, data volume, healthcheck), a systemd unit, documented Windows and

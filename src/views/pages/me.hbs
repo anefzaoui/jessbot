@@ -10,6 +10,11 @@
 {{> page-header title="You" subtitle="Your profile, what I remember, and your devices" width="max-w-3xl"}}
 
 <div class="mx-auto max-w-3xl px-4 py-6 sm:px-6">
+  {{#if readByAdmins}}
+    <p class="mb-4 flex items-start gap-2 rounded-lg border border-line bg-surface-2 px-3 py-2 text-[13px] text-ink-2" data-oversight-notice>
+      {{icon "eye" class="mt-0.5 size-4 shrink-0 text-ink-3"}}<span>On this {{bot.name}}, admins can read your chats, projects and Library items (read-only; every chat they open is logged).</span>
+    </p>
+  {{/if}}
   <nav class="tabs mb-6 overflow-x-auto" aria-label="Sections" data-me-tabs>
     {{#each tabs}}<a href="/me/{{key}}" data-me-tab="{{key}}" {{#if (eq key @root.tab)}}aria-current="page"{{/if}}>{{label}}</a>{{/each}}
   </nav>

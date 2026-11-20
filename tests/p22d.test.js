@@ -263,6 +263,7 @@ test('sheet_append_rows (tool): a new version of their file; refuses charts, bad
 
 // ---- library_describe -----------------------------------------------------------------------------------------------
 test('library_describe: any item (an uploaded scan too) gets a searchable title and description; the file is untouched', async () => {
+  (await import('../src/services/oversight.js')).setOversight(true, null); // admins view others' things only with oversight on (#219)
   const u = await createUser({ name: 'Describer', email: 'describer@t.dev', password: 'correct horse battery' });
   const ctx = await toolCtx(u);
   const scan = lib.createFileItem({ user: u, title: 'IMG_2291', type: 'pdf', ext: 'pdf', mime: 'application/pdf', buffer: Buffer.from('%PDF-1.4 scan'), text: '' });

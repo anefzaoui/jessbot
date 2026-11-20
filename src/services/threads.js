@@ -1,7 +1,9 @@
-// Threads: one main ("god") thread per person + side chats. Access: the owner, or an admin (audited, #36).
+// Threads: one main ("god") thread per person + side chats. Access: the owner, or an admin when oversight is on (audited,
+// #36, #219).
 import { get, all, run, tx } from '../db/index.js';
 import { forbidden, notFound, invalid } from '../lib/errors.js';
 import { audit } from './audit.js';
+import { adminMayView } from './oversight.js';
 
 export function mainThread(userId) {
   return tx(() => {
@@ -17,12 +19,13 @@ export function createSideThread(userId, title = 'New side chat') {
   return get('SELECT * FROM threads WHERE id = ?', Number(lastInsertRowid));
 }
 
-// Resolve a thread for a viewer; admins may open others' threads (read-only in the UI, audited once per open).
+// Resolve a thread for a viewer; admins may open others' threads only when oversight is on (read-only, audited once per
+// open). Otherwise someone else's thread doesn't exist for them.
 export function threadForViewer(threadId, viewer, { write = false, ip = null } = {}) {
   const t = get('SELECT * FROM threads WHERE id = ? AND deleted_at IS NULL', Number(threadId));
   if (!t) throw notFound('That chat no longer exists.');
   if (t.user_id === viewer.id) return { thread: t, asAdmin: false };
-  if (viewer.role !== 'admin') throw notFound('That chat no longer exists.'); // don't reveal existence
+  if (!adminMayView(viewer)) throw notFound('That chat no longer exists.'); // don't reveal existence
   if (write) throw forbidden("You can read this person's chat, but not write in it.");
   audit('thread.view_as_admin', { actorId: viewer.id, targetType: 'thread', targetId: t.id, ip });
   return { thread: t, asAdmin: true };

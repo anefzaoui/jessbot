@@ -10,6 +10,7 @@ import { setSessionCookie, clearSessionCookie } from '../../middleware/auth.js';
 import { formPost } from '../../lib/respond.js';
 import { HttpError, invalid, tooMany } from '../../lib/errors.js';
 import { hit, reset } from '../../lib/ratelimit.js';
+import { oversightOn } from '../../services/oversight.js';
 
 const router = Router();
 
@@ -59,7 +60,7 @@ router.post('/logout', (req, res) => {
 const inviteData = req => {
   const invite = findInvite(req.params.token);
   const inviter = invite?.invited_by ? getUser(invite.invited_by) : null;
-  return { layout: 'base', title: 'Join', invite, inviterName: inviter?.name, minPassword: MIN_PASSWORD,
+  return { layout: 'base', title: 'Join', invite, inviterName: inviter?.name, minPassword: MIN_PASSWORD, readByAdmins: oversightOn(),
     values: { name: invite?.name, email: invite?.email } };
 };
 

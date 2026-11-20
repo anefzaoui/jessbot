@@ -88,7 +88,18 @@ export const installProgress = () => progress;
 const servers = new WeakMap();
 export async function launch() {
   const sys = systemPath();
-  const server = await chromium.launchServer({ headless: true, ...(sys ? { executablePath: sys } : { channel: 'chromium' }) });
+  const version = sys ? null : browsersJsonVersion();
+  const server = await chromium.launchServer({
+    headless: true, ...(sys ? { executablePath: sys } : { channel: 'chromium' }),
+    host: '127.0.0.1', // the control socket stays on this machine (Playwright's default listens on every interface)
+    args: [
+      // No UDP from WebRTC outside a proxy: a page's peer connection or mDNS socket can't reach the network, and no
+      // firewall prompt pops up on a desktop for a browser that has no firewall rule of its own.
+      '--webrtc-ip-handling-policy=disable_non_proxied_udp',
+      // The user agent for the whole browser, workers included (a per-context override leaves "HeadlessChrome" in them).
+      ...(version ? [`--user-agent=${userAgent(version)}`] : []),
+    ],
+  });
   const browser = await chromium.connect(server.wsEndpoint());
   servers.set(browser, server);
   return browser;

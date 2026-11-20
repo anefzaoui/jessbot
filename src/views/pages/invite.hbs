@@ -9,7 +9,7 @@
     </form>
     <p class="mt-6 flex gap-2 rounded-xl border border-line bg-surface-2/60 px-3 py-2.5 text-xs leading-relaxed text-ink-2">
       {{icon "eye" class="mt-0.5 size-3.5 shrink-0 text-ink-3"}}
-      <span>You get your own chat with {{bot.name}}. It runs on {{default inviterName "the owner"}}'s server: the owner sets how {{bot.name}} helps you and <strong class="font-semibold text-ink">can read your conversations</strong>.</span>
+      <span>You get your own chat with {{bot.name}}. It runs on {{default inviterName "the owner"}}'s server: the owner sets how {{bot.name}} helps you{{#if readByAdmins}} and <strong class="font-semibold text-ink">can read your conversations</strong>{{else}}, and your conversations stay yours{{/if}}.</span>
     </p>
   {{/auth-frame}}
 {{else}}
