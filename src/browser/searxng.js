@@ -6,6 +6,7 @@
 // Result pages are still read through the browser (web_read), as always.
 // The request goes through lib/outbound.js (decision #221): the admin's address may be local, a redirect away from it may not.
 import { outboundFetch } from '../lib/outbound.js';
+import { trimEndChars } from '../lib/text-safe.js';
 
 export const SEARXNG_LABEL = 'SearXNG';
 const TIMEOUT_MS = 12000;
@@ -22,7 +23,7 @@ export function cleanSearxngUrl(raw) {
   if (!['http:', 'https:'].includes(u.protocol)) throw new Error('Use an http:// or https:// address.');
   if (u.username || u.password) throw new Error('Leave the user name and password out of the address.');
   u.search = ''; u.hash = '';
-  return u.href.replace(/\/+$/, '');
+  return trimEndChars(u.href, '/');
 }
 
 /** The JSON search URL. opts: { freshness: day|week|month|year, lang: 'fr', engines: 'google' , page }. */

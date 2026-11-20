@@ -12,6 +12,8 @@ Thanks for wanting to help. Jessbot is an early preview, so bug reports with cle
 - For anything bigger than a bug fix, open an issue first and describe what you want to change. It saves you from
   building something that doesn't fit.
 - Security problems: don't open a public issue. See [SECURITY.md](SECURITY.md).
+- Questions and where to ask them: [SUPPORT.md](SUPPORT.md). Everyone taking part follows the
+  [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ## Set up a development copy
 
@@ -32,6 +34,8 @@ The dev server keeps its data in `data/dev`, so it never touches an install you 
 
 - Node 24 ESM, Express 5, express-handlebars (`.hbs`), Tailwind v4 CLI, the built-in `node:sqlite`.
 - Every page is its own Express route. Logic lives in `src/services/`; web routes and `/api/v1` both call services.
+- New interface text goes through the translation layer: `{{t "…"}}` in templates, `t('…')` in the browser, whole
+  sentences with `{placeholders}`; then `npm run i18n` (CI runs `npm run i18n:check`). See docs/TRANSLATING.md.
 - Database changes are a new `src/db/migrations/NNN_name.sql` (or `.js` with `up()`). Never edit one that has shipped:
   applied migrations are checksummed and a changed one stops the server. See [docs/DATABASE.md](docs/DATABASE.md).
 - Icons: `{{icon "name"}}` with Jessbot's icon names; `scripts/icon-map.js` maps them to Phosphor, and
@@ -75,7 +79,8 @@ Mail and calendar tests use two local servers under the git-ignored `tools/test-
 - One topic per pull request, with a description of what changed and how you checked it, ending with a `Verified:`
   line (how) and a `Not verified:` line (what wasn't). Screenshots for anything
   visible (light and dark, and a phone width when layout changed).
-- Keep the docs current in the same pull request: the feature list, the API notes, the decision log, and a line under
+- Keep the docs current in the same pull request: the feature list, [ROADMAP.md](ROADMAP.md) (move the item to done,
+  or add it), the API notes, the decision log, and a line under
   `[Unreleased]` in CHANGELOG.md (plus a plain `Highlights` line for anything people would notice; see
   docs/RELEASING.md).
 - By contributing you agree that your contribution is licensed under the project's licence, GPL-3.0-or-later.

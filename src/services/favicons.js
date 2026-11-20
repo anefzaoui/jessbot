@@ -57,8 +57,18 @@ export async function iconFor(host) {
     file = cached(host);
   }
   if (file && !file.endsWith('.miss')) return { file: path.join(DIR, file) };
+  return { badge: letterBadge(host) };
+}
+
+// The badge is SVG served from Jessbot's own origin, so nothing from the host name goes into it as text: the letter is
+// picked from a fixed alphabet and the colour is a number (code scanning #22).
+const BADGE_LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+export function letterBadge(host) {
+  const h = String(host || '').toLowerCase();
   let hue = 0;
-  for (const c of host) hue = (hue * 31 + c.charCodeAt(0)) % 360;
-  const letter = (/[a-z0-9]/i.exec(host.replace(/^www\./, ''))?.[0] || '?').toUpperCase();
-  return { badge: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="7" fill="hsl(${hue} 55% 45%)"/><text x="16" y="22" font-family="Inter,Arial,sans-serif" font-size="17" font-weight="700" fill="#fff" text-anchor="middle">${letter}</text></svg>` };
+  for (const c of h) hue = (hue * 31 + c.charCodeAt(0)) % 360;
+  const first = /[a-z0-9]/.exec(h.replace(/^www\./, ''))?.[0];
+  const at = first ? BADGE_LETTERS.indexOf(first.toUpperCase()) : -1;
+  const letter = at >= 0 ? BADGE_LETTERS.charAt(at) : '?';
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="7" fill="hsl(${hue} 55% 45%)"/><text x="16" y="22" font-family="Inter,Arial,sans-serif" font-size="17" font-weight="700" fill="#fff" text-anchor="middle">${letter}</text></svg>`;
 }

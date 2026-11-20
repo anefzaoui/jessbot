@@ -22,7 +22,7 @@ import { looseDate } from '../lib/when.js';
 import { pruneInPage, pruneHiddenDocument } from '../lib/hidden-text.js';
 import { PATTERNS } from '../agent/injection.js';
 import { pdfOptions, fontsReady } from '../services/print.js';
-import { decodeEntities } from '../lib/text-safe.js';
+import { decodeEntities, trimEndChars } from '../lib/text-safe.js';
 
 const td = new TurndownService({ headingStyle: 'atx', codeBlockStyle: 'fenced', bulletListMarker: '-', emDelimiter: '_' });
 td.use(strikethrough);
@@ -143,7 +143,7 @@ export function normalizeUrl(raw) {
   const cache = /^\/[a-z]\/(?:s\/)?(.+)$/.exec(u.pathname);
   if (/\.cdn\.ampproject\.org$/i.test(u.hostname) && cache) return normalizeUrl(`https://${cache[1]}${u.search}`);
   const host = u.hostname.toLowerCase().replace(/^(www\d*|amp)\./, '');
-  const path = u.pathname.replace(/\/amp\/?$/i, '').replace(/\.amp(\.html?)?$/i, '$1').replace(/\/+$/, '');
+  const path = trimEndChars(u.pathname.replace(/\/amp\/?$/i, '').replace(/\.amp(\.html?)?$/i, '$1'), '/');
   const params = [...u.searchParams].filter(([k, v]) => !TRACKING.test(k) && !(k.toLowerCase() === 'outputtype' && /^amp$/i.test(v)))
     .sort(([a], [b]) => a.localeCompare(b));
   const query = params.length ? `?${new URLSearchParams(params)}` : '';

@@ -4,6 +4,7 @@ import { ACTIVITIES, describe, activityOf } from '../../public/js/activities.js'
 import { presenceManifest } from '../services/presence.js';
 import { validTimezone, defaultTimezone } from '../lib/when.js';
 import { assetVersion } from '../lib/assets.js';
+import { translate, translatePlural } from '../lib/i18n.js';
 
 const { SafeString, escapeExpression: esc } = Handlebars;
 
@@ -25,6 +26,10 @@ function toDate(v) {
 }
 
 const helpers = {
+  // Translations (#14, lib/i18n.js): {{t "Sign in to talk to {name}." name=bot.name}} · {{tn count "one item" "{count} items"}}.
+  // The locale is the page's (res.locals.locale); the result is escaped like any value.
+  t: (text, options) => translate(options?.data?.root?.locale, String(text ?? ''), options?.hash),
+  tn: (count, one, other, options) => translatePlural(options?.data?.root?.locale, Number(count), String(one), String(other), options?.hash),
   eq: (a, b) => a === b,
   neq: (a, b) => a !== b,
   and: (...args) => args.slice(0, -1).every(Boolean),

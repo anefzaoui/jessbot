@@ -4,6 +4,7 @@ import { settings } from '../db/index.js';
 import { presenceFor } from '../services/presence.js';
 import { skyOf } from '../services/weather.js';
 import { voiceOn } from '../services/voice.js';
+import { DEFAULT_LOCALE } from '../lib/i18n.js';
 
 let app;
 export const configureRenderer = expressApp => { app = expressApp; };
@@ -11,7 +12,7 @@ export const configureRenderer = expressApp => { app = expressApp; };
 // Page-level context a partial may reference via @root (bot name, living presence).
 export function fragmentLocals(user) {
   const bot = { name: 'Jessbot', ...settings.get('bot', {}) };
-  return { bot, presence: presenceFor({ bot, user, weather: skyOf(user) }), user, voiceOn: voiceOn() };
+  return { bot, presence: presenceFor({ bot, user, weather: skyOf(user) }), user, voiceOn: voiceOn(), locale: DEFAULT_LOCALE, dir: 'ltr' };
 }
 
 export async function renderFragment(partial, data, user) {

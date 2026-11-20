@@ -1,0 +1,238 @@
+{
+  "{inviter} invited you to talk to {name}, their personal agent.": {
+    "where": [
+      "src/views/pages/invite.hbs:2"
+    ]
+  },
+  "{name} has been keeping things moving.": {
+    "where": [
+      "src/views/partials/auth-frame.hbs:9"
+    ]
+  },
+  "A few steps of setup are left. Sign in and they pick up where you stopped.": {
+    "where": [
+      "src/views/partials/auth-frame.hbs:7"
+    ]
+  },
+  "Almost there.": {
+    "where": [
+      "src/views/partials/auth-frame.hbs:6"
+    ]
+  },
+  "At least {count} characters.": {
+    "where": [
+      "src/views/pages/invite.hbs:6",
+      "src/views/pages/reset.hbs:5"
+    ]
+  },
+  "Checking…": {
+    "where": [
+      "src/views/pages/login-code.hbs:3"
+    ]
+  },
+  "Choose a new password": {
+    "where": [
+      "src/views/pages/reset.hbs:3"
+    ]
+  },
+  "Code": {
+    "where": [
+      "src/views/pages/login-code.hbs:5"
+    ]
+  },
+  "Confirm password": {
+    "where": [
+      "src/views/pages/invite.hbs:7"
+    ]
+  },
+  "Couldn't save": {
+    "where": [
+      "public/js/forms.js:75"
+    ]
+  },
+  "Email": {
+    "where": [
+      "src/views/pages/invite.hbs:5",
+      "src/views/pages/login.hbs:5"
+    ]
+  },
+  "Enter the 6-digit code from your authenticator app.": {
+    "where": [
+      "src/views/pages/login-code.hbs:2"
+    ]
+  },
+  "Go to sign in": {
+    "where": [
+      "src/views/pages/invite.hbs:24",
+      "src/views/pages/reset.hbs:17"
+    ]
+  },
+  "Invite links work once and last 7 days. Ask for a fresh one.": {
+    "where": [
+      "src/views/pages/invite.hbs:23"
+    ]
+  },
+  "It runs on {owner}'s server: the owner sets how {name} helps you and can read your conversations.": {
+    "where": [
+      "src/views/pages/invite.hbs:14"
+    ]
+  },
+  "It runs on {owner}'s server: the owner sets how {name} helps you, and your conversations stay yours.": {
+    "where": [
+      "src/views/pages/invite.hbs:15"
+    ]
+  },
+  "Join": {
+    "where": [
+      "src/views/pages/invite.hbs:8"
+    ]
+  },
+  "Lost your phone? Type one of your recovery codes instead.": {
+    "where": [
+      "src/views/pages/login-code.hbs:9"
+    ]
+  },
+  "New password": {
+    "where": [
+      "src/views/pages/reset.hbs:5"
+    ]
+  },
+  "New password again": {
+    "where": [
+      "src/views/pages/reset.hbs:6"
+    ]
+  },
+  "No account? Ask the person who runs this {name} for an invite link.": {
+    "where": [
+      "src/views/pages/login.hbs:9"
+    ]
+  },
+  "No codes left? The person who runs this {name} can turn two-step sign-in off for you.": {
+    "where": [
+      "src/views/pages/login-code.hbs:14"
+    ]
+  },
+  "One more step": {
+    "where": [
+      "src/views/pages/login-code.hbs:2"
+    ]
+  },
+  "Password": {
+    "where": [
+      "src/views/pages/invite.hbs:6",
+      "src/views/pages/login.hbs:6"
+    ]
+  },
+  "Reset links work once and last 24 hours. Ask the person who runs this {name} for a fresh one.": {
+    "where": [
+      "src/views/pages/reset.hbs:16"
+    ]
+  },
+  "Save new password": {
+    "where": [
+      "src/views/pages/reset.hbs:8"
+    ]
+  },
+  "Saving…": {
+    "where": [
+      "src/views/pages/reset.hbs:4"
+    ]
+  },
+  "Setting you up…": {
+    "where": [
+      "src/views/pages/invite.hbs:3"
+    ]
+  },
+  "Setup isn’t finished yet. Sign in with the account you made to carry on where you left off.": {
+    "where": [
+      "src/views/pages/login.hbs:1"
+    ]
+  },
+  "Sign in": {
+    "where": [
+      "src/views/pages/login-code.hbs:12",
+      "src/views/pages/login.hbs:7"
+    ]
+  },
+  "Sign in to see what got done while you were away.": {
+    "where": [
+      "src/views/partials/auth-frame.hbs:10"
+    ]
+  },
+  "Sign in to talk to {name}.": {
+    "where": [
+      "src/views/pages/login.hbs:1"
+    ]
+  },
+  "Signing in…": {
+    "where": [
+      "src/views/pages/login.hbs:3"
+    ]
+  },
+  "Start over": {
+    "where": [
+      "src/views/pages/login-code.hbs:14"
+    ]
+  },
+  "the owner": {
+    "where": [
+      "src/views/pages/invite.hbs:14",
+      "src/views/pages/invite.hbs:15"
+    ]
+  },
+  "The owner": {
+    "where": [
+      "src/views/pages/invite.hbs:2"
+    ]
+  },
+  "This invite has expired": {
+    "where": [
+      "src/views/pages/invite.hbs:22"
+    ]
+  },
+  "This link doesn’t work any more": {
+    "where": [
+      "src/views/pages/reset.hbs:15"
+    ]
+  },
+  "This link works once. Afterwards you’re signed out everywhere and sign in with the new password.": {
+    "where": [
+      "src/views/pages/reset.hbs:3"
+    ]
+  },
+  "Welcome back": {
+    "where": [
+      "src/views/pages/login.hbs:1"
+    ]
+  },
+  "Yes, continue": {
+    "where": [
+      "public/js/forms.js:52"
+    ]
+  },
+  "You get your own chat with {name}.": {
+    "where": [
+      "src/views/pages/invite.hbs:13"
+    ]
+  },
+  "You'll use this to sign in.": {
+    "where": [
+      "src/views/pages/invite.hbs:5"
+    ]
+  },
+  "You're invited": {
+    "where": [
+      "src/views/pages/invite.hbs:2"
+    ]
+  },
+  "Your name": {
+    "where": [
+      "src/views/pages/invite.hbs:4"
+    ]
+  },
+  "Your new password is saved. Sign in with it.": {
+    "where": [
+      "src/views/pages/login.hbs:2"
+    ]
+  }
+}

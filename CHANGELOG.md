@@ -20,6 +20,7 @@ in their chat.
 
 ### Added
 
+- A translation layer for the interface (English first; right-to-left ready): docs/TRANSLATING.md.
 - Chat with tools and background tasks that carry on when the page is closed; approvals with the full text of every
   outgoing action.
 - An agent browser (open-source Chromium, or the installed Google Chrome) behind a guard proxy, in Chromium's sandbox.
@@ -36,3 +37,5 @@ in their chat.
   rotated (`npm run secrets:rotate`).
 - Outside content (pages, mail, files) is fenced and screened for instructions aimed at the assistant; see
   [docs/SECURITY-MODEL.md](docs/SECURITY-MODEL.md).
+- The last code-scanning findings are fixed or explained: addresses are cleaned in linear time, and site-icon badges
+  are served with a strict content policy.

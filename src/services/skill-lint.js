@@ -99,7 +99,7 @@ const OPENCLAW_INFO = ['allowed-tools', 'requires', 'disable-model-invocation', 
 function lineIndex(raw) {
   const text = String(raw ?? '');
   const starts = [0];
-  for (let i = 0; i < text.length; i++) if (text[i] === '\n') starts.push(i + 1);
+  for (let i = text.indexOf('\n'); i >= 0; i = text.indexOf('\n', i + 1)) starts.push(i + 1); // one step per line
   return pos => { let lo = 0, hi = starts.length - 1; while (lo < hi) { const mid = (lo + hi + 1) >> 1; if (starts[mid] <= pos) lo = mid; else hi = mid - 1; } return lo + 1; };
 }
 function excerptAt(text, pos, len = 0) {
