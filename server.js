@@ -25,7 +25,7 @@ const server = app.listen(config.port, config.host, () => {
   const code = claimCodeIfNeeded();
   if (code) {
     console.log(`[jessbot] first run — open http://${config.host === '0.0.0.0' ? 'localhost' : config.host}:${config.port}/setup`);
-    console.log(`[jessbot] setting up from another device? use setup code: ${code}`);
+    console.log(`[jessbot] setup code (asked when you create the admin account): ${code}`);
   }
 });
 attachWebSocket(server);

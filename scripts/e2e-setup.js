@@ -55,12 +55,14 @@ try {
     await owner.goto(`${BASE}/chat`);
     expect(owner.url().endsWith('/setup/account'), `landed on ${owner.url()}`);
     expect(log.includes('setup code'), 'claim code not printed to console');
+    expect(await owner.locator('#f-claim').count() === 1, 'the setup code field is missing (it is asked from every device)');
   });
 
   await test('account: validation errors render inline', async () => {
     await owner.fill('#f-name', 'Alex');
     await owner.fill('#f-email', 'owner@example.com');
     await owner.fill('#f-password', 'short');
+    await owner.fill('#f-claim', /setup code[^:\n]*: ([A-Z0-9-]+)/.exec(log)?.[1] || ''); // the right code: only the password is wrong
     await owner.click('button:has-text("Create my account")');
     await owner.waitForSelector('[data-field-error]');
     expect(await owner.locator('#f-password[aria-invalid="true"]').count() === 1, 'password not flagged by server');
@@ -69,6 +71,14 @@ try {
   await test('account: creates owner and signs in', async () => {
     await owner.fill('#f-email', 'owner@example.com');
     await owner.fill('#f-password', 'correct horse battery');
+    await owner.fill('#f-claim', 'WRONG-CODE1');
+    await owner.click('button:has-text("Create my account")');
+    await owner.waitForSelector('#f-claim[aria-invalid="true"]');
+    expect(/doesn’t match/.test(await owner.locator('main').innerText()), 'a wrong setup code was not refused');
+    const code = /setup code[^:\n]*: ([A-Z0-9-]+)/.exec(log)?.[1];
+    expect(code, 'no setup code in the server log');
+    await owner.fill('#f-password', 'correct horse battery');
+    await owner.fill('#f-claim', code.toLowerCase()); // case doesn't matter
     await owner.click('button:has-text("Create my account")');
     await owner.waitForURL(/\/setup\/model/);
   });

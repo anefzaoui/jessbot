@@ -3,6 +3,7 @@
 import crypto from 'node:crypto';
 import { settings } from '../db/index.js';
 import { countUsers } from './users.js';
+import { config } from '../config/index.js';
 
 export const STEPS = [
   { key: 'account', label: 'Your account' },
@@ -32,11 +33,16 @@ export function currentStep() {
   return STEPS.find(s => s.key !== 'account' && !done.includes(s.key))?.key || 'people';
 }
 
-// One-time claim code for a fresh install reached from another machine (printed to the server console).
+// One-time claim code for a fresh install (printed to the server console). It is needed to create the first admin from
+// ANY device: whether a request is "local" can't be told behind a reverse proxy on the same machine, where every request
+// arrives from 127.0.0.1. The operator can turn it off (JESSBOT_SETUP_CODE=off) or fix it (JESSBOT_SETUP_CODE=<code>).
 let claimCode = null;
 export function claimCodeIfNeeded() {
-  if (countUsers()) return null;
-  claimCode ??= crypto.randomBytes(4).toString('hex').toUpperCase().replace(/(.{4})/, '$1-');
+  if (countUsers() || config.setupCode.off) return null;
+  claimCode ??= config.setupCode.fixed || crypto.randomBytes(5).toString('hex').toUpperCase().replace(/(.{5})/, '$1-');
   return claimCode;
 }
-export const checkClaimCode = code => !!claimCode && String(code || '').trim().toUpperCase() === claimCode;
+const norm = s => String(s || '').trim().toUpperCase();
+const sameCode = (a, b) => { const x = Buffer.from(norm(a)), y = Buffer.from(norm(b)); return x.length === y.length && crypto.timingSafeEqual(x, y); };
+/** True when the code matches (or the operator turned the code off). */
+export const checkClaimCode = code => (config.setupCode.off ? true : !!claimCodeIfNeeded() && sameCode(code, claimCode));

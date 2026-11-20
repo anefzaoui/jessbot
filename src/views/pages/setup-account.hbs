@@ -2,10 +2,10 @@
   <form method="post" action="/setup/account" class="space-y-4" data-ajax data-busy="Creating your account…">
     {{#if needsClaim}}
       <div class="rounded-xl border border-warn/40 bg-warn-soft px-4 py-3 text-sm">
-        <p class="font-semibold text-warn-text">You're setting up from another device.</p>
-        <p class="mt-1 text-ink-2">Enter the setup code printed in the server console so nobody else can claim this install.</p>
+        <p class="font-semibold text-warn-text">First, the setup code.</p>
+        <p class="mt-1 text-ink-2">It's printed in the server's log when Jessbot starts (the terminal, or <code>docker logs</code>). It proves you're the one who started this install, so nobody else who reaches the page first can claim it.</p>
       </div>
-      {{> field name="claim" label="Setup code" placeholder="ABCD-1234" autocomplete="off" required=true}}
+      {{> field name="claim" label="Setup code" placeholder="ABCDE-12345" autocomplete="off" required=true}}
     {{/if}}
     {{> field name="name" label="Your name" autocomplete="name" required=true autofocus=true}}
     {{> field name="email" label="Email" type="email" autocomplete="email" required=true hint="Used to sign in. Nothing is sent anywhere."}}

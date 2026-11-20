@@ -20,7 +20,6 @@ import { browserStatus, browserSettings, installBrowser } from '../../browser/in
 import { renderFragment } from '../../views/render.js';
 
 const router = Router();
-const isLocal = req => ['127.0.0.1', '::1', '::ffff:127.0.0.1'].includes(req.socket.remoteAddress);
 
 // Common view data: stepper state + layout.
 function stepData(step, extra = {}) {
@@ -46,7 +45,7 @@ router.use((req, res, next) => {
 router.get('/', (req, res) => res.redirect(`/setup/${currentStep()}`));
 
 // ---- 1. Owner account ---------------------------------------------------------
-const accountData = req => stepData('account', { needsClaim: !isLocal(req) && !!claimCodeIfNeeded(), values: {} });
+const accountData = req => stepData('account', { needsClaim: !!claimCodeIfNeeded(), values: {} });
 
 router.get('/account', (req, res) => {
   if (countUsers()) return res.redirect('/setup/model');
@@ -56,7 +55,7 @@ router.get('/account', (req, res) => {
 router.post('/account', formPost('setup-account', accountData, async (req, res) => {
   if (countUsers()) return { redirect: '/setup/model' };
   if (!hit(`setup:${req.ip}`, { limit: 10, windowMs: 15 * 60e3 }).allowed) throw forbidden('Too many attempts. Wait a few minutes.');
-  if (!isLocal(req) && !checkClaimCode(req.body.claim)) throw invalid({ claim: 'That code doesn’t match the one printed in the server console.' });
+  if (!checkClaimCode(req.body.claim)) throw invalid({ claim: 'That code doesn’t match the one printed in the server console.' });
   const user = await createUser({ ...req.body, role: 'admin', timezone: req.body.timezone || null });
   const token = createSession(user.id, { device: deviceLabel(req.get('user-agent')), ip: req.ip });
   setSessionCookie(req, res, token);

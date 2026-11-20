@@ -46,12 +46,37 @@ export const config = {
   host: env.HOST || '127.0.0.1',
   port: Number(env.PORT) || 3737,
   publicUrl: env.PUBLIC_URL || `http://localhost:${Number(env.PORT) || 3737}`,
+  // Which proxies may tell us the client's address (X-Forwarded-For). Express's syntax: 'loopback' (default: a reverse
+  // proxy on the same machine), 'false' (no proxy: the socket address is the client), a hop count, or addresses/CIDRs.
+  trustProxy: parseTrustProxy(env.TRUST_PROXY),
+  // The first admin account needs the one-time setup code printed in the server log. JESSBOT_SETUP_CODE=off turns that
+  // off (only for an install nobody else can reach before you finish); any other value of 8+ characters is the code.
+  setupCode: parseSetupCode(env.JESSBOT_SETUP_CODE),
   llm: {
     baseUrl: env.LLM_BASE_URL || 'https://openrouter.ai/api/v1',
     apiKey: env.OPENROUTER_KEY || env.LLM_API_KEY || '',
     model: env.LLM_MODEL || 'openai/gpt-6-luna',
   },
 };
+
+/** TRUST_PROXY → the value Express's 'trust proxy' setting takes. */
+export function parseTrustProxy(v) {
+  const s = String(v ?? '').trim();
+  if (!s) return 'loopback';
+  if (/^(false|no|off|0)$/i.test(s)) return false;
+  if (/^(true|yes|on)$/i.test(s)) throw new Error('TRUST_PROXY=true would trust any client’s X-Forwarded-For. Name the proxy (loopback, an address, a CIDR) or a hop count.');
+  if (/^\d+$/.test(s)) return Number(s);
+  return s.split(',').map(x => x.trim()).filter(Boolean);
+}
+
+/** JESSBOT_SETUP_CODE → { off } | { fixed } | {} (a random code each start). */
+export function parseSetupCode(v) {
+  const s = String(v ?? '').trim();
+  if (!s) return {};
+  if (/^(off|false|no|0)$/i.test(s)) return { off: true };
+  if (s.length < 8) throw new Error('JESSBOT_SETUP_CODE must be at least 8 characters (or "off").');
+  return { fixed: s.toUpperCase() };
+}
 
 // Create the runtime directory tree on first boot.
 export function ensureDirs() {

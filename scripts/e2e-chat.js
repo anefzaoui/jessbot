@@ -15,7 +15,7 @@ const BASE = `http://127.0.0.1:${PORT}`;
 
 // Its own copy of .env (the model key comes along; keys the server makes stay in the throwaway folder).
 if (fs.existsSync(path.join(ROOT, '.env'))) fs.copyFileSync(path.join(ROOT, '.env'), path.join(HOME, '.env'));
-const server = spawn(process.execPath, ['server.js'], { cwd: ROOT, env: { ...process.env, JESSBOT_HOME: HOME, JESSBOT_ENV_FILE: path.join(HOME, '.env'), PORT: String(PORT), NODE_ENV: 'development', JESSBOT_EXTRACT_DELAY_MS: '600000' } });
+const server = spawn(process.execPath, ['server.js'], { cwd: ROOT, env: { ...process.env, JESSBOT_HOME: HOME, JESSBOT_ENV_FILE: path.join(HOME, '.env'), PORT: String(PORT), NODE_ENV: 'development', JESSBOT_SETUP_CODE: 'E2E-CHAT-SETUP', JESSBOT_EXTRACT_DELAY_MS: '600000' } });
 let log = '';
 server.stdout.on('data', d => { log += d; });
 server.stderr.on('data', d => { log += d; });
@@ -33,7 +33,7 @@ async function http(method, url, { body, cookie } = {}) {
   return { res, cookie: set ? set.split(';')[0] : null, json: res.headers.get('content-type')?.includes('json') ? await res.json() : null };
 }
 
-const setupAccount = await http('POST', '/setup/account', { body: { name: 'Owner Test', email: 'owner@test.dev', password: 'correct horse battery' } });
+const setupAccount = await http('POST', '/setup/account', { body: { name: 'Owner Test', email: 'owner@test.dev', password: 'correct horse battery', claim: 'E2E-CHAT-SETUP' } });
 const ownerCookie = setupAccount.cookie;
 await http('POST', '/setup/model', { body: { skip: '1' }, cookie: ownerCookie });
 await http('POST', '/setup/identity', { body: { name: 'Jess', variant: 'female', tone: 'warm', description: '' }, cookie: ownerCookie });

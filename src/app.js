@@ -17,7 +17,7 @@ import './agent/tools/index.js'; // register the built-in tools
 export function createApp() {
   const app = express();
   app.disable('x-powered-by');
-  app.set('trust proxy', 'loopback');
+  app.set('trust proxy', config.trustProxy); // TRUST_PROXY (src/config): who may set X-Forwarded-For
 
   app.engine('hbs', engine({
     extname: '.hbs',
