@@ -3579,6 +3579,29 @@ Note: most of Phase 23 part A landed in commit aa56076, whose message reads "Pha
     `tests/hardening.test.js` (each helper; the old patterns' worst inputs now finish in milliseconds; feeds, code blocks
     and comments are still found; path, redirect and property-name refusals).
 
+## 2026-11-20: Two-step sign-in and password reset (issue #6)
+
+230. **Two-step sign-in, password change and reset links; stronger hashing; sessions rotate on every credential change.**
+    Issue #6. *Two-step sign-in* is TOTP (RFC 6238, SHA-1, 6 digits, 30 s: what every authenticator app reads) through
+    `otpauth`, the QR code drawn by `uqr` (in-process SVG, no network). The secret is sealed with `JESSBOT_SECRET` like mail
+    passwords and kept pending until a code from it is confirmed; a code is accepted once (the step is stored and moved
+    forward atomically), one step early or late for drift; five wrong codes per person per 15 minutes, counted in the
+    database. Ten recovery codes of 60 random bits are shown once and stored as SHA-256. After the password, the web gets a
+    10-minute challenge cookie (`jb_2fa`, path `/login`, only its hash stored) for `/login/code`, never a session; the app
+    API takes `code` in the same login call and answers `two_factor_required` without it. *Password change* (You → Sign-in &
+    devices) needs the current password, signs out every session and makes a new one for this device (a stolen old token is
+    dead). *Reset*: Jessbot has no mail of its own, so an admin makes a one-time link (24 h, only its hash stored, a newer one
+    replaces it, built from `PUBLIC_URL` via `lib/origin.js`) and hands it over like an invite; `npm run reset-link -- <email>`
+    makes one on the server for the owner who is locked out (shell access is the proof), `--2fa-off` too. A link is claimed
+    atomically before the password changes, then every session is revoked; two-step sign-in stays on (a reset replaces the
+    password, not the phone); an admin can turn it off for someone (audited). *Hashing*: argon2id moves from the OWASP
+    minimum (19 MiB, t=2, p=1) to RFC 9106's second recommended option (64 MiB, t=3, p=4; about 50 ms here), and a hash with
+    weaker parameters is redone at the next successful sign-in (`needsRehash`). Why no mail-based reset: no outgoing mail
+    server is configured for the app itself, and a household's admin is at hand. Tested: `tests/account.test.js` (rehash,
+    setup and confirm, the code page and its single-use codes, recovery codes, the stored code limit, the API step, password
+    change with session rotation, reset links: only admins, once, expiry, newer replaces older, sessions revoked, two-step
+    kept; the admin turning it off; the CLI), and a real instance driven in Chromium for the screenshots.
+
 ## 2026-11-20: Prompt-injection review (issue #8)
 
 231. **Every place outside content reaches the model was reviewed; the gaps are closed at the source, and the model is

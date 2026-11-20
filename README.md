@@ -17,6 +17,24 @@ spends, books or shares stops at an approval card with the exact text first.
 You bring the AI model: Jessbot talks to [OpenRouter](https://openrouter.ai) by default, or to any OpenAI-compatible
 endpoint (see [Providers](#providers)).
 
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/images/chat-dark.png">
+    <img src="docs/images/chat-light.png" alt="Jessbot's chat: the agent answers two questions it looked up on the web, with the sources it checked; the activity log on the right" width="900">
+  </picture>
+</p>
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/images/chat-phone-dark.png">
+    <img src="docs/images/chat-phone-light.png" alt="The same chat on a phone" width="260">
+  </picture>
+  &nbsp;
+  <img src="docs/images/admin-people-light.png" alt="Admin → People: who uses Jessbot, whether admins may read other people's chats (off by default), and instructions for everyone" width="560">
+</p>
+
+<sub>Screenshots from a test install with made-up people.</sub>
+
 ## What it does
 
 - **Chat, one main conversation per person**, plus side chats and projects (a side chat with its own brief and files).

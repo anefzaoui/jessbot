@@ -6,8 +6,18 @@ The overview (who is trusted, every place outside content enters and how it is h
 [SECURITY-MODEL.md](SECURITY-MODEL.md).
 
 ## Who can see what
-- **Accounts.** Passwords are hashed with argon2id. Sessions are HttpOnly, SameSite=Lax cookies (Secure over HTTPS);
-  the Android app uses bearer tokens (revocable per device in You → Devices). Logins, invites and password attempts are
+- **Accounts.** Passwords are hashed with argon2id (64 MiB, 3 passes, 4 lanes: RFC 9106's second recommended option;
+  an older, weaker hash is redone at the next sign-in). Sessions are HttpOnly, SameSite=Lax cookies (Secure over HTTPS);
+  the Android app uses bearer tokens (revocable per device in You → Sign-in & devices). A new session is made at every
+  sign-in; changing the password signs out every device and gives the current one a new session; turning two-step
+  sign-in on or off signs out every other device. [#230]
+  **Two-step sign-in** (optional, per person): any authenticator app (TOTP); the secret is sealed with the install key
+  like mail passwords; a code is accepted once; five wrong codes in 15 minutes stop further tries; ten recovery codes
+  are shown once and stored as hashes. The password step alone gives only a 10-minute ticket to the code page (the
+  ticket's hash is stored), never a session. **Password reset**: Jessbot sends no mail, so an admin makes a one-time
+  link (24 hours, hash stored, a newer one replaces it, a disabled account's link is dead) and hands it over; the owner
+  can make one on the server with `npm run reset-link -- <email>`. Using it signs that person out everywhere; two-step
+  sign-in stays on (an admin can turn it off for someone who lost their phone and codes; audited). [#230] Logins, invites and password attempts are
   rate-limited (per address and email, and per address across sign-in, setup and invites), and every request counts
   against a general per-person limit. The counters live in the database (`rate_limits`), so a restart, or a crash someone
   provokes, doesn't hand out a fresh set of attempts. [#6, #12, #228]
