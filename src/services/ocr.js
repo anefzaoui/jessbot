@@ -7,7 +7,7 @@
 // recorded (purpose 'ocr'). The result becomes the file's text (library.js setOcrText): Library search, library_read and
 // project search read it, and the item is marked as text from OCR, which may contain errors.
 import { APIError } from 'openai';
-import { getClient, llmSettings } from './llm.js';
+import { getClient, llmSettings, providerOffers } from './llm.js';
 import { recordUsage, spentThisWeek } from './usage.js';
 import { taskCapRefusal } from './spend-watch.js';
 import { effectivePolicy } from './policy.js';
@@ -215,6 +215,7 @@ export async function ocrItem(user, item, { pages: spec, runId = null, signal } 
 /** Should the viewer offer reading this item by OCR? → 'scan' (a PDF with no text layer), 'picture' (a picture: offered
  *  quietly, in the menu), or null (a PDF with text, anything else). */
 export function ocrOffer(item) {
+  if (!providerOffers('ocr')) return null; // OpenRouter's vision models only (#11)
   if (item.type === 'image') return 'picture';
   if (item.ext !== 'pdf') return null;
   return hasReadableText(readText(item)) ? null : 'scan';

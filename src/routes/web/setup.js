@@ -4,7 +4,8 @@ import { settings } from '../../db/index.js';
 import { STEPS, currentStep, isSetupComplete, markStep, completeSetup, claimCodeIfNeeded, checkClaimCode } from '../../services/setup.js';
 import { createUser, countUsers } from '../../services/users.js';
 import { createSession, deviceLabel } from '../../services/sessions.js';
-import { llmSettings, testConnection, maskKey } from '../../services/llm.js';
+import { testConnection, llmView, providerInput } from '../../services/llm.js';
+import { ollamaModels } from '../../services/providers.js';
 import { VARIANTS, TONES, writeIdentity } from '../../services/workspace.js';
 import { listGroups, createGroup } from '../../services/groups.js';
 import { createInvite, listPendingInvites } from '../../services/invites.js';
@@ -14,7 +15,6 @@ import { setSessionCookie } from '../../middleware/auth.js';
 import { formPost, isAjax } from '../../lib/respond.js';
 import { invalid, forbidden } from '../../lib/errors.js';
 import { hit, signInLimit } from '../../lib/ratelimit.js';
-import { config } from '../../config/index.js';
 import { browserStatus, browserSettings, installBrowser } from '../../browser/index.js';
 import { renderFragment } from '../../views/render.js';
 import { baseUrl } from '../../lib/origin.js';
@@ -67,8 +67,7 @@ router.post('/account', signInLimit, formPost('setup-account', accountData, asyn
 
 // ---- 2. Brain (model connection) ---------------------------------------------
 const modelData = () => {
-  const s = llmSettings();
-  return stepData('model', { llm: { baseUrl: s.baseUrl, model: s.model, hasKey: !!s.apiKey, maskedKey: maskKey(s.apiKey), keySource: s.keySource },
+  return stepData('model', { llm: llmView(),
     modelDone: settings.get('setup', { done: [] }).done.includes('model'), values: {} });
 };
 
@@ -76,14 +75,22 @@ router.get('/model', (req, res) => res.render('setup-model', modelData()));
 
 // Save settings, then run a real completion. Always JSON (the page shows the result inline).
 router.post('/model/test', async (req, res) => {
-  const { apiKey, model, baseUrl } = req.body;
+  const { apiKey } = req.body;
+  const { provider, baseUrl, model } = providerInput(req.body); // 422 with field errors
   if (apiKey?.trim()) setSecret('llm.apiKey', apiKey.trim()); // sealed in the database (#10), never written to .env
-  // Keep what else the admin chose (fallbacks, background model: Admin → Models, #179): only these two change here.
-  settings.set('llm', { ...(settings.get('llm', {}) || {}), baseUrl: baseUrl?.trim() || config.llm.baseUrl, model: model?.trim() || config.llm.model });
-  const result = await testConnection();
+  // Keep what else the admin chose (fallbacks, background model: Admin → Models, #179): only these change here. A new key
+  // is for this address only (#11).
+  settings.set('llm', { ...(settings.get('llm', {}) || {}), provider, baseUrl, model, ...(apiKey?.trim() ? { keyFor: new URL(baseUrl).origin } : {}) });
+  const result = { ...(await testConnection()), llm: llmView() };
   if (result.ok) markStep('model');
   audit('setup.model_test', { actorId: req.user.id, detail: { ok: result.ok, model: result.model, error: result.error } });
   res.json(result);
+});
+
+// The models an Ollama server has (the picker's model list). The address is the admin's own choice.
+router.get('/model/ollama', async (req, res) => {
+  try { res.json({ models: (await ollamaModels(String(req.query.baseUrl || ''))).map(m => m.name) }); }
+  catch (err) { res.json({ models: [], error: err.message }); }
 });
 
 router.post('/model', (req, res) => {

@@ -3,11 +3,14 @@
 // Vectors are normalised Float32, so cosine = dot product. If embeddings fail, callers fall back to word search (BM25);
 // a failure pauses embedding calls for a few minutes instead of failing every search.
 import { settings } from '../db/index.js';
-import { getClient } from './llm.js';
+import { getClient, llmState } from './llm.js';
+import { PROVIDERS } from './providers.js';
 import { recordUsage } from './usage.js';
 
+// The model: the admin's setting, JESSBOT_EMBED_MODEL, else the provider's usual one (#11; none for an unknown service:
+// memories are then found by their words).
 export const embedModel = () => ({
-  model: settings.get('embeddings', {})?.model || process.env.JESSBOT_EMBED_MODEL || 'openai/text-embedding-3-small',
+  model: settings.get('embeddings', {})?.model || process.env.JESSBOT_EMBED_MODEL || PROVIDERS[llmState().provider].embedModel,
   dims: Number(settings.get('embeddings', {})?.dims || process.env.JESSBOT_EMBED_DIMS || 512),
 });
 
@@ -19,6 +22,7 @@ export async function embed(texts, { userId = null, signal } = {}) {
   if (!texts.length) return [];
   if (Date.now() < pausedUntil || process.env.JESSBOT_EMBED_OFF === '1') return null; // tests run offline
   const { model, dims } = embedModel();
+  if (!model) return null;
   const out = [];
   try {
     for (let i = 0; i < texts.length; i += BATCH) {

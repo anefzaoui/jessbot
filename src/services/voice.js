@@ -8,7 +8,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { paths } from '../config/index.js';
 import { get, all, run, settings } from '../db/index.js';
-import { getClient, llmSettings } from './llm.js';
+import { getClient, llmSettings, providerOffers } from './llm.js';
 import { recordUsage } from './usage.js';
 import { overBudget } from './policy.js';
 import { VARIANTS, TONES, readWorkspaceFile } from './workspace.js';
@@ -255,7 +255,12 @@ async function speakOnce({ model, voice, direction, script, signal }) {
  * Script → a checked WAV. Tries the voice model (twice), then the fallback model; keeps the best clip if none passes.
  * Returns { wav, transcript, model, voice, durationMs, peaks, attempts, check }.
  */
+// Voice uses OpenRouter's audio models (#11, services/providers.js): with another provider it is off, said plainly.
+export const voiceOn = () => providerOffers('voice');
+const needVoice = () => { if (!voiceOn()) throw badRequest('Voice notes need OpenRouter as the model provider (Admin → Models).'); };
+
 export async function synthesize(script, { user = null, runId = null, project = null, voice = null, direction: custom = null, signal } = {}) {
+  needVoice();
   const text = String(script || '').trim();
   if (!text) throw badRequest('Nothing to say.');
   if (user && overBudget(user)) throw badRequest("This week's budget is used up — voice resumes Monday.");
@@ -293,6 +298,7 @@ const STT_SYSTEM = 'You are a speech-to-text engine, not an assistant. You write
 
 /** A WAV voice note → its transcript ('' when nobody spoke). */
 export async function transcribe(wav, { user = null, signal } = {}) {
+  needVoice();
   if (user && overBudget(user)) throw badRequest("This week's budget is used up — voice notes resume Monday.");
   const { sttModel } = voiceSettings();
   const res = await getClient().chat.completions.create({

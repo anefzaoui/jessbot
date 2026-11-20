@@ -14,30 +14,7 @@
 
   <div class="grid gap-6 md:grid-cols-[minmax(0,1fr)_18rem]">
     <form class="card space-y-4 p-5" data-model-test action="/admin/model">
-      <div class="rounded-xl border border-line bg-surface px-4 py-3">
-        <div class="flex items-center gap-3">
-          <span class="grid size-9 place-items-center rounded-lg bg-accent-soft text-accent-text">{{icon "key-round" class="size-[18px]"}}</span>
-          <div class="min-w-0 flex-1">
-            <p class="text-sm font-semibold">API key</p>
-            {{#if llm.hasKey}}
-              <p class="text-xs text-ink-3">{{#if (eq llm.keySource 'environment')}}Set in the server’s environment{{else}}Saved encrypted with this install’s key{{/if}} · <span class="font-mono" data-masked-key>{{llm.maskedKey}}</span></p>
-            {{else}}
-              <p class="text-xs text-bad">No key yet. {{bot.name}} can’t think until you add one.</p>
-            {{/if}}
-          </div>
-        </div>
-        <div class="mt-3 {{#if llm.hasKey}}hidden{{/if}}" data-key-field>
-          <label class="sr-only" for="f-apiKey">New API key</label>
-          <input id="f-apiKey" name="apiKey" type="password" class="input font-mono text-[13px]" placeholder="sk-or-…" autocomplete="off">
-        </div>
-        {{#if llm.hasKey}}<button type="button" class="mt-2 text-xs font-medium text-accent-text hover:underline" data-show-key-field>Replace the key</button>{{/if}}
-      </div>
-
-      <div data-field>
-        <label class="label" for="f-model">Model</label>
-        <input id="f-model" name="model" class="input font-mono text-[13px]" value="{{llm.model}}" autocomplete="off" spellcheck="false" required>
-        <p class="hint">Any model id your provider offers, e.g. <span class="font-mono">openai/gpt-6-luna</span>. Cheaper models cost less; pick the cheapest that answers well.</p>
-      </div>
+      {{> setup/provider-fields}}
       {{!-- The fallback chain and the background model (decision #179; the screen is Phase 25 #203). Each model answers a tiny
            test before it counts: a row shows its own test, and Save waits while one runs or refuses one that didn't answer.
            Saving tests every new one again on the server. Client: admin-models.js (rows, order, tests) + model-test.js (save). --}}
@@ -84,14 +61,6 @@
         </p>
         <p class="hint">A cheaper model for background work. If it fails or answers badly, the main model tries once.</p>
       </div>
-      <details class="group">
-        <summary class="cursor-pointer text-xs font-medium text-ink-3 hover:text-ink-2">Advanced: a different endpoint</summary>
-        <div class="mt-3" data-field>
-          <label class="label" for="f-baseUrl">Base URL</label>
-          <input id="f-baseUrl" name="baseUrl" class="input font-mono text-[13px]" value="{{llm.baseUrl}}" placeholder="{{llm.defaultBaseUrl}}">
-          <p class="hint">OpenRouter, OpenAI or a local server (Ollama, LM Studio): anything OpenAI-compatible.</p>
-        </div>
-      </details>
 
       <button type="submit" class="btn btn-primary btn-block" data-test-button>{{icon "plug-zap" class="size-4"}} Save and test</button>
       <div data-test-result aria-live="polite"></div>
@@ -108,6 +77,7 @@
 
   {{!-- The assistant's voice (Phase 14, docs/VOICE.md). Client: admin-voice.js (save, "Hear …", per-voice samples). --}}
   <section id="voice" class="mt-10 scroll-mt-20" aria-labelledby="voice-h">
+    {{#unless llm.offers.voice}}{{> admin/needs-openrouter what="Voice notes" provider=llm.providerLabel}}{{/unless}}
     <div class="mb-4 flex flex-wrap items-end justify-between gap-3">
       <div>
         <h2 id="voice-h" class="text-lg font-semibold tracking-tight">{{bot.name}}’s voice</h2>
@@ -193,6 +163,7 @@
 
   {{!-- Quick decisions (Phase 16, docs/JEV.md). Client: admin-decide.js (save, try, refresh the list). --}}
   <section id="decide" class="mt-10 scroll-mt-20" aria-labelledby="decide-h">
+    {{#unless llm.offers.decisions}}{{> admin/needs-openrouter what="Quick decisions" provider=llm.providerLabel}}{{/unless}}
     <div class="mb-4 flex flex-wrap items-end justify-between gap-3">
       <div class="max-w-2xl">
         <h2 id="decide-h" class="text-lg font-semibold tracking-tight">Quick decisions</h2>
@@ -289,6 +260,7 @@
        the endpoint's image model list (free) and says what a picture costs and how that was worked out; the last check is
        kept (images.checked). Client: admin-models.js. --}}
   <section id="images" class="mt-10 scroll-mt-20" aria-labelledby="images-h">
+    {{#unless llm.offers.images}}{{> admin/needs-openrouter what="Making pictures" provider=llm.providerLabel}}{{/unless}}
     <div class="mb-4 max-w-2xl">
       <h2 id="images-h" class="text-lg font-semibold tracking-tight">Pictures</h2>
       <p class="text-sm text-ink-3">An image model can make pictures on request: invitations, colouring pages, story art. It stays off until you choose a model here, and then only the people you allow can use it. Each picture counts against that person’s weekly budget.</p>

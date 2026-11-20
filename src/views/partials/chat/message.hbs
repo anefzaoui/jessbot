@@ -64,7 +64,7 @@
       {{#if soulProposal}}<div class="mt-3 max-w-xl">{{> projects/soul-proposal proposal=soulProposal}}</div>{{/if}}
       {{#if messageId}}
         <div class="msg-actions mt-1.5 -ml-1.5 flex items-center gap-0.5 opacity-0 transition group-hover:opacity-100 group-focus-within:opacity-100">
-          {{#unless @root.readOnly}}<button type="button" class="btn btn-ghost btn-icon btn-sm size-7" data-listen="{{messageId}}" data-tooltip="Listen" aria-label="Listen to this reply">{{icon "volume-2" class="size-3.5"}}</button>{{/unless}}
+          {{#unless @root.readOnly}}{{#if @root.voiceOn}}<button type="button" class="btn btn-ghost btn-icon btn-sm size-7" data-listen="{{messageId}}" data-tooltip="Listen" aria-label="Listen to this reply">{{icon "volume-2" class="size-3.5"}}</button>{{/if}}{{/unless}}
           <button type="button" class="btn btn-ghost btn-icon btn-sm size-7" data-copy-message data-tooltip="Copy" aria-label="Copy message">{{icon "copy" class="size-3.5"}}</button>
           {{#if simplerText}}{{#unless @root.readOnly}}<button type="button" class="btn btn-ghost btn-sm h-7 gap-1 px-2 text-xs" data-message-simpler="{{simplerText}}" data-tooltip="Explain it again more simply">{{icon "feather" class="size-3.5"}} Simpler</button>{{/unless}}{{/if}}
           <button type="button" class="btn btn-ghost btn-icon btn-sm size-7" data-message-feedback="up" aria-pressed="{{eq feedback 'up'}}" data-tooltip="Good reply" aria-label="Good reply">{{icon "thumbs-up" class="size-3.5"}}</button>

@@ -10,7 +10,8 @@ import { usageOverview, featureTotals } from '../../services/usage.js';
 import { wishesView, wishSummary } from '../../services/wishes.js';
 import { doctor, createBackup, listBackups, backupPath, aboutSystem } from '../../services/system.js';
 import { recentLog, logFiles, logFilePath } from '../../lib/log.js';
-import { llmSettings, maskKey, testConnection, saveModelSettings, MAX_FALLBACKS, MODEL_ID, onOpenRouter } from '../../services/llm.js';
+import { llmSettings, testConnection, saveModelSettings, MAX_FALLBACKS, MODEL_ID, onOpenRouter, llmView, providerInput, providerOffers } from '../../services/llm.js';
+import { ollamaModels } from '../../services/providers.js';
 import { balanceView, refreshBalance } from '../../services/spend-watch.js';
 import { prepAdminView } from '../../services/prep.js';
 import { selfReviewPage, summaryFor, REVIEW_EVERY_DAYS } from '../../agent/self-review.js';
@@ -120,9 +121,9 @@ router.get('/system/logs/:file', (req, res) => {
 // ---- Model -----------------------------------------------------------------------------------------------------
 const modelView = () => {
   const s = llmSettings();
-  return { model: s.model, baseUrl: s.baseUrl, hasKey: !!s.apiKey, maskedKey: maskKey(s.apiKey), keySource: s.keySource, defaultBaseUrl: config.llm.baseUrl,
+  return { ...llmView(), keyWord: 'Replace the key', defaultBaseUrl: config.llm.baseUrl,
     fallbacks: s.fallbacks.join(', '), fallbackList: s.fallbacks, background: s.background, maxFallbacks: MAX_FALLBACKS,
-    onOpenRouter: onOpenRouter(s.baseUrl) };
+    onOpenRouter: onOpenRouter(s.baseUrl), offers: { voice: providerOffers('voice'), decisions: providerOffers('decisions'), images: providerOffers('images') } };
 };
 // Her voice (docs/VOICE.md): which models speak and listen, which voice (Auto = the one that matches her identity) and how.
 const voiceView = () => {
@@ -155,23 +156,25 @@ router.post('/model/test', async (req, res) => {
   res.json({ ...out, model, answered: out.model ?? null, cost: out.cost ?? null });
 });
 
+// The models an Ollama server has (the picker's model list).
+router.get('/model/ollama', async (req, res) => {
+  try { res.json({ models: (await ollamaModels(String(req.query.baseUrl || ''))).map(m => m.name) }); }
+  catch (err) { res.json({ models: [], error: err.message }); }
+});
+
 // Save, then prove it with a real (tiny) call. The key is written to the install's .env only when a new one is given.
 router.post('/model', async (req, res) => {
-  const model = String(req.body?.model || '').trim();
-  const baseUrl = String(req.body?.baseUrl || '').trim() || config.llm.baseUrl;
   const apiKey = String(req.body?.apiKey || '').trim();
-  const errors = {};
-  if (!/^[\w.-]+\/[\w.:-]+$|^[\w.:-]+$/.test(model)) errors.model = 'Use a model id like openai/gpt-6-luna.';
-  try { if (!/^https?:$/.test(new URL(baseUrl).protocol)) throw new Error(); } catch { errors.baseUrl = 'That isn’t a web address.'; }
-  if (apiKey && (apiKey.length < 20 || /\s/.test(apiKey))) errors.apiKey = 'That doesn’t look like an API key.';
-  if (Object.keys(errors).length) throw invalid(errors);
+  if (apiKey && (apiKey.length < 20 || /\s/.test(apiKey))) throw invalid({ apiKey: 'That doesn’t look like an API key.' });
+  const { provider, baseUrl, model } = providerInput(req.body); // 422 with field errors (provider, address, model)
   const before = llmSettings();
   if (apiKey) setSecret('llm.apiKey', apiKey); // sealed in the database (#10), never written to .env
   // The main model and address are saved as before; the fallback chain and the background model (#179) only once each new
   // one answered a tiny call (422 { errors: { fallbacks | background } } otherwise, those two left as they were).
-  const s = await saveModelSettings({ model, baseUrl, fallbacks: req.body?.fallbacks, background: req.body?.background });
+  if (apiKey) settings.set('llm', { ...(settings.get('llm', {}) || {}), keyFor: new URL(baseUrl).origin }); // this address only (#11)
+  const s = await saveModelSettings({ model, baseUrl, provider, fallbacks: req.body?.fallbacks, background: req.body?.background });
   const result = await testConnection();
-  audit('admin.model', { actorId: req.user.id, detail: { model, baseUrl, keyChanged: !!apiKey, ok: result.ok, from: before.model, fallbacks: s.fallbacks,
+  audit('admin.model', { actorId: req.user.id, detail: { provider, model, baseUrl, keyChanged: !!apiKey, ok: result.ok, from: before.model, fallbacks: s.fallbacks,
     background: s.background || null } });
   res.json({ ...result, llm: modelView() });
 });

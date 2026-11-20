@@ -3794,9 +3794,36 @@ Note: most of Phase 23 part A landed in commit aa56076, whose message reads "Pha
     retry is that occurrence's run. The p19a helper gives its schedules a time twelve hours from now in the schedule's own
     time zone, and a new test pins the edge relative to now (occurrence in 5 minutes, retry in 10): only the retry runs.
 
+## 2026-11-20: Model providers (#11)
+
+242. **A provider picker (OpenRouter, Ollama, any OpenAI-compatible service), and features that need OpenRouter are off
+    elsewhere instead of failing.** Setup's model step and Admin → Models share one picker (`partials/setup/provider-fields.hbs`,
+    `services/providers.js`): OpenRouter (the default, every feature), Ollama (no key; the address fills in; the models
+    Ollama has are listed from its `/api/tags`, embedding models left out) and another service (its address required).
+    `llmState()` knows the provider, whether it needs a key (not Ollama, not a server on the local network) and whether
+    it is ready; the health check, the overview and the connection test use that instead of "has a key". What each
+    provider offers is one table (`FEATURES`), shown under the picker and in docs/guide/providers.md and the README.
+    Off without OpenRouter: voice (the tool isn't offered, the mic and Listen buttons are hidden, the services refuse with
+    the reason), pictures and reading scans (tools not offered, no viewer offer), quick decisions (already OpenRouter-only),
+    fallback chains, the balance. Embeddings default to the provider's model (`nomic-embed-text` for Ollama; none for an
+    unknown service: keyword search). Two fixes found by running Ollama for real: requests carried OpenRouter-only
+    fields, and Ollama turns `reasoning` into "thinking", which most local models refuse with a 400 (OpenAI rejects
+    unknown fields too), so `reasoning`, `models`, `provider`, `transforms` and `plugins` are now stripped from every
+    request body to any other provider, in the client's fetch, whatever made the call. And a saved key is only sent to
+    the address it was entered for (`llm.keyFor`; the #10 migration records it too), so switching from OpenRouter to
+    another service never hands it the OpenRouter key, and Ollama never receives a key. Why switch features off rather
+    than let them try: their model ids and endpoints are OpenRouter's, so every use would fail with a provider error.
+    Not done: prices for other services (so budgets could count their spending), local voice and pictures. Tested:
+    `tests/providers.test.js` (provider detection, the picker's input rules, keys per address, the fields stripped on a
+    real call to a fake Ollama that refuses `reasoning` like the real one, the model list, every gate) and a real Ollama
+    in Docker (`qwen2.5:1.5b`, `nomic-embed-text`): the setup step listed only the chat model, connected in 2.9 s, chat
+    answered, the mic and Listen were gone, Admin → Models showed the three notices, System said "Ollama · qwen2.5:1.5b".
+    A 1.5B model is too small for Jessbot's prompt (about 2 minutes on CPU, and it wrote a tool call as text), hence
+    the 7B advice.
+
 ## 2026-11-20: Logo, screenshots and the website
 
-242. **The project's public face is built from the app itself, and the site is static and built from the repository.**
+243. **The project's public face is built from the app itself, and the site is static and built from the repository.**
     The logo is Jess's default portrait over her night sky, layered the way the living avatar is
     (`scripts/build-brand.js`, no new image generation). Screenshots come from `scripts/docs-shots.js`: the setup
     wizard, Admin → People and an approval run from a real install with made-up people, the other screens from the dev

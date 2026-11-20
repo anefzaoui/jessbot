@@ -7,6 +7,7 @@ import { makeImage, imageModel, imageSettings, IMAGE_SIZES, IMAGE_STYLES, DEPICT
 import { itemView } from '../../services/library.js';
 import { publish } from '../../lib/bus.js';
 import { renderFragment } from '../../views/render.js';
+import { providerOffers } from '../../services/llm.js';
 
 const SHAPE_WORDS = { square: 'Square', portrait: 'Portrait (2:3)', landscape: 'Landscape (3:2)', wide: 'Wide (16:9)', tall: 'Tall (9:16)' };
 // The picture a call works from, for the card: named and linked only when it is the requester's own.
@@ -19,7 +20,7 @@ const clip = (s, n) => { const t = String(s || '').replace(/\s+/g, ' ').trim(); 
 
 registerTool({
   name: 'make_image', displayName: 'Pictures', toolset: 'images', risk: 'write', activity: 'creating', iconName: 'palette', activityKind: 'file',
-  available: () => !!imageModel(),
+  available: () => !!imageModel() && providerOffers('images'), // OpenRouter only (#11)
   description: 'Make ONE picture with the image model and save it to their Library: an invitation or card picture, a colouring page, '
     + 'story art, a sticker, a poster image. Each picture costs money from their weekly budget (checked before it is made; refused '
     + 'when it would not fit). Write a full visual prompt: the subject, setting, composition, colours and mood. Keep words in the '
