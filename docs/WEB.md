@@ -1,7 +1,7 @@
 # The web — how Jess reads and searches
 
-Everything Jess sees of the web goes through her own browser (open-source Chromium by default, or CloakBrowser when the
-admin picks it; decisions #15, #43, #218), with one exception:
+Everything Jess sees of the web goes through her own browser (the installed Google Chrome through Patchright where there is
+one, else open-source Chromium, or CloakBrowser when the admin picks it; decisions #15, #43, #218, #221), with one exception:
 an optional SearXNG search engine the admin runs (below, #138). This page covers what `web_read` and `web_search` do
 since Phase 21 (decisions #135–#138), and the browser side added after (#164–#168: ready-made searches, learned site
 recipes, uploads, screenshots, the autopilot's domain lock, trust warnings, ad blocking). Code: `src/browser/` (`read.js`,

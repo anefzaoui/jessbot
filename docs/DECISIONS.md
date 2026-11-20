@@ -3478,3 +3478,19 @@ Note: most of Phase 23 part A landed in commit aa56076, whose message reads "Pha
     under their chat box, a note on their You page, and `adminsCanRead` on `GET /api/v1/me` for the apps. Turning it on or
     off is audited (`admin.oversight`). Migration 053 keeps it on for an install that already had accounts (their members
     were told under #36). The switch is the first card in Admin → People.
+
+221. **Where Google Chrome is installed, the browser is that Chrome driven by Patchright.** A comparison of open-source
+    alternatives to CloakBrowser (on Windows and in Linux Docker, against the common bot checks) found Patchright
+    (`patchright-core`, Apache-2.0: the Playwright API with its automation traces removed) driving the person's own Google
+    Chrome as good as or better than CloakBrowser, with nothing to download; plain Playwright Chromium is flagged
+    everywhere. `engines/chrome.js` is the default when Chrome is found (Windows, macOS and Linux install paths; its
+    version read without starting it, for the `--user-agent` launch switch); `chromium` (plain Playwright) is the default
+    elsewhere. Jessbot never downloads or ships Chrome. Patchright's differences are handled, not hidden: `page.evaluate`
+    runs in an isolated world, so a reader that needs the page's own globals uses `evaluateInPage()` (the YouTube player
+    data); console events and bindings from init scripts don't exist, so Jessbot's own pages (page checks, print, export:
+    `withPage({ render: true })`) open in a plain Playwright browser on the same Chrome, and DuckDuckGo's autoconsent (which
+    needs a binding) is off with this engine — consent pages are still handled by walls.js. Engines declare this as
+    `caps`. Shared launching (a browser server on 127.0.0.1 that can always be killed, no stray WebRTC UDP) lives in
+    `engines/server.js`. Not taken: Camoufox (Firefox: no PDF, no CDP, 2.8 GB, needs an older Playwright) as a possible
+    later optional engine; Clearcote (young, its SDK crashes on a second context); anything AGPL. Cloudflare challenges stay
+    a hand-over to the person.

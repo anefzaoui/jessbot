@@ -114,10 +114,13 @@ A Docker image and a Linux service file are on the way (see below).
 
 ### Web access (the agent's browser)
 
-The agent's browser is **open-source Chromium**, driven by Playwright. The setup page (or `npm run browser:install`)
-downloads it once into `tools/ms-playwright`, about 200 MB. To use a Chrome or Chromium that is already installed
-instead, set `JESSBOT_CHROMIUM_PATH` to its executable. Until a browser is there, chat, files, the Library, reminders,
-lists and mail work, but web lookups, the Feed, weather and places, and exporting pages to PDF or PNG don't.
+If **Google Chrome** is installed on the machine, the agent uses it, driven by
+[Patchright](https://github.com/Kaliiiiiiiiii-Vinyzu/patchright) (Playwright without its automation traces), so sites
+don't see an obviously automated browser. Nothing is downloaded and Jessbot never ships Chrome. Without Chrome (a
+server, Docker), it uses **open-source Chromium** through Playwright: the setup page (or `npm run browser:install`)
+downloads it once into `tools/ms-playwright`, about 200 MB, or set `JESSBOT_CHROMIUM_PATH` to a Chromium that is already
+installed. Admin → Browser switches between them. Until a browser is there, chat, files, the Library, reminders, lists
+and mail work, but web lookups, the Feed, weather and places, and exporting pages to PDF or PNG don't.
 
 Some sites (a few airlines and shops) refuse automated browsers. For those, Admin → Browser can switch to
 **CloakBrowser**, a Chromium build with stealth patches. It is optional and you install it yourself: its binary is

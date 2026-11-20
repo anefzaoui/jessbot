@@ -8,6 +8,7 @@
 // thin browser part.
 
 import { captionsToText } from '../../lib/captions.js';
+import { evaluateInPage } from '../index.js';
 
 const ID = /^[A-Za-z0-9_-]{11}$/;
 
@@ -157,7 +158,7 @@ export async function readYouTube(url, { withPage, signal, lang = 'en', dismissC
       await page.waitForURL(u => !/^consent\./.test(u.hostname), { timeout: 15000 }).catch(() => {});
       await page.waitForLoadState('domcontentloaded').catch(() => {});
     }
-    const pr = await page.evaluate(() => {
+    const pr = await evaluateInPage(page, () => { // the page's own global: the main world (Patchright, #221)
       const p = window.ytInitialPlayerResponse;
       return p ? JSON.parse(JSON.stringify({ videoDetails: p.videoDetails, microformat: p.microformat, captions: p.captions, playabilityStatus: { status: p.playabilityStatus?.status } })) : null;
     }).catch(() => null);
