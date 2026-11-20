@@ -100,7 +100,7 @@ Each layer assumes the ones before it can fail.
 11. **No shell, no code execution.** The agent has no tool that runs commands or code on the machine. Office files are
     converted by LibreOffice (only when the admin installed it) in a throwaway profile with macros off and every network
     path closed [#162]; PDFs are drawn in-process by pdf.js without eval [#161].
-12. **Chromium's sandbox** [#238]. The agent's browser runs with Chromium's own sandbox wherever the system allows it
+12. **Chromium's sandbox** [#239]. The agent's browser runs with Chromium's own sandbox wherever the system allows it
     (Windows, macOS, Linux with user namespaces, the Docker image with its seccomp profile), so a page that breaks the
     renderer is still inside a process that can't read files or start programs. Where it can't start, the browser runs
     without it and Admin → Browser and Admin → System say so; see [Browser sandbox](#browser-sandbox).
@@ -130,6 +130,7 @@ injection detector (stage 1 = patterns only, used where the prompt must stay byt
 | The live browser: `browser_open`, clicks, typing, snapshots, `browser_read`, `open_search` | yes (the page snapshot) | yes | yes | yes | Jess's own account above the snapshot stays plain; page titles, dialog texts, pop-up and download names in it are one clean line. |
 | Browser autopilot | yes (the snapshot it hands back) | yes | yes | yes | Its decision model sees the page as data; a click that may pay, book or send is stopped in code and left for Jess, whose click asks. |
 | Screenshots (`web_screenshot`, `browser_screenshot`) | no (an image for the person) | title one line | yes | no | The model doesn't see the picture. |
+| Page self-check pictures (after Jess saves a page) | no (an image) | n/a | no | no | The model does see these: a phone-width screenshot of a page she made herself, rendered with the Library's sandbox policy (no network calls). The page is her own, though it can quote what she read earlier (fenced when she read it); text in the picture isn't screened (see below) [#145]. |
 | Browser downloads | as files (below) | yes | yes | yes | Become Library items labelled "Downloaded from <host>". |
 | Email list and messages: `email_list`, `email_read`, `email_unsubscribe_link` | yes | yes, hidden HTML text pruned | yes | yes | Sender, subject and attachment names one clean line; a plain part that says more than the reader sees is replaced by the visible text. |
 | Email attachments: `email_save_attachments` | as files (below) | yes | yes | yes | Typed by their bytes; programs and archives refused. |
@@ -149,10 +150,12 @@ injection detector (stage 1 = patterns only, used where the prompt must stay byt
 | Skills Jess drafts (`skill_propose`) | n/a | linted | refused after taint | linted | Never run before an admin approves. |
 | Page self-check output | n/a | yes | on a hit | yes | On a hit only counts and line numbers are passed on. |
 | A watch's memo, notes from background tasks | yes | yes, one line | n/a | no | Written by Jess's own unattended runs, passed on as information. |
-| Delegated task results | no | n/a | n/a | no | Jess's own one-line summary; the brief is shown on the approval card when the task read outside content. |
+| Delegated task results | yes (`background_report`, with what the task read) | yes | the task's taint, on every run that sees the report | warning when the task read a suspected injection | The person sees the report as before; the model never reads it back as its own words [#236]. The brief is shown on the approval card when the task read outside content. |
 | Voice notes | n/a | n/a | n/a | n/a | The person's own speech, transcribed as their message. |
 | Shared lists, group memories | no | yes, one line | n/a | memories: refused when instruction-like | Written by members (trusted); sharing a memory asks first. |
-| Weather and place names | no | short | no | no | Short structured data from public services. |
+| Place names (geocoding, "use my location") | other matches: yes (`geocoding_matches`) | one clean line, capped [#238] | no | no | Community-edited map data; short, structured, and never more than a name. |
+| Calendar names, mail folder names | no | one clean line, capped [#238] | n/a | no | Set by whoever owns a shared calendar or mailbox; they appear only as labels ("Added to …", "Moved to …"). |
+| Weather | no | n/a | no | no | Numbers and fixed words from a public service. |
 
 ## Browser sandbox
 

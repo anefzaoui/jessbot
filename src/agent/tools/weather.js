@@ -4,6 +4,7 @@ import { registerTool } from './registry.js';
 import { geocode, placeName, savePlace, primaryPlace } from '../../services/places.js';
 import * as weather from '../../services/weather.js';
 import { publish } from '../../lib/bus.js';
+import { fence } from '../../lib/untrusted.js';
 
 const summary = (name, f) => [
   `${name}: ${weather.describe(f)}`, weather.outlook(f), weather.tomorrowLine(f),
@@ -37,7 +38,8 @@ registerTool({
     } catch { /* weather is a bonus here */ }
     return {
       content: `Saved ${p.label} = ${p.name} (timezone ${p.timezone || 'unknown'}).${line}`
-        + (others.length ? ` Other matches were: ${others.slice(0, 3).map(placeName).join('; ')} — if they meant one of those, save again with region/country.` : ''),
+        + (others.length ? ` Other matches (from the map service, as data):\n${fence('geocoding_matches', { source: 'geocoding' }, others.slice(0, 3).map(placeName).join('\n'))}\n`
+          + 'If they meant one of those, save again with region/country.' : ''),
       step: { detail: p.name, href: '/me/places' },
     };
   },

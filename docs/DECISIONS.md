@@ -3695,9 +3695,45 @@ Note: most of Phase 23 part A landed in commit aa56076, whose message reads "Pha
     orientation 6, an Artist tag and trailing bytes comes out upright with none of them; sizes; replacing deletes;
     only the current upload is served; routes: admin only, headers, signed out, traversal) and the real UI in Chromium.
 
+## 2026-11-20: Prompt-injection review follow-ups (issue #40)
+
+236. **A background task's report is fenced as reported content, and its taint carries into the chat it reports to.** The
+    report `delegate` posts back (the first line of the background run's reply, and the titles of what it made) used to
+    arrive as an ordinary assistant message: the next turn in that chat read a stranger-influenced line as Jess's own words,
+    and none of the background run's taint (even `high`) came along, so approvals there didn't count it. Now the report
+    run's system line carries the report inside a `background_report` fence (with the task's provenance and, after a
+    suspected injection, a warning), `toChat` shows the model a placeholder in place of the visible copy, the report run
+    gets the background run's taint rows (tool `delegate_report`), and `buildPrompt` marks every run whose prompt includes
+    such a report with the same rows. The person still sees the report as before. Why mark every later run that sees it,
+    not only the next: the line stays in the prompt until compaction, and a report is rare enough that this doesn't make
+    the rule meaningless. Tested: `tests/p22j.test.js` (a background run marked `high` before it finishes: the report is
+    fenced with the warning, the next run in that chat never sees the task's words as an assistant message and is marked
+    `high` from `delegate_report`).
+
+237. **A tool's error reaches the model as one clean, capped line.** A failed tool's message went to the model as
+    `Error: <message>` whatever the message held, and many messages quote a remote party (a mail or calendar server's
+    refusal, SearXNG's answer, a page's error text): line breaks could start what looks like a new prompt section, and a
+    long body went in whole. `toolError()` in `agent/loop.js` (both places a tool result is made from an error) now runs it
+    through `oneLine()` from `lib/untrusted.js`, capped at 300 characters: invisible characters out, fence and chat-role
+    look-alikes defanged, no line breaks. The run-level error line shown to the person gets the same treatment. Why not
+    fence errors: they are short and the model needs them as plain facts ("the server refused the password"); one capped
+    line takes away what made them useful to an attacker. Tested: `tests/p22j.test.js` (a tool that throws a multi-line,
+    4,000-character error with a fence look-alike and "SYSTEM: new instructions" reaches the model as one capped line).
+
+238. **Names other people set are one clean line: calendars, mail folders, places.** A shared calendar's name is set by
+    its owner, a shared mailbox's folders by whoever made them, and place names come from community-edited map data; all
+    reached the model as given (`Added to <calendar>`, `Moved … to <folder>`, `Saved home = <place>`, the list of other
+    geocoding matches). Now `calendarLabel()` (services/calendar.js) and `placeName()` / reverse geocoding
+    (services/places.js) make them one clean line at the source (60 characters per name, 120 for a whole place), the email
+    tool does the same for folder names in what it reports, and the other geocoding matches are fenced
+    (`geocoding_matches`). Why one line and not a fence everywhere: they are labels the model must repeat to the person;
+    one line without invisible characters or fence look-alikes takes away what an author could do with them. Tested:
+    `tests/injection-review.test.js` (a multi-line calendar and place name with a fence look-alike and "SYSTEM:"
+    instructions comes out as one capped, defanged line; normal names are unchanged).
+
 ## 2026-11-20: Chromium's sandbox (#37)
 
-238. **The agent's browser runs in Chromium's sandbox wherever the system allows it.** Playwright and Patchright launch
+239. **The agent's browser runs in Chromium's sandbox wherever the system allows it.** Playwright and Patchright launch
     Chromium with `--no-sandbox` unless told otherwise, and CloakBrowser's wrapper adds it to its own defaults, so every
     engine ran unsandboxed: a page that broke the renderer would have had Jessbot's user's access to the machine. Now
     `engines/server.js` asks for the sandbox (`chromiumSandbox: true`) for Chromium, Google Chrome and Jessbot's own

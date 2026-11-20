@@ -164,6 +164,12 @@ function chain(threadId, job) {
   return next;
 }
 
+// A tool's error as the model sees it (#40, decision #237): one clean line, capped. Error text often quotes a remote server
+// or a web page (a mail server's refusal, an HTTP error body), so it gets the same treatment as a header from outside:
+// invisible characters out, fence and chat-role look-alikes defanged, no line breaks to start a new prompt section.
+export const TOOL_ERROR_MAX = 300;
+export const toolError = err => `Error: ${oneLine(err?.errors ? Object.values(err.errors).join(' ') : (err?.message ?? String(err)), TOOL_ERROR_MAX)}`;
+
 // Queue a run behind any earlier run in the same thread.
 export function enqueueRun(runId) {
   const r = runs.getRun(runId);
@@ -392,7 +398,7 @@ function friendlyError(err) {
   if (s === 429) return "The model is rate-limiting me right now. Give it a moment, then press Retry.";
   if (s >= 500) return 'The model provider had a hiccup. Press Retry and I will pick it up again.';
   if (err?.code === 'ENOTFOUND' || err?.cause?.code === 'ENOTFOUND' || err?.code === 'ECONNREFUSED') return "I can't reach the model right now — is the internet down?";
-  return `Something went wrong while I was working on this (${String(err?.message || err).slice(0, 140)}).`;
+  return `Something went wrong while I was working on this (${oneLine(err?.message || err, 140)}).`;
 }
 
 // A passing problem (rate limit, provider 5xx, timeout, network) is worth one automatic retry; a rejected key, no credits
@@ -990,7 +996,7 @@ async function runTool({ run: r, user, thread, call, signal, fast = false }) {
   } catch (err) {
     status = 'bad';
     // Validation errors keep the specific reasons in err.errors — give the model those, not the generic line.
-    content = `Error: ${err.errors ? Object.values(err.errors).join(' ') : err.message}`;
+    content = toolError(err);
   }
   if (pause) { runs.endStep(r.id, stepId, { status: 'wait' }); return { pause, questionId }; }
   noteToolRead(r.id, call.function.name); // outside content read without guardOutside's own mark (agent/taint.js)
@@ -1062,7 +1068,7 @@ async function deliverDecision(a, r) {
       if ((step.status || 'ok') === 'ok') noteSources(r.id, a.tool, args, content, step);
       logToolActivity(user, r, tool, args, label, 'ok', step.href);
     } catch (err) {
-      content = `Error: ${err.errors ? Object.values(err.errors).join(' ') : err.message}`;
+      content = toolError(err);
       runs.endStep(r.id, stepId, { status: 'bad' });
     }
   } else if (a.status === 'expired') {
