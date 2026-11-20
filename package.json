@@ -28,6 +28,7 @@
     "ui:flows": "node scripts/ui-flows.js",
     "test:e2e": "node scripts/e2e-setup.js",
     "assets:images": "node scripts/build-images.js",
+    "brand": "node scripts/build-brand.js",
     "test:chat": "node scripts/e2e-chat.js",
     "eval:agent": "node scripts/agent-eval.js",
     "test": "node --test \"tests/**/*.test.js\"",
