@@ -92,7 +92,7 @@ test('the operator’s own environment is never stored, and wins; a .env outside
   fs.rmSync(shared, { recursive: true, force: true });
 });
 
-test('keys entered in setup or Admin → Model are sealed in the database, not written to .env', () => {
+test('keys entered in setup or Admin → Models are sealed in the database, not written to .env', () => {
   const dir = home('');
   const out = run(dir, `
     const { setSecret, getSecret } = await r('src/services/stored-secrets.js');

@@ -14,7 +14,7 @@ let client, clientKey;
 
 // fallbacks: models tried in order when the main one is down, rate-limited, over its context or refuses (decision #179);
 // background: an optional (cheaper) model for JSON jobs (compaction, memory, feed, goals), retried once on the main one.
-// The key: the operator's environment wins (never stored); otherwise the key entered in setup or Admin → Model, sealed
+// The key: the operator's environment wins (never stored); otherwise the key entered in setup or Admin → Models, sealed
 // (#10), and only for the address it was entered for (#11: `keyFor`), so switching to another service never sends it the
 // old one. Ollama never gets a key: it needs none, and the server may be anyone's on the network.
 const originOf = u => { try { return new URL(u).origin; } catch { return ''; } };

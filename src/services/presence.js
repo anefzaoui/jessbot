@@ -54,6 +54,25 @@ export function variantFrames(variant) {
   return presenceManifest().avatars?.[variant] || [];
 }
 
+/**
+ * The web app manifest (#55, decision #253): Jessbot installs on a phone's home screen or as a desktop app under the
+ * assistant's name. The icons are the logo (#39, `public/img/app/`, copies of docs/images/brand's) for the default look,
+ * else that look's own neutral portrait; never an uploaded picture, which is served behind sign-in (the browser fetches
+ * the manifest and its icons without the session cookie).
+ */
+export function webManifest(bot = {}) {
+  const name = String(bot?.name || '').trim() || 'Jessbot'; // the page title's own default (middleware/locals.js)
+  const look = bot?.variant && bot.variant !== 'female' && variantFrames(bot.variant).length ? bot.variant : null;
+  const icons = look
+    ? [{ src: `/img/avatars/${look}/neutral-256.webp`, sizes: '256x256', type: 'image/webp' },
+      { src: `/img/avatars/${look}/neutral.webp`, sizes: '1024x1024', type: 'image/webp' }]
+    : [{ src: '/img/app/icon-192.png', sizes: '192x192', type: 'image/png' },
+      { src: '/img/app/icon-512.png', sizes: '512x512', type: 'image/png' },
+      { src: '/img/app/icon-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' }];
+  return { id: '/', name, short_name: name, description: `${name}, your household's assistant (Jessbot).`, start_url: '/', scope: '/',
+    display: 'standalone', background_color: '#faf9f7', theme_color: '#faf9f7', icons };
+}
+
 // Presence data for templates (res.locals.presence). weather = services/weather.sky() of the person's home, or null (clear).
 // The admin's pictures (#7, services/assistant-pictures.js) replace the built-in art only for signed-in people: their
 // files are served behind sign-in, so the sign-in and invite pages keep the built-in look.

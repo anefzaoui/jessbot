@@ -136,7 +136,7 @@ export function doctor({ cli = false } = {}) {
   // Model
   const llm = llmState();
   out.push(llm.ready ? check('model', 'AI model', 'ok', `${llm.providerLabel} · ${llm.model}${llm.fallbacks.length ? ` · falls back to ${llm.fallbacks.join(', ')}` : ''}`, null, '/admin/model')
-    : check('model', 'AI model', 'bad', `No API key — ${botName()} can’t think.`, 'Add an OpenRouter key in Admin → Model.', '/admin/model'));
+    : check('model', 'AI model', 'bad', `No API key — ${botName()} can’t think.`, `Add the ${llm.providerLabel} key in Admin → Models.`, '/admin/model'));
   // The OpenRouter balance (decision #179), as last read by the spend watch (refreshed every few hours and from Admin → Usage).
   const bal = llm.apiKey ? balanceCheck() : null;
   if (bal) out.push(bal);

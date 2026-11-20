@@ -6,12 +6,20 @@ import setupRoutes from './setup.js';
 import authRoutes from './auth.js';
 import adminRoutes from './admin.js';
 import { requireSetup, requireAuth, requireAdmin } from '../../middleware/auth.js';
+import { settings } from '../../db/index.js';
+import { webManifest } from '../../services/presence.js';
 
 const router = Router();
 
 // Liveness probe for process managers / reverse proxies.
 router.get('/healthz', (req, res) => {
   res.json({ ok: true, uptime: Math.round(process.uptime()) });
+});
+
+// The web app manifest (#55, decision #253): before setup and sign-in, because the browser fetches it without the session
+// cookie. It names the assistant and points at public icons; nothing else about the install.
+router.get('/manifest.webmanifest', (req, res) => {
+  res.type('application/manifest+json').set('Cache-Control', 'no-cache').send(JSON.stringify(webManifest(settings.get('bot', null) || {})));
 });
 
 // Dev-only: component gallery + every page rendered with demo data against a simulated API.

@@ -177,7 +177,10 @@ here were taken on the maintainer's machine and network.
       frames": blink, glance-left/right, listening), smooth expression transitions (crossfade, never hard swap).
     - Reacts: listening while the user types; momentary expressions on events (MOMENTS: done→proud,
       thanks→happy, problem→concerned, clarifying→confused); activity drives the base expression; sleepy at
-      night / offline. Respects prefers-reduced-motion (then only gentle crossfades on state change).
+      night / offline. Respects prefers-reduced-motion (then only gentle crossfades on state change). As built
+      (checked for #55): the moments are done → proud, greeting and delighted → happy, clarifying → confused,
+      surprise → surprised (`public/js/activities.js`); there is no thanks moment, and a problem shows through the
+      activity's face instead (error → apologetic, waiting for them → concerned).
     - Lives in a place and time: scene = local time of day × weather; greetings and small remarks grounded in
       the real moment (time, weather, schedule), never generic.
     - Visible inner life: a presence line ("Checking the rain radar for your 5pm run…") + timeline that moves
@@ -3975,3 +3978,25 @@ Note: most of Phase 23 part A landed in commit aa56076, whose message reads "Pha
     tablet and laptop widths, so no cue moves the page and the words never sit on her face. Reduced motion: nothing
     moves through space, the cues wait for a click, a picked cue's light changes in 200 ms. The rules are in
     docs/DESIGN.md → Website.
+
+## 2026-11-20: The docs and the code agree; a web app manifest (#55)
+
+253. **Where the docs and the code disagreed, the one that was wrong changed; the missing manifest was built.** Found
+    while writing the user guide (#54), checked against the code: (1) the doctor's old advice that the install key
+    "travels with the backup" was already gone (#10's sealing work); the key still isn't in backups, on purpose (a
+    backup file alone can't open saved passwords), and Admin → System → Backups now says so beside **Download**, as the
+    guide and `.env.example` do. (2) The model's address and name live in the database once setup or Admin → Models saves
+    them; `LLM_BASE_URL` / `LLM_MODEL` in `.env` only fill in the setup page. One source of truth, the one the picker
+    (#11) writes; `.env.example` and the guide say so. (3) `HOST=0.0.0.0` is for other devices on the home network (the
+    README and the guide were right); behind a reverse proxy on the same machine the loopback default stays, so
+    `.env.example` changed. (4) The approvals page's empty state pointed at an approvals control "in your profile" that
+    doesn't exist; it now names what does ("Always allow" on a card, which an admin can take back on the person's page).
+    (5) The doctor and the comments say Admin → Models, the tab's name, and the doctor asks for the key of the provider
+    in use, not always OpenRouter's. (6) FEATURES.md no longer calls the portraits pending, and decision #33 notes the
+    moments as built. (7) The manifest: `GET /manifest.webmanifest`, served before setup and sign-in (browsers fetch it
+    without the session cookie), names the assistant (the page title's own default, "Jessbot", before the identity step)
+    and nothing else about the install; its icons are the logo from #39 (`public/img/app/`, copies of
+    docs/images/brand's, since the Docker image doesn't carry docs/) for the default look, or the chosen look's neutral
+    portrait, never an uploaded picture (those are served behind sign-in). `display: standalone`, start and scope `/`.
+    The push-only service worker (#85) is unchanged: no offline caching, the app is always served fresh. Browsers offer
+    a full install only over HTTPS or on localhost, and the guide says so.
