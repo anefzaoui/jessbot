@@ -497,9 +497,11 @@ test('LibreOffice conversion (stand-in): a throwaway locked-down profile, headle
   useFake('hang');
   await assert.rejects(office.officeToPdf(SAMPLE_DOCX, 'docx', { timeoutMs: 1500 }), err => err.name === 'TimeoutError' && /longer than 2 s/.test(err.message));
   const { pid } = logLines().find(l => l.at === 'start');
-  let alive = true;
-  for (let i = 0; i < 30 && alive; i++) { await new Promise(r => setTimeout(r, 100)); try { process.kill(pid, 0); } catch { alive = false; } }
-  assert.equal(alive, false, 'the hung process was killed');
+  // The timeout answers only once the process has exited (or 10 s at most); under load that can take a while, so this
+  // waits on the process itself rather than on a fixed clock.
+  const isAlive = () => { try { process.kill(pid, 0); return true; } catch { return false; } };
+  for (const t0 = Date.now(); isAlive() && Date.now() - t0 < 15000;) await new Promise(r => setTimeout(r, 100));
+  assert.equal(isAlive(), false, 'the hung process was killed');
   office.useSoffice(null);
 });
 

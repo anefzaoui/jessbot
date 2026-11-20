@@ -39,7 +39,7 @@ export function createApp() {
   app.use(express.urlencoded({ extended: false, limit: '1mb' }));
   app.use(loadUser);
   // Every page and API call counts against the person (or, signed out, the address): far above what a household's
-  // browsers and apps send, low enough that a script hammering one route is stopped (decision #223).
+  // browsers and apps send, low enough that a script hammering one route is stopped (decision #228).
   app.use(limiter({ name: 'requests', limit: 1200, windowMs: 60e3, message: m => `Too many requests. Wait ${m} min and try again.` }));
   app.use(locals);
   app.use(sameOrigin);

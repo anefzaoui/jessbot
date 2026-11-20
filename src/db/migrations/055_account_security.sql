@@ -1,4 +1,4 @@
--- Account security (decision #225, issue #6): optional two-step sign-in (TOTP), one-time recovery codes, the pending
+-- Account security (decision #230, issue #6): optional two-step sign-in (TOTP), one-time recovery codes, the pending
 -- second step of a sign-in, and admin-made password reset links.
 -- totp_secret / totp_pending are sealed with JESSBOT_SECRET (lib/secrets.js), like mail passwords: a copied database
 -- alone doesn't reveal them. totp_last_step: the last 30-second step a code was accepted for (a code works once).

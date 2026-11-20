@@ -1,4 +1,4 @@
-// Two-step sign-in (decision #225, issue #6): optional, per person, with any authenticator app (TOTP, RFC 6238: SHA-1,
+// Two-step sign-in (decision #230, issue #6): optional, per person, with any authenticator app (TOTP, RFC 6238: SHA-1,
 // 6 digits, 30 s — what every app understands). The secret is sealed like a mail password (lib/secrets.js); a code is
 // accepted once (the step it belongs to is remembered), one step early or late for clock drift. Ten recovery codes are
 // shown once and stored as SHA-256 hashes (60 random bits each). Turning it on or off signs out every other device.

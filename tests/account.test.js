@@ -1,4 +1,4 @@
-// Account security (decision #225, issue #6): two-step sign-in (TOTP + recovery codes), password change with session
+// Account security (decision #230, issue #6): two-step sign-in (TOTP + recovery codes), password change with session
 // rotation, admin-made password reset links, stronger password hashing with rehash on sign-in.
 // Run: npm test  (throwaway data dir; the real app on a local port; codes made with the same TOTP library).
 import { test, before, after } from 'node:test';

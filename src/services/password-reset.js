@@ -1,4 +1,4 @@
-// Password reset (decision #225, issue #6): Jessbot sends no mail of its own, so a reset is a one-time link an admin makes
+// Password reset (decision #230, issue #6): Jessbot sends no mail of its own, so a reset is a one-time link an admin makes
 // for someone (Admin → People → the person) and hands over like an invite, or that the owner makes on the server with
 // `npm run reset-link -- <email>` when they are the one locked out. Only the link's SHA-256 is stored; it works once, for
 // 24 hours, and a newer link replaces an older one. Setting the new password signs that person out everywhere.

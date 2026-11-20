@@ -1,4 +1,4 @@
-// Rate limits that survive a restart (decision #223, issue #6). Counters live in SQLite (table rate_limits): a fixed window
+// Rate limits that survive a restart (decision #228, issue #6). Counters live in SQLite (table rate_limits): a fixed window
 // per key, so a restart (or a crash an attacker provokes) never hands out a fresh set of attempts.
 //   hit(key, { limit, windowMs })   one attempt inside a handler (sign-in per address and email, invite, setup, …)
 //   limiter({ name, limit, windowMs, key?, message? })   the one middleware for routes (express-rate-limit with this store)

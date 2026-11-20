@@ -169,7 +169,7 @@ router.post('/people/:id/status', formPost('admin/person', personData, req => {
   return { redirect: `/admin/people/${id}` };
 }));
 
-// Sign-in help (decision #225): a one-time password reset link to hand over, and turning off two-step sign-in for someone
+// Sign-in help (decision #230): a one-time password reset link to hand over, and turning off two-step sign-in for someone
 // who lost their phone and their recovery codes. Both sign the person out everywhere (the reset when it is used).
 router.post('/people/:id/reset-link', (req, res) => {
   const person = getUser(Number(req.params.id));

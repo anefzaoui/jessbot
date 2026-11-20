@@ -214,7 +214,7 @@ router.get(['/me', '/me/:tab'], (req, res) => {
   res.render('me', {
     nav: 'me', title: `You · ${ME_TABS.find(([k]) => k === tab)[1]}`, tab, tabs: ME_TABS.map(([key, label]) => ({ key, label })),
     readByAdmins: req.user.role !== 'admin' && oversightOn(), // the "admins can read your chats" note (#219)
-    minPassword: MIN_PASSWORD, recoveryUsed: req.query.recovery === 'used', // sign-in (#225)
+    minPassword: MIN_PASSWORD, recoveryUsed: req.query.recovery === 'used', // sign-in (#230)
     me: { profile: req.user, memories: listForUser(req.user), episodes: listEpisodes(req.user, { limit: 60 }), groups: groupsOfUser(req.user.id),
       // Phase 25 (#204): "How I work with you" and the weekly tidy (?tidy=<id> from its Activity item opens that one).
       lessons: personLessonsView(req.user), tidy: memoryTidy(req.user, req.query.tidy),

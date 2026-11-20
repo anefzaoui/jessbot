@@ -5,7 +5,7 @@ import crypto from 'node:crypto';
 import { promisify } from 'node:util';
 
 const argon2 = promisify(crypto.argon2);
-// RFC 9106's second recommended option (64 MiB, 3 passes, 4 lanes; decision #225): about 50 ms on a desktop, a few hundred
+// RFC 9106's second recommended option (64 MiB, 3 passes, 4 lanes; decision #230): about 50 ms on a desktop, a few hundred
 // on a small board, and sign-in is rate-limited. It was the OWASP minimum (19 MiB, 2 passes, 1 lane); a hash made with
 // weaker parameters is redone at the next successful sign-in (needsRehash).
 const PARAMS = { memory: 65536, passes: 3, parallelism: 4, tagLength: 32 };

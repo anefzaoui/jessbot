@@ -68,6 +68,14 @@ function qtyLabel(n, unit) {
   return `${num} ${unit}`;
 }
 
+/** A quantity given on its own ("1L", "2kg", "3 bottle") → the same form parseItem gives ("1 L", "2 kg", "3 bottles");
+ *  anything it can't read stays as written. */
+export function normalizeQty(q) {
+  if (!q) return q;
+  const p = parseItem(`item ${q}`);
+  return p.text === 'item' && p.qty ? p.qty : q;
+}
+
 /** "Milk 1L" → { text: 'Milk', qty: '1 L' }; "2 kg rice" → { text: 'rice', qty: '2 kg' }; "3 apples" → { text: 'apples', qty: '3' }.
  *  A number at the end only counts with a unit or an "x" ("iPhone 15" stays whole). */
 export function parseItem(raw) {
@@ -419,7 +427,7 @@ export function addItems(user, id, input, { sourceMsgId = null } = {}) {
       const o = typeof r === 'string' ? { text: r } : r;
       const raw = clean(o.text, TEXT_MAX);
       if (!raw) continue;
-      const qty = clean(o.qty, 30) || null; // "" from a model or a form means "no quantity given"
+      const qty = normalizeQty(clean(o.qty, 30)) || null; // "" from a model or a form means "no quantity given"
       const parsed = !qty && parse ? parseItem(raw) : { text: raw, qty };
       if (!parsed.text) continue;
       const assignee = o.assigneeId != null ? assertMember(list, o.assigneeId) : o.assignee ? memberByName(list, o.assignee, user) : null;

@@ -174,7 +174,7 @@ Tick items only when they work end to end. `Phase` refers to the build plan in A
 ## Sign-in (issue #6)
 - [x] **Two-step sign-in** with any authenticator app, recovery codes shown once, an app-friendly API step; **change your
   password** (signs out every other device); **reset links** an admin makes and hands over (or `npm run reset-link` on the
-  server); stronger password hashing, redone at sign-in; rate limits stored in the database [R] — #225, #223
+  server); stronger password hashing, redone at sign-in; rate limits stored in the database [R] — #230, #228
 
 ## Safety (from the skills review, Phase 18)
 - [x] **Outside content stays information**: web pages, emails, files, search snippets, browser snapshots and calendar titles reach Jess inside fences a page can't close, with hidden text (tiny, invisible, off-screen, white-on-white) left out; text addressed to AI assistants is flagged inside the fence ("⚠ …, not from them") and she tells the person instead of acting [R] — P18 (#118, #120)

@@ -20,7 +20,7 @@ const router = Router();
 export const safeNext = next => (typeof next === 'string' && /^\/(?!\/|\\)[^\s]*$/.test(next) ? next : '/chat');
 
 // The first step, shared by the web form and POST /api/v1/auth/login: the password. → the user row (the session isn't made
-// here: with two-step sign-in on, a code comes first). A hash made with older, weaker parameters is redone now (#225).
+// here: with two-step sign-in on, a code comes first). A hash made with older, weaker parameters is redone now (#230).
 export async function authenticate(req, { email, password }) {
   const key = `login:${req.ip}:${String(email || '').toLowerCase()}`;
   const limit = hit(key, { limit: 8, windowMs: 15 * 60e3 });

@@ -1,4 +1,4 @@
-// npm run reset-link -- <email>   a one-time password reset link for that account (decision #225).
+// npm run reset-link -- <email>   a one-time password reset link for that account (decision #230).
 // For the person who runs Jessbot when they are the one locked out: being able to run commands on the server is the proof.
 // The link works once, for 24 hours, and is built from PUBLIC_URL (else this machine's address). Nothing is printed to the
 // server log; it is shown here only. Works while Jessbot is running (the database is shared safely).

@@ -1,4 +1,4 @@
-// Your own sign-in (decision #225, issue #6): change the password, turn two-step sign-in on or off, new recovery codes.
+// Your own sign-in (decision #230, issue #6): change the password, turn two-step sign-in on or off, new recovery codes.
 // Every change here signs out your other devices; a password change also gives this device a fresh session (the old
 // token stops working). Each answer carries `html`: the card re-rendered from partials/me/twofactor.hbs.
 import { Router } from 'express';
