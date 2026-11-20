@@ -39,7 +39,13 @@ router.use((req, res, next) => {
   res.locals.presence = presenceFor({ bot, user: req.user });
   // After the account exists, only the owner may continue the wizard.
   const needsOwner = countUsers() > 0 && !['/', '/account'].includes(req.path);
-  if (needsOwner && req.user?.role !== 'admin') return res.redirect('/login?next=/setup');
+  if (needsOwner && req.user && req.user.role !== 'admin') {
+    // A member (an invite accepted before setup finished): the wizard is the owner's, and sending them to /login would
+    // send them straight back here (#50).
+    return res.status(403).render('error', { layout: 'base', title: 'Not quite ready', code: 403,
+      message: 'The owner is still setting things up. Come back in a little while.' });
+  }
+  if (needsOwner && !req.user) return res.redirect('/login?next=/setup');
   next();
 });
 

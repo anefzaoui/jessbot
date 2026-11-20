@@ -13,6 +13,7 @@ import { formPost, localPath } from '../../lib/respond.js';
 import { HttpError, invalid, tooMany } from '../../lib/errors.js';
 import { hit, reset, signInLimit } from '../../lib/ratelimit.js';
 import { oversightOn } from '../../services/oversight.js';
+import { isSetupComplete } from '../../services/setup.js';
 
 const router = Router();
 
@@ -57,7 +58,7 @@ export function signedIn(req, user, via = 'password') {
 }
 
 const loginData = req => ({ layout: 'base', title: 'Sign in', next: safeNext(req.query.next || req.body?.next), values: {},
-  resetDone: req.query.reset === '1' });
+  resetDone: req.query.reset === '1', setupUnfinished: !isSetupComplete() });
 const CHALLENGE_COOKIE = 'jb_2fa';
 const challengeCookie = (req, res, token) => res.cookie(CHALLENGE_COOKIE, token, { httpOnly: true, sameSite: 'lax', secure: req.secure, path: '/login', maxAge: 10 * 60e3 });
 const startSession = (req, res, user) => setSessionCookie(req, res, createSession(user.id, { device: deviceLabel(req.get('user-agent')), ip: req.ip }));

@@ -3833,3 +3833,17 @@ Note: most of Phase 23 part A landed in commit aa56076, whose message reads "Pha
     workflow. Its home page leads with a live copy of a real approval card, because "asks before it acts" is what sets
     Jessbot apart; the sky follows the visitor's clock like the app's. A custom domain is a settings change plus a
     `SITE_URL` variable (website/README.md), not a file in the repository.
+
+## 2026-11-20: Coming back to an unfinished setup (#50)
+
+245. **Once the owner's account exists, an unfinished setup lets people sign in, and never loops.** `requireSetup` sent every
+    page to /setup until setup was done, and the wizard sent a signed-out visitor to /login, so an owner who lost the
+    session mid-setup (closed the browser, cleared cookies) got a redirect loop and no way back in; a member who joined
+    by invite before setup finished looped the same way, signed in. Now, while setup is unfinished and an account exists,
+    the sign-in pages answer (`/login`, `/login/code`, `/logout`, `/reset/…`, `/invite/…`): the login page says setup isn't
+    finished and sends the owner back to the wizard's next step after sign-in; a signed-in member gets a plain 403 "The
+    owner is still setting things up" instead of a redirect. Why sign-in and not the setup code again: the account is
+    already made, with a password; the setup code proves who may create the first account, and accepting it again would
+    let anyone who sees the server log sign in as the owner. Tested: `tests/setup-resume.test.js` (fails on the code
+    before: the redirect chain repeats /setup → /setup/model → /login?next=/setup; passes after), and in Chromium: the
+    account made in the wizard, a new browser session lands on the sign-in page and gets back to /setup/model.
