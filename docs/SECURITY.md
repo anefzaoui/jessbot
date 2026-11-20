@@ -248,6 +248,10 @@ The overview (who is trusted, every place outside content enters and how it is h
 - Headers: a strict CSP (scripts only from this origin + a per-request nonce), `nosniff`, `Referrer-Policy: same-origin`,
   a Permissions-Policy that only allows the microphone and location to this site. [#86]
 
+- **Chromium's sandbox** is on for every engine where the system allows it; `JESSBOT_BROWSER_SANDBOX` (auto, on, off)
+  decides what happens where it doesn't, and Admin → Browser / Admin → System show which it is. Docker uses
+  `deploy/seccomp-chromium.json` so the sandbox works without capabilities. [#239]
+
 ## Secrets and data
 - `.env` holds the model key, the secrets key and the Web Push keys. It is never committed. Tests run on throwaway data
   folders with their own copy of `.env`. [#86]

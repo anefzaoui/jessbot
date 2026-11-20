@@ -22,6 +22,10 @@ services:
     shm_size: 512m          # Chromium uses /dev/shm for its pages
     security_opt:
       - no-new-privileges:true
+      # Docker's own seccomp rules plus the calls Chromium's sandbox needs (user namespaces, chroot), so the agent's browser
+      # runs sandboxed without giving the container any capability. Remove this line to use Docker's default profile: the
+      # browser then starts without its sandbox, and Admin → Browser says so. docs/SECURITY-MODEL.md → Browser sandbox.
+      - seccomp=./deploy/seccomp-chromium.json
     cap_drop:
       - ALL
 volumes:

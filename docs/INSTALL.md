@@ -32,6 +32,11 @@ proxy (below) or a VPN rather than by publishing it on every interface. To use a
 Settings go in `compose.yaml` under `environment` (see [.env.example](../.env.example) for all of them), for example
 `PUBLIC_URL` behind a proxy. The container's health is checked every 30 s (`docker compose ps` shows it).
 
+The agent's browser runs in Chromium's sandbox: `compose.yaml` gives the container `deploy/seccomp-chromium.json`
+(Docker's default seccomp rules plus the calls the sandbox needs) and no capabilities. With plain `docker run`, pass
+`--security-opt seccomp=deploy/seccomp-chromium.json`, or the browser runs without its sandbox and Admin → Browser
+says so. Details: [SECURITY-MODEL.md → Browser sandbox](SECURITY-MODEL.md#browser-sandbox).
+
 ## Linux: Node.js and a systemd service
 
 You need Node.js 24.19 or newer (from [nodejs.org](https://nodejs.org) or your distribution) and git.
@@ -50,6 +55,11 @@ journalctl -u jessbot | grep "setup code"
 
 The unit (`deploy/jessbot.service`) runs Jessbot as its own user with a read-only system and only `/var/lib/jessbot`
 writable. If Google Chrome is installed on the machine, Jessbot uses it instead of Chromium (Admin → Browser).
+
+Chromium's sandbox needs unprivileged user namespaces. Most distributions allow them; Ubuntu 23.10 and later block them
+for programs without an AppArmor profile, so Admin → Browser shows the sandbox as off until you add the profile in
+[SECURITY-MODEL.md → Browser sandbox](SECURITY-MODEL.md#browser-sandbox) (or use Google Chrome's `.deb`). Check with
+`sudo -u jessbot JESSBOT_TOOLS=/var/lib/jessbot/tools node scripts/sandbox-probe.mjs`.
 
 ## Windows
 

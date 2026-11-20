@@ -23,6 +23,8 @@ Every other dependency is listed in `package.json` and keeps its own licence (MI
 `@ghostery/adblocker` and `@duckduckgo/autoconsent` (both MPL-2.0); PDF rendering uses `pdfjs-dist` (Apache-2.0); the
 browser is driven by `playwright-core` (Apache-2.0) and, with the installed Google Chrome, by `patchright-core`
 (Apache-2.0). Google Chrome itself is only used where the person installed it; Jessbot never downloads or ships it.
+`deploy/seccomp-chromium.json` is Docker's default seccomp profile (`moby/profiles/seccomp/default.json`, Apache-2.0,
+© Docker, Inc. and the Moby authors) with one rule added by `scripts/seccomp-profile.js`.
 
 ## Skills adapted from other projects
 
