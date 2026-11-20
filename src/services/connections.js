@@ -5,6 +5,7 @@ import { get, all, run } from '../db/index.js';
 import { seal, unseal } from '../lib/secrets.js';
 import { invalid, notFound } from '../lib/errors.js';
 import { resolveTarget, outboundFetch } from '../lib/outbound.js';
+import { isEmail } from '../lib/text-safe.js';
 
 // App passwords: these providers refuse the normal password for IMAP/CalDAV once two-step sign-in is on (it always should be).
 export const PRESETS = {
@@ -53,7 +54,7 @@ export function readForm(kind, body, existing = null) {
     if (!HOST_RE.test(imapHost)) errors.imapHost = 'The incoming (IMAP) server, e.g. imap.example.com.';
     if (!HOST_RE.test(smtpHost)) errors.smtpHost = 'The outgoing (SMTP) server, e.g. smtp.example.com.';
     const address = String(body.address || username).trim();
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(address)) errors.address = 'The address your mail is sent from.';
+    if (!isEmail(address)) errors.address = 'The address your mail is sent from.';
     config = {
       address, username,
       imap: { host: imapHost, port: port(body.imapPort, preset.imap.port), secure: body.imapSecure == null ? preset.imap.secure : body.imapSecure === true || body.imapSecure === 'true' || body.imapSecure === 'on' },

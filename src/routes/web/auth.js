@@ -9,7 +9,7 @@ import { audit } from '../../services/audit.js';
 import { twoFactorOn, verifySecondStep, createChallenge, readChallenge, endChallenge } from '../../services/twofactor.js';
 import { findReset, useReset } from '../../services/password-reset.js';
 import { setSessionCookie, clearSessionCookie, readCookie } from '../../middleware/auth.js';
-import { formPost } from '../../lib/respond.js';
+import { formPost, localPath } from '../../lib/respond.js';
 import { HttpError, invalid, tooMany } from '../../lib/errors.js';
 import { hit, reset, signInLimit } from '../../lib/ratelimit.js';
 import { oversightOn } from '../../services/oversight.js';
@@ -17,7 +17,7 @@ import { oversightOn } from '../../services/oversight.js';
 const router = Router();
 
 // Only same-site relative paths are allowed as post-login destinations (no open redirects).
-export const safeNext = next => (typeof next === 'string' && /^\/(?!\/|\\)[^\s]*$/.test(next) ? next : '/chat');
+export const safeNext = next => localPath(next, '/chat');
 
 // The first step, shared by the web form and POST /api/v1/auth/login: the password. → the user row (the session isn't made
 // here: with two-step sign-in on, a code comes first). A hash made with older, weaker parameters is redone now (#230).

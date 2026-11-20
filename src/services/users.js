@@ -3,9 +3,9 @@ import { get, all, run } from '../db/index.js';
 import { hashPassword, checkPasswordStrength } from './passwords.js';
 import { invalid, notFound } from '../lib/errors.js';
 import { audit } from './audit.js';
+import { isEmail } from '../lib/text-safe.js';
 
 const PUBLIC_COLS = `id, email, name, call_me, name_say, share_busy, checkins, prep, role, status, hue, timezone, about, created_at, updated_at, last_seen_at`;
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 // Stable, pleasant avatar hue per user.
 const HUES = [250, 285, 20, 155, 45, 200, 330, 110];
@@ -24,7 +24,7 @@ export const listUsers = () => all(`SELECT ${PUBLIC_COLS} FROM users ORDER BY ro
 export function validateAccount({ name, email, password }, { requirePassword = true } = {}) {
   const errors = {};
   if (!String(name || '').trim()) errors.name = 'What should I call you?';
-  if (!EMAIL_RE.test(String(email || '').trim())) errors.email = "That doesn't look like an email address.";
+  if (!isEmail(String(email || '').trim())) errors.email = "That doesn't look like an email address.";
   else if (getUserWithHash(email)) errors.email = 'Someone already uses that email.';
   if (requirePassword) {
     const weak = checkPasswordStrength(password);
@@ -49,7 +49,7 @@ export function updateProfile(id, { name, callMe, email, timezone, about, nameSa
   const errors = {};
   if (name !== undefined && !String(name).trim()) errors.name = 'Name can’t be empty.';
   if (email !== undefined && email !== user.email) {
-    if (!EMAIL_RE.test(String(email).trim())) errors.email = "That doesn't look like an email address.";
+    if (!isEmail(String(email).trim())) errors.email = "That doesn't look like an email address.";
     else if (getUserWithHash(email)) errors.email = 'Someone already uses that email.';
   }
   let say;

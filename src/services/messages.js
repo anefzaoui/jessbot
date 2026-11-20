@@ -10,6 +10,7 @@ import { ftsAny } from '../lib/fts.js';
 import { validTimezone, dayKey, dayLabel } from '../lib/when.js';
 import { invalid } from '../lib/errors.js';
 import { settleNudge } from './reply-actions.js';
+import { writeNew } from '../lib/safe-path.js';
 
 export const OFFLOAD_OVER = Number(process.env.JESSBOT_OFFLOAD_TOKENS) || 2000;
 const BLOBS = path.join(paths.data, 'blobs');
@@ -18,7 +19,7 @@ function offload(content, toolName, args) {
   fs.mkdirSync(BLOBS, { recursive: true });
   const sha = crypto.createHash('sha256').update(content).digest('hex');
   const file = path.join(BLOBS, `${sha}.txt`);
-  if (!fs.existsSync(file)) fs.writeFileSync(file, content);
+  writeNew(file, content);
   const head = content.slice(0, 600), tail = content.length > 1200 ? content.slice(-600) : '';
   const stub = `[Stored output of ${toolName}${args ? ` ${args}` : ''} — ${content.length} chars, ref ${sha.slice(0, 16)}. `
     + `Use read_offloaded("${sha.slice(0, 16)}") for the full text.]\n${head}${tail ? `\n…\n${tail}` : ''}`;

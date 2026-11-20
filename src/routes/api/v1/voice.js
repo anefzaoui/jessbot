@@ -90,7 +90,7 @@ router.post('/admin/voice/preview', async (req, res) => {
   const text = String(req.body?.text || '').trim().slice(0, 300)
     || `Hi, it’s ${name}. This is how I sound when I send you a voice note — tell me if you’d like me warmer, calmer or brighter.`;
   const started = Date.now();
-  const out = await synthesize(text, { user: req.user, voice: req.body?.voice || null, direction: String(req.body?.direction || '').trim() || null });
+  const out = await synthesize(text, { user: req.user, voice: req.body?.voice || null, direction: String(req.body?.direction || '').trim().slice(0, 600) || null });
   res.json({ audio: out.wav.toString('base64'), transcript: out.transcript, model: out.model, voice: out.voice, attempts: out.attempts,
     durationMs: out.durationMs, ms: Date.now() - started });
 });

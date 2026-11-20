@@ -26,7 +26,7 @@ export const clearSessionCookie = res => res.clearCookie(COOKIE, { path: '/' });
 
 // Populate req.user / res.locals.user from either carrier.
 export function loadUser(req, res, next) {
-  const bearer = req.headers.authorization?.match(/^Bearer\s+(.+)$/i)?.[1];
+  const bearer = req.headers.authorization?.match(/^Bearer[ \t]+(\S+)[ \t]*$/i)?.[1]; // one token: no overlap for a long header to backtrack on
   const token = bearer || readCookie(req, COOKIE);
   const found = token ? resolveSession(token) : null;
   if (found) {

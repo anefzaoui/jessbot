@@ -9,6 +9,8 @@
 //    that carries data (a long or random-looking value, an email address in its query) asks when the task read outside
 //    content first (services/policy.js assess).
 
+import { trimEndChars } from './text-safe.js';
+
 // ---- Registered secrets ------------------------------------------------------------------------------------------------
 const MIN_SECRET = 8;          // shorter values would match ordinary text (a 4-digit PIN is everywhere)
 const MAX_REGISTERED = 500;
@@ -19,7 +21,7 @@ const ENV_SECRETS = [['OPENROUTER_KEY', 'the model key'], ['LLM_API_KEY', 'the m
 
 /** Remember a value that must never leave in a tool call. Returns false for values too short to match safely. */
 // The forms a value can take on its way out: as is, URL-encoded, base64 (padding dropped).
-const formsOf = v => [...new Set([v, encodeURIComponent(v), Buffer.from(v).toString('base64').replace(/=+$/, '')])];
+const formsOf = v => [...new Set([v, encodeURIComponent(v), trimEndChars(Buffer.from(v).toString('base64'), '=')])];
 
 export function registerSecret(value, label = 'a saved password') {
   const v = String(value ?? '');

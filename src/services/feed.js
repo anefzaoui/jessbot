@@ -19,6 +19,7 @@ import { toIso } from './chatview.js';
 import { iconUrl } from './favicons.js';
 import { wordMatcher } from '../lib/word-match.js';
 import { invalid, notFound } from '../lib/errors.js';
+import { writeNew } from '../lib/safe-path.js';
 
 export const COVERS = path.join(paths.data, 'feed', 'covers');
 const GNEWS_EVERY_MS = 45 * 60000;
@@ -267,7 +268,7 @@ export function saveCover(buf, ext) {
   fs.mkdirSync(COVERS, { recursive: true });
   const name = `${crypto.createHash('sha1').update(buf).digest('hex').slice(0, 20)}.${ext}`;
   const file = path.join(COVERS, name);
-  if (!fs.existsSync(file)) fs.writeFileSync(file, buf);
+  writeNew(file, buf);
   return name;
 }
 
