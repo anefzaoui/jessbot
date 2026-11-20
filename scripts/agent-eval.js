@@ -8,7 +8,10 @@
 //   npm run eval:agent -- --yes --runs 3     each question 3 times (1–3)
 //   npm run eval:agent -- --yes --only pdf-most-pages,budget-march   some questions only
 //   --model <id>  another chat model · --out <file.json>  also write the results as JSON
-// Needs the model key: in the environment, .env, or sealed in a local install (scripts/lib/model-key.js). Nothing touches data/ or the running servers.
+//   --base-url <url> --model <id>   another provider (#11): Ollama (http://127.0.0.1:11434/v1, no key) or any OpenAI-compatible
+//                  service (its key in LLM_API_KEY). The OpenRouter key is then neither read nor sent anywhere.
+// Needs the model key (unless --base-url is Ollama or a server on this network): in the environment, .env, or sealed in a
+// local install (scripts/lib/model-key.js). Nothing touches data/ or the running servers.
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -25,8 +28,12 @@ const ONLY = opt('only') ? new Set(opt('only').split(',').map(s => s.trim())) : 
 
 // ---- A throwaway install (set up before any app module loads: config reads these at import) --------------------------
 const HOME = fs.mkdtempSync(path.join(os.tmpdir(), 'jessbot-eval-'));
-if (fs.existsSync(path.join(ROOT, '.env'))) fs.copyFileSync(path.join(ROOT, '.env'), path.join(HOME, '.env'));
-{ const k = devModelKey(); if (k) process.env.OPENROUTER_KEY = k; } // used, never stored (#10)
+const BASE_URL = opt('base-url');
+if (BASE_URL) delete process.env.OPENROUTER_KEY; // another provider: the OpenRouter key must not reach it (#11)
+else {
+  if (fs.existsSync(path.join(ROOT, '.env'))) fs.copyFileSync(path.join(ROOT, '.env'), path.join(HOME, '.env'));
+  const k = devModelKey(); if (k) process.env.OPENROUTER_KEY = k; // used, never stored (#10)
+}
 Object.assign(process.env, { JESSBOT_HOME: HOME, JESSBOT_ENV_FILE: path.join(HOME, '.env'), JESSBOT_EMBED_OFF: '1', JESSBOT_EXTRACT_DELAY_MS: '86400000' });
 const cleanup = () => { try { fs.rmSync(HOME, { recursive: true, force: true }); } catch { /* a file still open on Windows: the OS temp cleaner takes it */ } };
 
@@ -43,7 +50,7 @@ const { makeWorkbook } = await import('../src/services/office.js');
 const { createAlarm } = await import('../src/services/alarms.js');
 const { createList, addItems, checkItems } = await import('../src/services/lists.js');
 const { createSideThread } = await import('../src/services/threads.js');
-const { llmSettings } = await import('../src/services/llm.js');
+const { llmSettings, llmState, providerInput } = await import('../src/services/llm.js');
 const { modelPrice, estimateCost, dollars } = await import('../src/services/model-price.js');
 const { countMessages, countTokens } = await import('../src/lib/tokens.js');
 const { buildPrompt } = await import('../src/agent/prompt.js');
@@ -52,8 +59,9 @@ await import('../src/agent/tools/index.js');
 const loop = await import('../src/agent/loop.js');
 const { PDFDocument, StandardFonts } = await import('@cantoo/pdf-lib');
 
-if (!llmSettings().apiKey) { console.error('No model key (environment, .env or a local install): the evaluation needs the real model.'); cleanup(); process.exit(2); }
-if (opt('model')) settings.set('llm', { model: opt('model') });
+if (BASE_URL) settings.set('llm', providerInput({ baseUrl: BASE_URL, model: opt('model') })); // { provider, baseUrl, model }; throws on a bad one
+else if (opt('model')) settings.set('llm', { model: opt('model') });
+if (!llmState().ready) { console.error('No model key (environment, .env or a local install): the evaluation needs the real model.'); cleanup(); process.exit(2); }
 const MODEL = llmSettings().model;
 
 // ---- Fixtures ----------------------------------------------------------------------------------------------------------
