@@ -37,7 +37,9 @@
     "doctor": "node scripts/doctor.js",
     "browser:sandbox": "node scripts/sandbox-probe.mjs",
     "secrets:rotate": "node scripts/rotate-secret.js",
-    "release": "node scripts/release.js"
+    "release": "node scripts/release.js",
+    "i18n": "node scripts/i18n.js",
+    "i18n:check": "node scripts/i18n.js --check"
   },
   "dependencies": {
     "@cantoo/fontkit": "2.0.12",

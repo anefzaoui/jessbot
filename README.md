@@ -315,8 +315,9 @@ Honest list, roughly in order:
 - **Install options**: a published image per release (the Dockerfile and compose file are here), a Windows installer.
 - **Providers**: prices for services other than OpenRouter (so their budgets can count spending), and local voice and
   pictures.
-- **Interface languages**: the interface is English only for now (the agent itself reads and writes in many languages,
-  including right-to-left ones).
+- **Interface languages**: the translation layer is in (right-to-left included, [docs/TRANSLATING.md](docs/TRANSLATING.md)),
+  but only the sign-in pages are marked so far and no language ships yet (the agent itself reads and writes in many
+  languages, including right-to-left ones).
 - Later: messaging channels (Telegram first), MCP tools, a mobile app.
 
 ## Documentation

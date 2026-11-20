@@ -3,11 +3,11 @@
   <aside class="setup-hero relative hidden overflow-hidden lg:flex lg:flex-col lg:justify-center lg:p-10" aria-hidden="true">
     <div class="w-fit">{{> avatar size="hero" activity="resting"}}</div>
     {{#if @root.setupUnfinished}}
-      <p class="mt-8 max-w-sm text-3xl leading-tight font-semibold tracking-tight text-balance text-white">Almost there.</p>
-      <p class="mt-3 max-w-sm text-white/70">A few steps of setup are left. Sign in and they pick up where you stopped.</p>
+      <p class="mt-8 max-w-sm text-3xl leading-tight font-semibold tracking-tight text-balance text-white">{{t "Almost there."}}</p>
+      <p class="mt-3 max-w-sm text-white/70">{{t "A few steps of setup are left. Sign in and they pick up where you stopped."}}</p>
     {{else}}
-      <p class="mt-8 max-w-sm text-3xl leading-tight font-semibold tracking-tight text-balance text-white">{{@root.bot.name}} has been keeping things moving.</p>
-      <p class="mt-3 max-w-sm text-white/70">Sign in to see what got done while you were away.</p>
+      <p class="mt-8 max-w-sm text-3xl leading-tight font-semibold tracking-tight text-balance text-white">{{t "{name} has been keeping things moving." name=@root.bot.name}}</p>
+      <p class="mt-3 max-w-sm text-white/70">{{t "Sign in to see what got done while you were away."}}</p>
     {{/if}}
   </aside>
   <main id="main" class="flex items-center px-5 py-10 sm:px-10">

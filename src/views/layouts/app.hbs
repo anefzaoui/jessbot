@@ -3,7 +3,7 @@
   Pages set: title, nav (active section), and optionally hidePanel / mainClass.
 --}}
 <!doctype html>
-<html lang="en" class="h-full" data-bot-name="{{bot.name}}" data-asset-v="{{assetV}}"{{#if apiBase}} data-api-base="{{apiBase}}"{{/if}}{{#if seq}} data-seq="{{seq}}"{{else if user}} data-seq="0"{{/if}}>
+<html lang="{{default locale 'en'}}" dir="{{default dir 'ltr'}}" class="h-full" data-bot-name="{{bot.name}}" data-asset-v="{{assetV}}"{{#if apiBase}} data-api-base="{{apiBase}}"{{/if}}{{#if seq}} data-seq="{{seq}}"{{else if user}} data-seq="0"{{/if}}>
 <head>
   {{> shell/head}}
 </head>
@@ -37,6 +37,7 @@
   <div class="alarm-dock" data-alarm-dock>{{#each shell.ringing}}{{> alarm-ring this}}{{/each}}</div>
   <div id="toasts" class="toast-region" aria-live="polite" aria-atomic="false"></div>
   <div id="announcer" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+  <script type="application/json" id="jb-i18n">{{{default i18nCatalog '{}'}}}</script>
   <script type="module" src="/js/main.js?v={{assetV}}"></script>
 </body>
 </html>

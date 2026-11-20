@@ -1,24 +1,27 @@
 {{#if invite}}
-  {{#> auth-frame heading=(concat "You're invited") lead=(concat (default inviterName "The owner") " invited you to talk to " bot.name ", their personal agent.")}}
-    <form method="post" action="" class="space-y-4" data-ajax data-busy="Setting you up…">
-      {{> field name="name" label="Your name" autocomplete="name" required=true autofocus=true}}
-      {{> field name="email" label="Email" type="email" autocomplete="email" required=true hint="You'll use this to sign in."}}
-      {{> field name="password" label="Password" type="password" autocomplete="new-password" required=true hint=(concat "At least " minPassword " characters.")}}
-      {{> field name="confirm" label="Confirm password" type="password" autocomplete="new-password" required=true}}
-      <button class="btn btn-primary btn-lg btn-block mt-2">Join {{icon "arrow-right" class="size-4"}}</button>
+  {{#> auth-frame heading=(t "You're invited") lead=(t "{inviter} invited you to talk to {name}, their personal agent." inviter=(default inviterName (t "The owner")) name=bot.name)}}
+    <form method="post" action="" class="space-y-4" data-ajax data-busy="{{t "Setting you up…"}}">
+      {{> field name="name" label=(t "Your name") autocomplete="name" required=true autofocus=true}}
+      {{> field name="email" label=(t "Email") type="email" autocomplete="email" required=true hint=(t "You'll use this to sign in.")}}
+      {{> field name="password" label=(t "Password") type="password" autocomplete="new-password" required=true hint=(t "At least {count} characters." count=minPassword)}}
+      {{> field name="confirm" label=(t "Confirm password") type="password" autocomplete="new-password" required=true}}
+      <button class="btn btn-primary btn-lg btn-block mt-2">{{t "Join"}} {{icon "arrow-right" class="size-4 rtl:-scale-x-100"}}</button>
     </form>
     <p class="mt-6 flex gap-2 rounded-xl border border-line bg-surface-2/60 px-3 py-2.5 text-xs leading-relaxed text-ink-2">
       {{icon "eye" class="mt-0.5 size-3.5 shrink-0 text-ink-3"}}
-      <span>You get your own chat with {{bot.name}}. It runs on {{default inviterName "the owner"}}'s server: the owner sets how {{bot.name}} helps you{{#if readByAdmins}} and <strong class="font-semibold text-ink">can read your conversations</strong>{{else}}, and your conversations stay yours{{/if}}.</span>
+      {{!-- Whole sentences, so each language can order them its own way; the warning keeps its emphasis. --}}
+      <span>{{t "You get your own chat with {name}." name=bot.name}}
+        {{#if readByAdmins}}<strong class="font-semibold text-ink">{{t "It runs on {owner}'s server: the owner sets how {name} helps you and can read your conversations." owner=(default inviterName (t "the owner")) name=bot.name}}</strong>
+        {{else}}{{t "It runs on {owner}'s server: the owner sets how {name} helps you, and your conversations stay yours." owner=(default inviterName (t "the owner")) name=bot.name}}{{/if}}</span>
     </p>
   {{/auth-frame}}
 {{else}}
   <main id="main" class="grid min-h-dvh place-items-center px-6">
     <div class="max-w-sm text-center">
       <div class="mx-auto w-fit">{{> avatar size="xl" activity="offline"}}</div>
-      <h1 class="mt-6 text-2xl font-semibold tracking-tight">This invite has expired</h1>
-      <p class="mt-2 text-ink-2">Invite links work once and last 7 days. Ask for a fresh one.</p>
-      <a href="/login" class="btn btn-secondary mt-6">Go to sign in</a>
+      <h1 class="mt-6 text-2xl font-semibold tracking-tight">{{t "This invite has expired"}}</h1>
+      <p class="mt-2 text-ink-2">{{t "Invite links work once and last 7 days. Ask for a fresh one."}}</p>
+      <a href="/login" class="btn btn-secondary mt-6">{{t "Go to sign in"}}</a>
     </div>
   </main>
 {{/if}}

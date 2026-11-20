@@ -32,6 +32,8 @@ The dev server keeps its data in `data/dev`, so it never touches an install you 
 
 - Node 24 ESM, Express 5, express-handlebars (`.hbs`), Tailwind v4 CLI, the built-in `node:sqlite`.
 - Every page is its own Express route. Logic lives in `src/services/`; web routes and `/api/v1` both call services.
+- New interface text goes through the translation layer: `{{t "…"}}` in templates, `t('…')` in the browser, whole
+  sentences with `{placeholders}`; then `npm run i18n` (CI runs `npm run i18n:check`). See docs/TRANSLATING.md.
 - Database changes are a new `src/db/migrations/NNN_name.sql` (or `.js` with `up()`). Never edit one that has shipped:
   applied migrations are checksummed and a changed one stops the server. See [docs/DATABASE.md](docs/DATABASE.md).
 - Icons: `{{icon "name"}}` with Jessbot's icon names; `scripts/icon-map.js` maps them to Phosphor, and

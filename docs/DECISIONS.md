@@ -3870,3 +3870,25 @@ Note: most of Phase 23 part A landed in commit aa56076, whose message reads "Pha
     let anyone who sees the server log sign in as the owner. Tested: `tests/setup-resume.test.js` (fails on the code
     before: the redirect chain repeats /setup → /setup/model → /login?next=/setup; passes after), and in Chromium: the
     account made in the wizard, a new browser session lands on the sign-in page and gets back to /setup/model.
+
+## 2026-11-20: Translations (#14)
+
+246. **A translation layer: English texts as keys, a catalog per language, a list the tools keep current.** The interface
+    was English only, with its words written straight into templates and scripts. Now `src/lib/i18n.js` (server, and the
+    `{{t}}`/`{{tn}}` template helpers) and `public/js/i18n.js` (the browser) translate a text by its English: a catalog
+    `locales/<lang>.json` maps it, a missing entry shows the English (never a blank), `{placeholders}` are filled as text
+    (escaped by the template), plurals follow the language's `Intl.PluralRules` categories. Why English as the key
+    (gettext style) rather than ids: code stays readable, nothing needs a second file to show English, and the
+    extractor can find every text. The page's language: `?lang=` (remembered in a cookie), else Accept-Language, among
+    languages that have a catalog, else English; `<html lang dir>` follows, right-to-left for Arabic, Hebrew, Persian and
+    Urdu, and English shown on such a page keeps its own direction (Unicode isolates, so its full stop stays put). The
+    browser gets the page's catalog as JSON in the page (none for English). `npm run i18n` writes `locales/messages.json`
+    (every text with where it is used) and reports each language's coverage; `npm run i18n:check`, in CI, fails on a stale
+    list, a text no longer used, a placeholder the English doesn't have, or a plural that isn't one. In development
+    `?lang=en-XA` marks every translated text (`[Sígn ín]`), which shows what isn't marked yet. Marked so far: the
+    sign-in pages (sign in, two-step code, password reset, invite: 44 texts) and the shared form messages; no language
+    ships yet. Not done: the rest of the interface, server messages (form errors, notifications), a language picker.
+    Tested: `tests/i18n.test.js` (translation and fallback, French and Arabic plural rules, the locale choice, the pages
+    in French, Arabic and the pseudo-locale, the cookie, the extractor and its checks, the list current), and in
+    Chromium with a temporary Arabic catalog: the sign-in page right-to-left, its arrow turned, the English line still
+    reading left to right; the browser's `t()` per language.

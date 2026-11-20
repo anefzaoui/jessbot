@@ -5,6 +5,7 @@
 import { $, $$, on, api, withBusy, ApiError } from './core.js';
 import { toast } from './toast.js';
 import { confirmDialog } from './modal.js';
+import { t } from './i18n.js';
 
 function toBody(form) {
   const fd = new FormData(form);
@@ -48,7 +49,7 @@ export function initForms() {
   on(document, 'submit', 'form[data-ajax]', async (e, form) => {
     e.preventDefault();
     // data-confirm="Question?" asks first (destructive actions).
-    if (form.dataset.confirm && !(await confirmDialog({ title: form.dataset.confirm, confirmLabel: 'Yes, continue', danger: true }))) return;
+    if (form.dataset.confirm && !(await confirmDialog({ title: form.dataset.confirm, confirmLabel: t('Yes, continue'), danger: true }))) return;
     clearErrors(form);
     const submit = e.submitter || $('[type="submit"]', form);
     await withBusy(submit, async () => {
@@ -71,7 +72,7 @@ export function initForms() {
         if (to) location.assign(to);
       } catch (err) {
         if (err instanceof ApiError && err.data?.errors) showErrors(form, err.data.errors);
-        else toast.error(err.message, { title: form.dataset.errorTitle || "Couldn't save" });
+        else toast.error(err.message, { title: form.dataset.errorTitle || t("Couldn't save") });
         form.dispatchEvent(new CustomEvent('ajax:error', { detail: err, bubbles: true }));
       }
     }, form.dataset.busy);
