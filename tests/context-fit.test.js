@@ -226,3 +226,14 @@ test('compaction aims below a small known window, and keeps the usual limits oth
   const k128 = compactionLimits(131_072);
   assert.ok(k128.target < 120_000 && k128.minMsgs === 20);
 });
+
+test('a small reading kept from before Ollama was restarted with a bigger context doesn’t block the next run', async () => {
+  ps = loaded(4096);
+  assert.equal((await F.ollamaContext(`${BASE}/v1`, 'qwen2.5:7b')).context, 4096); // kept for a minute
+  ps = loaded(32768); // the admin set OLLAMA_CONTEXT_LENGTH and restarted Ollama
+  promptTokens = 26_000;
+  script = [{ text: 'Hello again.' }];
+  const r = await settle(chatRun('Hello?'));
+  assert.equal(r.status, 'done', r.error);
+  assert.equal(F.knownContext(), 32768);
+});

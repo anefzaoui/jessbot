@@ -723,7 +723,9 @@ async function execute(runId) {
       const raw = rawMessageTokens(messages);
       // A context window too small for the request (Ollama, #69, decision #252): stop with what to set, rather than let the
       // model read a cut prompt and call tools at random. Only a provider that reports its window is checked here.
-      const misfit = fitOf(requestTokens(messages, tools), await currentContext().catch(() => null));
+      const asked = requestTokens(messages, tools);
+      let misfit = fitOf(asked, await currentContext().catch(() => null));
+      if (misfit) misfit = fitOf(asked, await currentContext({ fresh: true }).catch(() => null)); // a reading kept from before a restart never blocks
       if (misfit) {
         console.warn(`[agent] run ${runId}: the request (~${misfit.tokens} tokens) doesn't fit the model's context (${misfit.context})`);
         await failRun(runId, misfit.message, 'permanent');

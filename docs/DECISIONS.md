@@ -3988,8 +3988,8 @@ Note: most of Phase 23 part A landed in commit aa56076, whose message reads "Pha
     reported the server's context), and a model loaded with a larger `num_ctx` through the native API is reloaded at the
     server's setting by the next `/v1` request, so Jessbot doesn't send it and the guide says what to set
     (`OLLAMA_CONTEXT_LENGTH=32768`, or a Modelfile's `num_ctx`; on an 8 GB card also `OLLAMA_FLASH_ATTENTION=1` and
-    `OLLAMA_KV_CACHE_TYPE=q8_0`, which brought the 32K model back onto the GPU: about 1,700 prompt and 33 reply tokens a
-    second). What Jessbot does (`src/services/context-fit.js`): the connection test (setup, Admin → Models) reads the
+    `OLLAMA_KV_CACHE_TYPE=q8_0`, which brought the 32K model back onto the GPU: the issue measured about 1,700 prompt and
+    33 reply tokens a second, and the recheck here had the whole model and its context on the card, 5.6 GB). What Jessbot does (`src/services/context-fit.js`): the connection test (setup, Admin → Models) reads the
     context Ollama loaded the model with (`/api/ps`, right after the test call loaded it; else a Modelfile's `num_ctx`
     from `/api/show`) and the model's trained length, compares them with this admin's own prompt (instructions and tool
     list, o200k-counted) plus 2,048 tokens for the reply, and shows a warning under "Connected" with what to set (also

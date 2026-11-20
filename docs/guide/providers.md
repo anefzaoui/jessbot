@@ -41,8 +41,8 @@ Set it where Ollama runs, then restart Ollama:
 On a graphics card with **8 GB** (an RTX 4060, say), a 7B model with a 32,768-token context no longer fits and spills
 onto the processor: replies slow to a couple of words a second. Two more settings make it fit again:
 `OLLAMA_FLASH_ATTENTION=1` and `OLLAMA_KV_CACHE_TYPE=q8_0` (the context's cache at 8 bits, half the memory). Measured
-with `qwen2.5:7b` on an RTX 4060: about 1,700 prompt tokens and 33 reply tokens a second, a plain chat answered in
-about 17 seconds. A bigger context helps long chats if your memory allows it: Jessbot folds older messages into a
+with `qwen2.5:7b` on an RTX 4060: the whole model and its 32,768-token context on the graphics card (5.6 GB), a plain
+question answered in about 20 seconds, a task with several steps in one to two minutes. A bigger context helps long chats if your memory allows it: Jessbot folds older messages into a
 summary sooner when the context is small.
 
 Jessbot checks this for you. **Test the connection** (setup) and **Save and test** (Admin → Models) read the context
