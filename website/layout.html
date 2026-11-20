@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>{{title}}</title>
+<meta name="description" content="{{description}}">
+<link rel="canonical" href="{{url}}">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f8fa" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f1318" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Jessbot">
+<meta property="og:title" content="{{title}}">
+<meta property="og:description" content="{{description}}">
+<meta property="og:url" content="{{url}}">
+<meta property="og:image" content="{{site}}images/social-preview.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+<meta property="og:image:alt" content="Jess, the assistant, in her night sky, next to the words: Jessbot, a self-hosted AI agent for your household">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="{{root}}favicon.ico" sizes="16x16 32x32 48x48">
+<link rel="icon" href="{{root}}favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="{{root}}images/apple-touch-icon.png">
+<link rel="manifest" href="{{root}}site.webmanifest">
+<link rel="preload" href="{{root}}assets/geist.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="{{root}}assets/styles.css">
+<script>
+  // The theme before first paint: the visitor's choice if they made one here, else their system's.
+  (function () {
+    var t = null; try { t = localStorage.getItem('jb-site-theme'); } catch (e) {}
+    if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+  })();
+</script>
+<script src="{{root}}assets/site.js" defer></script>
+</head>
+<body class="{{bodyClass}}">
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-head">
+  <div class="site-head-in">
+    <a class="brand" href="{{root}}index.html" aria-label="Jessbot, home">
+      <img src="{{root}}images/mark-128.webp" width="32" height="32" alt="">
+      <span>Jessbot</span>
+    </a>
+    <nav class="site-nav" aria-label="Main">{{nav}}</nav>
+    <div class="site-tools">
+      <button type="button" class="icon-btn" data-theme-toggle aria-label="Switch to dark theme">
+        <span class="when-light">{{icon:moon}}</span><span class="when-dark">{{icon:sun}}</span>
+      </button>
+      <a class="btn btn-small" href="{{repo}}">{{icon:github-logo}}<span>GitHub</span></a>
+    </div>
+  </div>
+</header>
+{{body}}
+<footer class="site-foot">
+  <div class="site-foot-in">
+    <div class="foot-brand">
+      <img src="{{root}}images/mark-128.webp" width="40" height="40" alt="">
+      <p><strong>Jessbot</strong><br>A self-hosted AI agent for your household. Free software under the
+        <a href="{{repo}}/blob/main/LICENSE">GPL-3.0-or-later</a>.</p>
+    </div>
+    <nav aria-label="Footer">
+      <ul role="list">
+        <li><a href="{{root}}docs/getting-started.html">Getting started</a></li>
+        <li><a href="{{root}}docs/install.html">Install</a></li>
+        <li><a href="{{root}}docs/approvals-and-safety.html">Approvals and safety</a></li>
+        <li><a href="{{root}}docs/faq.html">FAQ</a></li>
+      </ul>
+      <ul role="list">
+        <li><a href="{{repo}}">Source code</a></li>
+        <li><a href="{{repo}}/issues">Report a problem</a></li>
+        <li><a href="{{repo}}/blob/main/SECURITY.md">Report a security issue</a></li>
+        <li><a href="{{repo}}/blob/main/AI-DECLARATION.md">How it's made (with AI)</a></li>
+      </ul>
+    </nav>
+  </div>
+  <p class="foot-note">Jess is an AI-generated character made for this project. Demo screens use made-up people.</p>
+</footer>
+</body>
+</html>

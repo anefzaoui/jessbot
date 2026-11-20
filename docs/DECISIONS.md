@@ -3782,3 +3782,16 @@ Note: most of Phase 23 part A landed in commit aa56076, whose message reads "Pha
     what it leaves alone, no plaintext in the database or its WAL file, the key file, the previous key, a full rotation of
     every kind and its refusals, the inventory), and on a real install: the key moved out of `.env` at start, the model
     answered, Admin → System opened it; after `npm run secrets:rotate` it answered again with the new key.
+
+## 2026-11-20: Logo, screenshots and the website
+
+241. **The project's public face is built from the app itself, and the site is static and built from the repository.**
+    The logo is Jess's default portrait over her night sky, layered the way the living avatar is
+    (`scripts/build-brand.js`, no new image generation). Screenshots come from `scripts/docs-shots.js`: the setup
+    wizard, Admin → People and an approval run from a real install with made-up people, the other screens from the dev
+    styleguide's demo household (a new install has no weeks of history to show), all labelled as such. The website is a
+    plain build script (`scripts/build-site.js`, markdown-it already a dependency) rather than a site generator, so it
+    adds no dependency and renders the user guide (`docs/guide/`) as it is, published by a pinned GitHub Pages
+    workflow. Its home page leads with a live copy of a real approval card, because "asks before it acts" is what sets
+    Jessbot apart; the sky follows the visitor's clock like the app's. A custom domain is a settings change plus a
+    `SITE_URL` variable (website/README.md), not a file in the repository.

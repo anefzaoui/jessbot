@@ -27,3 +27,6 @@ Thumbs.db
 
 # JVM crash logs (a test mail server that ran out of memory writes these to the working folder)
 hs_err_pid*.log
+
+# The website build (scripts/build-site.js)
+/_site/
