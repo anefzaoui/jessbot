@@ -19,10 +19,13 @@ expressive material. Light and dark are both first-class.
 STORY: the visitor meets Jess, sees a real card from a test run, presses Approve or Deny themselves, understands the
 deal (it works on its own, it asks before it sends, spends or books), sees the rest of what it does in real screens,
 reads what leaves their machine, and copies the install command.
-FIRST VIEWPORT: a full-width band of Jess's sky; her round portrait large on the inline-start side; the name and a
-one-line promise; the live approval card on the inline-end side, at real size, Approve/Deny working; under the promise,
-the install command in a copyable field (the primary action) and a quieter GitHub link. Phones stack portrait, promise,
-command, card.
-FORM: structure 3 of 7 on the ranked list (the approval card as spine); seed: none (unavailable) — run unattended as a
-subagent, no decision page served; the dealt lead was taken as assigned.
+FIRST VIEWPORT: a full-width band of Jess's sky. The promise (h1), the lead and the install command in a copyable field
+(the primary action), with a quieter GitHub link under it, sit on the inline-start side. Jess stands in the middle as a
+full cut-out bust in her sky, not a round crop (amended after the first render: a round portrait beside a full-size
+card hid her face; the cut-out matches the social preview). The live approval card, Approve/Deny working, sits on the
+inline-end side, its caption above it. The name is the header's wordmark and the lead's first word (no eyebrow). Phones
+stack Jess (head and shoulders), promise, command, card. Jess's seam lines and temple light are her designed look
+(the avatar prompt asks for them) and are kept, not retouched.
+FORM: structure 3 of 7 on the ranked list (the approval card as spine); seed:3c3923a4b818688e; run unattended as a subagent, no decision page
+served; the dealt lead was taken as assigned.
 FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance

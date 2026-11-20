@@ -14,11 +14,13 @@
         </div>
         <p class="hint">Then open <code>http://127.0.0.1:3737</code>. Node.js and the other systems are in the
           <a href="docs/install.html">install guide</a>. Free and open source, early preview.</p>
+        <p class="hero-source"><a href="https://github.com/anefzaoui/jessbot">{{icon:github-logo}} Read the source on GitHub</a></p>
       </div>
     </div>
 
     <div class="hero-stage">
       <img class="hero-jess" src="images/jess.webp" width="1024" height="1024" alt="Jess, the default look of the assistant: a woman with short auburn hair, in her sky">
+      <p class="stage-note">A card from a real test run (made-up people; the email is shortened here). Try it: nothing is sent from this page.</p>
       <article class="approval" data-status="pending" aria-labelledby="demo-title" data-demo-card>
         <header class="approval-head">
           <span class="approval-risk" aria-hidden="true">{{icon:paper-plane-tilt}}</span>
@@ -58,7 +60,6 @@ Alex</div>
           <p class="approval-result" data-result aria-live="polite"></p>
         </footer>
       </article>
-      <p class="stage-note">A card from a real test run (made-up people; the email is shortened here). Try it: nothing is sent from this page.</p>
     </div>
   </div>
 </section>
@@ -69,13 +70,13 @@ Alex</div>
       <h2 id="story-title">One request, start to finish</h2>
       <p class="lead">This is the run that card came from, recorded on a test install and sped up where it waits.</p>
       <ol class="steps" role="list">
-        <li><strong>You ask in plain words.</strong> “In the background, find one easy hike near Lyon for Saturday
+        <li data-step="ask"><strong>You ask in plain words.</strong> “In the background, find one easy hike near Lyon for Saturday
           morning, then email Maya the plan.”</li>
-        <li><strong>Jess takes it to the background.</strong> She opens her own side chat for it, so yours stays free,
+        <li data-step="run"><strong>Jess takes it to the background.</strong> She opens her own side chat for it, so yours stays free,
           and searches the web with her browser.</li>
-        <li><strong>She stops at a card.</strong> The recipient, the exact text, whether it can be undone, and why she is
+        <li data-step="wait"><strong>She stops at a card.</strong> The recipient, the exact text, whether it can be undone, and why she is
           asking. Nothing has left yet.</li>
-        <li><strong>You approve, and only then it is sent.</strong> The activity log keeps a line for each step.</li>
+        <li data-step="ok"><strong>You approve, and only then it is sent.</strong> The activity log keeps a line for each step.</li>
       </ol>
     </div>
     <figure class="story-video">
@@ -99,8 +100,8 @@ Alex</div>
         <a class="more" href="docs/feed.html">How the Feed works {{icon:arrow-right}}</a>
       </div>
       <picture class="feature-shot">
-        <img class="only-light" src="images/feed-desktop-light.webp" alt="The Feed: an evening greeting with the weather, Jess's evening brief, and topic filters" loading="lazy" width="1552" height="1012">
-        <img class="only-dark" src="images/feed-desktop-dark.webp" alt="The Feed in the dark theme" loading="lazy" width="1552" height="1012">
+        <img class="only-light" src="images/feed-main-desktop-light.webp" alt="The Feed: an evening greeting with the weather, Jess's evening brief, and topic filters" loading="lazy" width="928" height="832">
+        <img class="only-dark" src="images/feed-main-desktop-dark.webp" alt="The Feed in the dark theme" loading="lazy" width="928" height="832">
       </picture>
     </div>
 
@@ -111,8 +112,8 @@ Alex</div>
           suggests, each with the reason, that you can start or turn down.</p>
       </div>
       <picture class="feature-shot">
-        <img class="only-light" src="images/goals-desktop-light.webp" alt="Goals: suggestions to adopt, and goals in progress with their percentage and next step" loading="lazy" width="1552" height="1012">
-        <img class="only-dark" src="images/goals-desktop-dark.webp" alt="Goals in the dark theme" loading="lazy" width="1552" height="1012">
+        <img class="only-light" src="images/goals-main-desktop-light.webp" alt="Goals: suggestions to adopt, and goals in progress with their percentage and next step" loading="lazy" width="928" height="832">
+        <img class="only-dark" src="images/goals-main-desktop-dark.webp" alt="Goals in the dark theme" loading="lazy" width="928" height="832">
       </picture>
     </div>
 
@@ -124,8 +125,8 @@ Alex</div>
         <a class="more" href="docs/library.html">About the Library {{icon:arrow-right}}</a>
       </div>
       <picture class="feature-shot">
-        <img class="only-light" src="images/library-desktop-light.webp" alt="The Library: pages, audio and calendar files Jess made, filtered by kind" loading="lazy" width="1552" height="1012">
-        <img class="only-dark" src="images/library-desktop-dark.webp" alt="The Library in the dark theme" loading="lazy" width="1552" height="1012">
+        <img class="only-light" src="images/library-main-desktop-light.webp" alt="The Library: pages, audio and calendar files Jess made, filtered by kind" loading="lazy" width="928" height="832">
+        <img class="only-dark" src="images/library-main-desktop-dark.webp" alt="The Library in the dark theme" loading="lazy" width="928" height="832">
       </picture>
     </div>
 
@@ -136,8 +137,8 @@ Alex</div>
           nudge until someone says done, alarms and timers, and what is coming up across the household.</p>
       </div>
       <picture class="feature-shot">
-        <img class="only-light" src="images/upcoming-desktop-light.webp" alt="Upcoming: the week ahead, dates Jess remembers, and alarms, reminders and timers" loading="lazy" width="1552" height="1012">
-        <img class="only-dark" src="images/upcoming-desktop-dark.webp" alt="Upcoming in the dark theme" loading="lazy" width="1552" height="1012">
+        <img class="only-light" src="images/upcoming-main-desktop-light.webp" alt="Upcoming: the week ahead, dates Jess remembers, and alarms, reminders and timers" loading="lazy" width="928" height="832">
+        <img class="only-dark" src="images/upcoming-main-desktop-dark.webp" alt="Upcoming in the dark theme" loading="lazy" width="928" height="832">
       </picture>
     </div>
 
@@ -149,8 +150,8 @@ Alex</div>
         <a class="more" href="docs/people-and-admin.html">People and admin {{icon:arrow-right}}</a>
       </div>
       <picture class="feature-shot">
-        <img class="only-light" src="images/admin-people-real-desktop-light.webp" alt="Admin, People: whether admins may read other people's chats (off by default), instructions for everyone, and the household's accounts" loading="lazy" width="1552" height="1012">
-        <img class="only-dark" src="images/admin-people-real-desktop-dark.webp" alt="Admin, People in the dark theme" loading="lazy" width="1552" height="1012">
+        <img class="only-light" src="images/admin-people-real-main-desktop-light.webp" alt="Admin, People: whether admins may read other people's chats (off by default), instructions for everyone, and the household's accounts" loading="lazy" width="928" height="832">
+        <img class="only-dark" src="images/admin-people-real-main-desktop-dark.webp" alt="Admin, People in the dark theme" loading="lazy" width="928" height="832">
       </picture>
     </div>
 
