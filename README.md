@@ -304,8 +304,8 @@ Features a provider can't serve are switched off and say so (Admin → Models ma
 A key is only ever sent to the service it was entered for, and Ollama never gets one. Small local models connect but get
 lost in Jessbot's long instructions: use 7B or larger. Jessbot's prompt is about 25,000 tokens, far more than Ollama's
 default context, so set `OLLAMA_CONTEXT_LENGTH=32768` on the Ollama server (and, on an 8 GB graphics card,
-`OLLAMA_FLASH_ATTENTION=1` and `OLLAMA_KV_CACHE_TYPE=q8_0`); the connection test warns when it is too small. The weekly budget per person caps what each person can spend
-where the provider reports costs. Details: [docs/guide/providers.md](docs/guide/providers.md).
+`OLLAMA_FLASH_ATTENTION=1` and `OLLAMA_KV_CACHE_TYPE=q8_0`); the connection test warns when it is too small. The
+weekly budget per person caps what each person can spend where the provider reports costs. Details: [docs/guide/providers.md](docs/guide/providers.md).
 
 ## What's missing before a 1.0
 
