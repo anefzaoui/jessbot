@@ -51,13 +51,15 @@ The dev server keeps its data in `data/dev`, so it never touches an install you 
 
 | Command | What it covers | Needs |
 |---|---|---|
-| `npm test` | Unit and integration tests (Node's test runner, throwaway data folders, fake model servers) | nothing |
+| `npm run lint` | A syntax check of every JavaScript file | nothing |
+| `npm test` | Unit and integration tests (Node's test runner, throwaway data folders, fake model servers); the real-render tests need `npm run browser:install` | nothing |
 | `npm run test:e2e` | Setup, sign-in, invites, two people sharing a list, feed topics, in a real headless browser | Chrome, Edge or Chromium installed |
 | `npm run ui:flows` / `npm run ui:check` | UI interaction checks and a screenshot sweep with console-error checks | `npm run dev` running |
 | `npm run test:chat` | The chat core against a real model (a few cheap calls), plus mail and calendar when the test servers are installed | a model key in `.env`; internet |
 | `npm run eval:agent` | Eleven household questions answered end to end by the real agent ([docs/EVAL.md](docs/EVAL.md)) | a model key |
 
-Run `npm test` for every change, the e2e and UI checks for anything you can see, and `test:chat` for changes to the
+CI runs `npm run lint`, `npm test` (Linux, Windows and macOS) and `npm audit --audit-level=high` on every pull request,
+plus CodeQL; Dependabot opens weekly update pull requests. Run `npm test` yourself for every change, the e2e and UI checks for anything you can see, and `test:chat` for changes to the
 agent, its tools or prompts. A flaky test is a bug: find why it fails, don't re-run it until it passes.
 
 Mail and calendar tests use two local servers under the git-ignored `tools/test-servers/`: GreenMail

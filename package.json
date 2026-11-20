@@ -17,6 +17,7 @@
     "dev": "node scripts/dev.js",
     "start": "node server.js",
     "check": "node --check server.js",
+    "lint": "node scripts/lint.js",
     "db:status": "node scripts/db-status.js",
     "db:backup": "node scripts/db-status.js --backup",
     "browser:install": "node scripts/browser-install.js",
