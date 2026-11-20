@@ -49,8 +49,8 @@ async function mark(size, { form = 'round', crop = CROP.full } = {}) {
 }
 
 const write = async (name, buf) => { fs.writeFileSync(path.join(OUT, name), buf); return name; };
-// Large PNGs go through a 256-colour palette with dithering: a quarter of the size, no visible loss at icon sizes.
-const small = buf => sharp(buf).png({ palette: true, quality: 95, effort: 10, dither: 1, compressionLevel: 9 }).toBuffer();
+// Full-colour PNGs: the portrait is a photograph-like image, so no palette quantization (it bands the skin).
+const small = buf => sharp(buf).png({ compressionLevel: 9, adaptiveFiltering: true }).toBuffer();
 const webp = (buf, q = 86) => sharp(buf).webp({ quality: q, alphaQuality: 90, effort: 6 }).toBuffer();
 const made = [];
 
