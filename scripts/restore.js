@@ -10,7 +10,8 @@ import { DatabaseSync } from 'node:sqlite';
 import * as tar from 'tar';
 import { paths, config } from '../src/config/index.js';
 
-const ITEMS = ['jessbot.sqlite', 'workspace', 'users', 'artifacts', 'uploads', 'blobs', 'feed', 'shots'];
+// The same folders a backup holds (services/system.js INCLUDE), plus the database.
+const ITEMS = ['jessbot.sqlite', 'workspace', 'users', 'artifacts', 'uploads', 'blobs', 'feed', 'shots', 'voice', 'assistant'];
 const die = msg => { console.error(`\n[restore] ${msg}\n`); process.exit(1); };
 const arg = process.argv[2];
 

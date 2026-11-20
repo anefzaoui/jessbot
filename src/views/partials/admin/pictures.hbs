@@ -1,0 +1,80 @@
+{{!--
+  Admin → Identity → Pictures (#7): the avatar, the background behind it and the cover (chat header, Feed greeting).
+  Data: pictures { avatar: { kind: look|upload }, background|cover: { kind: sky|scene|upload, scene? },
+                   scenes: [{ value, label }], lookLabel, accept, maxMb }  (routes/web/admin.js identityData)
+  Previews come from @root.presence: what everyone signed in sees now. Each form posts on its own and the page reloads.
+  Client: setup.js (a chosen file uploads at once; without JS the Upload button does).
+--}}
+<section id="pictures" class="mt-10 scroll-mt-20" aria-labelledby="pictures-h">
+  <h2 id="pictures-h" class="text-lg font-semibold tracking-tight">Pictures</h2>
+  <p class="mt-1 text-sm text-ink-3 text-pretty">What everyone sees. PNG, JPEG, WebP or GIF, up to {{pictures.maxMb}} MB. Each upload is
+    saved again as a new image, so what a photo hides (where and when it was taken, the camera) is left behind.</p>
+
+  <div class="mt-4 space-y-4">
+    {{!-- Avatar --}}
+    <div class="card p-4 sm:p-5">
+      <div class="flex items-start gap-4">
+        <div class="shrink-0">{{> avatar size="xl" activity="resting"}}</div>
+        <div class="min-w-0 flex-1 space-y-3">
+          <div>
+            <h3 class="font-semibold">Avatar</h3>
+            {{#if (eq pictures.avatar.kind 'upload')}}
+              <p class="text-sm text-ink-3 text-pretty">Your picture, cropped to a square. The look you picked above still sets the voice.</p>
+            {{else}}
+              <p class="text-sm text-ink-3 text-pretty">The {{pictures.lookLabel}} portrait, with its expressions. Change the look above, or use a picture of your own.</p>
+            {{/if}}
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            {{> admin/picture-upload slot="avatar"}}
+            {{#if (eq pictures.avatar.kind 'upload')}}
+              <form method="post" action="/admin/identity/pictures/avatar/choice" data-ajax data-stay data-reload data-busy="Switching…">
+                <input type="hidden" name="kind" value="look">
+                <button class="btn btn-ghost btn-sm">{{icon "rotate-ccw" class="size-3.5"}} Use the portrait again</button>
+              </form>
+            {{/if}}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {{!-- Background (behind the avatar) and cover (chat header, Feed greeting): the same choices --}}
+    {{#each (array (obj slot="background" title="Background" what="Behind the avatar, everywhere it appears.")
+                   (obj slot="cover" title="Cover" what="The band at the top of the chat and the Feed’s greeting."))}}
+      {{#with (lookup @root.pictures slot) as |choice|}}
+        <div class="card p-4 sm:p-5">
+          <div class="flex flex-col gap-4 sm:flex-row sm:items-start">
+            {{#if (eq ../slot 'background')}}
+              <img class="size-20 shrink-0 rounded-xl object-cover" src="{{@root.presence.sceneBase}}/{{@root.presence.scene}}-256.webp" alt="" width="80" height="80">
+            {{else}}
+              <span class="block h-20 w-full shrink-0 rounded-xl bg-surface-3 bg-cover bg-center sm:w-40" {{#if @root.presence.cover.url}}style="background-image: url('{{@root.presence.cover.url}}')"{{/if}}></span>
+            {{/if}}
+            <div class="min-w-0 flex-1 space-y-3">
+              <div>
+                <h3 class="font-semibold">{{../title}}</h3>
+                <p class="text-sm text-ink-3 text-pretty">{{../what}}</p>
+              </div>
+              <form method="post" action="/admin/identity/pictures/{{../slot}}/choice" class="space-y-2" data-ajax data-stay data-reload data-busy="Saving…">
+                <fieldset class="space-y-2">
+                  <legend class="sr-only">{{../title}}</legend>
+                  <label class="flex items-center gap-2 text-sm"><input type="radio" name="kind" value="sky" class="size-4 shrink-0 accent-accent" {{#if (eq choice.kind 'sky')}}checked{{/if}}>
+                    The live sky <span class="text-ink-3">(time of day and weather)</span></label>
+                  <div class="flex flex-wrap items-center gap-2" data-field>
+                    <label class="flex items-center gap-2 text-sm"><input type="radio" name="kind" value="scene" class="size-4 shrink-0 accent-accent" {{#if (eq choice.kind 'scene')}}checked{{/if}}> Always</label>
+                    <select name="scene" class="input h-9 w-auto py-0 text-sm" aria-label="{{../title}} scene" data-picture-scene>
+                      {{#each @root.pictures.scenes}}<option value="{{value}}" {{#if (eq value choice.scene)}}selected{{/if}}>{{label}}</option>{{/each}}
+                    </select>
+                  </div>
+                  {{#if (eq choice.kind 'upload')}}
+                    <label class="flex items-center gap-2 text-sm"><input type="radio" name="kind" value="upload" class="size-4 shrink-0 accent-accent" checked disabled> Your picture</label>
+                  {{/if}}
+                </fieldset>
+                <button class="btn btn-secondary btn-sm">Save</button>
+              </form>
+              {{> admin/picture-upload slot=../slot}}
+            </div>
+          </div>
+        </div>
+      {{/with}}
+    {{/each}}
+  </div>
+</section>

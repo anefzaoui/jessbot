@@ -1187,6 +1187,7 @@
   .avatar-xs, .avatar-sm { --zoom: 1.75; }
   .avatar-md, .avatar-lg { --zoom: 1.45; }
   .avatar-xl { --zoom: 1.2; }
+  .presence[data-avatar-upload] { --zoom: 1; } /* the admin's own picture (#7) is shown whole: the face zoom fits the built-in portraits */
   .presence-scene img { transform: scale(1.08); animation: scene-drift 60s ease-in-out infinite alternate; }
   .presence-portrait { position: absolute; inset: 0; transform-origin: 50% 100%; animation: presence-breathe 5.6s ease-in-out infinite; }
   .presence[data-state="offline"] .presence-portrait { filter: grayscale(.7) brightness(.85); animation-duration: 9s; }

@@ -22,6 +22,7 @@ import { notFound } from '../../lib/errors.js';
 import { activityDays, todaySummary } from '../../services/activity.js';
 import { pendingFor, historyFor } from '../../services/approvals.js';
 import { paths } from '../../config/index.js';
+import { pictureFile } from '../../services/assistant-pictures.js';
 import { upcomingData, upcomingPanel, checkinsView } from '../../services/upcoming.js';
 import { placesOf, placeView } from '../../services/places.js';
 import { weatherOf, describe as describeWeather } from '../../services/weather.js';
@@ -72,6 +73,17 @@ function renderChat(req, res, thread, { asAdmin = false, project = null } = {}) 
     whatsNew: thread.kind === 'main' && !asAdmin ? unseenFor(req.user) : [],
   });
 }
+
+// The assistant's pictures the admin uploaded (#7, services/assistant-pictures.js): everyone signed in sees them; only the
+// current upload of a slot is served. The URL keeps the built-in art's shape, "<base>/<frame>[-256].webp", so the avatar
+// and the sky code build both the same way; every frame of an uploaded avatar is its one picture.
+router.get('/assistant-pictures/:pic/:frame', (req, res) => {
+  const m = /^[a-z-]+?(-256)?\.webp$/.exec(req.params.frame);
+  const file = m && pictureFile(`${req.params.pic}${m[1] || ''}.webp`);
+  if (!file) throw notFound('That picture is gone.');
+  res.set({ 'Content-Security-Policy': "default-src 'none'", 'Cache-Control': 'private, max-age=31536000, immutable' });
+  res.sendFile(file, { headers: { 'Content-Type': 'image/webp' } }, err => { if (err && !res.headersSent) res.status(404).end(); });
+});
 
 // Web screenshots (web_screenshot): only the person they were taken for, or an admin.
 router.get('/shots/:file', (req, res) => {
