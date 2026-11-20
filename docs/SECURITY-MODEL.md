@@ -100,7 +100,11 @@ Each layer assumes the ones before it can fail.
 11. **No shell, no code execution.** The agent has no tool that runs commands or code on the machine. Office files are
     converted by LibreOffice (only when the admin installed it) in a throwaway profile with macros off and every network
     path closed [#162]; PDFs are drawn in-process by pdf.js without eval [#161].
-12. **Sandboxed Library pages** [#47]. Pages Jess builds run in a sandboxed frame with an opaque origin and a content
+12. **Chromium's sandbox** [#238]. The agent's browser runs with Chromium's own sandbox wherever the system allows it
+    (Windows, macOS, Linux with user namespaces, the Docker image with its seccomp profile), so a page that breaks the
+    renderer is still inside a process that can't read files or start programs. Where it can't start, the browser runs
+    without it and Admin → Browser and Admin → System say so; see [Browser sandbox](#browser-sandbox).
+13. **Sandboxed Library pages** [#47]. Pages Jess builds run in a sandboxed frame with an opaque origin and a content
     security policy that blocks network calls, cookies and storage, so they can't reach the app or its API.
 
 Around all of this sit the ordinary web-app controls: argon2id password hashes (redone with stronger parameters at
@@ -150,6 +154,51 @@ injection detector (stage 1 = patterns only, used where the prompt must stay byt
 | Shared lists, group memories | no | yes, one line | n/a | memories: refused when instruction-like | Written by members (trusted); sharing a memory asks first. |
 | Weather and place names | no | short | no | no | Short structured data from public services. |
 
+## Browser sandbox
+
+Every web page Jessbot opens is untrusted code running in Chromium. Playwright starts Chromium with `--no-sandbox`
+unless asked otherwise; Jessbot asks for the sandbox with every engine (Chromium, Google Chrome through Patchright,
+CloakBrowser) and for its own page renderer. `JESSBOT_BROWSER_SANDBOX` decides what happens when the system can't start
+it:
+
+| Value | Behaviour |
+|---|---|
+| `auto` (default) | The sandbox on; if Chromium reports that it can't start one, the browser starts without it, the log says why, and Admin → Browser and Admin → System show "Off" with the reason. |
+| `on` | The sandbox or nothing: the browser refuses to start without it (for installs that must never run unsandboxed). |
+| `off` | Never (as before). Shown as off, with that reason. |
+
+Where it works, checked with `node scripts/sandbox-probe.mjs` (which starts each installed engine the way Jessbot does
+and reads Chromium's own `chrome://sandbox` page):
+
+| System | Sandbox | Notes |
+|---|---|---|
+| Windows 10/11 | On | Renderers run at "Lockdown" with untrusted integrity. Checked with Chromium 156 and Google Chrome 158. |
+| macOS | On (expected) | Chromium's Seatbelt sandbox needs nothing from the system. Not run on a Mac for this change. |
+| Docker, with `compose.yaml` | On | "You are adequately sandboxed": user, PID and network namespaces and seccomp-BPF, with every capability dropped, a read-only root and `no-new-privileges`. `compose.yaml` uses `deploy/seccomp-chromium.json`: Docker's default seccomp profile plus `chroot`, `clone`, `setns` and `unshare` without capabilities (made by `scripts/seccomp-profile.js`; the kernel still checks the capability inside the new namespace). |
+| Docker with its default seccomp profile (`docker run` without the profile, Kubernetes' `RuntimeDefault`) | Off | Docker's profile blocks creating namespaces without `CAP_SYS_ADMIN`. Pass `--security-opt seccomp=deploy/seccomp-chromium.json`. Don't give the container `CAP_SYS_ADMIN` instead: that is far broader. |
+| Running as root (any Linux) | Off | Chromium refuses to sandbox itself as root. Run Jessbot as its own user (the Docker image and `deploy/jessbot.service` do). |
+| Linux with `deploy/jessbot.service` | On where unprivileged user namespaces are allowed | The unit allows namespaces (`RestrictNamespaces=false`). Most distributions allow unprivileged user namespaces. |
+| Ubuntu 23.10 and later | Off until allowed | AppArmor blocks unprivileged user namespaces for programs without a profile that permits them. Either give the browser one (below), or install Google Chrome from its `.deb`, which brings its own. Not yet checked on a real Ubuntu host in this change. |
+| Debian with `kernel.unprivileged_userns_clone=0` | Off | Set it to 1, or run Google Chrome. |
+
+An AppArmor profile that lets Jessbot's Chromium (downloaded into `tools/ms-playwright`) create user namespaces, for
+Ubuntu 23.10+ (`/etc/apparmor.d/jessbot-chromium`, then `sudo apparmor_parser -r /etc/apparmor.d/jessbot-chromium`;
+adjust the path if `JESSBOT_TOOLS` points elsewhere):
+
+```
+abi <abi/4.0>,
+include <tunables/global>
+
+profile jessbot-chromium /var/lib/jessbot/tools/ms-playwright/chromium-*/chrome-linux64/chrome flags=(unconfined) {
+  userns,
+  include if exists <local/jessbot-chromium>
+}
+```
+
+What the sandbox doesn't change: pages still reach only the internet through Jessbot's guard proxy (they can't reach
+this machine or the local network either way), and the agent's own tools are unaffected. Without it, a page that
+exploited a bug in Chromium's renderer could read whatever Jessbot's user can read, the data folder included.
+
 ## What is not defended
 
 Be clear-eyed about these before relying on Jessbot:
@@ -173,6 +222,9 @@ Be clear-eyed about these before relying on Jessbot:
 - **Error messages** from a tool (a remote server's error text) reach the model as plain text.
 - **The outbound guard matches exactly.** A secret split, reversed or encoded another way, or a password shorter than 8
   characters, gets through; only web-toolset URLs are checked for carried data (email and calendar actions always ask).
+- **The browser without its sandbox.** Where the system can't start Chromium's sandbox (see
+  [Browser sandbox](#browser-sandbox)), a renderer exploit is not contained by it. Admin → Browser says when that is
+  the case; `JESSBOT_BROWSER_SANDBOX=on` refuses to run that way.
 - **Members are trusted** to use Jess for themselves and to write in what they share; the admin is trusted with the
   whole machine.
 - **The model provider sees everything Jess works on.** That is a privacy matter rather than an injection one, but it
