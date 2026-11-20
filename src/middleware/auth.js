@@ -7,7 +7,7 @@ import { originAllowed } from '../lib/origin.js';
 
 export const COOKIE = 'jb_session';
 
-function readCookie(req, name) {
+export function readCookie(req, name) {
   const header = req.headers.cookie;
   if (!header) return null;
   for (const part of header.split(';')) {

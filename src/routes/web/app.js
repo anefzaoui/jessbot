@@ -43,6 +43,8 @@ import { unseenFor } from '../../services/whats-new.js';
 import { prepView } from '../../services/prep.js';
 import { notesFor } from '../../services/notes.js';
 import { adminMayView, oversightOn } from '../../services/oversight.js';
+import { twoFactorState } from '../../services/twofactor.js';
+import { MIN_PASSWORD } from '../../services/passwords.js';
 
 const router = Router();
 
@@ -205,18 +207,19 @@ function memoryTidy(user, id) {
 }
 
 // You: real tabs, each its own address (/me/places …); /me opens the profile.
-const ME_TABS = [['profile', 'Profile'], ['places', 'Places'], ['connections', 'Connections'], ['memory', 'Memory'], ['notifications', 'Notifications'], ['devices', 'Devices'], ['usage', 'Usage']];
+const ME_TABS = [['profile', 'Profile'], ['places', 'Places'], ['connections', 'Connections'], ['memory', 'Memory'], ['notifications', 'Notifications'], ['devices', 'Sign-in & devices'], ['usage', 'Usage']];
 router.get(['/me', '/me/:tab'], (req, res) => {
   const tab = req.params.tab || 'profile';
   if (!ME_TABS.some(([k]) => k === tab)) throw notFound();
   res.render('me', {
     nav: 'me', title: `You · ${ME_TABS.find(([k]) => k === tab)[1]}`, tab, tabs: ME_TABS.map(([key, label]) => ({ key, label })),
     readByAdmins: req.user.role !== 'admin' && oversightOn(), // the "admins can read your chats" note (#219)
+    minPassword: MIN_PASSWORD, recoveryUsed: req.query.recovery === 'used', // sign-in (#225)
     me: { profile: req.user, memories: listForUser(req.user), episodes: listEpisodes(req.user, { limit: 60 }), groups: groupsOfUser(req.user.id),
       // Phase 25 (#204): "How I work with you" and the weekly tidy (?tidy=<id> from its Activity item opens that one).
       lessons: personLessonsView(req.user), tidy: memoryTidy(req.user, req.query.tidy),
       busyLookups: busyLookupsFor(req.user), // who looked at my availability (#196)
-      sites: signedInSites(req.user.id).map(x => ({ ...x, iconUrl: `/favicons/${encodeURIComponent(x.site)}` })), sessions: listSessions(req.user.id, req.session.id), usage: weeklyUsage(req.user.id, effectivePolicy(req.user).weeklyBudget),
+      sites: signedInSites(req.user.id).map(x => ({ ...x, iconUrl: `/favicons/${encodeURIComponent(x.site)}` })), sessions: listSessions(req.user.id, req.session.id), twoFactor: twoFactorState(req.user.id), usage: weeklyUsage(req.user.id, effectivePolicy(req.user).weeklyBudget),
       checkins: checkinsView(req.user), places: placesOf(req.user).map(placeView), weather: weatherSummary(req.user),
       prep: prepView(req.user), notes: notesFor(req.user, { delivered: 8 }), // overnight prep and notes for later (#212)
       connections: { email: connectionsOf(req.user, 'email').map(connectionView), calendar: connectionsOf(req.user, 'calendar').map(connectionView) },

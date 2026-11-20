@@ -1,0 +1,15 @@
+{{!-- Two-step sign-in, the second step (decision #225): reached only with a live challenge from the password step. --}}
+{{#> auth-frame heading="One more step" lead="Enter the 6-digit code from your authenticator app."}}
+  <form method="post" action="/login/code" class="space-y-4" data-ajax data-busy="Checking…">
+    <div data-field>
+      <label class="label" for="f-code">Code</label>
+      <input id="f-code" name="code" class="input h-12 text-center font-mono text-lg tracking-widest" dir="ltr" inputmode="numeric" autocomplete="one-time-code"
+        maxlength="20" required autofocus {{#if errors.code}}aria-invalid="true" aria-describedby="f-code-error"{{/if}}>
+      {{#if errors.code}}<p class="field-error" id="f-code-error" data-field-error>{{errors.code}}</p>
+      {{else}}<p class="hint">Lost your phone? Type one of your recovery codes instead.</p>{{/if}}
+    </div>
+    {{#if error}}<p class="field-error" role="alert">{{error}}</p>{{/if}}
+    <button class="btn btn-primary btn-lg btn-block mt-2">Sign in {{icon "arrow-right" class="size-4"}}</button>
+  </form>
+  <p class="mt-6 text-center text-xs text-ink-3"><a href="/login" class="font-medium text-accent-text hover:underline">Start over</a> · No codes left? The person who runs this {{bot.name}} can turn two-step sign-in off for you.</p>
+{{/auth-frame}}

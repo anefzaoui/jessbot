@@ -62,6 +62,8 @@ import { formPost, isAjax } from '../../lib/respond.js';
 import { HttpError, badRequest, invalid, notFound } from '../../lib/errors.js';
 import { oversightOn, oversightState, setOversight } from '../../services/oversight.js';
 import { baseUrl } from '../../lib/origin.js';
+import { createResetLink } from '../../services/password-reset.js';
+import { twoFactorOn, disableTwoFactor } from '../../services/twofactor.js';
 
 const router = Router();
 const base = { nav: 'admin' };
@@ -135,7 +137,7 @@ const personData = req => {
     sessions: listSessions(person.id), instructionsMax: INSTRUCTIONS_MAX, isSelf: person.id === req.user.id, values: {},
     threads: oversightOn() ? threadsOfUser(person.id) : [], oversight: oversightOn(),
     policy: policyForm(`/admin/policy/user/${person.id}`, getPolicy('user', person.id), inheritedPolicy(person), true),
-    grants: grantsOf(person.id),
+    grants: grantsOf(person.id), twoFactorOn: twoFactorOn(person.id),
   };
 };
 
@@ -164,6 +166,24 @@ router.post('/people/:id/status', formPost('admin/person', personData, req => {
   setStatus(id, status);
   if (status === 'disabled') revokeAllSessions(id);
   audit(`user.${status === 'disabled' ? 'disable' : 'enable'}`, { actorId: req.user.id, targetType: 'user', targetId: id });
+  return { redirect: `/admin/people/${id}` };
+}));
+
+// Sign-in help (decision #225): a one-time password reset link to hand over, and turning off two-step sign-in for someone
+// who lost their phone and their recovery codes. Both sign the person out everywhere (the reset when it is used).
+router.post('/people/:id/reset-link', (req, res) => {
+  const person = getUser(Number(req.params.id));
+  if (!person) throw notFound('No such person.');
+  if (person.id === req.user.id) throw badRequest('Change your own password on You → Sign-in & devices.');
+  const { url, expiresAt } = createResetLink(person.id, { createdBy: req.user.id, base: baseUrl(req) }); // PUBLIC_URL when set (#220)
+  res.json({ ok: true, link: url, name: person.name, expiresAt });
+});
+
+router.post('/people/:id/2fa-off', formPost('admin/person', personData, req => {
+  const id = Number(req.params.id);
+  if (!getUser(id)) throw notFound();
+  if (id === req.user.id) throw badRequest('Turn off your own two-step sign-in on You → Sign-in & devices.');
+  if (twoFactorOn(id)) disableTwoFactor(id, { actorId: req.user.id, ip: req.ip });
   return { redirect: `/admin/people/${id}` };
 }));
 

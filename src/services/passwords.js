@@ -5,7 +5,18 @@ import crypto from 'node:crypto';
 import { promisify } from 'node:util';
 
 const argon2 = promisify(crypto.argon2);
-const PARAMS = { memory: 19456, passes: 2, parallelism: 1, tagLength: 32 }; // OWASP 2025 minimum for argon2id
+// RFC 9106's second recommended option (64 MiB, 3 passes, 4 lanes; decision #225): about 50 ms on a desktop, a few hundred
+// on a small board, and sign-in is rate-limited. It was the OWASP minimum (19 MiB, 2 passes, 1 lane); a hash made with
+// weaker parameters is redone at the next successful sign-in (needsRehash).
+const PARAMS = { memory: 65536, passes: 3, parallelism: 4, tagLength: 32 };
+
+/** True when a stored hash was made with weaker parameters than today's (or isn't argon2id). */
+export function needsRehash(encoded) {
+  const [algo, , params] = String(encoded || '').split('$');
+  if (algo !== 'argon2id' || !params) return true;
+  const p = Object.fromEntries(params.split(',').map(kv => kv.split('=')));
+  return Number(p.m) < PARAMS.memory || Number(p.t) < PARAMS.passes || Number(p.p) < PARAMS.parallelism;
+}
 
 export const MIN_PASSWORD = 10;
 

@@ -1,7 +1,10 @@
 // JSON API v1 — used by the web UI's in-house JS and by the future Android app (Bearer token).
 // Documented in docs/API.md. Errors: { error, errors? } with a proper HTTP status.
 import { Router } from 'express';
-import { authenticate } from '../../web/auth.js';
+import { authenticate, checkSecondStep, signedIn } from '../../web/auth.js';
+import { twoFactorOn } from '../../../services/twofactor.js';
+import { HttpError } from '../../../lib/errors.js';
+import accountRoutes from './account.js';
 import { createSession, revokeSession, listSessions } from '../../../services/sessions.js';
 import { updateProfile, getUser } from '../../../services/users.js';
 import { audit } from '../../../services/audit.js';
@@ -36,13 +39,24 @@ const fragment = (res, partial, data) => new Promise((resolve, reject) =>
   res.render('fragment', { layout: false, partial, data, ...data }, (err, html) => (err ? reject(err) : resolve(html))));
 
 // ---- Auth ---------------------------------------------------------------------------
+// With two-step sign-in on, the same call carries `code` (an app or recovery code); without it the answer is a 401 with
+// code "two_factor_required", so the app asks for it and sends everything again.
 router.post('/auth/login', signInLimit, async (req, res) => {
   const user = await authenticate(req, req.body);
+  let via = 'password';
+  if (twoFactorOn(user.id)) {
+    if (!String(req.body.code || '').trim()) {
+      throw new HttpError(401, 'Enter the code from your authenticator app.', { errors: { code: 'Enter the code from your authenticator app.' }, code: 'two_factor_required' });
+    }
+    via = checkSecondStep(req, user.id, req.body.code).via;
+  }
   const token = createSession(user.id, { kind: 'app', device: String(req.body.device || 'Android app').slice(0, 60), ip: req.ip });
+  signedIn(req, user, via);
   res.json({ token, user: getUser(user.id) });
 });
 
 router.use(requireAuth);
+router.use(accountRoutes); // password, two-step sign-in
 
 router.post('/auth/logout', (req, res) => {
   revokeSession(req.session.id, req.user.id);
