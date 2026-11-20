@@ -152,7 +152,10 @@ test('delegate: a side chat "Working on: …" and a run there; the call returns 
   reset();
   const r = newRun(alice, 'Research family tents in the background and let me know.');
   script = [{ tool: 'delegate', args: { title: 'Family tents', brief: BRIEF } }, { text: 'On it in the background. I’ll let you know when it’s done.' }];
-  const side = route(DELEGATE_TEXT, [{ text: 'Top pick: the Coleman WeatherMaster 6 ($249).\n\nDetails and two alternatives below.', delay: 700 }]);
+  // The background task answers only when the test releases it, so it is still working when the chat run is done however
+  // loaded the machine is (a fixed 700 ms delay lost that race under load).
+  let release;
+  const side = route(DELEGATE_TEXT, [{ text: 'Top pick: the Coleman WeatherMaster 6 ($249).\n\nDetails and two alternatives below.', hold: new Promise(res => { release = res; }) }]);
   await loop.enqueueRun(r.id); // the chat's own queue: the delegated run is in another chat's queue
   assert.equal(runs.getRun(r.id).status, 'done', 'the chat run finishes without waiting for the background task');
   const [d] = delegatesOf(r.id);
@@ -175,6 +178,7 @@ test('delegate: a side chat "Working on: …" and a run there; the call returns 
   assert.ok(!labels(r.id).includes('Checking what I said I did'));
   assert.equal(calls.filter(c => !c.route).length, 2);
 
+  release();
   await settle(d.id);
   assert.equal(runs.getRun(d.id).status, 'done');
   assert.equal(side.length, 0);
