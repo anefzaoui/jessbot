@@ -290,7 +290,7 @@ Setup's "Give it a brain" step (and Admin → Models) asks where the models come
 
 | Feature | OpenRouter | Ollama | Another OpenAI-compatible service |
 |---|---|---|---|
-| Chat, tools, tasks, goals, the feed, projects | Yes | With a model that calls tools, 7B or larger | Yes, with a model that calls tools |
+| Chat, tools, tasks, goals, the feed, projects | Yes | With a model that calls tools, 7B or larger, and a 32,768-token context | Yes, with a model that calls tools |
 | Memory search by meaning | Yes | With `nomic-embed-text` pulled | If it serves an embedding model; otherwise by keywords |
 | Fallback models | Yes | No: the main model only | No: the main model only |
 | Quick decisions | Yes | Off: the full model or plain rules decide | Off |
@@ -302,8 +302,10 @@ Setup's "Give it a brain" step (and Admin → Models) asks where the models come
 
 Features a provider can't serve are switched off and say so (Admin → Models marks them), instead of failing each time.
 A key is only ever sent to the service it was entered for, and Ollama never gets one. Small local models connect but get
-lost in Jessbot's long instructions: use 7B or larger. The weekly budget per person caps what each person can spend
-where the provider reports costs. Details: [docs/guide/providers.md](docs/guide/providers.md).
+lost in Jessbot's long instructions: use 7B or larger. Jessbot's prompt is about 25,000 tokens, far more than Ollama's
+default context, so set `OLLAMA_CONTEXT_LENGTH=32768` on the Ollama server (and, on an 8 GB graphics card,
+`OLLAMA_FLASH_ATTENTION=1` and `OLLAMA_KV_CACHE_TYPE=q8_0`); the connection test warns when it is too small. The
+weekly budget per person caps what each person can spend where the provider reports costs. Details: [docs/guide/providers.md](docs/guide/providers.md).
 
 ## What's missing before a 1.0
 

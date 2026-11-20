@@ -15,6 +15,10 @@ A dev-only check of how well the real model uses Jess's tools on household quest
 - prints the estimated cost first (the prompt measured with `buildPrompt` + the tool schemas, ~3 steps a question, the
   model's listed price) and runs only with `--yes`. Options: `--runs 1-3`, `--only id,id`, `--model <id>`,
   `--out results.json` (every answer, tool call with its arguments and the start of its result, feedback and cost).
+- runs against **another provider** with `--base-url <url> --model <id>`: Ollama
+  (`--base-url http://127.0.0.1:11434/v1 --model qwen2.5:7b`, no key; give it a 32,768-token context first, see
+  [the guide](guide/providers.md#give-ollama-a-context-of-32768-tokens)) or any OpenAI-compatible service (its key in
+  `LLM_API_KEY`). The OpenRouter key is then neither read nor sent anywhere.
 
 ## Run of 2026-09-26 (1 run each, openai/gpt-6-luna)
 

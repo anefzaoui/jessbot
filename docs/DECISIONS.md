@@ -4000,6 +4000,33 @@ Note: most of Phase 23 part A landed in commit aa56076, whose message reads "Pha
     Website). A gallery link still opens the picture with no script. The build gives gallery and guide pictures their
     width and height (read from the WebP), so they keep their place while they load and open at the right size.
 
+## 2026-11-20: Ollama's context window (#69)
+
+252. **With Ollama, Jessbot measures the model's context window against its own prompt and says what to set, instead
+    of running on a cut prompt.** Tested with a real Ollama (qwen2.5:7b, an 8 GB RTX 4060): Ollama's default context
+    there is 4,096 tokens, Jessbot's prompt with its tool list about 24,600, and Ollama doesn't refuse a longer prompt:
+    it drops the start (`truncating input prompt limit=2050 prompt=24599`). The model then saw neither its instructions
+    nor most tools, made 41 tool calls in 248 s for "what can you help me with?" and answered "…", while the connection
+    test (a tiny prompt) passed. The context is set on the Ollama server: `num_ctx` sent with a request to the
+    OpenAI-compatible endpoint Jessbot uses (top level or under `options`) changed nothing (Ollama's `/api/ps` still
+    reported the server's context), and a model loaded with a larger `num_ctx` through the native API is reloaded at the
+    server's setting by the next `/v1` request, so Jessbot doesn't send it and the guide says what to set
+    (`OLLAMA_CONTEXT_LENGTH=32768`, or a Modelfile's `num_ctx`; on an 8 GB card also `OLLAMA_FLASH_ATTENTION=1` and
+    `OLLAMA_KV_CACHE_TYPE=q8_0`, which brought the 32K model back onto the GPU: the issue measured about 1,700 prompt and
+    33 reply tokens a second, and the recheck here had the whole model and its context on the card, 5.6 GB). What Jessbot does (`src/services/context-fit.js`): the connection test (setup, Admin → Models) reads the
+    context Ollama loaded the model with (`/api/ps`, right after the test call loaded it; else a Modelfile's `num_ctx`
+    from `/api/show`) and the model's trained length, compares them with this admin's own prompt (instructions and tool
+    list, o200k-counted) plus 2,048 tokens for the reply, and shows a warning under "Connected" with what to set (also
+    when Ollama doesn't say, or the window is under the advised 32,768). Before each model call of a run, a known window
+    too small for the request stops the run with that advice (no model call); after each call, an Ollama that reports
+    reading under half of what was sent (and at least 4,000 tokens were sent) stops the run before any tool it asked for
+    runs. Other providers aren't judged this way: hosted services refuse a too-long prompt with an error, and other
+    tokenizers count differently. Streams to every provider but OpenRouter now ask for their usage
+    (`stream_options.include_usage`), which Ollama otherwise leaves out and which compaction and budgets read too.
+    Compaction follows a small known window (90 % of it less the reply's room, a verbatim tail of 8 %, at least 6
+    messages under 64K; docs/CONTEXT-AND-MEMORY.md). The agent eval takes `--base-url` and `--model`, so it runs against
+    Ollama without the OpenRouter key being read or sent.
+
 ## 2026-11-20: The docs and the code agree; a web app manifest (#55)
 
 253. **Where the docs and the code disagreed, the one that was wrong changed; the missing manifest was built.** Found

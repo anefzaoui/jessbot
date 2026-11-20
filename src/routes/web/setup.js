@@ -6,6 +6,7 @@ import { createUser, countUsers } from '../../services/users.js';
 import { createSession, deviceLabel } from '../../services/sessions.js';
 import { testConnection, llmView, providerInput } from '../../services/llm.js';
 import { ollamaModels } from '../../services/providers.js';
+import { connectionFit } from '../../services/context-fit.js';
 import { VARIANTS, TONES, writeIdentity } from '../../services/workspace.js';
 import { listGroups, createGroup } from '../../services/groups.js';
 import { createInvite, listPendingInvites } from '../../services/invites.js';
@@ -88,6 +89,8 @@ router.post('/model/test', async (req, res) => {
   // is for this address only (#11).
   settings.set('llm', { ...(settings.get('llm', {}) || {}), provider, baseUrl, model, ...(apiKey?.trim() ? { keyFor: new URL(baseUrl).origin } : {}) });
   const result = { ...(await testConnection()), llm: llmView() };
+  // Ollama: the context it loaded the model with, against this admin's prompt (#69): a warning beside "Connected".
+  if (result.ok) result.context = await connectionFit(req.user).catch(() => null);
   if (result.ok) markStep('model');
   audit('setup.model_test', { actorId: req.user.id, detail: { ok: result.ok, model: result.model, error: result.error } });
   res.json(result);

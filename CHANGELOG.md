@@ -29,6 +29,9 @@ in their chat.
 - People, groups and permissions; two-step sign-in, password reset links; per-person weekly budgets.
 - The assistant's own name, pronouns, avatar, background and cover.
 - Model providers: OpenRouter, Ollama, or any OpenAI-compatible service.
+- With Ollama, the connection test checks the context window the model was loaded with against Jessbot's prompt (about
+  25,000 tokens) and says what to set on the server (`OLLAMA_CONTEXT_LENGTH=32768`); a task whose prompt Ollama would
+  cut stops with the same advice instead of acting on part of its instructions.
 - Docker image and compose file, a systemd unit, install guides for Windows, macOS and Linux.
 - A web app manifest: Jessbot installs on a phone's home screen or as a desktop app, under the assistant's name, with
   the logo (or its look's portrait) as the icon.

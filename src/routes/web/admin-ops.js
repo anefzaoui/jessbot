@@ -12,6 +12,7 @@ import { doctor, createBackup, listBackups, backupPath, aboutSystem } from '../.
 import { recentLog, logFiles, logFilePath } from '../../lib/log.js';
 import { llmSettings, testConnection, saveModelSettings, MAX_FALLBACKS, MODEL_ID, onOpenRouter, llmView, providerInput, providerOffers } from '../../services/llm.js';
 import { ollamaModels } from '../../services/providers.js';
+import { connectionFit } from '../../services/context-fit.js';
 import { balanceView, refreshBalance } from '../../services/spend-watch.js';
 import { prepAdminView } from '../../services/prep.js';
 import { selfReviewPage, summaryFor, REVIEW_EVERY_DAYS } from '../../agent/self-review.js';
@@ -174,6 +175,7 @@ router.post('/model', async (req, res) => {
   if (apiKey) settings.set('llm', { ...(settings.get('llm', {}) || {}), keyFor: new URL(baseUrl).origin }); // this address only (#11)
   const s = await saveModelSettings({ model, baseUrl, provider, fallbacks: req.body?.fallbacks, background: req.body?.background });
   const result = await testConnection();
+  if (result.ok) result.context = await connectionFit(req.user).catch(() => null); // Ollama's context against the prompt (#69)
   audit('admin.model', { actorId: req.user.id, detail: { provider, model, baseUrl, keyChanged: !!apiKey, ok: result.ok, from: before.model, fallbacks: s.fallbacks,
     background: s.background || null } });
   res.json({ ...result, llm: modelView() });
