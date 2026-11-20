@@ -3697,6 +3697,19 @@ Note: most of Phase 23 part A landed in commit aa56076, whose message reads "Pha
 
 ## 2026-11-20: Prompt-injection review follow-ups (issue #40)
 
+236. **A background task's report is fenced as reported content, and its taint carries into the chat it reports to.** The
+    report `delegate` posts back (the first line of the background run's reply, and the titles of what it made) used to
+    arrive as an ordinary assistant message: the next turn in that chat read a stranger-influenced line as Jess's own words,
+    and none of the background run's taint (even `high`) came along, so approvals there didn't count it. Now the report
+    run's system line carries the report inside a `background_report` fence (with the task's provenance and, after a
+    suspected injection, a warning), `toChat` shows the model a placeholder in place of the visible copy, the report run
+    gets the background run's taint rows (tool `delegate_report`), and `buildPrompt` marks every run whose prompt includes
+    such a report with the same rows. The person still sees the report as before. Why mark every later run that sees it,
+    not only the next: the line stays in the prompt until compaction, and a report is rare enough that this doesn't make
+    the rule meaningless. Tested: `tests/p22j.test.js` (a background run marked `high` before it finishes: the report is
+    fenced with the warning, the next run in that chat never sees the task's words as an assistant message and is marked
+    `high` from `delegate_report`).
+
 237. **A tool's error reaches the model as one clean, capped line.** A failed tool's message went to the model as
     `Error: <message>` whatever the message held, and many messages quote a remote party (a mail or calendar server's
     refusal, SearXNG's answer, a page's error text): line breaks could start what looks like a new prompt section, and a
