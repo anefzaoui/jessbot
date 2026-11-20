@@ -136,14 +136,17 @@ async function convert(soffice, buffer, ext, { signal, timeoutMs }) {
       ...(process.platform === 'linux' ? { SAL_USE_VCLPLUGIN: 'svp' } : {}) };
     await new Promise((resolve, reject) => {
       const child = spawn(soffice.path, args, { cwd: dir, env, windowsHide: true, stdio: ['ignore', 'ignore', 'pipe'], detached: process.platform !== 'win32' });
-      let stderr = '', done = false;
+      let stderr = '', done = false, stopping = null;
       const finish = err => { if (done) return; done = true; clearTimeout(timer); signal?.removeEventListener('abort', onAbort); err ? reject(err) : resolve(); };
-      const timer = setTimeout(() => { killTree(child); finish(Object.assign(new Error(`LibreOffice took longer than ${Math.round(timeoutMs / 1000)} s.`), { name: 'TimeoutError' })); }, timeoutMs);
-      const onAbort = () => { killTree(child); finish(Object.assign(new Error('cancelled'), { name: 'AbortError' })); };
+      // A hang or a cancel kills the whole tree and answers once it has really exited (or after 10 s at most), so the next
+      // conversion in the queue never runs beside a dying one and callers can rely on it being gone.
+      const stop = err => { if (stopping || done) return; stopping = err; killTree(child); setTimeout(() => finish(err), 10000).unref(); };
+      const timer = setTimeout(() => stop(Object.assign(new Error(`LibreOffice took longer than ${Math.round(timeoutMs / 1000)} s.`), { name: 'TimeoutError' })), timeoutMs);
+      const onAbort = () => stop(Object.assign(new Error('cancelled'), { name: 'AbortError' }));
       signal?.addEventListener('abort', onAbort, { once: true });
       child.stderr.on('data', d => { if (stderr.length < 2000) stderr += d; });
       child.on('error', err => finish(new Error(`LibreOffice couldn’t start (${err.code || err.message}).`)));
-      child.on('exit', code => finish(code === 0 ? null : new Error(`LibreOffice stopped with code ${code}${stderr.trim() ? `: ${stderr.trim().split('\n')[0].slice(0, 160)}` : ''}.`)));
+      child.on('exit', code => finish(stopping || code === 0 ? stopping : new Error(`LibreOffice stopped with code ${code}${stderr.trim() ? `: ${stderr.trim().split('\n')[0].slice(0, 160)}` : ''}.`)));
     });
     const out = path.join(outDir, 'document.pdf');
     const pdf = fs.existsSync(out) ? fs.readFileSync(out) : null;
