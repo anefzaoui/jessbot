@@ -100,6 +100,17 @@
     setTimeout(() => { btn.textContent = 'Copy'; delete btn.dataset.done; }, 2000);
   });
 
+  // ---- Pictures, big: the gallery, the home page's screenshots and the guide's open over the page -------------------
+  // Vitrine (https://github.com/anefzaoui/vitrine, vendored in website/vitrine/, README there): it flies the picture
+  // from where it is, goes through its group by arrows, keys and swipes, zooms by click, double tap, pinch or wheel,
+  // and closes by Escape, Back, a click beside it or a swipe down. The site's English words; the theme's version of
+  // each picture is the one shown. A gallery link still opens the full picture with no script.
+  if (window.Vitrine && Vitrine.lightbox) {
+    Vitrine.setStrings({ viewer: 'Screenshot viewer', close: 'Close', prev: 'Previous screenshot', next: 'Next screenshot',
+      zoomIn: 'Zoom in', zoomOut: 'Zoom out', counter: '{n} of {total}' });
+    Vitrine.lightbox.init({ auto: '.prose' });
+  }
+
   // ---- Install tabs (arrow keys move between them, mirrored in right-to-left) ---------------------------------------
   for (const tabs of document.querySelectorAll('[data-tabs]')) {
     const list = [...tabs.querySelectorAll('[role="tab"]')];

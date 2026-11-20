@@ -83,6 +83,8 @@ Jessbot is an early preview: run it at home or on a private network, not on the 
   gallery and 404 in the same look
 - ✅ The site refined: a still headline, short and eased motion that respects reduced motion, steadier type and spacing,
   no layout shift between the hours
+- ✅ The site's screenshots open in [Vitrine](https://github.com/anefzaoui/vitrine), the owner's own lightbox (decision #251): they fly from their place and back, go through
+  their group by keys and swipes, zoom and pan, close by Back too; light and dark, reduced motion, no layout shift
 - ✅ Node.js 26 (the current LTS) in the Docker image and in CI next to 24; playwright-core and patchright-core kept in
   step, moving together when Patchright follows Playwright ([#43](https://github.com/anefzaoui/jessbot/issues/43))
 

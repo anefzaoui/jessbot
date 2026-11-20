@@ -36,6 +36,10 @@ in their chat.
 - The site is calmer: the home page's headline no longer swells from thin to heavy as it loads (it's there, still, from
   the first frame), the pictures fade up as they arrive, her line arrives like a message, and changing the hour never
   moves the page; the type, buttons and links of the whole site are steadier.
+- The site's screenshots open big over the page (the gallery, the home page's and the guide's): each grows out of its
+  place and goes back into it, the arrows, keys and a swipe go through its group, a click, double tap, pinch or the wheel
+  zooms in to look around, and Escape, a click beside it, a swipe down or the phone's Back button close it. The page
+  doesn't move, the focus comes back, a screen reader hears where it is, and with reduced motion it fades instead.
 
 ### Security
 
