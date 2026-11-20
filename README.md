@@ -326,6 +326,7 @@ Honest list, roughly in order:
   approvals and safety, mail and calendar, the Feed, the Library, people and admin, backups, FAQ, troubleshooting
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md): how it's built, and the build history
 - [docs/FEATURES.md](docs/FEATURES.md): every feature and its status
+- [ROADMAP.md](ROADMAP.md): what's done, what's being worked on and what's planned
 - [CHANGELOG.md](CHANGELOG.md) and [docs/RELEASING.md](docs/RELEASING.md): what each release changed, and how releases are made
 - [docs/SECURITY-MODEL.md](docs/SECURITY-MODEL.md): the security model: who is trusted, every untrusted input, what isn't defended
 - [docs/SECURITY.md](docs/SECURITY.md): the safety controls in detail

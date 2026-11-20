@@ -72,7 +72,8 @@ Mail and calendar tests use two local servers under the git-ignored `tools/test-
 
 - One topic per pull request, with a description of what changed and how you checked it. Screenshots for anything
   visible (light and dark, and a phone width when layout changed).
-- Keep the docs current in the same pull request: the feature list, the API notes, the decision log, and a line under
+- Keep the docs current in the same pull request: the feature list, [ROADMAP.md](ROADMAP.md) (move the item to done,
+  or add it), the API notes, the decision log, and a line under
   `[Unreleased]` in CHANGELOG.md (plus a plain `Highlights` line for anything people would notice; see
   docs/RELEASING.md).
 - By contributing you agree that your contribution is licensed under the project's licence, GPL-3.0-or-later.
