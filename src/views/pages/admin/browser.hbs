@@ -14,7 +14,7 @@
       {{#each status.engines}}
         <label class="flex items-start gap-3">
           <input type="radio" class="mt-1 size-4 shrink-0 accent-accent" name="engine" value="{{id}}" {{#if (eq id @root.status.engine.id)}}checked{{/if}}>
-          <span class="text-sm"><span class="font-medium">{{label}}</span>{{#if (eq id 'chromium')}} <span class="text-ink-3">(default, open source)</span>{{/if}}<span class="block text-xs text-ink-3">{{summary}}</span></span>
+          <span class="text-sm"><span class="font-medium">{{label}}</span>{{#if (eq id 'chromium')}} <span class="text-ink-3">(open source)</span>{{/if}}<span class="block text-xs text-ink-3">{{summary}}</span></span>
         </label>
       {{/each}}
       <button class="btn btn-secondary btn-sm">Use this engine</button>
