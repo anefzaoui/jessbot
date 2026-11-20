@@ -26,7 +26,10 @@ One opaque-token system, carried two ways:
 Only a SHA-256 of each token is stored. Revoking a session (`/me/sessions/:id/revoke`, a disabled account, or logout) takes effect immediately.
 
 ### `POST /auth/login`
-Body: `{ "email", "password", "device"?: "Pixel 9" }` → `200 { token, user }`.
+Body: `{ "email", "password", "code"?, "device"?: "Pixel 9" }` → `200 { token, user }`.
+With two-step sign-in on, `code` is an authenticator or recovery code. Without it: `401 { error, code: "two_factor_required" }`
+(ask for it, then send everything again); a wrong one: `401 { code: "two_factor_invalid" }`; five wrong codes in 15
+minutes: `429`. A code is accepted once.
 Rate limit: 8 attempts per 15 minutes per IP and email, and 30 per 15 minutes per IP across sign-in, setup and invites.
 Limits are stored in the database, so a restart doesn't reset them. Wrong email and wrong password get the same
 response and take the same time. Every request also counts against a general limit of 1,200 a minute per person
@@ -42,6 +45,12 @@ Revokes the current session. → `{ ok: true }`
 | `POST /me/profile` | `{ name?, callMe?, email?, timezone?, about? }` | `{ ok, user }` (422 with field errors) |
 | `GET /me/sessions` | — | `{ sessions: [{ id, device, kind: web\|app, where, lastSeen, createdAt, current }] }` |
 | `POST /me/sessions/:id/revoke` | — | `{ ok }` |
+| `POST /me/password` | `{ current, password, confirm }` | `{ ok, token? }`: every session is signed out and a new one made for this device (the cookie is replaced; a bearer client gets `token`). 422 for a wrong current password (8 tries per 15 min) |
+| `GET /me/2fa` | — | `{ twoFactor: { on, since, codesLeft }, html }` |
+| `POST /me/2fa/setup` | `{ password }` | `{ secret, uri, html }`: a pending secret (`otpauth://` URI; `html` holds the QR code) |
+| `POST /me/2fa/confirm` | `{ code }` | `{ ok, codes, html }`: on; ten recovery codes, shown this once; other devices signed out |
+| `POST /me/2fa/recovery-codes` | `{ password }` | `{ ok, codes, html }`: new codes, the old ones stop working |
+| `POST /me/2fa/off` | `{ password, code }` | `{ ok, html }`: off; other devices signed out |
 
 `user` = `{ id, email, name, firstName, callMe, role: admin|member, status, hue, timezone, about, createdAt, lastSeenAt }`
 

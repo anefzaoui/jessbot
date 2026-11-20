@@ -1,0 +1,82 @@
+{{!--
+  Two-step sign-in card on You → Sign-in & devices (decision #230). Re-rendered by /api/v1/me/2fa* (their `html`).
+  twoFactor: { on, since, codesLeft }, setup?: { secret, qrSvg } (turning on), codes?: [string], codesText? (shown once).
+  Field ids are this card's own (the password form on the same page has a "password" field too).
+--}}
+<section class="card p-5" aria-labelledby="h-2fa" data-2fa-card>
+  <div class="flex items-start gap-3">
+    <span class="grid size-9 shrink-0 place-items-center rounded-lg bg-surface-2 text-ink-2">{{#if twoFactor.on}}{{icon "shield-check" class="size-4"}}{{else}}{{icon "shield" class="size-4"}}{{/if}}</span>
+    <div class="min-w-0 flex-1">
+      <h3 id="h-2fa" class="text-sm font-semibold">Two-step sign-in {{#if twoFactor.on}}<span class="badge badge-ok ms-1">On</span>{{/if}}</h3>
+      <p class="mt-0.5 text-[13px] text-ink-2">{{#if twoFactor.on}}Signing in asks for a code from your authenticator app as well as your password.{{else}}Ask for a code from an authenticator app (Aegis, 2FAS, Google Authenticator, 1Password…) as well as your password, so a leaked password alone can’t get in.{{/if}}</p>
+    </div>
+  </div>
+
+  {{#if codes}}
+    <div class="mt-4 rounded-xl border border-ok/30 bg-ok-soft px-4 py-3" data-recovery-codes>
+      <p class="text-sm font-semibold">Your recovery codes</p>
+      <p class="text-xs text-ink-2">Each works once, if your phone is lost. Keep them somewhere safe, like a password manager. They won’t be shown again.</p>
+      <ul class="mt-2 grid grid-cols-2 gap-x-6 gap-y-1 font-mono text-sm" role="list" dir="ltr">{{#each codes}}<li>{{this}}</li>{{/each}}</ul>
+      <button type="button" class="btn btn-secondary btn-sm mt-3" data-copy="{{codesText}}">{{icon "copy" class="size-4"}} Copy all</button>
+    </div>
+  {{/if}}
+
+  {{#if setup}}
+    <div class="mt-4 grid gap-4 sm:grid-cols-[180px_1fr]" data-2fa-setup>
+      <div class="w-44 rounded-xl bg-white p-2" role="img" aria-label="QR code for your authenticator app">{{{setup.qrSvg}}}</div>
+      <div class="min-w-0 space-y-3">
+        <p class="text-[13px] text-ink-2">Scan the code with your authenticator app, or type this key into it:</p>
+        <p class="break-all rounded-lg bg-surface-2 px-3 py-2 font-mono text-sm" dir="ltr" data-2fa-secret>{{setup.secret}}</p>
+        <form method="post" action="/api/v1/me/2fa/confirm" class="space-y-3" data-ajax data-stay data-2fa-form data-busy="Checking…" data-success="Two-step sign-in is on.">
+          <div data-field>
+            <label class="label" for="f-2fa-code">The 6-digit code it shows</label>
+            <input id="f-2fa-code" name="code" class="input w-40 font-mono tracking-widest" dir="ltr" inputmode="numeric" autocomplete="one-time-code" maxlength="7" required>
+          </div>
+          <button class="btn btn-primary btn-sm">{{icon "check" class="size-4"}} Turn on</button>
+        </form>
+      </div>
+    </div>
+  {{else if twoFactor.on}}
+    <div class="mt-4 divide-y divide-line border-t border-line">
+      <details class="group py-3" data-codes-left>
+        <summary class="flex cursor-pointer list-none items-center gap-2 text-sm">
+          <span class="flex-1"><span class="font-medium">Recovery codes</span> <span class="text-ink-3">· {{#if twoFactor.codesLeft}}{{twoFactor.codesLeft}} left{{else}}none left{{/if}}</span></span>
+          <span class="text-xs text-accent-text group-open:hidden">Make new ones</span>
+        </summary>
+        <form method="post" action="/api/v1/me/2fa/recovery-codes" class="mt-3 flex flex-wrap items-end gap-3" data-ajax data-stay data-2fa-form data-busy="Making codes…" data-success="New recovery codes are ready; the old ones stopped working.">
+          <div class="min-w-48 flex-1" data-field>
+            <label class="label" for="f-2fa-pw-codes">Your password</label>
+            <input id="f-2fa-pw-codes" name="password" type="password" class="input" autocomplete="current-password" required>
+          </div>
+          <button class="btn btn-secondary btn-sm h-10">{{icon "refresh-cw" class="size-4"}} New recovery codes</button>
+        </form>
+        <p class="mt-2 text-xs text-ink-3">The old codes stop working.</p>
+      </details>
+      <details class="group py-3">
+        <summary class="flex cursor-pointer list-none items-center gap-2 text-sm">
+          <span class="flex-1 font-medium">Turn off two-step sign-in</span>
+          <span class="text-xs text-accent-text group-open:hidden">Turn off…</span>
+        </summary>
+        <form method="post" action="/api/v1/me/2fa/off" class="mt-3 grid gap-3 sm:grid-cols-2" data-ajax data-stay data-2fa-form data-busy="Turning off…" data-success="Two-step sign-in is off." data-confirm="Turn off two-step sign-in? Your password alone will sign you in again.">
+          <div data-field>
+            <label class="label" for="f-2fa-pw-off">Your password</label>
+            <input id="f-2fa-pw-off" name="password" type="password" class="input" autocomplete="current-password" required>
+          </div>
+          <div data-field>
+            <label class="label" for="f-2fa-off-code">A code from your app, or a recovery code</label>
+            <input id="f-2fa-off-code" name="code" class="input font-mono" dir="ltr" autocomplete="one-time-code" maxlength="20" required>
+          </div>
+          <div class="sm:col-span-2"><button class="btn btn-danger-ghost btn-sm">{{icon "shield-alert" class="size-4"}} Turn off</button></div>
+        </form>
+      </details>
+    </div>
+  {{else}}
+    <form method="post" action="/api/v1/me/2fa/setup" class="mt-4 flex flex-wrap items-end gap-3" data-ajax data-stay data-2fa-form data-busy="Preparing…">
+      <div class="min-w-48 flex-1" data-field>
+        <label class="label" for="f-2fa-pw-setup">Your password, to start</label>
+        <input id="f-2fa-pw-setup" name="password" type="password" class="input" autocomplete="current-password" required>
+      </div>
+      <button class="btn btn-primary btn-sm h-10">{{icon "shield-check" class="size-4"}} Set up</button>
+    </form>
+  {{/if}}
+</section>

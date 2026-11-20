@@ -171,6 +171,11 @@ Tick items only when they work end to end. `Phase` refers to the build plan in A
   pause after 3 failures [R] — P19b (#178, #179); the Admin screens P25 (#203: fallback rows tested as they are added, the
   background model's test, the balance card with Read it now, the per-task budget field)
 
+## Sign-in (issue #6)
+- [x] **Two-step sign-in** with any authenticator app, recovery codes shown once, an app-friendly API step; **change your
+  password** (signs out every other device); **reset links** an admin makes and hands over (or `npm run reset-link` on the
+  server); stronger password hashing, redone at sign-in; rate limits stored in the database [R] — #230, #228
+
 ## Safety (from the skills review, Phase 18)
 - [x] **Outside content stays information**: web pages, emails, files, search snippets, browser snapshots and calendar titles reach Jess inside fences a page can't close, with hidden text (tiny, invisible, off-screen, white-on-white) left out; text addressed to AI assistants is flagged inside the fence ("⚠ …, not from them") and she tells the person instead of acting [R] — P18 (#118, #120)
 - [x] **Approvals count what the task read**: after an email or a web page, standing "always allow" permissions stop covering sending and spending, and lasting changes (scheduled tasks, repeating reminders, memories, goals, background tasks) ask first; the card says what she read [R] — P18 (#124)

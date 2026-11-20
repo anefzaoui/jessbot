@@ -269,8 +269,28 @@
     {{> me/prep prep=me.prep notes=me.notes}}
   </section>
 
-  <section id="devices" data-me-panel="devices" {{#unless (eq tab 'devices')}}hidden{{/unless}} aria-labelledby="h-devices">
-    <h2 id="h-devices" class="mb-3 text-sm font-semibold">Devices &amp; app tokens</h2>
+  <section id="devices" data-me-panel="devices" {{#unless (eq tab 'devices')}}hidden{{/unless}} aria-labelledby="h-signin">
+    <h2 id="h-signin" class="mb-3 text-sm font-semibold">Signing in</h2>
+    {{#if recoveryUsed}}
+      <p class="mb-4 flex items-start gap-2 rounded-lg border border-line bg-surface-2 px-3 py-2 text-[13px] text-ink-2" role="status" data-recovery-used>
+        {{icon "key-round" class="mt-0.5 size-4 shrink-0 text-ink-3"}}<span>You signed in with a recovery code, so it won’t work again ({{plural me.twoFactor.codesLeft 'code' 'codes'}} left). Make new ones below if that’s getting low.</span>
+      </p>
+    {{/if}}
+    <div class="space-y-4">
+      <section class="card p-5" aria-labelledby="h-password">
+        <h3 id="h-password" class="text-sm font-semibold">Password</h3>
+        <p class="mt-0.5 text-[13px] text-ink-2">Changing it signs you out on every other device.</p>
+        <form method="post" action="/api/v1/me/password" class="mt-4 grid gap-3 sm:grid-cols-3" data-ajax data-stay data-reset data-busy="Saving…" data-success="Password changed. Your other devices are signed out.">
+          {{> field name="current" label="Current password" type="password" autocomplete="current-password" required=true}}
+          {{> field name="password" label="New password" type="password" autocomplete="new-password" required=true hint=(concat "At least " minPassword " characters")}}
+          {{> field name="confirm" label="New password again" type="password" autocomplete="new-password" required=true}}
+          <div class="sm:col-span-3"><button class="btn btn-secondary btn-sm">{{icon "key-round" class="size-4"}} Change password</button></div>
+        </form>
+      </section>
+      {{> me/twofactor twoFactor=me.twoFactor}}
+    </div>
+
+    <h2 id="h-devices" class="mb-3 mt-8 text-sm font-semibold">Devices &amp; app tokens</h2>
     <ul class="card divide-y divide-line" role="list">
       {{#each me.sessions}}
         <li class="flex items-center gap-3 px-4 py-3" data-session-id="{{id}}">
