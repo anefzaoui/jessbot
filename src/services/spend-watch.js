@@ -13,6 +13,7 @@ import { notify } from './notify.js';
 import { outboundFetch } from '../lib/outbound.js';
 import { llmSettings, onOpenRouter } from './llm.js';
 import { config } from '../config/index.js';
+import { trimEndChars } from '../lib/text-safe.js';
 
 const money = n => `$${(Number(n) || 0).toFixed(2)}`;
 const admins = () => all(`SELECT id FROM users WHERE role = 'admin' AND status = 'active' ORDER BY id`).map(u => u.id);
@@ -122,7 +123,7 @@ export async function refreshBalance({ force = false, now = new Date() } = {}) {
   if (!force && cur?.at && now - new Date(cur.at) < BALANCE_MS) return cur;
   const { baseUrl, apiKey } = llmSettings();
   if (!apiKey || !onOpenRouter(baseUrl)) return null;
-  const base = baseUrl.replace(/\/+$/, '');
+  const base = trimEndChars(baseUrl, '/');
   const fetchJson = async p => {
     try {
       const res = await outboundFetch(`${base}/${p}`, { headers: { Authorization: `Bearer ${apiKey}`, 'HTTP-Referer': config.publicUrl, 'X-Title': 'Jessbot' },

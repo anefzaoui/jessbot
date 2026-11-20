@@ -11,6 +11,7 @@ import { revokeAllSessions } from './sessions.js';
 import { audit } from './audit.js';
 import { checkPasswordStrength } from './passwords.js';
 import { invalid } from '../lib/errors.js';
+import { trimEndChars } from '../lib/text-safe.js';
 
 const TTL_MS = 24 * 3600e3;
 const sha256 = s => crypto.createHash('sha256').update(s).digest('hex');
@@ -23,7 +24,7 @@ export function createResetLink(userId, { createdBy = null, base = config.public
   const expiresAt = iso(Date.now() + TTL_MS);
   run('INSERT INTO password_resets (user_id, token_hash, created_by, expires_at) VALUES (?, ?, ?, ?)', userId, sha256(token), createdBy, expiresAt);
   audit('auth.reset_link', { actorId: createdBy, targetType: 'user', targetId: userId });
-  return { token, url: `${String(base).replace(/\/+$/, '')}/reset/${token}`, expiresAt };
+  return { token, url: `${trimEndChars(base, '/')}/reset/${token}`, expiresAt };
 }
 
 /** The live reset for a token: { id, userId } or null (unknown, used or expired). */

@@ -8,6 +8,7 @@ import { invalid } from '../lib/errors.js';
 import { boundFetch } from '../lib/outbound.js';
 import { readSecret } from './stored-secrets.js';
 import { PROVIDERS, currentProvider, providerFor, supports, featureSupport } from './providers.js';
+import { trimEndChars } from '../lib/text-safe.js';
 
 let client, clientKey;
 
@@ -66,7 +67,7 @@ export function providerInput(body = {}) {
   if (!model) errors.model = provider === 'ollama' ? 'Pick one of the models Ollama has.' : 'Enter the model’s name.';
   else if (!MODEL_ID.test(model)) errors.model = 'Use a model id like openai/gpt-6-luna or qwen2.5:7b.';
   if (Object.keys(errors).length) throw invalid(errors);
-  return { provider, baseUrl: baseUrl.replace(/\/+$/, ''), model };
+  return { provider, baseUrl: trimEndChars(baseUrl, '/'), model };
 }
 
 /** Does the current provider offer this feature (services/providers.js FEATURES)? true only when it surely does. */
