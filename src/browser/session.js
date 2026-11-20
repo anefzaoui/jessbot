@@ -8,7 +8,7 @@ import os from 'node:os';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
-import { openSessionContext, note, browserSettings } from './index.js';
+import { openSessionContext, note, browserSettings, engineCaps } from './index.js';
 import { learnRecipe, recipeHint, noteRecipeUse } from './recipes.js';
 import { trustSignals, cautionLine, brandsFor } from './trust.js';
 import { antiAdblockWall, adblockOffFor, switchOffFor } from './adblock.js';
@@ -160,7 +160,9 @@ export async function sessionFor(key, { userId, threadId = null, runId = null, c
     const profile = profileFile(userId);
     const ctx = await openSessionContext({ storageState: loadProfile(profile) });
     s = new Session(key, ctx, { userId, profile, threadId, runId });
-    await withConsent(s, ctx);
+    // DuckDuckGo's autoconsent talks to us through a binding; engines without bindings (Patchright, #227) skip it, and
+    // consent pages are still handled by walls.js.
+    if (engineCaps().bindings) await withConsent(s, ctx);
     ctx.on('page', p => { s.adopt(p); s.active = p; s.events.push('A new tab opened — it is now the active tab.'); });
     ctx.on('close', () => { if (sessions.get(key) === s) sessions.delete(key); clearTimeout(s.timer); });
     sessions.set(key, s);

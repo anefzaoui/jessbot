@@ -3528,9 +3528,25 @@ Note: most of Phase 23 part A landed in commit aa56076, whose message reads "Pha
     never sees a request; a bare context without the request guard still can't reach 127.0.0.1 or localhost), and real
     sites over HTTPS and plain HTTP load through it.
 
+227. **Where Google Chrome is installed, the browser is that Chrome driven by Patchright.** A comparison of open-source
+    alternatives to CloakBrowser (on Windows and in Linux Docker, against the common bot checks) found Patchright
+    (`patchright-core`, Apache-2.0: the Playwright API with its automation traces removed) driving the person's own Google
+    Chrome as good as or better than CloakBrowser, with nothing to download; plain Playwright Chromium is flagged
+    everywhere. `engines/chrome.js` is the default when Chrome is found (Windows, macOS and Linux install paths; its
+    version read without starting it, for the `--user-agent` launch switch); `chromium` (plain Playwright) is the default
+    elsewhere. Jessbot never downloads or ships Chrome. Patchright's differences are handled, not hidden: `page.evaluate`
+    runs in an isolated world, so a reader that needs the page's own globals uses `evaluateInPage()` (the YouTube player
+    data); console events and bindings from init scripts don't exist, so Jessbot's own pages (page checks, print, export:
+    `withPage({ render: true })`) open in a plain Playwright browser on the same Chrome, and DuckDuckGo's autoconsent (which
+    needs a binding) is off with this engine — consent pages are still handled by walls.js. Engines declare this as
+    `caps`. Shared launching (a browser server on 127.0.0.1 that can always be killed, no stray WebRTC UDP) lives in
+    `engines/server.js`. Not taken: Camoufox (Firefox: no PDF, no CDP, 2.8 GB, needs an older Playwright) as a possible
+    later optional engine; Clearcote (young, its SDK crashes on a second context); anything AGPL. Cloudflare challenges stay
+    a hand-over to the person.
+
 ## 2026-11-20: Rate limits that survive a restart (issues #6, #22)
 
-223. **Rate limits are stored in SQLite, and one middleware limits routes.** The sign-in, setup and invite limits lived in a
+228. **Rate limits are stored in SQLite, and one middleware limits routes.** The sign-in, setup and invite limits lived in a
     `Map` in the process, so every restart (or a crash someone could provoke) started them over, and most routes had no
     limit at all. Now `src/lib/ratelimit.js` keeps fixed-window counters in `rate_limits` (migration 054; one UPSERT per
     hit, expired rows swept every 500 hits): `hit()` keeps its signature for the per-account checks inside handlers, and

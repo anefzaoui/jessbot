@@ -1,4 +1,4 @@
-// Rate limits that survive a restart (decision #223, issue #6): counters live in SQLite, one middleware for routes.
+// Rate limits that survive a restart (decision #228, issue #6): counters live in SQLite, one middleware for routes.
 // Run: npm test  (throwaway data dir; the restart check runs the real server twice on a free local port).
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';

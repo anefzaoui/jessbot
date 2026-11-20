@@ -8,7 +8,7 @@ and how, so a reviewer (or a future session) can check each control. Decisions a
   the Android app uses bearer tokens (revocable per device in You → Devices). Logins, invites and password attempts are
   rate-limited (per address and email, and per address across sign-in, setup and invites), and every request counts
   against a general per-person limit. The counters live in the database (`rate_limits`), so a restart, or a crash someone
-  provokes, doesn't hand out a fresh set of attempts. [#6, #12, #223]
+  provokes, doesn't hand out a fresh set of attempts. [#6, #12, #228]
 - **Host and origin.** When Jessbot listens on loopback (the default) or `PUBLIC_URL` is set, a request must name an
   expected host (loopback names, `PUBLIC_URL`'s host, `ALLOWED_HOSTS`); anything else gets 421, which closes DNS
   rebinding against a local install. Cookie-authenticated changes and WebSocket upgrades must come from `PUBLIC_URL`'s

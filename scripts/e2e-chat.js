@@ -7,6 +7,7 @@ import { spawn } from 'node:child_process';
 import net from 'node:net';
 import { chromium, executablePath as exe } from './lib/test-browser.js';
 import WebSocket from 'ws';
+import { spawnHelper, stopHelper } from '../tests/helpers/procs.js';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname.replace(/^\/(\w:)/, '$1')), '..');
 const HOME = fs.mkdtempSync(path.join(os.tmpdir(), 'jessbot-chat-'));
@@ -889,8 +890,11 @@ try {
       const seen = await p.evaluate(() => { const r = document.querySelector('#feed-reader'); return r ? `open=${r.open} · ${r.querySelector('[data-reader-article]')?.textContent.trim().slice(0, 200)}` : 'no reader'; });
       throw new Error(`${err.message}\n  story ${withArticle[0].id}: ${seen}`);
     });
-    const words = (await p.locator('#feed-reader .reader-article').innerText()).split(/\s+/).length;
-    expect(words > 120, `saved article too short (${words} words)`);
+    // The reader shows the whole saved article (how long that is depends on the day's news: compare with what was saved).
+    const words = (await p.locator('#feed-reader .reader-article').innerText()).split(/\s+/).filter(Boolean).length;
+    const savedArticle = (await http('GET', `/api/v1/feed/posts/${withArticle[0].id}/article`, { cookie: ownerCookie })).json;
+    const savedWords = String(savedArticle?.html || '').replace(/<[^>]+>/g, ' ').split(/\s+/).filter(Boolean).length;
+    expect(savedArticle?.status === 'ok' && words >= 40 && words >= savedWords * 0.8, `reader shows ${words} words of a ${savedWords}-word saved article`);
     expect(await p.locator('#feed-reader [data-reader-original]:not([hidden])').count() === 1, 'no link to the original');
     await p.keyboard.press('Escape');
     // An unwritten story: opening it makes Jess read it and write her take on the spot.
@@ -1076,9 +1080,9 @@ try {
     const radDir = fs.mkdtempSync(path.join(os.tmpdir(), 'jb-rad-'));
     fs.writeFileSync(path.join(radDir, 'users'), 'owner:secret\n');
     fs.writeFileSync(path.join(radDir, 'config'), `[server]\nhosts = 127.0.0.1:5299\n[auth]\ntype = htpasswd\nhtpasswd_filename = ${path.join(radDir, 'users')}\nhtpasswd_encryption = plain\n[storage]\nfilesystem_folder = ${path.join(radDir, 'col')}\n`);
-    servers.push(spawn('java', ['-Dgreenmail.setup.test.smtp', '-Dgreenmail.setup.test.imap', '-Dgreenmail.hostname=127.0.0.1', '-Dgreenmail.users=owner:secret@local.test,sam:secret@local.test',
+    servers.push(spawnHelper('java', ['-Dgreenmail.setup.test.smtp', '-Dgreenmail.setup.test.imap', '-Dgreenmail.hostname=127.0.0.1', '-Dgreenmail.users=owner:secret@local.test,sam:secret@local.test',
       '-Dgreenmail.users.login=email', '-Dgreenmail.api.enabled=false', '-jar', path.join(TS, 'greenmail-standalone.jar')], { stdio: 'ignore' }));
-    servers.push(spawn(path.join(TS, 'radicale-venv', process.platform === 'win32' ? 'Scripts/python.exe' : 'bin/python'), ['-m', 'radicale', '--config', path.join(radDir, 'config')], { stdio: 'ignore' }));
+    servers.push(spawnHelper(path.join(TS, 'radicale-venv', process.platform === 'win32' ? 'Scripts/python.exe' : 'bin/python'), ['-m', 'radicale', '--config', path.join(radDir, 'config')], { stdio: 'ignore' }));
     await waitPort(3025); await waitPort(3143); await waitPort(5299);
     await fetch('http://127.0.0.1:5299/owner/home/', { method: 'MKCALENDAR', headers: { Authorization: `Basic ${Buffer.from('owner:secret').toString('base64')}`, 'Content-Type': 'application/xml' },
       body: '<?xml version="1.0"?><C:mkcalendar xmlns:D="DAV:" xmlns:C="urn:ietf:params:xml:ns:caldav"><D:set><D:prop><D:displayname>Home</D:displayname></D:prop></D:set></C:mkcalendar>' });
@@ -1208,7 +1212,9 @@ try {
     lock.release(); await imap.logout();
     expect(got?.attachments?.length === 1 && got.attachments[0].content.equals(pdf), `Sam didn't get the PDF: ${JSON.stringify(got?.attachments?.map(a => a.filename))}`);
   });
-  for (const s of servers) s.kill();
+  // The whole tree: on Windows `java` and a venv's python are launchers whose real server is a child (tests/helpers/procs.js).
+  const left = (await Promise.all(servers.map(s => stopHelper(s)))).flat();
+  if (left.length) console.log(`  ✗ test servers still running after the mail and calendar checks: ${left.join(', ')}`);
 
   await test('office: a budget spreadsheet (live formulas) and a one-page PDF land in the Library with previews', async () => {
     // Only files made by THIS reply count as extras (an earlier test switches on a goal step that makes its own plan).

@@ -51,7 +51,7 @@
 
     {{#if status.installed}}
       <dl class="mt-4 grid grid-cols-2 gap-x-6 gap-y-3 text-[13px] @xl:grid-cols-4">
-        <div><dt class="text-xs text-ink-3">Version</dt><dd class="tabular font-medium" title="{{status.version}}">Chromium {{status.major}}</dd></div>
+        <div><dt class="text-xs text-ink-3">Version</dt><dd class="tabular font-medium" title="{{status.version}}">{{#if (eq status.engine.id 'chrome')}}Chrome{{else}}Chromium{{/if}} {{status.major}}</dd></div>
         <div><dt class="text-xs text-ink-3">Right now</dt><dd class="font-medium">
           {{#if status.running}}{{#if status.openPages}}{{plural status.openPages "page"}} open{{#if status.queued}} · {{status.queued}} waiting{{/if}}{{else}}Awake, idle{{/if}}{{else}}Asleep{{/if}}</dd></div>
         <div><dt class="text-xs text-ink-3">Last used</dt><dd class="font-medium">{{#if status.lastUsedAt}}<time datetime="{{status.lastUsedAt}}" data-relative>{{timeAgo status.lastUsedAt}}</time>{{else}}Not yet{{/if}}</dd></div>
