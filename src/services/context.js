@@ -12,6 +12,8 @@ import { addFactChecked, supersedeFact, userScope, recallHybrid, addEpisode, dat
 import { isShotRef } from './page-check.js';
 import { tzOf, dayKey } from '../lib/when.js';
 import { decide, noul, yes, note, threshold } from './decide.js';
+import { stage1 } from '../agent/injection.js';
+import { botName } from './bot.js';
 
 const TARGET = Number(process.env.JESSBOT_CONTEXT_TARGET) || 120_000;
 const HARD = Number(process.env.JESSBOT_CONTEXT_HARD) || 200_000;
@@ -116,6 +118,22 @@ const confirmedIn = json => { try { return new Set(normaliseTasks(JSON.parse(jso
 const NOT_A_RESULT = /^(?:Error:|The person declined|Nobody approved|Not done:|Not answered|Outcome unknown|Already done)/;
 const succeededIn = span => span.some(r => r.role === 'tool' && !NOT_A_RESULT.test(String(r.content || '').trim()));
 
+// Backstop for the summary itself: it sits in the system prompt of every later turn of the chat, where nothing marks it as
+// outside content, so an entry the summarizer copied from a page or an email that addresses AI assistants (the stage-1
+// patterns of agent/injection.js) is dropped before it is stored. → how many entries went.
+function screenSummary(j) {
+  let dropped = 0;
+  for (const [key, value] of Object.entries(j)) {
+    if (!Array.isArray(value)) continue;
+    j[key] = value.filter(x => {
+      const hit = stage1(typeof x === 'string' ? x : JSON.stringify(x ?? '')).hit;
+      if (hit) dropped++;
+      return !hit;
+    });
+  }
+  return dropped;
+}
+
 function toMarkdown(j) {
   const sec = (title, items, fmt = x => x) => (items?.length ? `**${title}**\n${items.map(x => `- ${fmt(x)}`).join('\n')}` : '');
   return [
@@ -156,6 +174,8 @@ export async function compact(thread) {
           { role: 'user', content: `PREVIOUS SUMMARY:\n${prev?.content_json || '(none)'}\n\nNEW SPAN:\n${transcript}` }] }));
     } catch (err) { if (err.code === 'bad_json') return false; throw err; }
     if (!j || typeof j !== 'object') return false;
+    const dropped = screenSummary(j);
+    if (dropped) console.warn(`[context] summary of thread ${thread.id}: left out ${dropped} entr${dropped === 1 ? 'y' : 'ies'} addressed to AI assistants`);
     // Deterministic repair: any URL in the span the summary dropped goes into identifiers.
     const urls = [...new Set(transcript.match(/https?:\/\/[^\s)"'<>]+/g) || [])];
     const text = JSON.stringify(j);
@@ -194,7 +214,7 @@ export async function compact(thread) {
   }
 }
 
-export const __test = { chooseCut, inTheirWords, contentWords, extractionFacts, toMarkdown };
+export const __test = { chooseCut, inTheirWords, contentWords, extractionFacts, toMarkdown, screenSummary };
 
 // ---- Memory extraction (after ~10 min idle) --------------------------------------------------------
 // Driven by the scheduler from the database (restart-safe): a thread whose newest message is past its extraction
@@ -263,7 +283,7 @@ question that got answered or a step that got done. ≤200 chars each, specific,
 async function worthRemembering(user, rows, project, { memory = true } = {}) {
   const res = await decide('memory', {
     user, timeoutMs: 3000,
-    state: { conversation: rows.map(r => `${r.role === 'user' ? 'Them' : 'Jess'}: ${r.content.replace(/\s+/g, ' ').slice(0, 800)}`).join('\n').slice(0, 12000),
+    state: { conversation: rows.map(r => `${r.role === 'user' ? 'Them' : botName()}: ${r.content.replace(/\s+/g, ' ').slice(0, 800)}`).join('\n').slice(0, 12000),
       ...(project ? { project: project.name } : {}) },
     questions: {
       ...(memory ? { fact: noul('Did they state (or clearly confirm) a durable fact about themselves worth remembering for months — a preference, a '

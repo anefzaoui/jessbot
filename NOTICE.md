@@ -44,6 +44,10 @@ image model (OpenAI's image models through OpenRouter) from text prompts written
 and costs are recorded in `assets/*/manifest.json`. They are distributed with Jessbot under the same licence as the
 rest of the repository.
 
+The logo files in `docs/images/brand/` are made from the same portrait and night-sky scene by
+`scripts/build-brand.js` (cropping, layering and resizing only, no new generation); the wordmark sets "Jessbot" in
+Geist (SIL Open Font License 1.1).
+
 ## Optional software Jessbot can use
 
 These are not included. If you install them, their own licences apply:

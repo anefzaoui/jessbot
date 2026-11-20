@@ -76,8 +76,11 @@ export function namesThing(text, label) {
  * → { intent: 'done' | 'stop' | null, specific }. specific: the message named the thing or the reminding itself, so it
  * counts anywhere after the nudge; otherwise only as the direct (first) answer to it (`direct`).
  */
-export function readReply(text, label = '', { direct = false } = {}) {
+// botName: the assistant's name when the admin renamed it (#7), a filler like "jess" ("done, Nova").
+export function readReply(text, label = '', { direct = false, botName = '' } = {}) {
   const t = normalize(text);
+  const bot = new Set(normalize(botName).split(/\s+/).filter(Boolean));
+  const filler = w => FILLER.has(w) || bot.has(w);
   if (!t) return { intent: null, specific: false };
   const stop = STOP.exec(t);
   const rest = stop ? `${t.slice(0, stop.index)} ${t.slice(stop.index + stop[0].length)}` : t; // "stop reminding me, i did it"
@@ -87,11 +90,11 @@ export function readReply(text, label = '', { direct = false } = {}) {
     const named = namesThing(rest, label);
     if (named && (DONE.test(rest) || DONE_VERBS.test(rest))) return { intent: 'done', specific: true };
     // Bare: nothing but the "done" and a few fillers ("ok done, thanks"); "I finished the report" is about something else.
-    const leftover = (rest.replace(DONE_ALL, ' ').match(/[\p{L}\p{N}]+/gu) || []).filter(w => !FILLER.has(w) && w.length > 1);
+    const leftover = (rest.replace(DONE_ALL, ' ').match(/[\p{L}\p{N}]+/gu) || []).filter(w => !filler(w) && w.length > 1);
     if (direct && !leftover.length && DONE.test(rest)) return { intent: 'done', specific: false };
   }
   if (stop) return { intent: 'stop', specific: true };
-  if (direct && !question && STOP_BARE.test(t) && !(t.replace(STOP_BARE_ALL, ' ').match(/[\p{L}\p{N}]+/gu) || []).some(w => !FILLER.has(w) && w.length > 1)) {
+  if (direct && !question && STOP_BARE.test(t) && !(t.replace(STOP_BARE_ALL, ' ').match(/[\p{L}\p{N}]+/gu) || []).some(w => !filler(w) && w.length > 1)) {
     return { intent: 'stop', specific: false }; // "stop" / "enough please", not "stop the car"
   }
   return { intent: null, specific: false };

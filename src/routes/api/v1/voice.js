@@ -15,6 +15,7 @@ import { parseWav, peaksOf, transcribe, saveClip, linkClip, clipFor, clipFile, c
 import { forbidden, invalid, notFound, tooMany } from '../../../lib/errors.js';
 import { hit } from '../../../lib/ratelimit.js';
 import { audit } from '../../../services/audit.js';
+import { botName } from '../../../services/bot.js';
 
 const router = Router();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: MAX_NOTE_BYTES, files: 1, fields: 4 } });
@@ -72,7 +73,7 @@ router.get('/voice/:id', (req, res) => {
 });
 
 // ---- Admin: voice settings and "Hear her" ---------------------------------------------------------------------------
-const adminOnly = req => { if (req.user.role !== 'admin') throw forbidden('Only the admin can change her voice.'); };
+const adminOnly = req => { if (req.user.role !== 'admin') throw forbidden(`Only the admin can change ${botName()}’s voice.`); };
 
 router.post('/admin/voice', (req, res) => {
   adminOnly(req);
@@ -86,7 +87,7 @@ router.post('/admin/voice/preview', async (req, res) => {
   adminOnly(req);
   const l = hit(`voice-preview:${req.user.id}`, { limit: 20, windowMs: 10 * 60e3 });
   if (!l.allowed) throw tooMany('Give it a minute before the next sample.');
-  const name = settings.get('bot', {}).name || 'Jess';
+  const name = botName();
   const text = String(req.body?.text || '').trim().slice(0, 300)
     || `Hi, it’s ${name}. This is how I sound when I send you a voice note — tell me if you’d like me warmer, calmer or brighter.`;
   const started = Date.now();

@@ -188,6 +188,7 @@ Honest list, roughly in order:
 
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md): how it's built, and the build history
 - [docs/FEATURES.md](docs/FEATURES.md): every feature and its status
+- [docs/SECURITY-MODEL.md](docs/SECURITY-MODEL.md): the security model: who is trusted, every untrusted input, what isn't defended
 - [docs/SECURITY.md](docs/SECURITY.md): the safety controls in detail
 - [docs/DECISIONS.md](docs/DECISIONS.md): why things are the way they are
 - [docs/API.md](docs/API.md): the HTTP and WebSocket API (the web app and a future mobile app share it)

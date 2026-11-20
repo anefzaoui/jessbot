@@ -9,6 +9,7 @@ import { activeRuns, getRun } from '../../../services/runs.js';
 import { startTurn } from '../../../agent/loop.js';
 import { assistantView, userView } from '../../../services/chatview.js';
 import { signedInSites } from '../../../browser/profiles.js';
+import { botName } from '../../../services/bot.js';
 
 const router = Router();
 const HANDBACK_TEXT = 'Done — I’ve handled it in the browser. Please take a fresh look and carry on.';
@@ -36,7 +37,7 @@ router.get('/threads/:id/browser/frame.jpg', async (req, res) => {
   let frame;
   // Mid-navigation Chromium can't capture ("Unable to capture screenshot"): a moment later it can. Not an error worth a stack.
   try { frame = await B.handoverFrame(s); } catch { return res.status(503).set('Retry-After', '1').json({ error: 'The page is changing — one moment.' }); }
-  if (!frame) return res.status(404).json({ error: 'Jess has no browser tab open in this chat.' });
+  if (!frame) return res.status(404).json({ error: `${botName()} has no browser tab open in this chat.` });
   res.set({ 'Content-Type': 'image/jpeg', 'Cache-Control': 'no-store', 'X-Page-Url': encodeURI(frame.url).slice(0, 500), 'X-Page-Title': encodeURIComponent(frame.title).slice(0, 300) });
   res.end(frame.buf);
 });
@@ -45,7 +46,7 @@ router.get('/threads/:id/browser/frame.jpg', async (req, res) => {
 // arrive as the page changes, up to ~10 a second; the screencast stops when the viewer closes.
 router.get('/threads/:id/browser/stream.mjpg', async (req, res) => {
   const { s } = tabOf(req);
-  if (!s?.active) return res.status(404).json({ error: 'Jess has no browser tab open in this chat.' });
+  if (!s?.active) return res.status(404).json({ error: `${botName()} has no browser tab open in this chat.` });
   const boundary = 'jbframe';
   res.writeHead(200, { 'Content-Type': `multipart/x-mixed-replace; boundary=${boundary}`, 'Cache-Control': 'no-store, no-transform',
     'X-Accel-Buffering': 'no', Connection: 'keep-alive' });
@@ -64,7 +65,7 @@ router.get('/threads/:id/browser/stream.mjpg', async (req, res) => {
 
 router.post('/threads/:id/browser/input', async (req, res) => {
   const { s } = tabOf(req);
-  if (!s?.active) throw badRequest('Jess has no browser tab open in this chat.');
+  if (!s?.active) throw badRequest(`${botName()} has no browser tab open in this chat.`);
   res.json({ ok: true, ...(await B.handoverInput(s, req.body || {})) });
 });
 

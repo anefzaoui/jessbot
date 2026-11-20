@@ -35,8 +35,9 @@ export const stripInvisible = input => cleanUntrusted(input).text;
 
 // Fence kinds in use. Any of these (and the chat roles) written inside outside content is defanged, as is any tag that
 // carries a fence="…" attribute and the common chat-template delimiters.
+// Every kind passed to fence() anywhere belongs here (tests/injection-review.test.js checks the source for strays).
 export const FENCE_KINDS = ['web_page', 'web_results', 'browser_page', 'email', 'email_list', 'file', 'library_item', 'project_files',
-  'calendar', 'outside'];
+  'calendar', 'feed_stories', 'notes', 'pdf_form', 'outside'];
 const ROLES = ['system', 'assistant', 'user', 'tool', 'developer', 'instructions?'];
 const TAG_LIKE = new RegExp(`<(\\s*\\/?\\s*)(${[...FENCE_KINDS, ...ROLES].join('|')})(?![\\w-])`, 'gi');
 const FENCE_ATTR = /<(\s*\/?\s*[a-z_][\w-]*\b[^<>]*?\bfence\s*=)/gi;

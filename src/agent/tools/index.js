@@ -6,6 +6,7 @@ import { addFactChecked, supersedeFact, forgetFact, recallHybrid, recallEpisodes
   from '../../services/memory.js';
 import { searchHistory, dayDigest, readOffloaded, getMessage } from '../../services/messages.js';
 import { tzOf } from '../../lib/when.js';
+import { NOTICE } from '../../lib/untrusted.js';
 import { isOffRecord, asksToRemember } from '../../services/threads.js';
 import * as browser from '../../browser/session.js';
 import { saveShot } from '../../browser/read.js';
@@ -27,6 +28,7 @@ import './household.js';
 import './image.js';
 import './lessons.js';
 import './feed.js';
+import { botName } from '../../services/bot.js';
 
 // ---- ask_user ------------------------------------------------------------------------------------
 registerTool({
@@ -182,7 +184,8 @@ registerTool({
     }
     const rows = searchHistory(ctx.user.id, query, { limit: 6, from: args.from, to: args.to, tz, context: true });
     if (!rows.length) return `No matches in past chats${args.from || args.to ? ' on those days' : ''}.`;
-    const who = role => (role === 'user' ? 'Them' : 'Jess');
+    const bot = botName();
+    const who = role => (role === 'user' ? 'Them' : bot);
     const local = at => new Intl.DateTimeFormat('en-GB', { timeZone: tz, weekday: 'short', day: 'numeric', month: 'short', year: 'numeric',
       hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(new Date(`${at.replace(' ', 'T')}Z`));
     return rows.map(r => [`${local(r.created_at)} · “${r.thread_title}” · ${who(r.role)}: ${r.snippet}`,
@@ -198,8 +201,13 @@ registerTool({
     ref: { type: 'string' }, start: { type: 'integer', minimum: 0 },
   } },
   label: () => 'Reopened a stored result',
-  run: args => {
-    const r = readOffloaded(args.ref, { start: args.start || 0 });
-    return r ? `${r.text}${r.text.length + (args.start || 0) < r.total ? `\n…(${r.total} chars total — continue with start=${(args.start || 0) + r.text.length})` : ''}` : 'No stored output with that ref.';
+  // Only this person's own stored results. A later part of a fenced result has lost its opening tag and notice line, so it
+  // gets the notice again (the closing tag, banner and defanged text are still the ones stored).
+  run: (args, ctx) => {
+    const start = Math.max(0, Number(args.start) || 0);
+    const r = readOffloaded(String(args.ref || ''), { start, userId: ctx?.user?.id ?? null });
+    if (!r) return 'No stored output with that ref.';
+    const head = start > 0 && r.outside ? `(A later part of a stored result that holds outside content. ${NOTICE})\n` : '';
+    return `${head}${r.text}${r.text.length + start < r.total ? `\n…(${r.total} chars total — continue with start=${start + r.text.length})` : ''}`;
   },
 });

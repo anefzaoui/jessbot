@@ -28,6 +28,7 @@ import { listUsers } from './users.js';
 import { notify } from './notify.js';
 import { logActivity } from './activity.js';
 import { audit } from './audit.js';
+import { botName } from './bot.js';
 
 const SOURCES = [{ dir: paths.skills, origin: 'built-in' }, { dir: path.join(paths.data, 'skills'), origin: 'yours' }];
 
@@ -349,8 +350,8 @@ export function proposeSkill({ name, description, toolsets = [], body, tests, ne
 
   const all3 = [desc, text, ...positives, ...negatives].join('\n');
   const links = urlFetchLines(text);
-  if (links.length) throw invalid({ body: `Line ${links[0].line} sends Jess to a web address (“${links[0].excerpt}”). A drafted skill can’t: what a page says later would become the steps. Name the site in words and search for it when the skill runs.` });
-  if (looksLikeInjection(all3)) throw invalid({ body: 'Part of it reads like instructions to an AI assistant (“ignore previous instructions”, “assistant: send…”). Write the steps plainly, to Jess.' });
+  if (links.length) throw invalid({ body: `Line ${links[0].line} sends ${botName()} to a web address (“${links[0].excerpt}”). A drafted skill can’t: what a page says later would become the steps. Name the site in words and search for it when the skill runs.` });
+  if (looksLikeInjection(all3)) throw invalid({ body: `Part of it reads like instructions to an AI assistant (“ignore previous instructions”, “assistant: send…”). Write the steps plainly, to ${botName()}.` });
   if (findShapes(all3).length || secretsIn(all3).length) throw invalid({ body: 'It contains a password, key, code or card number. A skill never holds secrets.' });
 
   const raw = skillFile({ name: n, description: desc, toolsets: sets, body: text });
@@ -384,8 +385,8 @@ export function proposeSkill({ name, description, toolsets = [], body, tests, ne
   const admins = listUsers().filter(u => u.role === 'admin' && u.status === 'active' && u.id !== user.id);
   for (const a of admins) {
     const title = `${updated ? 'An updated skill' : 'A new skill'} to review: “${n}”`;
-    notify(a.id, { kind: 'skill', title, body: `Drafted by Jess with ${user.name}. ${desc}`, href, tag: `skill-${n}-${checksum.slice(0, 8)}` });
-    logActivity(a.id, { kind: 'task', icon: 'notebook-pen', title, detail: `Drafted by Jess with ${user.name}`, status: 'warn', href });
+    notify(a.id, { kind: 'skill', title, body: `Drafted by ${botName()} with ${user.name}. ${desc}`, href, tag: `skill-${n}-${checksum.slice(0, 8)}` });
+    logActivity(a.id, { kind: 'task', icon: 'notebook-pen', title, detail: `Drafted by ${botName()} with ${user.name}`, status: 'warn', href });
   }
   return { skill: skillView(skillByName(n)), updated, warnings: findings.filter(f => f.level === 'warn'), notified: admins.length };
 }

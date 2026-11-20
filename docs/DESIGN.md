@@ -60,3 +60,23 @@ purple/violet defaults · `transition: all`.
 ## Checks
 `npm run ui:check` screenshots every screen at 1440 and 390 px in both themes and fails on console errors, the window
 scrolling, **and the main column being wider than the screen** (it names the widest element).
+
+## Logo
+The logo is Jess: the default persona's portrait (`public/img/avatars/female/neutral.webp`) over her night sky
+(`public/img/scenes/night-clear.webp`), clipped round, the same layering as the living avatar. Small sizes crop toward the
+face the way the app's small avatars do. `node scripts/build-brand.js` (`npm run brand`) makes every file in
+`docs/images/brand/` from those two images, with no new image generation:
+
+| File | Use |
+|---|---|
+| `mark-*.webp`, `mark-512.png` | the round mark (README, site, avatars on other services) |
+| `mark-square-*.webp`, `icon-192.png`, `icon-512.png` | the rounded-square app icon |
+| `icon-maskable-512.png`, `apple-touch-icon.png` | full-bleed icons for launchers and iOS, which cut their own shape |
+| `favicon.ico` (16, 32, 48), `favicon-16.png`, `favicon-32.png`, `favicon.svg` | browser tabs |
+| `wordmark-light.png`, `wordmark-dark.png` | the mark with "Jessbot" set in Geist, for light and for dark backgrounds |
+| `social-preview.png` | 1280×640 link preview (GitHub's repository card) |
+
+Rules: one portrait and one sky everywhere (never a mood frame or another variant in the logo); never recolour, outline
+or stretch it; leave clear space of a quarter of the mark's width around it. The name is set in Geist, weight 620,
+tracking -0.035em, in `ink` on light and dark backgrounds alike. A renamed or re-dressed install still uses the Jessbot
+logo for the project; the app itself shows the look its admin picked.

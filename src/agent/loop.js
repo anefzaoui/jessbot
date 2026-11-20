@@ -37,8 +37,8 @@ import { recordWish } from '../services/wishes.js';
 import { supportsReasoning } from '../services/model-price.js';
 import { secretsIn, argText } from '../lib/dlp.js';
 import { audit } from '../services/audit.js';
+import { botName } from '../services/bot.js';
 
-const botName = () => settings.get('bot', {}).name || 'Jessbot';
 const SILENT = /^\s*NOTHING\s*\.?\s*$/i;
 
 // A check-in (or a quiet watch check) with nothing worth saying leaves no trace in the chat (its hidden prompt and any

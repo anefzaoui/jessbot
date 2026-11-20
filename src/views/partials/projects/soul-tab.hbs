@@ -3,8 +3,8 @@
 {{#if soul.proposal}}<div class="mb-4">{{> projects/soul-proposal proposal=soul.proposal}}</div>{{/if}}
 {{#if soul.has}}
   <div class="soul-card">
-    <p class="proj-card-eyebrow">{{icon "sparkles" class="size-3.5"}} Jess here</p>
-    <p class="soul-stance" dir="auto">Jess, bringing {{soul.stance}}</p>
+    <p class="proj-card-eyebrow">{{icon "sparkles" class="size-3.5"}} {{@root.bot.name}} here</p>
+    <p class="soul-stance" dir="auto">{{@root.bot.name}}, bringing {{soul.stance}}</p>
     <p class="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] text-ink-3">
       <span class="badge badge-neutral">v{{soul.version}}</span>
       <span>changed by {{soul.by}} · <time datetime="{{iso soul.updatedAt}}" data-relative>{{timeAgo soul.updatedAt}}</time></span>

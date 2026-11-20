@@ -11,7 +11,7 @@ import { recordUsage } from './usage.js';
 import { embed, embedModel, dot, toBlob, fromBlob } from './embeddings.js';
 import { rrfMerge } from '../lib/rrf.js';
 import { fence, oneLine, stableFenceId } from '../lib/untrusted.js';
-import { screenSync } from '../agent/injection.js';
+import { screenSync, flagPromptHit } from '../agent/injection.js';
 
 const CHUNK_CHARS = 1800;     // ≈ 450 tokens: small enough to cite, big enough to read on its own
 const PAGE = /^--- page (\d+) ---$/;
@@ -225,14 +225,19 @@ export function fileMode(project) {
   const k = n => (n >= 1000 ? `${Math.round(n / 100) / 10}K` : String(n));
   return { full, files, tokens, tokensLabel: k(tokens), limitLabel: k(FULL_TOKENS) };
 }
-/** The files' text for the prompt in small-project mode (fenced; images by their caption). */
-export function fullTexts(project) {
+/**
+ * The files' text for the prompt in small-project mode (fenced; images by their caption). ctx: { user, run } of the prompt
+ * being built: a file that trips the stage-1 check marks that run (high, once) and is audited, like an attached file.
+ */
+export function fullTexts(project, { user = null, run: forRun = null } = {}) {
   return all(`SELECT * FROM library_items WHERE project_id = ? AND deleted_at IS NULL ORDER BY created_at, id`, project.id)
     .map(item => {
       const body = item.type === 'image' ? (item.caption ? `(image) ${item.caption}` : '(image, not described yet — view_image to look)') : readText(item);
       // Part of the cached prompt prefix: a fence id stable for this process, and the stage-1 check only (deterministic).
       const text = String(body || '').slice(0, 40000);
+      const screen = screenSync(text);
+      if (screen.banner) flagPromptHit({ user, runId: forRun?.id, tool: 'project_file', label: `project file “${oneLine(item.title, 80)}”`, excerpt: screen.excerpt });
       return `### “${oneLine(item.title, 120)}” [${item.public_id}]\n${fence('file', { id: item.public_id }, text,
-        { id: stableFenceId(`project-file:${item.public_id}`), banner: screenSync(text).banner })}`;
+        { id: stableFenceId(`project-file:${item.public_id}`), banner: screen.banner })}`;
     }).join('\n\n');
 }

@@ -19,6 +19,7 @@ import { isTainted } from '../taint.js';
 import { oneLine } from '../../lib/untrusted.js';
 import { enqueueRun, onRunFinished } from '../loop.js';
 import { postNote, announceRun, UNATTENDED } from '../proactive.js';
+import { botName } from '../../services/bot.js';
 
 export const MAX_DELEGATES = 2;          // background tasks running at once per person (each takes a run slot)
 export const BRIEF_MIN = 40, BRIEF_MAX = 6000;
@@ -37,7 +38,7 @@ export const DELEGATE_RULES = `${UNATTENDED} Start your reply with ONE plain lin
 // rules. briefOf() reads it back for the side chat's "What I was asked" card (Phase 25 #212): one format, both ways.
 const skillLine = skill => `Use the skill “${skill}”: call use_skill("${skill}") first.\n`;
 export const delegateTrigger = ({ title, brief, skill = null }) =>
-  `[Background task “${title}”: Jess started this from another chat so that chat stays free; the person is not watching this one `
+  `[Background task “${title}”: ${botName()} started this from another chat so that chat stays free; the person is not watching this one `
   + 'live. When it finishes, a one-line result and a link to this chat are posted back there.]\n'
   + `${brief}\n${skill ? skillLine(skill) : ''}${DELEGATE_RULES}`;
 
