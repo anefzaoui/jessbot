@@ -126,6 +126,7 @@ injection detector (stage 1 = patterns only, used where the prompt must stay byt
 | The live browser: `browser_open`, clicks, typing, snapshots, `browser_read`, `open_search` | yes (the page snapshot) | yes | yes | yes | Jess's own account above the snapshot stays plain; page titles, dialog texts, pop-up and download names in it are one clean line. |
 | Browser autopilot | yes (the snapshot it hands back) | yes | yes | yes | Its decision model sees the page as data; a click that may pay, book or send is stopped in code and left for Jess, whose click asks. |
 | Screenshots (`web_screenshot`, `browser_screenshot`) | no (an image for the person) | title one line | yes | no | The model doesn't see the picture. |
+| Page self-check pictures (after Jess saves a page) | no (an image) | n/a | no | no | The model does see these: a phone-width screenshot of a page she made herself, rendered with the Library's sandbox policy (no network calls). The page is her own, though it can quote what she read earlier (fenced when she read it); text in the picture isn't screened (see below) [#145]. |
 | Browser downloads | as files (below) | yes | yes | yes | Become Library items labelled "Downloaded from <host>". |
 | Email list and messages: `email_list`, `email_read`, `email_unsubscribe_link` | yes | yes, hidden HTML text pruned | yes | yes | Sender, subject and attachment names one clean line; a plain part that says more than the reader sees is replaced by the visible text. |
 | Email attachments: `email_save_attachments` | as files (below) | yes | yes | yes | Typed by their bytes; programs and archives refused. |
@@ -145,7 +146,7 @@ injection detector (stage 1 = patterns only, used where the prompt must stay byt
 | Skills Jess drafts (`skill_propose`) | n/a | linted | refused after taint | linted | Never run before an admin approves. |
 | Page self-check output | n/a | yes | on a hit | yes | On a hit only counts and line numbers are passed on. |
 | A watch's memo, notes from background tasks | yes | yes, one line | n/a | no | Written by Jess's own unattended runs, passed on as information. |
-| Delegated task results | no | n/a | n/a | no | Jess's own one-line summary; the brief is shown on the approval card when the task read outside content. |
+| Delegated task results | yes (`background_report`, with what the task read) | yes | the task's taint, on every run that sees the report | warning when the task read a suspected injection | The person sees the report as before; the model never reads it back as its own words [#236]. The brief is shown on the approval card when the task read outside content. |
 | Voice notes | n/a | n/a | n/a | n/a | The person's own speech, transcribed as their message. |
 | Shared lists, group memories | no | yes, one line | n/a | memories: refused when instruction-like | Written by members (trusted); sharing a memory asks first. |
 | Weather and place names | no | short | no | no | Short structured data from public services. |
