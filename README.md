@@ -237,8 +237,9 @@ docker compose up -d --build
 docker compose logs jessbot | grep "setup code"     # you'll need this code on the setup page
 ```
 
-**With Node.js**: you need **Node.js 26** (the current LTS; 24.19 or newer works too) and about 1 GB of disk (plus the browser download). It runs on
-Windows and Linux; macOS should work but hasn't been tested by a person yet (CI runs the tests there).
+**With Node.js**: you need **Node.js 26** (the current LTS; 24.19 or newer works too) and about 1 GB of disk (plus the
+browser download). It runs on Windows and Linux; macOS should work but hasn't been tested by a person yet (CI runs the
+tests there).
 
 ```bash
 git clone https://github.com/anefzaoui/jessbot
