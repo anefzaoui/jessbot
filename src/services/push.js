@@ -7,7 +7,7 @@
 // Subscriptions that the push service says are gone (404/410) are removed. Endpoints on the local network are refused
 // unless the admin allowed the local network (same switch as the browser's) — a push endpoint must not become a way to
 // reach inside the network.
-import webpush from 'web-push';
+import * as webpush from 'web-push'; // v4 is ESM with named exports only
 import { get, run } from '../db/index.js';
 import { setEnvVar } from '../lib/envfile.js';
 import { isPrivateUrl, browserSettings } from '../browser/index.js';
