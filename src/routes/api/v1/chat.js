@@ -18,6 +18,7 @@ import { hit } from '../../../lib/ratelimit.js';
 import { postMortem, withdrawGuess } from '../../../agent/lessons.js'; // also registers the pushed-task lesson hook
 import { invalid, notFound, badRequest } from '../../../lib/errors.js';
 import { SIMPLER_TEXT, addSimplerNote, lastNudgeAt, nudgeAllowed } from '../../../services/reply-actions.js';
+import { botName } from '../../../services/bot.js';
 
 const router = Router();
 const MAX_TEXT = 20_000;
@@ -159,7 +160,7 @@ function planFor(req) {
   const plan = deletionPlan(req.user, req.params.id);
   if (!plan) throw notFound('That message is already gone.');
   if (plan.runIds.length && get(`SELECT 1 FROM runs WHERE id IN (${plan.runIds.map(() => '?').join(',')}) AND status IN ('queued', 'running', 'waiting')`, ...plan.runIds)) {
-    throw badRequest('Jess is still working on this — stop the reply first, then delete it.');
+    throw badRequest(`${botName()} is still working on this — stop the reply first, then delete it.`);
   }
   return plan;
 }

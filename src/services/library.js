@@ -16,6 +16,7 @@ import { renderPdfPages, renderPdfPage, fitImage, MODEL_EDGE } from './pdf-rende
 import { officeToPdf, findSoffice, OFFICE_EXTS } from './office-render.js';
 import { publish } from '../lib/bus.js';
 import { adminMayView } from './oversight.js';
+import { stripInvisible } from '../lib/untrusted.js';
 import { decodeEntities } from '../lib/text-safe.js';
 
 export const FORMATS = {
@@ -199,13 +200,17 @@ function writeSidecars(item, v, { text, preview, meta = null }) {
 /** Small facts about a version the viewer needs without opening the file (audio: duration, waveform, voice), or null. */
 export const metaOf = (item, v = item.version) => { try { return JSON.parse(fs.readFileSync(metaFileOf(item, v), 'utf8')); } catch { return null; } };
 
+// A file's title usually comes from a name someone else chose (an upload, a download, an email attachment's MIME name, which
+// can carry newlines and invisible characters): stored as one clean line, so no prompt line that quotes it can be split.
+const fileTitle = title => stripInvisible(title).replace(/\s+/g, ' ').trim().slice(0, TITLE_MAX);
+
 /**
  * Store a file: uploads ({ type, ext, mime } from the file's own bytes, services/uploads.js) and office files Jess makes
  * (services/office.js). text = what search and Jess read; preview = our own escaped HTML for the viewer (office files).
  */
 export function createFileItem({ user, title, type, ext, mime, buffer, text = '', preview = null, meta = null, description = null, threadId = null,
   runId = null, sourceLabel = 'Uploaded', proactive = false, sourceItemId = null }) {
-  const t = String(title || '').trim().slice(0, TITLE_MAX) || 'Untitled file';
+  const t = fileTitle(title) || 'Untitled file';
   const publicId = crypto.randomBytes(9).toString('base64url');
   const { lastInsertRowid } = run(
     `INSERT INTO library_items (public_id, owner_id, title, type, description, ext, mime, source_label, thread_id, run_id, size_bytes, has_thumb, proactive, source_item_id)
@@ -226,7 +231,7 @@ export function createFileItem({ user, title, type, ext, mime, buffer, text = ''
 /** A new version of a file item (office files Jess revises); earlier versions stay restorable by download. */
 export function addFileVersion(item, { buffer, text = '', preview = null, title = null, description = null }) {
   const v = item.version + 1;
-  const t = title ? String(title).trim().slice(0, TITLE_MAX) : item.title;
+  const t = title ? fileTitle(title) || item.title : item.title;
   fs.mkdirSync(dirOf(item), { recursive: true });
   fs.writeFileSync(fileOf(item, v), buffer);
   writeSidecars(item, v, { text, preview });

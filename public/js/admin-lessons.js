@@ -7,7 +7,7 @@
 //  - Filters (All, Waiting, In use, …) show and hide cards in place; ?status= picks the first one.
 // Server contract (admin-lessons.js), each with ?fragment=1 → { ok, lesson, waiting, html }: POST /admin/lessons { rule, why,
 //   domain } · PATCH /admin/lessons/:id { rule, why, domain } · POST /admin/lessons/:id/(approve|reject|retire|promote).
-import { $, $$, on, api, withBusy, h } from './core.js';
+import { $, $$, on, api, withBusy, h, botName } from './core.js';
 import { toast } from './toast.js';
 import { confirmDialog } from './modal.js';
 import { showErrors, clearErrors } from './forms.js';
@@ -64,7 +64,7 @@ export function initAdminLessons() {
   const act = async (card, action, btn, body) => {
     if (card.hasAttribute('data-pending')) return;
     if (action === 'promote' && !(await confirmDialog({ title: 'Move this lesson into AGENTS.md?',
-      body: 'It becomes one of her operating rules for everyone, under “Lessons learned”. The change is kept in the history, so you can undo it.',
+      body: `It becomes one of ${botName()}’s operating rules for everyone, under “Lessons learned”. The change is kept in the history, so you can undo it.`,
       confirmLabel: 'Promote' }))) return;
     card.setAttribute('data-pending', '');
     await withBusy(btn, async () => {

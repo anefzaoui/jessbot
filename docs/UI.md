@@ -11,6 +11,7 @@ Checks: `npm run ui:check` (screenshots at 1440 and 390 px, light and dark; fail
 - **Always say what Jessbot is doing.** Use the activity vocabulary in `public/js/activities.js` and never invent labels. It drives the avatar, the status strip, the panel, the tab title and the screen-reader announcements (#22).
 - **One source of markup.** The server renders partials. The API returns rendered HTML fragments (`messageHtml`, `cardHtml`) through the same partials. The client only builds optimistic placeholders.
 - **Contracts live at the top of each partial.** Services must produce exactly those shapes. The fixtures in `src/dev/fixtures.js` follow them, so the styleguide breaks visibly when a contract drifts.
+- **The assistant has the name the admin gave it** (#7, decision #231): copy says `{{bot.name}}` (templates), `botName()` (`public/js/core.js`, `src/services/bot.js`), never "Jess", and never assumes a pronoun: a sentence that needs one names the assistant or is rephrased ("Hear Max", "the look", "the reply").
 - **In-house JS only.** Build on native `<dialog>`, `popover`, `fetch` streams and `:has()`.
 
 ## Tokens (`src/styles/input.css`)

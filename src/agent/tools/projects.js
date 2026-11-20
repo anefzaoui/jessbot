@@ -8,8 +8,9 @@ import * as F from '../../services/project-files.js';
 import { createItem, listItems } from '../../services/library.js';
 import { publish } from '../../lib/bus.js';
 import { fence, oneLine } from '../../lib/untrusted.js';
-import { guardOutside, screenSync } from '../injection.js';
+import { guardOutside, screenSync, flagPromptHit } from '../injection.js';
 import { isTainted } from '../taint.js';
+import { botName } from '../../services/bot.js';
 
 const BRIEF_ROW = {
   type: 'object', required: ['kind', 'text'], additionalProperties: false,
@@ -201,10 +202,13 @@ registerTool({
     const p = P.resolveProject(ctx.user, args.project, ctx.thread);
     const files = args.query ? listItems(ctx.user, { query: args.query, limit: 40 }).filter(i => i.project_id === p.id) : P.projectFiles(p);
     if (!files.length) return args.query ? `No file in ${p.name} matches “${args.query}”.` : `${p.name} has no files yet.`;
-    // File names of uploads and downloads are someone else's words: clean lines in a fence (stage-1 screened, no taint:
-    // a list of the person's own files, not their content).
+    // File names of uploads and downloads are someone else's words: clean lines in a fence, stage-1 screened. The loop marks
+    // the run as having read a file list (agent/taint.js); a name or description that addresses AI assistants marks it high
+    // and is audited, as everywhere else.
     const body = files.slice(0, 40).map(f => `- [${f.public_id}] ${oneLine(f.title, 120)} (${f.type}, v${f.version})${f.description ? ` — ${oneLine(f.description, 300)}` : ''}`).join('\n');
-    return fence('project_files', { project: p.name }, body, { banner: screenSync(body, ctx.user).banner });
+    const screen = screenSync(body, ctx.user);
+    if (screen.banner) flagPromptHit({ user: ctx.user, runId: ctx.run?.id, tool: 'project_files', label: `files of project “${oneLine(p.name, 60)}”`, excerpt: screen.excerpt });
+    return fence('project_files', { project: p.name }, body, { banner: screen.banner });
   },
 });
 
@@ -237,7 +241,7 @@ registerTool({
     if (readOutsideContent(ctx.run.id)) return 'Not noted: this turn read outside content, and notes must come from them. Note it on a later turn if they say it.';
     try { S.addLearned(p, args.note); } catch (err) { return `Not noted: ${err.message}`; }
     publish(ctx.user.id, 'project.updated', { id: p.public_id, soul: 1 }, { persist: false });
-    return { content: 'Noted (they can see it under “Jess here” and undo it).', step: { detail: String(args.note).slice(0, 80) } };
+    return { content: `Noted (they can see it under “${botName()} here” and undo it).`, step: { detail: String(args.note).slice(0, 80) } };
   },
 });
 

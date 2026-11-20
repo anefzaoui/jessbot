@@ -5,7 +5,10 @@
 // first version comes with page 1 as it prints for Jess to look at (PDFs; office files when LibreOffice is installed).
 import { imageSize } from 'image-size';
 import { registerTool } from './registry.js';
-import { createFileItem, addFileVersion, itemForUser, itemView, readBytes, readText, originOf, isOutsideFile, pagePicture, wantsPreview } from '../../services/library.js';
+import { createFileItem, addFileVersion, itemForUser, itemView, readBytes, readText, originOf, isOutsideFile, pagePicture, wantsPreview, fromWords,
+  outsideSource } from '../../services/library.js';
+import { oneLine } from '../../lib/untrusted.js';
+import { guardOutside } from '../injection.js';
 import { shotRef } from '../../services/page-check.js';
 import { primaryPlace } from '../../services/places.js';
 import { pdfFormFields, fillPdfForm, mergePdfs, pageText, writeOnPdf } from '../../services/pdf.js';
@@ -319,19 +322,26 @@ registerTool({
     + 'text with positions, to place answers with pdf_write_text. Use before pdf_fill_form.',
   parameters: { type: 'object', required: ['id'], additionalProperties: false, properties: { id: { type: 'string' } } },
   label: () => 'Read the form’s fields',
+  // Field names, labels, tooltips, values, options and a flat form's text are written by whoever made the PDF (often a website
+  // or an email's sender), and a tooltip is never on the printed page: fenced and screened like any outside file, the run marked
+  // with where it came from (agent/injection.js guardOutside). Jess's own instructions around them stay outside the fence.
   run: async (args, ctx) => {
     const item = pdfItem(ctx, args.id);
+    const title = oneLine(item.title, 120);
+    const from = fromWords(item);
+    const guarded = async body => (await guardOutside(ctx, { tool: 'pdf_form_fields', kind: 'pdf_form', attrs: { id: item.public_id, from },
+      body, label: `form “${title}” (${from})`, origin: outsideSource(item) })).content;
     const bytes = readBytes(item);
     const fields = await pdfFormFields(bytes);
     if (!fields.length) {
       const pages = await pageText(bytes).catch(() => []);
       const lines = pages.flatMap(p => p.segments.map(s => `- p${p.page} x=${s.x}–${s.x2} y=${s.y} (${s.size}pt): ${q(s.text)}`));
-      if (!lines.length) return `“${item.title}” has no fillable fields and no text layer (a scan). Look at it with pdf_page_image (its result converts a spot in `
+      if (!lines.length) return `“${title}” has no fillable fields and no text layer (a scan). Look at it with pdf_page_image (its result converts a spot in `
         + 'the picture to points), then place answers with pdf_write_text at positions in points from the bottom-left; or ask them what the form asks for.';
-      return `“${item.title}” has no fillable fields: it’s a flat form. Its text, with positions in points from the bottom-left `
-        + `(${pages.map(p => `page ${p.page} is ${p.width} × ${p.height}`).join(', ')}; y is the text baseline):\n${lines.slice(0, 160).join('\n')}`
-        + `${lines.length > 160 ? `\n(${lines.length - 160} more lines)` : ''}\nTo fill it, write each answer just right of its label (x a little past the label’s end, same y) `
-        + 'or on the line under it, with pdf_write_text.';
+      return `“${title}” has no fillable fields: it’s a flat form. Its text, with positions in points from the bottom-left `
+        + `(${pages.map(p => `page ${p.page} is ${p.width} × ${p.height}`).join(', ')}; y is the text baseline):\n`
+        + `${await guarded(`${lines.slice(0, 160).join('\n')}${lines.length > 160 ? `\n(${lines.length - 160} more lines)` : ''}`)}\n`
+        + 'To fill it, write each answer just right of its label (x a little past the label’s end, same y) or on the line under it, with pdf_write_text.';
     }
     const describe = f => [
       `- "${f.name}" (${f.type}${f.page ? `, page ${f.page}` : ''}${f.label ? `, label ${q(f.label)}` : ''}${f.tooltip ? `, tooltip ${q(f.tooltip)}` : ''}`
@@ -340,7 +350,7 @@ registerTool({
       f.options ? ` · options: ${f.options.join(' | ')}` : '',
       f.rect ? ` · at x=${f.rect.x} y=${f.rect.y} w=${f.rect.width} h=${f.rect.height}` : '',
     ].join('');
-    return `Fields in “${item.title}”, by page, top to bottom:\n${fields.map(describe).join('\n')}`;
+    return `Fields in “${title}”, by page, top to bottom:\n${await guarded(fields.map(describe).join('\n'))}`;
   },
 });
 

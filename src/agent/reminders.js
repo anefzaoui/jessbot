@@ -24,6 +24,7 @@ import { getRun } from '../services/runs.js';
 import { assistantView } from '../services/chatview.js';
 import { renderFragment } from '../views/render.js';
 import { publish } from '../lib/bus.js';
+import { botName } from '../services/bot.js';
 
 const firstName = u => u.call_me || String(u.name || '').split(/\s+/)[0] || 'They';
 const minutes = n => `${n} ${n === 1 ? 'minute' : 'minutes'}`;
@@ -227,7 +228,7 @@ export async function settle(user, { alarm = null, threadId = null, now = new Da
         if (jev === 'neither') continue;
         let intent = jev;
         if (!intent) {
-          const r = readReply(m.content, a.label, { direct: i === 0 });
+          const r = readReply(m.content, a.label, { direct: i === 0, botName: botName() });
           // A bare "done" or "stop" is ambiguous when several reminders wait here; a stop about the reminding is not.
           if (!r.intent || (!r.specific && others.length)) continue;
           intent = r.intent;

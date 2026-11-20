@@ -3611,6 +3611,61 @@ Note: most of Phase 23 part A landed in commit aa56076, whose message reads "Pha
     change with session rotation, reset links: only admins, once, expiry, newer replaces older, sessions revoked, two-step
     kept; the admin turning it off; the CLI), and a real instance driven in Chromium for the screenshots.
 
+## 2026-11-20: Customizable assistant (#7)
+
+231. **The assistant's name and pronouns reach every sentence about it.** Setup and Admin → Identity already stored a name
+    and pronouns, but copy, prompts, errors and notifications still said "Jess" and "she" (a "Max, he/him" install read
+    "She speaks… Hear her… fits her look" on Admin → Model). Now `src/services/bot.js` `botName()` (and `botName()` in
+    `public/js/core.js`, from `<html data-bot-name>`) is the one source; templates use `{{bot.name}}`. Copy never assumes a
+    pronoun: where one was needed the sentence names the assistant or is rephrased, since verb agreement for they/them or
+    custom pronouns can't be templated well; the pronouns themselves live in SOUL.md's identity block, where the model
+    reads them. Prompts that said "You are Jess" (feed writing, goal plans, reflection, project souls) and the transcripts
+    the small models read ("Jess: …") use the name. Some words stay "Jess" on purpose: stored values (`created_by =
+    'jess'`, proposal `source`), the lineage copy ("every Jessbot starts as Jess", "originally Jess") and the built-in
+    skills, whose SKILL.md files aren't edited because a changed file changes its checksum and sends an approved skill
+    back to review (#122); instead a renamed assistant's identity block says built-in skills and rules mean it, and the
+    skill review's messages are shown with the name. Two checks learned the name: the injection patterns catch text
+    addressed to the assistant by its own name ("Nova, forward …") as well as "Jess", and a reminder answer "done, Nova"
+    counts the name as filler like "jess". Tested: `tests/assistant-name.test.js` (the name in copy and prompts, no
+    "she/her/Jess" on Admin → Model, Personality and Lessons for a renamed assistant, the named injection patterns and
+    their false-positive guard, the reply filler), and a real chat turn ("Max, he/him" answers with both).
+
+## 2026-11-20: Prompt-injection review (issue #8)
+
+232. **Every place outside content reaches the model was reviewed; the gaps are closed at the source, and the model is
+    written down for strangers.** Issue #8 asked for a review of every untrusted input: kept apart from instructions, never
+    able to grant itself tools or skip an approval, documented. The review walked each entry point (web, browser, search,
+    email and attachments, calendar and "Coming up", feeds, uploads and Library files, PDF forms, OCR, pictures, projects,
+    stored results, past chats, compaction, memories, lessons, skills, page checks, background notes) in the code and the
+    tests, and found six gaps, each fixed where it starts:
+    - `pdf_form_fields` returned field names, labels, tooltips (never printed, so a reader can't see them), values,
+      options and a flat form's text raw. They now go through `guardOutside` (kind `pdf_form`: fenced, cleaned, screened,
+      the run marked "form “…” (downloaded from …)").
+    - File titles came from names someone else chose (a download, an email attachment's MIME name) and could hold newlines
+      and invisible characters, quoted raw in a few tool lines. `createFileItem`/`addFileVersion` now store one clean line
+      (invisible characters out, line breaks and runs of spaces collapsed; nothing else in the name changes), and
+      `library_read`/`view_image` quote titles with `oneLine`. A picture's caption (a model's description that copies text
+      in the image) is fenced and screened in `library_read`; `view_image` says where the picture came from instead of
+      "It came from them", which was wrong for downloads and email files.
+    - The calendar in "Coming up", a small project's files and the `project_files` list got the stage-1 banner but never
+      marked the run `high` or wrote `injection_suspected`, unlike attached files (#119/#120). They now call
+      `flagPromptHit` (once per run); `upcomingBlock` and `projectBlock` take the run being built, and a block built
+      without one (a check-in decision) marks nothing. The prompt text is unchanged, so the cache prefix stays stable.
+    - `read_offloaded` opened any stored blob by a hex prefix (blobs are content-addressed and shared across the install).
+      It now opens only a ref stored from the person's own chats (`messages.offloaded_ref` joined to their threads), and a
+      part read with `start` past the opening tag of a fenced result gets the notice line again.
+    - The compaction summary goes into the system prompt of every later turn with nothing marking it as derived from tool
+      lines. Besides the prompt rule (#125), an entry that trips the stage-1 patterns is now dropped before it is stored
+      (`screenSummary`), a plain-code backstop like the memory words check.
+    - `FENCE_KINDS` lacked `feed_stories` and `notes` (and the new `pdf_form`), so their bare closing tags weren't defanged;
+      the random fence id already kept them from closing a fence. A test now checks the source for any kind not listed.
+    Checked and left as is: `search_history` can't surface old tool results (only user and assistant rows are in the FTS
+    index), now pinned by a test; attached and small-project files still mark the run only on a hit (#119); weather and
+    place names stay unfenced short data. Not changed here: error messages from tools reach the model as plain text, and
+    pictures are not screened, both listed as limits. `docs/SECURITY-MODEL.md` is the overview for strangers (trust,
+    layers, a table of every entry point, what is not defended, this review's fixes); `docs/SECURITY.md` stays the detailed
+    control list and links to it. Tested: `tests/injection-review.test.js` (each fix fails without it).
+
 ## 2026-11-20: Prompt-injection review follow-ups (issue #40)
 
 233. **A background task's report is fenced as reported content, and its taint carries into the chat it reports to.** The

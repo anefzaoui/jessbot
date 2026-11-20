@@ -132,6 +132,9 @@ export function startClocks() {
   setInterval(tick, 1000);
 }
 
+// The assistant's name as the admin set it (#7; <html data-bot-name>). Copy names it; it never assumes "she".
+export const botName = () => document.documentElement.dataset.botName || 'Jess';
+
 export const storage = {
   get(key, fallback = null) { try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; } },
   set(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* private mode */ } },
