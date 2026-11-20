@@ -90,14 +90,22 @@ The public site (`website/`, built by `scripts/build-site.js`; see `website/READ
   `#0b1030` / `#3b4166`, and one green cue light `#33d17a` for "go" (Send it, Waits for your go, the exits). The home page
   runs from black through cobalt and rose to day white and back down to black; colour fields own whole sections.
 - **Type:** Anybody (display: condensed, heavy, `font-stretch` 72 to 92%), Hanken Grotesk (reading), Big Shoulders
-  Stencil (cue numbers, times, small labels such as "Guide"). All OFL, from npm, served by the site.
+  Stencil (cue numbers, times, small labels such as "Guide"). All OFL, from npm, served by the site. Three display
+  steps, weight 700 at most (decision #250): `--h-display` (the promise, the curtain), `--h-section` (each section's
+  heading, page titles) and `--h-band` (the four hours); tracking -0.02em on display, 0 on reading text, reading
+  leading 1.6 to 1.7.
 - **The stage (home):** Jess's portrait for the cue's hour over that hour's sky, picked from the visitor's clock as in the
   app; a black subtitle strip with her line and the cue board; cues change every six seconds until the visitor picks
   one. The skies are 1024 px, so they get 1.6 px of depth-of-field blur and film grain over sky and figure; Jess gets a
   back light, the sky's colour on her edges and a fade at the bottom so she is lit in the scene, not cut out.
 - **Pages with the house lights up** (guide, gallery, 404): the black header with a four-colour horizon line under it,
   day white in the light theme and night in the dark one, the black footer. The home page has no theme switch.
-- **Motion:** the lights come up once on load (the headline's weight rises with them), the cue crossfades, a slow drift
-  of the sky and breathing of the portrait; all of it stops with reduced motion, and the cues then wait for a click.
+- **Motion** (decision #250, after studying how mausbot.com moves): the words never animate on load; the headline is
+  set, still, from the first frame. Each sky and portrait stays dark until it has arrived and been decoded, then its
+  light comes up (1.2 s); a new cue crossfades the light the same way, and her line arrives like a message (rises 0.35em
+  and settles in 420 ms, the state 160 ms later, then the buttons). Hovers 150 ms, states 240 ms, all decelerating
+  (`--ease-ui`); the only ambient motion is Jess breathing. The strip keeps room for the day cue's buttons, so no cue
+  moves the page. With reduced motion nothing moves through space, the cues wait for a click, and a picked cue's light
+  changes in 200 ms.
 - **Performance:** only the visitor's sky and portrait load first; the rest after the page has loaded; the recorded run's
   video only when it comes near.

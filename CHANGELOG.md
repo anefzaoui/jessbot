@@ -32,6 +32,9 @@ in their chat.
 - The project site, with the user guide and screenshots: https://anefzaoui.github.io/jessbot/. Its home page is "Jess's
   day": Jess in her sky through four hours of a day, what she does at each, one real run with its timeline, and the
   install; the guide, the gallery and the 404 share its look.
+- The site is calmer: the home page's headline no longer swells from thin to heavy as it loads (it's there, still, from
+  the first frame), the pictures fade up as they arrive, her line arrives like a message, and changing the hour never
+  moves the page; the type, buttons and links of the whole site are steadier.
 
 ### Security
 

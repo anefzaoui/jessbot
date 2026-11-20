@@ -81,6 +81,8 @@ Jessbot is an early preview: run it at home or on a private network, not on the 
   [anefzaoui.github.io/jessbot](https://anefzaoui.github.io/jessbot/)
 - ✅ The site's home page redone as "Jess's day": Jess in her sky through a day, one real run, the install; the guide,
   gallery and 404 in the same look
+- ✅ The site refined: a still headline, short and eased motion that respects reduced motion, steadier type and spacing,
+  no layout shift between the hours
 
 ## Being worked on
 

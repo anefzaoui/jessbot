@@ -3955,3 +3955,23 @@ Note: most of Phase 23 part A landed in commit aa56076, whose message reads "Pha
     page is a feature that works (docs/FEATURES.md); the demo household and the made-up people are labelled. The app
     keeps its own world (Harbor, Geist; docs/DESIGN.md); only the site changed. Built with the impeccable skill
     (direction contract in `.impeccable/surfaces/website-index-html.md`).
+
+## 2026-11-20: The website, refined
+
+250. **The site's motion is short, eased and tied to what changes; the words never animate on load.** The owner found
+    the new home page (#249) unrefined, above all its headline: it loaded at weight 200 and swelled to 800 over 2.4 s,
+    which re-wrapped it from two lines to three and pushed the lead and the install command down as it grew (a type
+    specimen's trick, and a layout shift in the first viewport). He pointed at mausbot.com (OpenMausBot) as the bar.
+    Studied in a browser at 1440 and 390 px (screen recordings, computed styles and every animation on the page): its
+    headline is still from the first frame, only one accent word in it swaps, briefly, in step with the product shown
+    under it; motion clusters at 150, 240 and 420 to 520 ms on strong ease-out curves, no blur; one family in three
+    weights; reduced motion removes everything spatial. Techniques only: nothing of its code or assets is used. What
+    changed here: the headline is set once at weight 700 (three display steps for the whole site, `--h-display`,
+    `--h-section`, `--h-band`, nothing above 700); each sky and portrait stays dark until it has arrived and been decoded,
+    then its light comes up, instead of a 2.2 s fade on a timer (the first frame is the words alone and never waits on a
+    picture); her line arrives like a message (420 ms rise, the state and the buttons a beat later) instead of a 700 ms
+    blur-in; the sky's slow drift is gone and Jess's breathing stays; hovers, presses and tabs get 150 to 240 ms
+    transitions from two shared curves. The strip keeps room for the day cue's buttons and Jess steps back between
+    tablet and laptop widths, so no cue moves the page and the words never sit on her face. Reduced motion: nothing
+    moves through space, the cues wait for a click, a picked cue's light changes in 200 ms. The rules are in
+    docs/DESIGN.md → Website.

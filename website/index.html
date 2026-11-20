@@ -18,15 +18,21 @@
   <div class="grain" aria-hidden="true"></div>
   <script>
     // Before first paint: the cue for the visitor's hour (as the app's sky does), or ?cue=; only its sky and portrait
-    // load now, the other three after the page has loaded (site.js).
+    // load now, the other three after the page has loaded (site.js). Each picture stays dark until it has loaded and
+    // been decoded off the main thread, and at least one frame has been painted; then its light comes up (styles.css,
+    // data-fade/data-ready). So the first frame is the words alone and never waits on a picture.
     (function () {
       var stage = document.getElementById('stage');
       var q = (location.search.match(/[?&]cue=(night|dawn|day|dusk)/) || [])[1];
       var h = new Date().getHours();
       var cue = q || (h < 5 || h >= 21 ? 'night' : h < 9 ? 'dawn' : h < 17 ? 'day' : 'dusk');
       stage.dataset.cue = cue;
-      if (!matchMedia('(prefers-reduced-motion: reduce)').matches) stage.classList.add('dark');
-      stage.querySelectorAll('[data-sky="' + cue + '"], [data-face="' + cue + '"]').forEach(function (img) { img.fetchPriority = 'high'; img.src = img.dataset.src; });
+      stage.dataset.fade = '';
+      stage.querySelectorAll('[data-sky="' + cue + '"], [data-face="' + cue + '"]').forEach(function (img) {
+        var ready = function () { requestAnimationFrame(function () { requestAnimationFrame(function () { img.dataset.ready = ''; }); }); };
+        img.decoding = 'async'; img.fetchPriority = 'high'; img.src = img.dataset.src;
+        img.addEventListener('load', function () { if (img.decode) img.decode().then(ready, ready); else ready(); }, { once: true });
+      });
     })();
   </script>
   <noscript><style>.stage .sky[data-sky="night"] { opacity: 1; }</style><img class="sky" src="images/sky-night.webp" alt="" style="opacity:1"></noscript>
@@ -48,10 +54,12 @@
     <div class="line-wrap" aria-live="polite">
       <p class="cue-label"><span data-cue-no>Q1</span> <span data-cue-time>02:10</span> <span data-cue-name>Night</span></p>
       <p class="line" data-line>You're asleep. I'm comparing the three venues you liked, so the draft is ready by seven.</p>
-      <p class="state" data-state>Reading venue pages · nothing will be sent</p>
-      <div class="ask" data-ask hidden>
-        <button type="button" class="go" data-answer="yes">Send it</button>
-        <button type="button" class="hold" data-answer="no">Not now</button>
+      <div class="beat">
+        <p class="state" data-state>Reading venue pages · nothing will be sent</p>
+        <div class="ask" data-ask hidden>
+          <button type="button" class="go" data-answer="yes">Send it</button>
+          <button type="button" class="hold" data-answer="no">Not now</button>
+        </div>
       </div>
     </div>
     <ol class="board" aria-label="Her day, cue by cue">

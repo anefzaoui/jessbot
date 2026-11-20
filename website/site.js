@@ -26,17 +26,19 @@
     };
     const order = ['night', 'dawn', 'day', 'dusk'];
     const $ = s => stage.querySelector(s);
-    const line = $('[data-line]'), state = $('[data-state]'), ask = $('[data-ask]');
+    const line = $('[data-line]'), state = $('[data-state]'), ask = $('[data-ask]'), wrap = $('.line-wrap');
+    // Her line arrives like a message: restart the arrival (styles.css, .line-wrap.swap) on every change.
+    const arrive = () => { if (reduce) return; wrap.classList.remove('swap'); void wrap.offsetWidth; wrap.classList.add('swap'); };
     const buttons = [...stage.querySelectorAll('[data-go]')];
     let current = stage.dataset.cue || 'night', timer = null, touched = false;
 
-    const show = (name, fromUser) => {
+    const show = (name, fromUser, first) => {
       const c = cues[name]; if (!c) return;
       current = name; stage.dataset.cue = name;
       $('[data-cue-no]').textContent = c.no; $('[data-cue-time]').textContent = c.time; $('[data-cue-name]').textContent = c.name;
       line.textContent = c.line; state.textContent = c.state;
-      if (!reduce) { line.classList.remove('swap'); void line.offsetWidth; line.classList.add('swap'); }
       ask.hidden = !c.ask;
+      if (!first) arrive(); // the first cue is already on the page as it was painted
       buttons.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.go === name)));
       if (fromUser) stop();
     };
@@ -53,17 +55,20 @@
       stop(); ask.hidden = true;
       if (a.dataset.answer === 'yes') { line.textContent = 'Sent to Maya at 12:31. It’s in Activity with the exact text.'; state.textContent = 'Approved by you · sent (in the app; nothing left this page)'; }
       else { line.textContent = "I won't send it. The draft stays in the chat if you change your mind."; state.textContent = 'Not sent'; }
+      arrive();
     });
     stage.querySelector('.surtitles').addEventListener('focusin', stop);
     // The cues pause while the stage is off screen; once the visitor has taken over, they stay where they put them.
     new IntersectionObserver(([en]) => { if (en.isIntersecting) play(); else { clearInterval(timer); stage.classList.remove('playing'); } }, { threshold: 0.3 }).observe(stage);
 
-    show(current);
-    // The other three skies and portraits load once the page has.
-    const rest = () => stage.querySelectorAll('img[data-src]:not([src])').forEach(img => { img.decoding = 'async'; img.src = img.dataset.src; });
+    show(current, false, true);
+    // The other three skies and portraits load once the page has; each is lit only once it has arrived.
+    const rest = () => stage.querySelectorAll('img[data-src]:not([src])').forEach(img => {
+      const ready = () => { img.dataset.ready = ''; };
+      img.addEventListener('load', () => img.decode().then(ready, ready), { once: true });
+      img.decoding = 'async'; img.src = img.dataset.src;
+    });
     if (document.readyState === 'complete') rest(); else addEventListener('load', rest, { once: true });
-    // The house lights come up.
-    requestAnimationFrame(() => requestAnimationFrame(() => stage.classList.remove('dark')));
   }
 
   // ---- The recorded run: loads when it comes near, plays while it's on screen, its timetable follows ---------------
