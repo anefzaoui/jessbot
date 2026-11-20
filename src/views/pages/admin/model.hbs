@@ -20,7 +20,7 @@
           <div class="min-w-0 flex-1">
             <p class="text-sm font-semibold">API key</p>
             {{#if llm.hasKey}}
-              <p class="text-xs text-ink-3">Saved in this install’s <code class="font-mono">.env</code> · <span class="font-mono" data-masked-key>{{llm.maskedKey}}</span></p>
+              <p class="text-xs text-ink-3">{{#if (eq llm.keySource 'environment')}}Set in the server’s environment{{else}}Saved encrypted with this install’s key{{/if}} · <span class="font-mono" data-masked-key>{{llm.maskedKey}}</span></p>
             {{else}}
               <p class="text-xs text-bad">No key yet. {{bot.name}} can’t think until you add one.</p>
             {{/if}}

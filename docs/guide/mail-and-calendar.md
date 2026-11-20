@@ -30,8 +30,8 @@ Google Calendar isn't supported yet, because it needs Google sign-in. Gmail itse
 
 - Each account can only be used by the person who connected it, for their own requests. Not even an admin can use it.
 - Passwords are stored encrypted on this computer and never shown again. The encryption key lives in this install's
-  `.env`, so a copy of the database or a backup alone doesn't reveal them. When you move Jessbot to another machine,
-  bring `.env` along.
+  `.env` (or a key file), so a copy of the database or a backup alone doesn't reveal them. When you move Jessbot to
+  another machine, bring `.env` along.
 - Mail and calendar servers must be on the public internet. A server on this computer or your home network is refused
   unless an admin turns on **Allow the local network** in Admin → Browser.
 

@@ -8,11 +8,12 @@
 //   npm run eval:agent -- --yes --runs 3     each question 3 times (1–3)
 //   npm run eval:agent -- --yes --only pdf-most-pages,budget-march   some questions only
 //   --model <id>  another chat model · --out <file.json>  also write the results as JSON
-// Needs OPENROUTER_KEY in .env (copied into the throwaway dir). Nothing touches data/ or the running servers.
+// Needs the model key: in the environment, .env, or sealed in a local install (scripts/lib/model-key.js). Nothing touches data/ or the running servers.
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { devModelKey } from './lib/model-key.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
@@ -25,6 +26,7 @@ const ONLY = opt('only') ? new Set(opt('only').split(',').map(s => s.trim())) : 
 // ---- A throwaway install (set up before any app module loads: config reads these at import) --------------------------
 const HOME = fs.mkdtempSync(path.join(os.tmpdir(), 'jessbot-eval-'));
 if (fs.existsSync(path.join(ROOT, '.env'))) fs.copyFileSync(path.join(ROOT, '.env'), path.join(HOME, '.env'));
+{ const k = devModelKey(); if (k) process.env.OPENROUTER_KEY = k; } // used, never stored (#10)
 Object.assign(process.env, { JESSBOT_HOME: HOME, JESSBOT_ENV_FILE: path.join(HOME, '.env'), JESSBOT_EMBED_OFF: '1', JESSBOT_EXTRACT_DELAY_MS: '86400000' });
 const cleanup = () => { try { fs.rmSync(HOME, { recursive: true, force: true }); } catch { /* a file still open on Windows: the OS temp cleaner takes it */ } };
 
@@ -50,7 +52,7 @@ await import('../src/agent/tools/index.js');
 const loop = await import('../src/agent/loop.js');
 const { PDFDocument, StandardFonts } = await import('@cantoo/pdf-lib');
 
-if (!llmSettings().apiKey) { console.error('No OPENROUTER_KEY in .env: the evaluation needs the real model.'); cleanup(); process.exit(2); }
+if (!llmSettings().apiKey) { console.error('No model key (environment, .env or a local install): the evaluation needs the real model.'); cleanup(); process.exit(2); }
 if (opt('model')) settings.set('llm', { model: opt('model') });
 const MODEL = llmSettings().model;
 

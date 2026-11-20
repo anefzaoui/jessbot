@@ -1,7 +1,8 @@
 // Push transport (Phase 12, decision #85): reaching someone whose Jessbot isn't open. Two self-hostable transports, no
 // Google account needed on the server:
 //   webpush     — browsers and installed PWAs (Chrome/Edge/Firefox/Safari, Android included) via the Web Push protocol,
-//                 VAPID keys made per install (in .env). The page's service worker (public/sw.js) shows the notification.
+//                 VAPID keys made per install (the private one sealed in the database, #10). The page's service worker
+//                 (public/sw.js) shows the notification.
 //   unifiedpush — the Android app (later) through any UnifiedPush distributor, e.g. ntfy: a plain HTTPS POST to the
 //                 endpoint the device registered.
 // Subscriptions that the push service says are gone (404/410) are removed. Endpoints on the local network are refused
@@ -9,19 +10,20 @@
 // reach inside the network. Delivery goes through lib/outbound.js (decision #221): the address it connects to is the one
 // it checked, and a redirect is checked again.
 import * as webpush from 'web-push'; // v4 is ESM with named exports only
-import { get, run } from '../db/index.js';
-import { setEnvVar } from '../lib/envfile.js';
+import { get, run, settings } from '../db/index.js';
+import { readSecret, setSecret } from './stored-secrets.js';
 import { outboundFetch, localNetworkAllowed } from '../lib/outbound.js';
 
 let vapid = null;
-/** This install's VAPID keys (made once, kept in .env). */
+/** This install's VAPID keys (made once; an operator's JESSBOT_VAPID_* environment wins). */
 export function vapidKeys() {
   if (vapid) return vapid;
-  let pub = process.env.JESSBOT_VAPID_PUBLIC, priv = process.env.JESSBOT_VAPID_PRIVATE;
+  let pub = process.env.JESSBOT_VAPID_PUBLIC || settings.get('push', {})?.publicKey;
+  let priv = process.env.JESSBOT_VAPID_PRIVATE || readSecret('push.vapidPrivate');
   if (!pub || !priv) {
     ({ publicKey: pub, privateKey: priv } = webpush.generateVAPIDKeys());
-    setEnvVar('JESSBOT_VAPID_PUBLIC', pub);
-    setEnvVar('JESSBOT_VAPID_PRIVATE', priv);
+    settings.set('push', { ...(settings.get('push', {}) || {}), publicKey: pub });
+    setSecret('push.vapidPrivate', priv);
   }
   const admin = get(`SELECT email FROM users WHERE role = 'admin' ORDER BY id LIMIT 1`);
   webpush.setVapidDetails(`mailto:${admin?.email || 'owner@jessbot.local'}`, pub, priv);

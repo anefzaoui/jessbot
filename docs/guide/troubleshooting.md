@@ -138,9 +138,10 @@ If something else uses port 3737, Jessbot stops at start with `EADDRINUSE: addre
 
 ## Saved mail passwords stopped working after a move
 
-The health check says "Password key" needs fixing when `.env` didn't come along: saved mail and calendar passwords are
-sealed with a key kept in `.env`, never in the database or the backups. Put back the `.env` from the old install, or
-reconnect the accounts. See [Backups and updates](backups-and-updates.md#moving-to-another-machine).
+The health check says "Password key" needs fixing when the install key didn't come along: saved mail and calendar
+passwords, two-step sign-in codes and the model key are sealed with a key kept in `.env` (or a key file), never in the
+database or the backups. Put back the `.env` from the old install (or set its key as `JESSBOT_SECRET_PREVIOUS`), or
+reconnect the accounts and enter the model key again. See [Backups and updates](backups-and-updates.md#moving-to-another-machine).
 
 Related: [Guide index](README.md) · [Getting started](getting-started.md) · [Models and costs](providers.md) ·
 [People and admin](people-and-admin.md) · [Mail and calendar](mail-and-calendar.md) ·

@@ -10,7 +10,6 @@ import { listGroups, createGroup } from '../../services/groups.js';
 import { createInvite, listPendingInvites } from '../../services/invites.js';
 import { audit } from '../../services/audit.js';
 import { presenceFor } from '../../services/presence.js';
-import { setEnvVar } from '../../lib/envfile.js';
 import { setSessionCookie } from '../../middleware/auth.js';
 import { formPost, isAjax } from '../../lib/respond.js';
 import { invalid, forbidden } from '../../lib/errors.js';
@@ -19,6 +18,7 @@ import { config } from '../../config/index.js';
 import { browserStatus, browserSettings, installBrowser } from '../../browser/index.js';
 import { renderFragment } from '../../views/render.js';
 import { baseUrl } from '../../lib/origin.js';
+import { setSecret } from '../../services/stored-secrets.js';
 
 const router = Router();
 
@@ -68,7 +68,7 @@ router.post('/account', signInLimit, formPost('setup-account', accountData, asyn
 // ---- 2. Brain (model connection) ---------------------------------------------
 const modelData = () => {
   const s = llmSettings();
-  return stepData('model', { llm: { baseUrl: s.baseUrl, model: s.model, hasKey: !!s.apiKey, maskedKey: maskKey(s.apiKey) },
+  return stepData('model', { llm: { baseUrl: s.baseUrl, model: s.model, hasKey: !!s.apiKey, maskedKey: maskKey(s.apiKey), keySource: s.keySource },
     modelDone: settings.get('setup', { done: [] }).done.includes('model'), values: {} });
 };
 
@@ -77,7 +77,7 @@ router.get('/model', (req, res) => res.render('setup-model', modelData()));
 // Save settings, then run a real completion. Always JSON (the page shows the result inline).
 router.post('/model/test', async (req, res) => {
   const { apiKey, model, baseUrl } = req.body;
-  if (apiKey?.trim()) setEnvVar('OPENROUTER_KEY', apiKey.trim());
+  if (apiKey?.trim()) setSecret('llm.apiKey', apiKey.trim()); // sealed in the database (#10), never written to .env
   // Keep what else the admin chose (fallbacks, background model: Admin → Models, #179): only these two change here.
   settings.set('llm', { ...(settings.get('llm', {}) || {}), baseUrl: baseUrl?.trim() || config.llm.baseUrl, model: model?.trim() || config.llm.model });
   const result = await testConnection();

@@ -3755,3 +3755,30 @@ Note: most of Phase 23 part A landed in commit aa56076, whose message reads "Pha
     warns, `on` refuses) and as root (off, "runs as root"); a real page load each time; `tests/browser-sandbox.test.js`
     (the fallback rules) and the real-browser tests in `npm test` with the sandbox on. Not tested: macOS, an Ubuntu
     23.10+ host (AppArmor profile documented, not run), CloakBrowser (its binary isn't downloaded here).
+
+## 2026-11-20: Secrets at rest (#10)
+
+240. **The model key and the push key are sealed in the database too; the install key can live in a file; it can be
+    rotated.** Mail and calendar passwords, two-step seeds and browser sign-ins were already sealed (#78, #136, #230), but
+    the model provider's key and the Web Push private key sat in plain text in `.env`, next to the key that seals the rest,
+    and in Docker that `.env` is inside the data volume. Now (`services/stored-secrets.js`): a key entered in setup or Admin
+    → Model is sealed into `settings.sealedSecrets`, never written to `.env`; the push key pair is made into the database;
+    at start, those keys found in the install's own `.env` move into the database and their lines are removed. Only for
+    the default `.env` or one inside the data folder: a `JESSBOT_ENV_FILE` elsewhere may be shared by two copies of the code,
+    and moving the key into one copy's database would take it from the other. A key in the real environment stays the
+    operator's: used first, never stored. The install key: `JESSBOT_SECRET_FILE` (a Docker or systemd secret, so the data
+    folder holds nothing readable; a file that won't read is an error, never a reason to make a new key) or
+    `JESSBOT_SECRET` in `.env` as before; `JESSBOT_SECRET_PREVIOUS` opens what an older key sealed. `npm run
+    secrets:rotate` (refuses while Jessbot runs, checks that everything opens before changing anything, writes the old key as
+    PREVIOUS before the new one, re-seals the database in one transaction and the profile files one by one, removes PREVIOUS
+    and keeps the old `.env` aside for old backups). Everything sealed is listed in one place
+    (`services/sealed-inventory.js`), used by the rotation and by Admin → System's key check, which now opens one value of
+    each kind; a test compares that list with the database's columns so a new sealed column can't be missed. The scripts that
+    need the real model (`test:chat`, `test:e2e`, `eval:agent`, avatar generation) find the key through
+    `scripts/lib/model-key.js` (environment, `.env`, or a local install's sealed key) and pass it to their throwaway servers
+    as environment. Why not leave the model key in `.env`: one secret file holding only the key is easier to keep apart
+    (a key file, a secret store), backups never held the model key and still don't in readable form, and the key and what
+    it protects no longer travel together in the Docker volume. Tested: `tests/secrets-at-rest.test.js` (the migration and
+    what it leaves alone, no plaintext in the database or its WAL file, the key file, the previous key, a full rotation of
+    every kind and its refusals, the inventory), and on a real install: the key moved out of `.env` at start, the model
+    answered, Admin → System opened it; after `npm run secrets:rotate` it answered again with the new key.

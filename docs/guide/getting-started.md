@@ -58,7 +58,7 @@ off.
 2. **Brain.** Your model key and the model to use. The default is `openai/gpt-6-luna`, a cheap, capable model. Under
    "Advanced: a different endpoint" you can point it at another service. Press **Test the connection**: Jessbot asks
    the model a real question, and **Continue** works once that succeeds. You can also choose **Skip for now** and add
-   the key later in Admin → Models. The key is saved to `.env` on this machine, never in the database.
+   the key later in Admin → Models. The key stays on this machine, encrypted with the install's own key.
 3. **Internet.** The agent reads the web through its own browser on this machine. If Chrome is installed, it uses that.
    Otherwise **Install browser** downloads open-source Chromium (about 200 MB) in the background while you carry on.
    Until a browser is there, chat, files, reminders, lists and mail work, but web lookups, the Feed and weather don't.

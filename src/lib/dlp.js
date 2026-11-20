@@ -17,7 +17,7 @@ const MAX_REGISTERED = 500;
 const registered = new Map();  // value → label
 // Read live on every check: setup and Admin can change the model key while the server runs.
 const ENV_SECRETS = [['OPENROUTER_KEY', 'the model key'], ['LLM_API_KEY', 'the model key'], ['JESSBOT_SECRET', 'the password key'],
-  ['JESSBOT_VAPID_PRIVATE', 'the push key']];
+  ['JESSBOT_SECRET_PREVIOUS', 'the password key'], ['JESSBOT_VAPID_PRIVATE', 'the push key']];
 
 /** Remember a value that must never leave in a tool call. Returns false for values too short to match safely. */
 // The forms a value can take on its way out: as is, URL-encoded, base64 (padding dropped).

@@ -6,6 +6,7 @@ import { settings } from '../db/index.js';
 import { recordUsage } from './usage.js';
 import { invalid } from '../lib/errors.js';
 import { boundFetch } from '../lib/outbound.js';
+import { readSecret } from './stored-secrets.js';
 
 let client, clientKey;
 
@@ -16,7 +17,9 @@ export function llmSettings() {
   return {
     baseUrl: s.baseUrl || config.llm.baseUrl,
     model: s.model || config.llm.model,
-    apiKey: process.env.OPENROUTER_KEY || process.env.LLM_API_KEY || '',
+    // The operator's environment wins (never stored); otherwise the key entered in setup or Admin → Model, sealed (#10).
+    apiKey: process.env.OPENROUTER_KEY || process.env.LLM_API_KEY || readSecret('llm.apiKey'),
+    keySource: process.env.OPENROUTER_KEY || process.env.LLM_API_KEY ? 'environment' : 'sealed',
     fallbacks: modelList(s.fallbacks),
     background: String(s.background || '').trim(),
   };

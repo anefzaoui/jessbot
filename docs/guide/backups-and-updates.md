@@ -16,9 +16,10 @@ feed pictures, screenshots, voice notes and the assistant's pictures. It leaves 
 
 - **Browser sign-ins** (the cookies of sites the assistant is signed in to), so a backup file can't be used to sign in
   as you.
-- **The `.env` file**, which holds your model key and the key that seals saved mail and calendar passwords. Keep a copy
-  of `.env` somewhere safe yourself: without it, a restored install can't open those saved passwords, and you'd have to
-  reconnect the mail and calendar accounts.
+- **The install key** (`JESSBOT_SECRET` in `.env`, or the key file `JESSBOT_SECRET_FILE` names), which encrypts saved
+  mail and calendar passwords, two-step sign-in codes and the model key. Those are in the backup, but only encrypted.
+  Keep a copy of `.env` (or the key file) somewhere safe yourself: without it, a restored install can't open them, and
+  you'd have to reconnect the mail and calendar accounts and enter the model key again.
 - Logs and caches.
 
 You can see the backups in **Admin → System → Backups**, make one straight away with **Back up now**, and **Download**
@@ -96,7 +97,7 @@ That restores the database only; your files stay as they are.
 
 1. Stop Jessbot.
 2. Copy the whole Jessbot folder, including `data/` and `.env`. With Docker, copy the `jessbot-data` volume, which
-   holds the data and the `.env` the setup page wrote.
+   holds the data and the `.env` with the install key (or, if you keep the key in a Docker secret, bring that too).
 3. On the new machine, install Node.js 24.19 or newer (or Docker) and start Jessbot from the copied folder.
 
 If the new machine runs a different operating system, run `npm ci && npm run build` there before the first start, since

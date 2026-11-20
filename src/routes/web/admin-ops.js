@@ -19,7 +19,6 @@ import { VOICES, VOICE_MODELS, DEFAULT_VOICE, SPEEDS, voiceSettings, voiceFor, a
 import { VARIANTS } from '../../services/workspace.js';
 import { decideSettings, usesView, recentDecisions, decideSummary, CONFIDENCES } from '../../services/decide.js';
 import { imageSettings } from '../../services/images.js';
-import { setEnvVar } from '../../lib/envfile.js';
 import { audit } from '../../services/audit.js';
 import { renderFragment } from '../../views/render.js';
 import { allSkills, setSkill, saveSkill, deleteSkill, skillView, skillReview, lintOf, skillUsage, reviewPage, reviewSummary, RECOMMENDED, CATEGORIES,
@@ -31,6 +30,7 @@ import { allSources, adminCheckSource, adminRemoveSource } from '../../services/
 import { TOOLSETS } from '../../services/policy.js';
 import { renderMarkdown } from '../../lib/markdown.js';
 import { invalid, notFound, tooMany } from '../../lib/errors.js';
+import { setSecret } from '../../services/stored-secrets.js';
 
 const router = Router();
 const base = { nav: 'admin' };
@@ -120,7 +120,7 @@ router.get('/system/logs/:file', (req, res) => {
 // ---- Model -----------------------------------------------------------------------------------------------------
 const modelView = () => {
   const s = llmSettings();
-  return { model: s.model, baseUrl: s.baseUrl, hasKey: !!s.apiKey, maskedKey: maskKey(s.apiKey), defaultBaseUrl: config.llm.baseUrl,
+  return { model: s.model, baseUrl: s.baseUrl, hasKey: !!s.apiKey, maskedKey: maskKey(s.apiKey), keySource: s.keySource, defaultBaseUrl: config.llm.baseUrl,
     fallbacks: s.fallbacks.join(', '), fallbackList: s.fallbacks, background: s.background, maxFallbacks: MAX_FALLBACKS,
     onOpenRouter: onOpenRouter(s.baseUrl) };
 };
@@ -166,7 +166,7 @@ router.post('/model', async (req, res) => {
   if (apiKey && (apiKey.length < 20 || /\s/.test(apiKey))) errors.apiKey = 'That doesn’t look like an API key.';
   if (Object.keys(errors).length) throw invalid(errors);
   const before = llmSettings();
-  if (apiKey) setEnvVar('OPENROUTER_KEY', apiKey);
+  if (apiKey) setSecret('llm.apiKey', apiKey); // sealed in the database (#10), never written to .env
   // The main model and address are saved as before; the fallback chain and the background model (#179) only once each new
   // one answered a tiny call (422 { errors: { fallbacks | background } } otherwise, those two left as they were).
   const s = await saveModelSettings({ model, baseUrl, fallbacks: req.body?.fallbacks, background: req.body?.background });

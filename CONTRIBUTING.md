@@ -19,7 +19,7 @@ You need Node.js 24.19 or newer (`node --version`).
 
 ```bash
 npm install
-cp .env.example .env        # add a model key if you want to chat (see README → Providers)
+cp .env.example .env        # add a model key if you want to chat (it moves into data/, encrypted, at the first start)
 npm run build               # fonts, icons, CSS
 npm run dev                 # http://127.0.0.1:3738, its own data in data/dev, restarts when src/ changes
 npm run css:watch           # in a second terminal, when you change templates or styles

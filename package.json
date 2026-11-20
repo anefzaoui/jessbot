@@ -35,7 +35,8 @@
     "restore": "node scripts/restore.js",
     "reset-link": "node scripts/reset-link.js",
     "doctor": "node scripts/doctor.js",
-    "browser:sandbox": "node scripts/sandbox-probe.mjs"
+    "browser:sandbox": "node scripts/sandbox-probe.mjs",
+    "secrets:rotate": "node scripts/rotate-secret.js"
   },
   "dependencies": {
     "@cantoo/fontkit": "2.0.12",

@@ -123,4 +123,9 @@ Caddy passes the Host header and WebSocket upgrades as they are. With nginx, pas
   `npm run restore` lists and restores them (with Jessbot stopped). Copy the backups somewhere else too.
 - To update: `git pull`, then `npm ci && npm run build` (or `docker compose up -d --build`). Database changes are
   applied at start after a backup; a change that fails stops the start instead of half-applying.
-- To move an install: stop it and copy the folder with its `data/` (or the Docker volume).
+- To move an install: stop it and copy the folder with its `data/` (or the Docker volume), and its `.env`.
+- **The install key.** Passwords, two-step sign-in seeds and the model key are stored encrypted with a key that is
+  not in the backups: `JESSBOT_SECRET` in `.env`, or the file `JESSBOT_SECRET_FILE` names. Keep a copy of it with your
+  backups (somewhere else); a backup restored without it keeps everything except those secrets, which then have to be
+  entered again. In Docker you can keep it out of the volume entirely with a secret (see `compose.yaml`). To change it:
+  `npm run secrets:rotate` with Jessbot stopped ([SECURITY.md → Secrets and data](SECURITY.md#secrets-and-data)).
