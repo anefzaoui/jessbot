@@ -3927,3 +3927,31 @@ Note: most of Phase 23 part A landed in commit aa56076, whose message reads "Pha
     the model unfenced, docs describing what the code didn't do), and unit tests alone passed on all of them. Same
     practice as the maintainer's other projects. An item is added once the same kind of miss shows up in two pull
     requests; items that stop earning their place are removed.
+
+## 2026-11-20: The website's home page, "Jess's day"
+
+249. **The site's home page is a stage: Jess in front of her sky, through four hours of a day, and the page below it a
+    cyclorama from black to white and back.** The owner found the first home page (a split hero: the promise beside a
+    live approval card over Jess in a blue sky, decision #59's site) too ordinary next to other AI products. Research
+    of about twenty of them (Anthropic, Claude, OpenAI, Comet, Manus, Lindy, Dia, Linear, Cursor, Granola, Poke, Sesame,
+    Tolan and others) showed a category that has converged on an off-white page, a serif headline and one dark button;
+    the strongest pages prove the product in the first screen, put it inside an authored material and sell the clock
+    when the agent works in the background. Three directions were built as working pages (Jess's day; a departures
+    board of the household's tasks; the terms Jess works under as a carbon form); the owner picked Jess's day, with the
+    second one's recorded run and its timeline added. What it is: the first viewport is Jess, large, lit by the cue for
+    the visitor's hour (night, first light, day, dusk, as the app's sky follows the clock), with the promise ("Jess keeps
+    working after you close the app."), the install command with Copy, and a black subtitle strip where she says what
+    she is doing at that hour; the cues play every six seconds until the visitor picks one, and the day cue's "Send it"
+    / "Not now" work (nothing is sent). Below: four bands (02:10 overnight prep, 06:40 the Feed, 08:00 reminders and
+    watches, 12:30 approvals) on a background that runs from black through cobalt and rose to white; the real recorded
+    run (`docs/images/flow-approval.mp4`) with a timetable that follows the video; the rest of what she does as a cue
+    sheet; safety ("She calls standby. You call go."), what leaves the machine, and the install. The guide, the gallery
+    and the 404 use the same type and colours with the house lights up (day white, or night in the dark theme); the
+    home page has no theme switch because it is the whole day. Type: Anybody, Hanken Grotesk and Big Shoulders Stencil
+    (OFL, from npm like Geist). The skies are 1024 px paintings, so on wide screens they sit behind a touch of
+    depth-of-field blur and film grain that also covers Jess, with a back light, the sky's colour on her edges and a
+    fade where she meets the stage, so she reads as lit in the scene rather than cut out. Only the visitor's cue loads
+    first; the other skies and portraits load after the page, and the video only when it comes near. Every line on the
+    page is a feature that works (docs/FEATURES.md); the demo household and the made-up people are labelled. The app
+    keeps its own world (Harbor, Geist; docs/DESIGN.md); only the site changed. Built with the impeccable skill
+    (direction contract in `.impeccable/surfaces/website-index-html.md`).

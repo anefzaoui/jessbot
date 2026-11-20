@@ -8,13 +8,14 @@ publishes it from `.github/workflows/pages.yml`.
 |---|---|
 | `layout.html` | the page frame every page shares: head, header, footer |
 | `index.html` | the home page's content |
-| `styles.css` | every style, on the app's own tokens (Harbor colours, Geist; see `docs/DESIGN.md`) |
-| `site.js` | the theme switch, the sky that follows the visitor's clock, the demo approval card, copy buttons, install tabs |
+| `styles.css` | every style: the site's own world, "Jess's day" (cyclorama colours, Anybody, Hanken Grotesk, Big Shoulders Stencil; see `docs/DESIGN.md` → Website) |
+| `site.js` | the theme switch (guide and gallery), the home page's cues, the recorded run's timetable, copy buttons, install tabs |
+| `run-poster.webp` | the recorded run's poster: the frame of `docs/images/flow-approval.mp4` at 11.5 s (the approval card), a still so the page doesn't load the animated preview |
 
 Everything else comes from the repository, so the site can't drift from it: the docs pages from `docs/guide/*.md`,
 `docs/INSTALL.md` and `docs/SECURITY-MODEL.md`; the screenshots and the recorded run from `docs/images/` (made by
-`scripts/docs-shots.js`); the logo and icons from `docs/images/brand/` (`scripts/build-brand.js`); Jess and her sky from
-`public/img/`; the Geist font and the Phosphor icons from `node_modules`, as in the app. Links between docs pages are
+`scripts/docs-shots.js`); the logo and icons from `docs/images/brand/` (`scripts/build-brand.js`); Jess's portraits and
+her skies from `public/img/`; the fonts and the Phosphor icons from `node_modules`. Links between docs pages are
 rewritten to the site's pages, and links to other files in the repository point at them on GitHub.
 
 ## Build and preview
@@ -24,8 +25,10 @@ npm ci
 node scripts/build-site.js --serve     # http://127.0.0.1:8790
 ```
 
-Check a change at 360, 768 and 1280 pixels wide, in light and dark (the moon and sun button in the header switches
-the theme; the hero's sky depends on your clock). Every link inside the site is relative, so the same build works at
+Check a change at 360, 390, 768, 1280 and 1440 pixels wide, in light and dark on the guide and gallery (the moon and
+sun button in the header switches the theme), and on the home page each cue: it starts at the visitor's hour, and
+`index.html?cue=night` (or `dawn`, `day`, `dusk`) fixes the first one. With reduced motion the cues don't play on their
+own and the run's video waits with its controls. Every link inside the site is relative, so the same build works at
 `https://<owner>.github.io/jessbot/` and at the root of a domain.
 
 ## Publishing

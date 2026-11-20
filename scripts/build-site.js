@@ -2,7 +2,8 @@
 // website/ holds the page layout, the home page, the styles and one small script; everything else comes from the
 // repository itself so the site never drifts from it: docs/guide/*.md (+ docs/INSTALL.md, docs/SECURITY-MODEL.md)
 // become the docs pages, docs/images/ the screenshots and the gallery, docs/images/brand/ the icons, public/img/ Jess's
-// portrait and her sky, the Geist font and the Phosphor icons come from node_modules (the app's own).
+// portraits and her skies (the home page is "Jess's day", decision #249), the fonts (Anybody, Hanken Grotesk, Big Shoulders
+// Stencil) and the Phosphor icons come from node_modules.
 //   node scripts/build-site.js             build _site/
 //   node scripts/build-site.js --serve     build, then serve it on http://127.0.0.1:8790 (local preview)
 // SITE_URL (default https://anefzaoui.github.io/jessbot/) is the address pages give as canonical and in link previews;
@@ -40,15 +41,21 @@ const copy = (from, to) => { fs.mkdirSync(path.dirname(path.join(OUT, to)), { re
 // ---- Assets -------------------------------------------------------------------------------------------------------
 copy('website/styles.css', 'assets/styles.css');
 copy('website/site.js', 'assets/site.js');
-copy('node_modules/@fontsource-variable/geist/files/geist-latin-wght-normal.woff2', 'assets/geist.woff2');
+copy('website/run-poster.webp', 'images/run-poster.webp'); // the recorded run's poster: its frame at 11.5 s, a still
+copy('node_modules/@fontsource-variable/anybody/files/anybody-latin-standard-normal.woff2', 'assets/anybody.woff2');
+copy('node_modules/@fontsource-variable/hanken-grotesk/files/hanken-grotesk-latin-wght-normal.woff2', 'assets/hanken-grotesk.woff2');
+copy('node_modules/@fontsource-variable/big-shoulders-stencil/files/big-shoulders-stencil-latin-wght-normal.woff2', 'assets/big-shoulders-stencil.woff2');
 for (const f of fs.readdirSync(path.join(ROOT, 'docs/images'))) if (/\.(webp|mp4)$/.test(f)) copy(`docs/images/${f}`, `images/${f}`);
 for (const f of ['favicon.ico', 'favicon.svg', 'favicon-32.png', 'apple-touch-icon.png', 'icon-192.png', 'icon-512.png',
   'icon-maskable-512.png', 'social-preview.png', 'mark-128.webp', 'mark-256.webp']) copy(`docs/images/brand/${f}`, f.startsWith('favicon.') ? f : `images/${f}`);
 for (const t of ['dawn', 'day', 'dusk', 'night']) copy(`public/img/scenes/${t}-clear.webp`, `images/sky-${t}.webp`);
 copy('public/img/avatars/female/neutral.webp', 'images/jess.webp');
+// Her portrait for each cue of the home page's day, and asleep for the curtain and the 404.
+for (const [face, file] of [['reading', 'reading'], ['happy', 'happy'], ['listening', 'life-listening'], ['proud', 'proud'], ['sleepy', 'sleepy']])
+  copy(`public/img/avatars/female/${file}.webp`, `images/jess-${face}.webp`);
 fs.writeFileSync(path.join(OUT, '.nojekyll'), '');
 fs.writeFileSync(path.join(OUT, 'site.webmanifest'), JSON.stringify({
-  name: 'Jessbot', short_name: 'Jessbot', start_url: './', display: 'browser', background_color: '#0f1318', theme_color: '#0f1318',
+  name: 'Jessbot', short_name: 'Jessbot', start_url: './', display: 'browser', background_color: '#05060a', theme_color: '#05060a',
   icons: [{ src: 'images/icon-192.png', sizes: '192x192', type: 'image/png' }, { src: 'images/icon-512.png', sizes: '512x512', type: 'image/png' },
     { src: 'images/icon-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' }],
 }, null, 2));
@@ -107,15 +114,15 @@ function renderDoc(srcFile) {
 
 // ---- Layout -------------------------------------------------------------------------------------------------------
 const LAYOUT = fs.readFileSync(path.join(WEB, 'layout.html'), 'utf8');
-function page({ file, title, description, body, root, current, bodyClass = '' }) {
+function page({ file, title, description, body, root, current, bodyClass = '', head = '' }) {
   const url = SITE_URL + file.replace(/(^|\/)index\.html$/, '$1');
-  const nav = (key, href, label) => `<a href="${root}${href}"${current === key ? ' aria-current="page"' : ''}>${label}</a>`;
+  const nav = (key, href, label, keep) => `<a href="${root}${href}"${current === key ? ' aria-current="page"' : ''}${keep ? ' data-keep' : ''}>${label}</a>`;
   const html = LAYOUT
     .replaceAll('{{title}}', esc(title)).replaceAll('{{description}}', esc(description)).replaceAll('{{url}}', esc(url))
     .replaceAll('{{site}}', esc(SITE_URL)).replaceAll('{{root}}', root).replaceAll('{{repo}}', REPO)
-    .replace('{{bodyClass}}', bodyClass)
-    .replace('{{nav}}', [nav('features', 'index.html#what-it-does', 'Features'), nav('safety', 'index.html#safety', 'Safety'),
-      nav('docs', 'docs/index.html', 'Docs'), nav('gallery', 'gallery.html', 'Screenshots')].join(''))
+    .replace('{{bodyClass}}', bodyClass).replace('{{preload}}', () => head)
+    .replace('{{nav}}', [nav('day', 'index.html#day', 'Her day'), nav('safety', 'index.html#safety', 'Safety'),
+      nav('docs', 'docs/index.html', 'Docs', true), nav('gallery', 'gallery.html', 'Screenshots')].join(''))
     .replace('{{body}}', () => body);
   fs.mkdirSync(path.dirname(path.join(OUT, file)), { recursive: true });
   fs.writeFileSync(path.join(OUT, file), icons(html));
@@ -125,8 +132,15 @@ const urls = [];
 
 // Home page.
 urls.push(page({ file: 'index.html', title: 'Jessbot: a self-hosted AI agent for your household',
-  description: 'One assistant the people at home can talk to. It keeps working in the background and asks before it sends, spends or books anything. Free software you run on your own computer.',
-  body: fs.readFileSync(path.join(WEB, 'index.html'), 'utf8'), root: '', current: 'home', bodyClass: 'home' }));
+  description: 'Jess keeps working after you close the app, day and night, and asks before she sends, spends or books anything. Free software you run on your own computer.',
+  body: fs.readFileSync(path.join(WEB, 'index.html'), 'utf8'), root: '', current: 'home', bodyClass: 'home',
+  // The sky and portrait for the visitor's hour start downloading with the stylesheet (the page's largest paint).
+  head: `
+<script>(function () { var q = (location.search.match(/[?&]cue=(night|dawn|day|dusk)/) || [])[1], h = new Date().getHours();
+  var c = q || (h < 5 || h >= 21 ? 'night' : h < 9 ? 'dawn' : h < 17 ? 'day' : 'dusk');
+  var f = { night: 'reading', dawn: 'happy', day: 'listening', dusk: 'proud' }[c];
+  ['images/sky-' + c + '.webp', 'images/jess-' + f + '.webp'].forEach(function (u) { var l = document.createElement('link'); l.rel = 'preload'; l.as = 'image'; l.href = u; l.fetchPriority = 'high'; document.head.appendChild(l); });
+})();</script>` }));
 
 // The docs menu's short names.
 const menuLabel = t => ({ 'Installing Jessbot': 'Install', 'Jessbot guide': 'Overview' })[t] || t.split(':')[0];
@@ -165,8 +179,8 @@ urls.push(page({ file: 'gallery.html', title: 'Screenshots · Jessbot', descript
     <h2>On a phone</h2><div class="shots shots-phone">${sorted('phone').map(fig).join('')}</div></main>`, root: '', current: 'gallery', bodyClass: 'gallery' }));
 
 // 404, sitemap, robots.
-page({ file: '404.html', title: 'Not found · Jessbot', description: 'This page does not exist.', root: './', current: '',
-  body: `<main id="main" class="page-head notfound"><h1>That page isn't here</h1><p>It may have moved when the guide was reorganized.</p><p><a class="btn btn-primary" href="./index.html">Go to the home page</a> <a class="btn" href="./docs/index.html">Open the guide</a></p></main>` });
+page({ file: '404.html', title: 'Not found · Jessbot', description: 'This page does not exist.', root: './', current: '', bodyClass: 'lost',
+  body: `<main id="main" class="page-head notfound"><img class="sleeping" src="./images/jess-sleepy.webp" alt="" width="1024" height="1024"><h1>That page isn't here</h1><p>Jess looked everywhere. It may have moved when the guide was reorganized.</p><p><a class="btn btn-primary" href="./index.html">Go to the home page</a> <a class="btn" href="./docs/index.html">Open the guide</a></p></main>` });
 fs.writeFileSync(path.join(OUT, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map(u => `  <url><loc>${esc(u)}</loc></url>`).join('\n')}\n</urlset>\n`);
 fs.writeFileSync(path.join(OUT, 'robots.txt'), `User-agent: *\nAllow: /\nSitemap: ${SITE_URL}sitemap.xml\n`);
 

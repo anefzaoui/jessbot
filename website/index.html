@@ -1,252 +1,203 @@
 <main id="main">
-<section class="hero" data-sky="night" aria-labelledby="hero-title">
-  <div class="hero-in">
-    <div class="hero-copy">
-      <h1 id="hero-title">An AI agent for your household that asks before it acts.</h1>
-      <p class="hero-lead">Jessbot runs on your own computer. Everyone at home gets a private chat with Jess, who looks
-        things up in her own browser, keeps working when the app is closed, and stops for your OK before she sends,
-        spends or books anything.</p>
-      <div class="install-field" data-copy-field>
-        <label for="hero-cmd">Install with Docker</label>
-        <div class="install-row">
-          <input id="hero-cmd" class="cmd" readonly value="git clone https://github.com/anefzaoui/jessbot && cd jessbot && docker compose up -d --build">
-          <button type="button" class="btn btn-primary" data-copy="#hero-cmd">{{icon:copy}}<span data-copy-label>Copy</span></button>
-        </div>
-        <p class="hint">Then open <code>http://127.0.0.1:3737</code>. Node.js and the other systems are in the
-          <a href="docs/install.html">install guide</a>. Free and open source, early preview.</p>
-        <p class="hero-source"><a href="https://github.com/anefzaoui/jessbot">{{icon:github-logo}} Read the source on GitHub</a></p>
+<!-- The stage: Jess in front of her sky, lit by the cue that's running (decision #249) -->
+<section class="stage" id="stage" data-cue="night" aria-label="Jess, through a day">
+  <div class="cyc" aria-hidden="true">
+    <img class="sky" data-sky="night" data-src="images/sky-night.webp" alt="" width="1024" height="1024">
+    <img class="sky" data-sky="dawn" data-src="images/sky-dawn.webp" alt="" width="1024" height="1024">
+    <img class="sky" data-sky="day" data-src="images/sky-day.webp" alt="" width="1024" height="1024">
+    <img class="sky" data-sky="dusk" data-src="images/sky-dusk.webp" alt="" width="1024" height="1024">
+    <div class="wash"></div>
+    <div class="vignette"></div>
+  </div>
+  <figure class="actor" aria-hidden="true">
+    <img class="face" data-face="night" data-src="images/jess-reading.webp" alt="" width="1024" height="1024">
+    <img class="face" data-face="dawn" data-src="images/jess-happy.webp" alt="" width="1024" height="1024">
+    <img class="face" data-face="day" data-src="images/jess-listening.webp" alt="" width="1024" height="1024">
+    <img class="face" data-face="dusk" data-src="images/jess-proud.webp" alt="" width="1024" height="1024">
+  </figure>
+  <div class="grain" aria-hidden="true"></div>
+  <script>
+    // Before first paint: the cue for the visitor's hour (as the app's sky does), or ?cue=; only its sky and portrait
+    // load now, the other three after the page has loaded (site.js).
+    (function () {
+      var stage = document.getElementById('stage');
+      var q = (location.search.match(/[?&]cue=(night|dawn|day|dusk)/) || [])[1];
+      var h = new Date().getHours();
+      var cue = q || (h < 5 || h >= 21 ? 'night' : h < 9 ? 'dawn' : h < 17 ? 'day' : 'dusk');
+      stage.dataset.cue = cue;
+      if (!matchMedia('(prefers-reduced-motion: reduce)').matches) stage.classList.add('dark');
+      stage.querySelectorAll('[data-sky="' + cue + '"], [data-face="' + cue + '"]').forEach(function (img) { img.fetchPriority = 'high'; img.src = img.dataset.src; });
+    })();
+  </script>
+  <noscript><style>.stage .sky[data-sky="night"] { opacity: 1; }</style><img class="sky" src="images/sky-night.webp" alt="" style="opacity:1"></noscript>
+
+  <div class="pitch">
+    <h1>Jess keeps working after you close the app.</h1>
+    <p class="lead">Jessbot is a self-hosted AI agent for your household. Jess looks things up in her own browser, writes, reminds and watches for you, day and night, and stops to ask before she sends, spends or books anything.</p>
+    <div class="install-field">
+      <label for="cmd-hero">Install with Docker</label>
+      <div class="cmd">
+        <input id="cmd-hero" readonly value="git clone https://github.com/anefzaoui/jessbot && cd jessbot && docker compose up -d --build">
+        <button type="button" class="copy-btn" data-copy="#cmd-hero">Copy</button>
+      </div>
+      <p class="after">Free and open source (GPL-3.0). Early preview: it runs on your own computer, then open <code>127.0.0.1:3737</code>. <a href="docs/install.html">Other ways to install</a></p>
+    </div>
+  </div>
+
+  <div class="surtitles">
+    <div class="line-wrap" aria-live="polite">
+      <p class="cue-label"><span data-cue-no>Q1</span> <span data-cue-time>02:10</span> <span data-cue-name>Night</span></p>
+      <p class="line" data-line>You're asleep. I'm comparing the three venues you liked, so the draft is ready by seven.</p>
+      <p class="state" data-state>Reading venue pages · nothing will be sent</p>
+      <div class="ask" data-ask hidden>
+        <button type="button" class="go" data-answer="yes">Send it</button>
+        <button type="button" class="hold" data-answer="no">Not now</button>
       </div>
     </div>
-
-    <div class="hero-stage">
-      <img class="hero-jess" src="images/jess.webp" width="1024" height="1024" alt="Jess, the default look of the assistant: a woman with short auburn hair, in her sky">
-      <p class="stage-note">A card from a real test run (made-up people; the email is shortened here). Try it: nothing is sent from this page.</p>
-      <article class="approval" data-status="pending" aria-labelledby="demo-title" data-demo-card>
-        <header class="approval-head">
-          <span class="approval-risk" aria-hidden="true">{{icon:paper-plane-tilt}}</span>
-          <div class="approval-heading">
-            <h2 class="approval-title" id="demo-title">Send “Easy hike near Lyon — Sat 21 Nov” to maya@example.com</h2>
-            <p class="approval-meta">Sends outside this app · Sends an email · 4 minutes ago</p>
-          </div>
-          <span class="approval-stamp" data-stamp="pending">Needs your OK</span>
-          <span class="approval-stamp" data-stamp="approved">{{icon:check-circle}} Approved</span>
-          <span class="approval-stamp" data-stamp="denied">{{icon:x-circle}} Denied</span>
-        </header>
-        <dl class="approval-facts">
-          <div><dt>To</dt><dd>maya@example.com</dd></div>
-          <div><dt>Subject</dt><dd>Easy hike near Lyon — Sat 21 Nov</dd></div>
-          <div><dt>Undo</dt><dd>{{icon:lock}} Can’t be undone: an email can’t be recalled once it’s sent</dd></div>
-        </dl>
-        <div class="approval-why">
-          <span aria-hidden="true">{{icon:shield-check}}</span>
-          <p><strong>Why I’m asking</strong> Suggested after reading: a web search for easy hikes near Lyon, a page on
-            visorando.com and 7 more.</p>
-        </div>
-        <section class="approval-preview" data-folded aria-label="What will be sent">
-          <p class="approval-preview-h"><span>What will be sent</span><span class="tabular">645 characters</span></p>
-          <div class="approval-preview-text">Hi Maya,
-
-For Saturday morning, how about the Saint-Cyr-au-Mont-d’Or loop? It’s listed as 6.4 km and about 2 h 3 min, with roughly 170 m of climbing. Lyon to the Monts d’Or area is about 28 minutes by car at current traffic, so well under an hour; check traffic before leaving.
-
-Wear grippy shoes (mud can make wooded paths slippery) and bring water. Please open the route map for the precise start before setting off.
-
-Best,
-Alex</div>
-          <button type="button" class="approval-expand" data-expand aria-expanded="false"><span data-when="folded">Show all</span><span data-when="open">Show less</span>{{icon:caret-down}}</button>
-        </section>
-        <footer class="approval-actions">
-          <button type="button" class="btn btn-primary" data-decide="approved">{{icon:check}} Approve</button>
-          <button type="button" class="btn" data-decide="denied">Deny</button>
-          <p class="approval-result" data-result aria-live="polite"></p>
-        </footer>
-      </article>
-    </div>
+    <ol class="board" aria-label="Her day, cue by cue">
+      <li><button type="button" data-go="night" aria-pressed="true"><span class="q">Q1</span><span class="t">02:10</span><span class="n">Night</span><i></i></button></li>
+      <li><button type="button" data-go="dawn" aria-pressed="false"><span class="q">Q2</span><span class="t">06:40</span><span class="n">First light</span><i></i></button></li>
+      <li><button type="button" data-go="day" aria-pressed="false"><span class="q">Q3</span><span class="t">12:30</span><span class="n">Day</span><i></i></button></li>
+      <li><button type="button" data-go="dusk" aria-pressed="false"><span class="q">Q4</span><span class="t">18:40</span><span class="n">Dusk</span><i></i></button></li>
+    </ol>
+    <p class="demo-note">Scenes from a demo household. Nothing is sent from this page.</p>
   </div>
 </section>
 
-<section class="story" aria-labelledby="story-title">
-  <div class="wrap story-in">
-    <div class="story-text">
-      <h2 id="story-title">One request, start to finish</h2>
-      <p class="lead">This is the run that card came from, recorded on a test install and sped up where it waits.</p>
-      <ol class="steps" role="list">
-        <li data-step="ask"><strong>You ask in plain words.</strong> “In the background, find one easy hike near Lyon for Saturday
-          morning, then email Maya the plan.”</li>
-        <li data-step="run"><strong>Jess takes it to the background.</strong> She opens her own side chat for it, so yours stays free,
-          and searches the web with her browser.</li>
-        <li data-step="wait"><strong>She stops at a card.</strong> The recipient, the exact text, whether it can be undone, and why she is
-          asking. Nothing has left yet.</li>
-        <li data-step="ok"><strong>You approve, and only then it is sent.</strong> The activity log keeps a line for each step.</li>
-      </ol>
+<!-- The lights rise: four hours, black to cobalt to rose to white -->
+<section class="day" id="day" aria-label="A day with Jess">
+  <article class="band b-night">
+    <div class="copy">
+      <h2><time class="time">02:10</time> While you sleep, one idea gets done.</h2>
+      <p>Switch on overnight prep and I take one of your research, plan or comparison ideas and turn it into a draft in your Library. Web reads and one document only. Nothing sent, nothing booked, and never when this week's budget is low.</p>
+      <p class="said">In the morning: “Ready for you.”</p>
     </div>
-    <figure class="story-video">
-      <video src="images/flow-approval.mp4" poster="images/approval-real-desktop-light.webp" autoplay muted loop playsinline preload="metadata"
-        aria-label="Screen recording: the request, Jess working in the background, the approval card for the email to Maya, Approve, and the email sent"></video>
-      <figcaption>Recorded on a real install with a real model and a local mail server. Maya got exactly one email.</figcaption>
+    <figure class="shot"><img src="images/chat-desktop-dark.webp" alt="Jess's chat in the dark theme: she has booked a table, found cinema seats and asks three quick questions before buying" loading="lazy" decoding="async" width="1552" height="1012"></figure>
+  </article>
+  <article class="band b-dawn">
+    <div class="copy">
+      <h2><time class="time">06:40</time> Your morning, written for you.</h2>
+      <p>Tell me what you follow in plain words: “finance news in the morning, book picks in the evening”. I pick the sources, from news searches, RSS or your own OPML, and write short posts with the weather where you live. Likes and “less of this” shape tomorrow.</p>
+    </div>
+    <figure class="shot"><img src="images/feed-desktop-light.webp" alt="The Feed: an evening greeting with the weather, Jess's evening brief and topic filters" loading="lazy" decoding="async" width="1552" height="1012"></figure>
+  </article>
+  <article class="band b-morning">
+    <div class="copy">
+      <h2><time class="time">08:00</time> I keep reminding you until it's done.</h2>
+      <p>Medicine, the bins, homework. Gentler, then firmer nudges until someone says done, never in quiet hours. Quiet watches too: “tell me when the fare drops” is checked on a schedule and only speaks when something changed.</p>
+    </div>
+    <figure class="shot"><img src="images/upcoming-desktop-light.webp" alt="Upcoming: the week ahead, dates Jess remembers, and alarms, reminders and timers" loading="lazy" decoding="async" width="1552" height="1012"></figure>
+  </article>
+  <article class="band b-noon">
+    <div class="copy">
+      <h2><time class="time">12:30</time> I ask before anything leaves.</h2>
+      <p>Sending an email, changing a calendar, buying, booking, sharing a memory, uploading a file. Each one stops at a card with the exact text, who it reaches, whether it can be undone and why I'm asking. It goes out only when you say so.</p>
+    </div>
+    <figure class="shot"><img src="images/approvals-desktop-dark.webp" alt="The Approvals page: two cinema tickets and an email to Maya, each with the exact text and a Why I'm asking line" loading="lazy" decoding="async" width="1552" height="1012"></figure>
+  </article>
+</section>
+
+<!-- House lights: one real run, then the rest of what she does -->
+<section class="house" aria-labelledby="run-h">
+  <div class="house-head">
+    <h2 id="run-h">One real run, start to finish.</h2>
+    <p>Asked for a hike and an email to Maya, Jess hands the work to a background task, searches, reads two route sites, writes the email and stops at the card. It goes out only after Approve. Sped up where it waits; the people are made up.</p>
+  </div>
+  <div class="run">
+    <figure class="film">
+      <video data-video muted playsinline loop preload="none" poster="images/run-poster.webp" width="1280" height="800" aria-label="The recorded run: the request, the background work, the approval card for the email to Maya, Approve, and the email sent">
+        <source data-src="images/flow-approval.mp4" type="video/mp4">
+      </video>
+      <button type="button" class="film-toggle" data-film-toggle aria-pressed="false" hidden>Pause</button>
     </figure>
+    <div>
+      <ol class="timetable" data-timetable>
+        <li data-at="0"><time>06:06</time><span>Asked: “In the background, find one easy hike near Lyon for Saturday morning, then email Maya the plan.”</span></li>
+        <li data-at="4"><time>06:06</time><span>Handed to a background task, in its own side chat</span></li>
+        <li data-at="6.5"><time>06:07</time><span>Searching the web, reading openrunner.com</span></li>
+        <li data-at="9.5"><time>06:08</time><span>Made “Easy Lyon hike plan, 21 Nov 2026” in the Library</span></li>
+        <li data-at="11"><time>06:08</time><span>Waiting for you: the email card, with the exact text</span></li>
+        <li data-at="15"><time>06:12</time><span>Approved, then sent to maya@example.com</span></li>
+        <li data-at="17"><time>06:12</time><span>Reported back: the route, the drive, and what she couldn't verify</span></li>
+      </ol>
+      <p class="run-note">The times are the run's own; the list follows the video.</p>
+    </div>
   </div>
+
+  <div class="house-head">
+    <h2>House lights up. Here's the rest of the show.</h2>
+    <p>One assistant for everyone at home. Each person gets a private chat; the admin decides what Jess may do for whom, and how much she may spend a week.</p>
+  </div>
+  <figure class="wide-shot"><img src="images/library-desktop-light.webp" alt="The Library: pages, audio and calendar files Jess made, filtered by kind" loading="lazy" decoding="async" width="1552" height="1012"></figure>
+  <table class="cue-sheet">
+    <caption class="visually-hidden">What Jess does</caption>
+    <thead><tr><th scope="col">What</th><th scope="col">What she does</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">Chat and side chats</th><td>One main thread per person, side chats for tangents, “off the record” chats that never become memories.</td></tr>
+      <tr><th scope="row">Work in the background</th><td>“Research this in the background”: she opens her own side chat, works there and posts back when it's done.</td></tr>
+      <tr><th scope="row">Voice notes</th><td>Talk to her, and she answers in a voice that matches her look.</td></tr>
+      <tr><th scope="row">Goals and ideas</th><td>Goals she noticed you care about, broken into steps with “done when” lines; ideas, each with its reason.</td></tr>
+      <tr><th scope="row">Library</th><td>Word, Excel and PowerPoint files, PDFs made, filled and merged, pages, pictures and audio, with versions.</td></tr>
+      <tr><th scope="row">Household tools</th><td>Shared lists, birthdays, Secret Santa, alarms and timers, and everything coming up across the house.</td></tr>
+      <tr><th scope="row">Mail and calendar</th><td>IMAP, SMTP and CalDAV, each usable only by its owner. Sending and changing still ask first.</td></tr>
+      <tr><th scope="row">On your phone</th><td>A web app with push notifications, light and dark themes, and right-to-left text. <a href="gallery.html">Every screen</a></td></tr>
+    </tbody>
+  </table>
 </section>
 
-<section class="features" id="what-it-does" aria-labelledby="features-title">
-  <div class="wrap">
-    <h2 id="features-title">What else it does</h2>
-    <p class="lead">One assistant for the whole household, with a private space for each person.</p>
-
-    <div class="feature">
-      <div class="feature-text">
-        <h3>A feed written for you</h3>
-        <p>Say what you want to follow in plain words. Jess picks sources (news searches, RSS, your own OPML) and writes
-          short posts, starting with a brief for your morning or evening. “Less of this” and likes shape the next pick.</p>
-        <a class="more" href="docs/feed.html">How the Feed works {{icon:arrow-right}}</a>
-      </div>
-      <picture class="feature-shot">
-        <img class="only-light" src="images/feed-main-desktop-light.webp" alt="The Feed: an evening greeting with the weather, Jess's evening brief, and topic filters" loading="lazy" width="928" height="832">
-        <img class="only-dark" src="images/feed-main-desktop-dark.webp" alt="The Feed in the dark theme" loading="lazy" width="928" height="832">
-      </picture>
+<!-- Safety: standby and go -->
+<section class="standby" id="safety" aria-labelledby="sb-h">
+  <h2 id="sb-h">She calls standby. You call go.</h2>
+  <p class="sb-lead">What Jess may do is decided in code, not only in her instructions.</p>
+  <div class="rules">
+    <div class="rule-col">
+      <p class="rule-k">Waits for your go</p>
+      <ul>
+        <li>Sending an email</li><li>Changing a calendar</li><li>Buying or booking</li><li>Sharing a memory</li><li>Uploading a file to a website</li>
+      </ul>
+      <p class="note">After she has read a web page or an email, “always allow” no longer covers anything that sends or spends.</p>
     </div>
-
-    <div class="feature flip">
-      <div class="feature-text">
-        <h3>Goals and ideas, worked on step by step</h3>
-        <p>Goals it noticed you care about, broken into steps with “done when” lines and real numbers. Ideas it
-          suggests, each with the reason, that you can start or turn down.</p>
-      </div>
-      <picture class="feature-shot">
-        <img class="only-light" src="images/goals-main-desktop-light.webp" alt="Goals: suggestions to adopt, and goals in progress with their percentage and next step" loading="lazy" width="928" height="832">
-        <img class="only-dark" src="images/goals-main-desktop-dark.webp" alt="Goals in the dark theme" loading="lazy" width="928" height="832">
-      </picture>
-    </div>
-
-    <div class="feature">
-      <div class="feature-text">
-        <h3>A Library of everything it makes</h3>
-        <p>Word, Excel and PowerPoint files, PDFs (made, filled, merged), pages, pictures and audio, with versions,
-          previews and export.</p>
-        <a class="more" href="docs/library.html">About the Library {{icon:arrow-right}}</a>
-      </div>
-      <picture class="feature-shot">
-        <img class="only-light" src="images/library-main-desktop-light.webp" alt="The Library: pages, audio and calendar files Jess made, filtered by kind" loading="lazy" width="928" height="832">
-        <img class="only-dark" src="images/library-main-desktop-dark.webp" alt="The Library in the dark theme" loading="lazy" width="928" height="832">
-      </picture>
-    </div>
-
-    <div class="feature flip">
-      <div class="feature-text">
-        <h3>Lists, reminders and the week ahead</h3>
-        <p>Shared shopping lists sorted by aisle, chores, wish lists that hide what was bought, birthdays, reminders that
-          nudge until someone says done, alarms and timers, and what is coming up across the household.</p>
-      </div>
-      <picture class="feature-shot">
-        <img class="only-light" src="images/upcoming-main-desktop-light.webp" alt="Upcoming: the week ahead, dates Jess remembers, and alarms, reminders and timers" loading="lazy" width="928" height="832">
-        <img class="only-dark" src="images/upcoming-main-desktop-dark.webp" alt="Upcoming in the dark theme" loading="lazy" width="928" height="832">
-      </picture>
-    </div>
-
-    <div class="feature">
-      <div class="feature-text">
-        <h3>A real multi-person setup</h3>
-        <p>Invite the people you live or work with. Each chat is private. The admin decides, per person or group, which
-          tools Jess may use for them, how she behaves with them and how much she may spend a week.</p>
-        <a class="more" href="docs/people-and-admin.html">People and admin {{icon:arrow-right}}</a>
-      </div>
-      <picture class="feature-shot">
-        <img class="only-light" src="images/admin-people-real-main-desktop-light.webp" alt="Admin, People: whether admins may read other people's chats (off by default), instructions for everyone, and the household's accounts" loading="lazy" width="928" height="832">
-        <img class="only-dark" src="images/admin-people-real-main-desktop-dark.webp" alt="Admin, People in the dark theme" loading="lazy" width="928" height="832">
-      </picture>
-    </div>
-
-    <div class="phones" aria-label="On a phone">
-      <h3>On your phone</h3>
-      <p>The same app in your phone's browser, with notifications for alarms, reminders and messages.</p>
-      <div class="phone-row">
-        <img class="only-light" src="images/chat-phone-light.webp" alt="The chat on a phone, with Jess's questions" loading="lazy" width="488" height="942">
-        <img class="only-dark" src="images/chat-phone-dark.webp" alt="The chat on a phone, dark theme" loading="lazy" width="488" height="942">
-        <img class="only-light" src="images/feed-phone-light.webp" alt="The Feed on a phone" loading="lazy" width="488" height="942">
-        <img class="only-dark" src="images/feed-phone-dark.webp" alt="The Feed on a phone, dark theme" loading="lazy" width="488" height="942">
-        <img class="only-light" src="images/list-phone-light.webp" alt="The weekly shopping list on a phone" loading="lazy" width="488" height="942">
-        <img class="only-dark" src="images/list-phone-dark.webp" alt="The weekly shopping list on a phone, dark theme" loading="lazy" width="488" height="942">
-        <img class="only-light" src="images/approvals-phone-light.webp" alt="Approvals on a phone" loading="lazy" width="488" height="942">
-        <img class="only-dark" src="images/approvals-phone-dark.webp" alt="Approvals on a phone, dark theme" loading="lazy" width="488" height="942">
-      </div>
-      <a class="more" href="gallery.html">Every screen, light and dark {{icon:arrow-right}}</a>
+    <div class="rule-col">
+      <p class="rule-k">Never on her board</p>
+      <ul>
+        <li>No shell and no code running on your machine</li>
+        <li>No reaching your local network, unless the admin allows it</li>
+        <li>No pasting your keys or passwords into a form or an email</li>
+        <li>No instructions taken from pages, feeds or emails</li>
+      </ul>
+      <p class="note">Spending limits per task and per person each week. Prompt injection is mitigated, not solved: the <a href="docs/security-model.html">security model</a> lists the known limits.</p>
     </div>
   </div>
 </section>
 
-<section class="safety" id="safety" aria-labelledby="safety-title">
-  <div class="wrap">
-    <h2 id="safety-title">Safety and privacy, decided in code</h2>
-    <p class="lead">The assistant is useful because it can act, so what it may do is enforced around the model, not
-      only written in its instructions.</p>
-    <div class="ledger">
-      <div>
-        <h3>What it won't do on its own</h3>
-        <ul role="list">
-          <li><strong>Send, spend, book or share without a card.</strong> Mail, calendar changes, purchases, bookings,
-            shared memories and uploads stop for your OK with the exact text. After it has read a web page or an email,
-            even “always allow” asks again.</li>
-          <li><strong>Take orders from a web page.</strong> Pages, emails, feeds and files reach the model fenced as
-            information, with hidden text removed and text aimed at AI assistants flagged.</li>
-          <li><strong>Run commands on your machine.</strong> There is no shell tool. Pages it builds run in a sandbox with
-            no network.</li>
-          <li><strong>Reach your home network.</strong> Its browser can't open your router, NAS or admin panels unless the
-            admin allows it.</li>
-          <li><strong>Spend past its budget.</strong> A weekly budget per person and a cap per task.</li>
-        </ul>
-      </div>
-      <div>
-        <h3>What leaves your machine</h3>
-        <ul role="list">
-          <li>What you and the assistant send to <strong>your model provider</strong>: the conversation, and the pages
-            or files it is working on.</li>
-          <li><strong>Web traffic from its browser</strong> when it looks things up, and feed checks.</li>
-          <li>Your <strong>mail and calendar servers</strong>, if you connect them, and push notifications through your
-            browser's push service.</li>
-          <li>Nothing else: no telemetry, no account with us. Chats, memories and files stay in its <code>data/</code>
-            folder.</li>
-        </ul>
-      </div>
-    </div>
-    <p class="honest">Prompt injection is mitigated, not solved. The <a href="docs/security-model.html">security model</a>
-      says what is defended, and what isn't.</p>
-  </div>
+<section class="leaves" id="privacy" aria-labelledby="lv-h">
+  <h2 id="lv-h">What leaves the building.</h2>
+  <p>Chats, memories, files and settings stay in the <code>data/</code> folder on your machine. No telemetry, no account with us. Only three things go out:</p>
+  <ol class="exits">
+    <li><span>Your model provider</span> the conversation and the pages or files she's working on. OpenRouter, Ollama or any OpenAI-compatible service.</li>
+    <li><span>Her browser's web traffic</span> the searches and sites she visits, weather and maps, and feed polling.</li>
+    <li><span>Your mail, calendar and push</span> only if you connect them.</li>
+  </ol>
 </section>
 
-<section class="install" id="install" aria-labelledby="install-title">
-  <div class="wrap install-in">
-    <img class="install-mark" src="images/mark-256.webp" width="128" height="128" alt="">
-    <h2 id="install-title">Run it at home</h2>
-    <p class="lead">You need Docker or Node.js 24.19 or newer, about 1 GB of disk, and a key for an AI model
-      (<a href="https://openrouter.ai">OpenRouter</a> by default, or any OpenAI-compatible endpoint).</p>
-    <div class="tabs" data-tabs>
-      <div class="tab-list" role="tablist" aria-label="Install with">
-        <button type="button" role="tab" id="tab-docker" aria-controls="panel-docker" aria-selected="true">Docker</button>
-        <button type="button" role="tab" id="tab-node" aria-controls="panel-node" aria-selected="false" tabindex="-1">Node.js</button>
-      </div>
-      <div role="tabpanel" id="panel-docker" aria-labelledby="tab-docker" class="code-panel">
-<pre><code id="cmd-docker">git clone https://github.com/anefzaoui/jessbot
-cd jessbot
-docker compose up -d --build
-docker compose logs jessbot | grep "setup code"</code></pre>
-        <button type="button" class="btn btn-small" data-copy="#cmd-docker">{{icon:copy}}<span data-copy-label>Copy</span></button>
-      </div>
-      <div role="tabpanel" id="panel-node" aria-labelledby="tab-node" class="code-panel" hidden>
-<pre><code id="cmd-node">git clone https://github.com/anefzaoui/jessbot
-cd jessbot
-npm ci
-npm run build
-npm start</code></pre>
-        <button type="button" class="btn btn-small" data-copy="#cmd-node">{{icon:copy}}<span data-copy-label>Copy</span></button>
-      </div>
+<section class="curtain" id="install" aria-labelledby="cu-h">
+  <img class="sleep" src="images/jess-sleepy.webp" alt="" loading="lazy" decoding="async" width="1024" height="1024">
+  <div class="curtain-copy">
+    <h2 id="cu-h">Bring Jess home.</h2>
+    <div class="tabs" role="tablist" aria-label="Install with" data-tabs>
+      <button type="button" role="tab" id="t-docker" aria-selected="true" aria-controls="p-docker">Docker</button>
+      <button type="button" role="tab" id="t-node" aria-selected="false" aria-controls="p-node" tabindex="-1">Node.js</button>
     </div>
-    <p>Open <code>http://127.0.0.1:3737</code>, enter the setup code from the log, and the setup page walks you through
-      the rest: your account, the model, the browser, the assistant's name and look, and the people you invite.</p>
-    <p class="preview-note"><strong>Early preview.</strong> It works, but it is young. Run it on your own computer or home
-      network, or behind a VPN, not on the open internet yet.</p>
-    <p class="install-links">
-      <a class="btn btn-primary" href="docs/getting-started.html">{{icon:book-open}} Getting started</a>
-      <a class="btn" href="https://github.com/anefzaoui/jessbot">{{icon:github-logo}} Source on GitHub</a>
-    </p>
+    <div class="cmd big" role="tabpanel" id="p-docker" aria-labelledby="t-docker">
+      <input id="cmd-docker" readonly value="git clone https://github.com/anefzaoui/jessbot && cd jessbot && docker compose up -d --build" aria-label="Docker install command">
+      <button type="button" class="copy-btn" data-copy="#cmd-docker">Copy</button>
+    </div>
+    <div class="cmd big" role="tabpanel" id="p-node" aria-labelledby="t-node" hidden>
+      <input id="cmd-node" readonly value="git clone https://github.com/anefzaoui/jessbot && cd jessbot && npm install && npm run build && npm start" aria-label="Node.js install command">
+      <button type="button" class="copy-btn" data-copy="#cmd-node">Copy</button>
+    </div>
+    <p class="after">Node.js 24.19 or newer, or Docker. Windows and Linux; macOS should work. The setup page asks for the code printed in the server's log, then your model key, her browser, her name and look, and the people at home. <a href="docs/getting-started.html">Getting started</a></p>
+    <p class="after"><strong>Early preview.</strong> Run it at home or behind a VPN, not on the open internet yet.</p>
   </div>
 </section>
 </main>
