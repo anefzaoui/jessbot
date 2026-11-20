@@ -1,4 +1,4 @@
-// Prompt-injection review (issue #8, decision #224, docs/SECURITY-MODEL.md → "Hardened in this review"): the gaps found
+// Prompt-injection review (issue #8, decision #225, docs/SECURITY-MODEL.md → "Hardened in this review"): the gaps found
 // while walking every place outside content reaches the model, each with its fix pinned here.
 //   - every fence kind in use is one the defanger knows;
 //   - pdf_form_fields: field names, labels, tooltips, values and a flat form's text are fenced, cleaned and screened;

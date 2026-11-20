@@ -3530,7 +3530,7 @@ Note: most of Phase 23 part A landed in commit aa56076, whose message reads "Pha
 
 ## 2026-11-20: Prompt-injection review (issue #8)
 
-224. **Every place outside content reaches the model was reviewed; the gaps are closed at the source, and the model is
+225. **Every place outside content reaches the model was reviewed; the gaps are closed at the source, and the model is
     written down for strangers.** Issue #8 asked for a review of every untrusted input: kept apart from instructions, never
     able to grant itself tools or skip an approval, documented. The review walked each entry point (web, browser, search,
     email and attachments, calendar and "Coming up", feeds, uploads and Library files, PDF forms, OCR, pictures, projects,

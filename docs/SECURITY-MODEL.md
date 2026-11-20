@@ -179,7 +179,7 @@ The full list of known limits is in [docs/SECURITY.md → Known limits](SECURITY
 ## Hardened in this review
 
 The review for issue #8 walked every entry point above, in the code and in the tests, and fixed what was missing
-[#224]. Each fix has a test in `tests/injection-review.test.js`.
+[#225]. Each fix has a test in `tests/injection-review.test.js`.
 
 - **PDF form fields were returned raw.** `pdf_form_fields` passed field names, labels, tooltips (which never appear on
   the printed page), values, options and a flat form's text straight to the model. They are now fenced, cleaned and
