@@ -221,10 +221,12 @@ registerTool({
     const r = await organizeMail(c, { uids: args.uids, folder: args.folder || 'INBOX', action: args.action, toFolder: args.to_folder });
     const gone = r.missing.length ? ` ${count(r.missing.length)} weren’t in ${r.folder} (uid ${r.missing.join(', ')}).` : '';
     if (!r.done.length) return { content: `Nothing changed: none of those messages are in ${r.folder}.${gone}`, step: { status: 'bad', detail: 'No such messages' } };
-    const what = r.destination
-      ? `Moved ${count(r.done.length)} from ${r.folder} to ${r.destination}.${r.moved?.length ? ` New uids in ${r.destination}: ${r.moved.map(m => `${m.from}→${m.to}`).join(', ')}.` : ''}`
+    // Folder names come from the mail server (a shared mailbox's folders are named by others): one clean line (#238).
+    const from = oneLine(r.folder, 80), to = r.destination ? oneLine(r.destination, 80) : null;
+    const what = to
+      ? `Moved ${count(r.done.length)} from ${from} to ${to}.${r.moved?.length ? ` New uids in ${to}: ${r.moved.map(m => `${m.from}→${m.to}`).join(', ')}.` : ''}`
       : `${ACTION_WORDS[args.action]}: ${count(r.done.length)} in ${r.folder}.`;
-    return { content: `${what}${gone}`, step: { detail: r.destination ? `${count(r.done.length)} → ${r.destination}` : `${ACTION_WORDS[args.action]} · ${count(r.done.length)}` } };
+    return { content: `${what}${gone}`, step: { detail: to ? `${count(r.done.length)} → ${to}` : `${ACTION_WORDS[args.action]} · ${count(r.done.length)}` } };
   },
 });
 
