@@ -8,7 +8,7 @@ import { audit } from '../../../services/audit.js';
 import { requireSetup, requireAuth } from '../../../middleware/auth.js';
 import { notFound, invalid, tooMany } from '../../../lib/errors.js';
 import { renderMarkdown } from '../../../lib/markdown.js';
-import { hit } from '../../../lib/ratelimit.js';
+import { hit, signInLimit } from '../../../lib/ratelimit.js';
 import { listForUser, editFact, forgetFact, restoreFact, setPinned, listEpisodes } from '../../../services/memory.js';
 import { previewImport, confirmImport } from '../../../services/memory-import.js';
 import chatRoutes from './chat.js';
@@ -36,7 +36,7 @@ const fragment = (res, partial, data) => new Promise((resolve, reject) =>
   res.render('fragment', { layout: false, partial, data, ...data }, (err, html) => (err ? reject(err) : resolve(html))));
 
 // ---- Auth ---------------------------------------------------------------------------
-router.post('/auth/login', async (req, res) => {
+router.post('/auth/login', signInLimit, async (req, res) => {
   const user = await authenticate(req, req.body);
   const token = createSession(user.id, { kind: 'app', device: String(req.body.device || 'Android app').slice(0, 60), ip: req.ip });
   res.json({ token, user: getUser(user.id) });

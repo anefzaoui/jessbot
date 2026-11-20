@@ -62,5 +62,5 @@ export async function exportPage(html, { format, size, landscape, csp, signal } 
     const tall = await page.evaluate(() => Math.max(document.documentElement.scrollHeight, document.body ? document.body.scrollHeight : 0));
     const buffer = await page.screenshot({ type: 'png', fullPage: !fixed });
     return { buffer, mime: 'image/png', ext: 'png', frame: [width, height], issues, overflow: fixed ? Math.max(0, tall - height) : 0, scale: pngScale(o.size) };
-  }, { signal, media: true, viewport: { width, height }, deviceScaleFactor: o.format === 'png' ? pngScale(o.size) : undefined });
+  }, { signal, media: true, render: true, viewport: { width, height }, deviceScaleFactor: o.format === 'png' ? pngScale(o.size) : undefined });
 }

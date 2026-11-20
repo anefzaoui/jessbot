@@ -16,6 +16,7 @@ import { renderDocument } from '../lib/markdown.js';
 import { documentFontCss, mathFontCss } from './fonts.js';
 import { printPdf } from './print.js';
 import { themeOf, seriesColors } from './themes.js';
+import { escapeMarkdown } from '../lib/text-safe.js';
 
 const md = new MarkdownIt({ html: false, linkify: true });
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
@@ -494,7 +495,7 @@ export async function xlsxSheets(buffer, { maxRows = 500 } = {}) {
 export const sheetsText = sheets => sheets.map(s => {
   if (!s.rows.length) return `## ${s.name}\n(empty)`;
   const width = Math.max(...s.rows.map(r => r.length));
-  const line = r => `| ${Array.from({ length: width }, (_, k) => String(r[k] ?? '').replace(/\|/g, '\\|').replace(/\n/g, ' ')).join(' | ')} |`;
+  const line = r => `| ${Array.from({ length: width }, (_, k) => escapeMarkdown(String(r[k] ?? ''), '|').replace(/\n/g, ' ')).join(' | ')} |`;
   return `## ${s.name}\n${line(s.rows[0])}\n| ${Array(width).fill('---').join(' | ')} |\n${s.rows.slice(1).map(line).join('\n')}${s.total > s.rows.length ? `\n(${s.total - s.rows.length} more rows)` : ''}`;
 }).join('\n\n');
 

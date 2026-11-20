@@ -12,6 +12,7 @@ import { isAjax } from './lib/respond.js';
 import { HttpError } from './lib/errors.js';
 import { configureRenderer } from './views/render.js';
 import { staticCacheHeaders } from './lib/assets.js';
+import { limiter } from './lib/ratelimit.js';
 import { checkHost } from './lib/origin.js';
 import './agent/tools/index.js'; // register the built-in tools
 
@@ -37,6 +38,9 @@ export function createApp() {
   app.use(express.json({ limit: '1mb' }));
   app.use(express.urlencoded({ extended: false, limit: '1mb' }));
   app.use(loadUser);
+  // Every page and API call counts against the person (or, signed out, the address): far above what a household's
+  // browsers and apps send, low enough that a script hammering one route is stopped (decision #228).
+  app.use(limiter({ name: 'requests', limit: 1200, windowMs: 60e3, message: m => `Too many requests. Wait ${m} min and try again.` }));
   app.use(locals);
   app.use(sameOrigin);
 
@@ -53,7 +57,7 @@ export function createApp() {
     const code = err.status || err.statusCode || 500;
     // 4xx messages are written for people ("That account isn’t connected any more"); 5xx details stay in the log (http-errors' rule).
     const expose = err.expose ?? code < 500;
-    if (code >= 500) console.error(`[http] ${req.method} ${req.originalUrl.split('?')[0]} → ${code} (user ${req.user?.id ?? '-'})`, err);
+    if (code >= 500) console.error('[http] %s %s → %d (user %s)', req.method, req.originalUrl.split('?')[0].replace(/[\r\n]/g, ''), code, req.user?.id ?? '-', err);
     if (isAjax(req)) {
       return res.status(code).json({ error: expose ? err.message : 'Something went wrong on our side.', ...(err.errors && { errors: err.errors }),
         ...(expose && err instanceof HttpError && err.code && { code: err.code }) }); // code: a machine-readable reason (e.g. lint_bad)

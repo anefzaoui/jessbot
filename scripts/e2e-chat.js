@@ -890,8 +890,11 @@ try {
       const seen = await p.evaluate(() => { const r = document.querySelector('#feed-reader'); return r ? `open=${r.open} · ${r.querySelector('[data-reader-article]')?.textContent.trim().slice(0, 200)}` : 'no reader'; });
       throw new Error(`${err.message}\n  story ${withArticle[0].id}: ${seen}`);
     });
-    const words = (await p.locator('#feed-reader .reader-article').innerText()).split(/\s+/).length;
-    expect(words > 120, `saved article too short (${words} words)`);
+    // The reader shows the whole saved article (how long that is depends on the day's news: compare with what was saved).
+    const words = (await p.locator('#feed-reader .reader-article').innerText()).split(/\s+/).filter(Boolean).length;
+    const savedArticle = (await http('GET', `/api/v1/feed/posts/${withArticle[0].id}/article`, { cookie: ownerCookie })).json;
+    const savedWords = String(savedArticle?.html || '').replace(/<[^>]+>/g, ' ').split(/\s+/).filter(Boolean).length;
+    expect(savedArticle?.status === 'ok' && words >= 40 && words >= savedWords * 0.8, `reader shows ${words} words of a ${savedWords}-word saved article`);
     expect(await p.locator('#feed-reader [data-reader-original]:not([hidden])').count() === 1, 'no link to the original');
     await p.keyboard.press('Escape');
     // An unwritten story: opening it makes Jess read it and write her take on the spot.

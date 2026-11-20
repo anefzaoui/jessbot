@@ -16,7 +16,7 @@ const RULES = [
   { id: 'cloudflare', label: 'Cloudflare', selfSolving: true,
     title: /^(just a moment|un instant|einen moment|un momento|um momento|attention required|one more step|please wait|checking your browser)\b/i,
     text: /checking (if the site connection is secure|your browser)|verif(y|ying) you are (a )?human|enable javascript and cookies to continue|needs to review the security of your connection|performance (&|and) security by cloudflare/i,
-    frames: /challenges\.cloudflare\.com/i },
+    frames: /(?:^|\s)https:\/\/challenges\.cloudflare\.com\//i }, // a frame served from that host (frames are space-joined)
   { id: 'ddos-guard', label: 'DDoS-Guard', selfSolving: true, title: /^ddos-guard/i, text: /ddos-guard|checking your browser before accessing/i },
   { id: 'vercel', label: 'a Vercel security check', selfSolving: true, title: /vercel security checkpoint/i, text: /vercel security checkpoint/i },
   { id: 'reddit', label: 'Reddit’s bot check', selfSolving: true, title: /prove your humanity/i, text: /prove your humanity/i },

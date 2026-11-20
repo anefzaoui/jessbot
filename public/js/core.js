@@ -25,7 +25,7 @@ export function h(html) {
 }
 
 export const icon = (name, cls = 'size-4') =>
-  `<svg class="icon ${cls}" aria-hidden="true" focusable="false"><use href="/icons.svg?v=${document.documentElement.dataset.assetV || ''}#${name}"/></svg>`;
+  `<svg class="icon ${escapeHtml(cls)}" aria-hidden="true" focusable="false"><use href="/icons.svg?v=${escapeHtml(document.documentElement.dataset.assetV || '')}#${escapeHtml(name)}"/></svg>`;
 
 // Work in progress, shown where the result will land: an activity glyph (motions as in the run card), a label and
 // placeholder lines. Mirrors partials/loader.hbs.

@@ -5,6 +5,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import util from 'node:util';
 import { redactSecrets } from './dlp.js';
+import { inside } from './safe-path.js';
 
 const MAX_LINES = 2000;
 const LOG_DAYS = 14;
@@ -72,6 +73,6 @@ export function recentLog({ level = 'info', q = '', after = 0, limit = 500 } = {
 
 export const logFiles = () => (dir ? fs.readdirSync(dir).filter(f => /^jessbot-.*\.log$/.test(f)).sort().reverse()
   .map(f => ({ name: f, size: fs.statSync(path.join(dir, f)).size })) : []);
-export const logFilePath = name => (dir && /^jessbot-\d{4}-\d{2}-\d{2}\.log$/.test(name) ? path.join(dir, name) : null);
+export const logFilePath = name => (dir && /^jessbot-\d{4}-\d{2}-\d{2}\.log$/.test(name) ? inside(dir, name) : null);
 export const errorCountSince = sinceIso => ring.filter(e => e.level === 'error' && e.at >= sinceIso).length;
 export { today as logDay };

@@ -182,7 +182,7 @@ export async function checkPage(html, { csp, signal } = {}) {
       await readIssues(page, issues);
     }
     return { thumb, phone, issues, phoneFacts };
-  }, { signal, media: true, viewport: THUMB });
+  }, { signal, media: true, render: true, viewport: THUMB });
 }
 
 /**

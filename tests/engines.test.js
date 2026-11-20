@@ -24,15 +24,32 @@ const B = await import('../src/browser/index.js');
 const chromium = await import('../src/browser/engines/chromium.js');
 after(() => { closeDb(); fs.rmSync(HOME, { recursive: true, force: true }); fs.rmSync(TOOLS, { recursive: true, force: true }); });
 
-test('Chromium is the default engine; its download lives in tools/ms-playwright', () => {
-  assert.equal(E.engineId(), 'chromium');
+test('the default is the installed Google Chrome (Patchright) when there is one, else Chromium in tools/ms-playwright', async () => {
+  const chrome = await import('../src/browser/engines/chrome.js');
+  assert.equal(E.engineId(), chrome.chromePath() ? 'chrome' : 'chromium');
   assert.equal(process.env.PLAYWRIGHT_BROWSERS_PATH, paths.playwright);
   assert.equal(paths.playwright, path.join(TOOLS, 'ms-playwright'));
+  assert.deepEqual(B.browserStatus().engines.map(e => e.id), ['chrome', 'chromium', 'cloakbrowser']);
+  await B.saveBrowserSettings({ ...B.browserSettings(), engine: 'chromium' });
   const s = B.browserStatus();
   assert.equal(s.engine.id, 'chromium');
   assert.equal(s.installed, false, 'nothing downloaded in an empty tools folder');
-  assert.deepEqual(s.engines.map(e => e.id), ['chromium', 'cloakbrowser']);
   assert.ok(s.binaryPath.startsWith(path.join(TOOLS, 'ms-playwright')), s.binaryPath);
+  settings.set('browser', { ...settings.get('browser'), engine: undefined });
+});
+
+test('the Chrome engine downloads nothing and says how to get Chrome when it is missing', async () => {
+  const chrome = await import('../src/browser/engines/chrome.js');
+  const i = chrome.info();
+  assert.equal(i.source, 'system');
+  if (i.installed) {
+    assert.match(i.version || '', /^\d+\.\d+\.\d+\.\d+$/, 'its version is read without starting it');
+    assert.equal(await chrome.install(), i.binaryPath);
+  } else {
+    assert.match(i.unsupported, /google\.com\/chrome/);
+    await assert.rejects(chrome.install(), /never downloads Chrome/);
+  }
+  assert.deepEqual(chrome.caps, { consoleEvents: false, bindings: false }, 'what Patchright changes is declared');
 });
 
 test('JESSBOT_CHROMIUM_PATH uses a browser already on the machine (and says so when it is missing)', () => {

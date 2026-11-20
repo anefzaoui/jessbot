@@ -53,7 +53,7 @@ function parsePolicy(body) {
   const toolsets = {};
   for (const [k, v] of Object.entries(body || {})) {
     const m = k.match(/^toolsets\[(\w+)\]$/);
-    if (m && v) toolsets[m[1]] = v;
+    if (m && v && Object.hasOwn(TOOLSETS, m[1])) toolsets[m[1]] = v; // known toolsets only
   }
   // taskBudget (#178): only when the form sends it; left out, the layer keeps what it had (policy.setPolicy).
   return { toolsets, approver: body.approver || null, weeklyBudget: body.weeklyBudget, taskBudget: body.taskBudget, quietStart: body.quietStart, quietEnd: body.quietEnd };
