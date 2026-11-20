@@ -3697,7 +3697,7 @@ Note: most of Phase 23 part A landed in commit aa56076, whose message reads "Pha
 
 ## 2026-11-20: Prompt-injection review follow-ups (issue #40)
 
-234. **A tool's error reaches the model as one clean, capped line.** A failed tool's message went to the model as
+237. **A tool's error reaches the model as one clean, capped line.** A failed tool's message went to the model as
     `Error: <message>` whatever the message held, and many messages quote a remote party (a mail or calendar server's
     refusal, SearXNG's answer, a page's error text): line breaks could start what looks like a new prompt section, and a
     long body went in whole. `toolError()` in `agent/loop.js` (both places a tool result is made from an error) now runs it

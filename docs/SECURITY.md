@@ -179,7 +179,7 @@ The overview (who is trusted, every place outside content enters and how it is h
     to them (the owner's review lists household lessons only; a member's chat is never linked). [#186, #187]
 - **Tool errors are one clean line.** An error often quotes a remote server or a page (a mail server's refusal, an HTTP
   error body), so what a failed tool hands the model is cut to one line of at most 300 characters, invisible characters
-  removed and fence or chat-role look-alikes defanged, like any header from outside. [#234]
+  removed and fence or chat-role look-alikes defanged, like any header from outside. [#237]
 - **Browser downloads** become Library items for the person, typed from their bytes and read like uploads, labelled
   "Downloaded from <host>" (at most 10 files / 100 MB per browsing session, 25 MB per file); the temporary copy is
   deleted, and a type we don't take is named as not kept. [#117]

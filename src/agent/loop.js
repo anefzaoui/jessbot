@@ -164,7 +164,7 @@ function chain(threadId, job) {
   return next;
 }
 
-// A tool's error as the model sees it (#40, decision #234): one clean line, capped. Error text often quotes a remote server
+// A tool's error as the model sees it (#40, decision #237): one clean line, capped. Error text often quotes a remote server
 // or a web page (a mail server's refusal, an HTTP error body), so it gets the same treatment as a header from outside:
 // invisible characters out, fence and chat-role look-alikes defanged, no line breaks to start a new prompt section.
 export const TOOL_ERROR_MAX = 300;
