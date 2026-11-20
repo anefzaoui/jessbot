@@ -3856,3 +3856,17 @@ Note: most of Phase 23 part A landed in commit aa56076, whose message reads "Pha
     its refusals, the notes script refusing a mismatched tag), and for real: the release script stamped 0.1.0 on a
     throwaway branch (no tag, nothing pushed); that code, started on an install that last saw 0.0.9, showed the v0.1.0
     draft in Admin → System; publishing it put the card in a member's chat (light, dark, phone).
+
+## 2026-11-20: Coming back to an unfinished setup (#50)
+
+245. **Once the owner's account exists, an unfinished setup lets people sign in, and never loops.** `requireSetup` sent every
+    page to /setup until setup was done, and the wizard sent a signed-out visitor to /login, so an owner who lost the
+    session mid-setup (closed the browser, cleared cookies) got a redirect loop and no way back in; a member who joined
+    by invite before setup finished looped the same way, signed in. Now, while setup is unfinished and an account exists,
+    the sign-in pages answer (`/login`, `/login/code`, `/logout`, `/reset/…`, `/invite/…`): the login page says setup isn't
+    finished and sends the owner back to the wizard's next step after sign-in; a signed-in member gets a plain 403 "The
+    owner is still setting things up" instead of a redirect. Why sign-in and not the setup code again: the account is
+    already made, with a password; the setup code proves who may create the first account, and accepting it again would
+    let anyone who sees the server log sign in as the owner. Tested: `tests/setup-resume.test.js` (fails on the code
+    before: the redirect chain repeats /setup → /setup/model → /login?next=/setup; passes after), and in Chromium: the
+    account made in the wizard, a new browser session lands on the sign-in page and gets back to /setup/model.

@@ -1,4 +1,4 @@
-{{#> auth-frame heading=(concat "Welcome back") lead=(concat "Sign in to talk to " bot.name ".")}}
+{{#> auth-frame heading=(concat "Welcome back") lead=(iff setupUnfinished "Setup isn’t finished yet. Sign in with the account you made to carry on where you left off." (concat "Sign in to talk to " bot.name "."))}}
   {{#if resetDone}}<p class="mb-4 rounded-lg border border-ok/30 bg-ok-soft px-3 py-2 text-[13px]" role="status" data-reset-done>Your new password is saved. Sign in with it.</p>{{/if}}
   <form method="post" action="/login" class="space-y-4" data-ajax data-busy="Signing in…">
     <input type="hidden" name="next" value="{{next}}">
@@ -6,5 +6,5 @@
     {{> field name="password" label="Password" type="password" autocomplete="current-password" required=true}}
     <button class="btn btn-primary btn-lg btn-block mt-2">Sign in {{icon "arrow-right" class="size-4"}}</button>
   </form>
-  <p class="mt-6 text-center text-xs text-ink-3">No account? Ask the person who runs this {{bot.name}} for an invite link.</p>
+  {{#unless setupUnfinished}}<p class="mt-6 text-center text-xs text-ink-3">No account? Ask the person who runs this {{bot.name}} for an invite link.</p>{{/unless}}
 {{/auth-frame}}

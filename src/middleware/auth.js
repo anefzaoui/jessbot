@@ -1,6 +1,6 @@
 // Authentication for web (HttpOnly cookie) and apps (Authorization: Bearer). One token system, two carriers.
 import { resolveSession } from '../services/sessions.js';
-import { toPublic } from '../services/users.js';
+import { toPublic, countUsers } from '../services/users.js';
 import { isSetupComplete } from '../services/setup.js';
 import { unauthorized, forbidden } from '../lib/errors.js';
 import { originAllowed } from '../lib/origin.js';
@@ -50,8 +50,14 @@ export function sameOrigin(req, res, next) {
 const wantsJson = req => req.path.startsWith('/api/') || req.originalUrl.startsWith('/api/') || req.accepts(['html', 'json']) === 'json';
 
 // Until setup is finished, everything except setup, auth assets and health goes to the wizard.
+// Before setup is finished only the wizard answers, except, once the owner's account exists, the pages that get a
+// person signed in (#50): the owner who lost their session mid-setup signs in and is sent back into the wizard; an
+// emailed reset link or an invite made in the People step still opens. Without this, /login sent people to /setup and
+// the wizard sent signed-out visitors to /login, forever.
+const SIGN_IN_PAGES = /^\/(?:login(?:\/code)?|logout|reset\/[^/]+|invite\/[^/]+)$/;
 export function requireSetup(req, res, next) {
   if (isSetupComplete()) return next();
+  if (SIGN_IN_PAGES.test(req.path) && countUsers() > 0) return next();
   if (wantsJson(req)) return res.status(503).json({ error: 'Jessbot is not set up yet.', setup: '/setup' });
   res.redirect('/setup');
 }
