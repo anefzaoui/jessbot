@@ -99,7 +99,7 @@ test('sign-in page: a signed-in visitor is only ever sent to a page of this site
   };
   assert.equal(await to('/library?tab=files#top'), '/library?tab=files#top');
   for (const bad of ['//evil.example', '/\\evil.example', '/\t/evil.example', ' /evil', 'https://evil.example/', 'http:evil.example',
-    'javascript:alert(1)', '\\\\evil.example', '/%0a/evil.example'.replace('%0a', '\n')]) {
+    'javascript:alert(1)', '\\\\evil.example', '/\n/evil.example']) {
     assert.equal(await to(bad), '/chat', JSON.stringify(bad));
   }
   const twice = await fetch(`${base}/login?next=/library&next=//evil.example`, { redirect: 'manual', headers: { Cookie: cookie } });
