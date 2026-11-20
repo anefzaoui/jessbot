@@ -1,4 +1,4 @@
-{{> page-header title="Identity" subtitle=(concat "Who " bot.name " is: name, look, tone") width="max-w-5xl"}}
+{{> page-header title="Identity" subtitle=(concat "Who " bot.name " is: name, look, tone, pictures") width="max-w-5xl"}}
 <div class="mx-auto max-w-5xl px-4 py-6 sm:px-6">
   {{> admin/nav active="identity"}}
   <div class="max-w-xl">
@@ -7,6 +7,8 @@
       <button class="btn btn-primary">Save identity</button>
     </form>
     <p class="mt-6 text-xs text-ink-3">Saving updates the identity block in <code class="font-mono">data/workspace/SOUL.md</code>. The rest of the file (personality, boundaries) is kept as you edited it.</p>
+    {{#if (or errors.picture errors.kind errors.scene)}}<p class="field-error mt-6" role="alert">{{default errors.picture (default errors.kind errors.scene)}}</p>{{/if}}
+    {{> admin/pictures}}
   </div>
 </div>
 <script type="module" src="/js/setup.js"></script>

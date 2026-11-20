@@ -3665,3 +3665,32 @@ Note: most of Phase 23 part A landed in commit aa56076, whose message reads "Pha
     pictures are not screened, both listed as limits. `docs/SECURITY-MODEL.md` is the overview for strangers (trust,
     layers, a table of every entry point, what is not defended, this review's fixes); `docs/SECURITY.md` stays the detailed
     control list and links to it. Tested: `tests/injection-review.test.js` (each fix fails without it).
+
+## 2026-11-20: The assistant's pictures (#7)
+
+235. **The admin uploads or picks the assistant's pictures: avatar, background and cover.** Admin → Identity → Pictures.
+    Avatar: the chosen look's portrait set (default) or an upload; the look still sets the voice and the default pronouns.
+    Background (behind the avatar) and cover (the chat header band and the Feed's greeting): the live sky (default, time
+    of day × weather, #33), one built-in scene always, or an upload. An upload is never served as it came
+    (`services/assistant-pictures.js`): file-type must say PNG, JPEG, WebP or GIF (SVG is refused: it can carry script),
+    10 MB and 40 megapixels at most, the size read from the header before anything is decoded (a small file claiming
+    20000×20000 is refused without being opened), at least 64 px a side; then @napi-rs/canvas (already a dependency,
+    prebuilt for every platform, no browser needed) decodes it and draws it into a new WebP. That drops EXIF (location,
+    camera, dates), XMP, comments and bytes appended after the image, applies the EXIF orientation (a phone photo comes
+    out upright) and keeps a GIF's first frame. Avatar and background are cropped to a centred square at 1024 and 256 px
+    (the sizes of the built-in art, never enlarged); a cover keeps its shape, 1920 px wide at most. Files go to
+    `data/assistant/<slot>-<16 hex>[-256].webp`; a new upload is a new address (cached immutably) and the previous files
+    are deleted, as they are when the admin goes back to the built-in art. They are served at
+    `/assistant-pictures/<slot>-<id>/<frame>[-256].webp` (the built-in art's URL shape, so the presence code builds both
+    the same way) to signed-in people only, current upload only, as `image/webp` with `nosniff` and CSP
+    `default-src 'none'`; sign-in and invite pages keep the built-in look, so nothing uploaded shows before sign-in.
+    Templates and `public/js/presence.js` take image locations from `presence.avatarBase`, `sceneBase` and `cover`
+    instead of `/img/…` paths; an uploaded avatar has one frame (every expression shows it) and no face zoom; a pinned
+    background doesn't follow the clock, while a cover set to the sky still does. SOUL.md's identity block says "a
+    picture the admin chose" instead of the look's portrait. Backups include `data/assistant/`, and restore now puts back
+    the same folders a backup holds (it had been leaving out `voice/`). Why re-encode instead of serving the file: a
+    household's photos carry where they were taken, and an image served as uploaded can be a polyglot; drawing it again
+    leaves only pixels. Not done: a set of uploaded expressions (one picture serves all of them), cropping by hand.
+    Tested: `tests/assistant-pictures.test.js` (refusals by bytes, SVG, size and pixel count; a JPEG with EXIF
+    orientation 6, an Artist tag and trailing bytes comes out upright with none of them; sizes; replacing deletes;
+    only the current upload is served; routes: admin only, headers, signed out, traversal) and the real UI in Chromium.

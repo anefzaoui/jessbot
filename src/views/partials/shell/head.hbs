@@ -4,7 +4,7 @@
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#faf9f7" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#111113" media="(prefers-color-scheme: dark)">
-{{#if presence.variant}}<link rel="icon" href="/img/avatars/{{presence.variant}}/neutral-256.webp" type="image/webp">{{else}}<link rel="icon" href="/img/favicon.svg" type="image/svg+xml">{{/if}}
+{{#if presence.avatarBase}}<link rel="icon" href="{{presence.avatarBase}}/neutral-256.webp" type="image/webp">{{else}}<link rel="icon" href="/img/favicon.svg" type="image/svg+xml">{{/if}}
 {{!-- Resolve theme + shell state before first paint so nothing flashes or jumps on refresh. --}}
 <script nonce="{{nonce}}">
   (function () {

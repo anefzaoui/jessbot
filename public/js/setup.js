@@ -64,3 +64,17 @@ document.addEventListener('ajax:success', e => {
     form.reset();
   }
 });
+
+// ---- Pictures (#7, Admin → Identity): a chosen file uploads at once; picking a scene selects "Always" ---------------
+on(document, 'change', '[data-picture-file]', (e, input) => { if (input.files?.length) input.form.requestSubmit(); });
+on(document, 'change', '[data-picture-scene]', (e, select) => {
+  const always = select.closest('form')?.querySelector('input[name="kind"][value="scene"]');
+  if (always) always.checked = true;
+});
+// The page shows the new pictures everywhere at once (avatar, previews, favicon): reload it, back at the Pictures section.
+// (A redirect to "#pictures" from the same page would only change the hash.)
+document.addEventListener('ajax:success', e => {
+  if (!e.target.matches?.('form[data-reload]')) return;
+  history.replaceState(null, '', `${location.pathname}#pictures`);
+  location.reload();
+});

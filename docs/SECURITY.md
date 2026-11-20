@@ -254,6 +254,10 @@ The overview (who is trusted, every place outside content enters and how it is h
 - **Secrets never become memories:** memories go to the AI service with every message, so card numbers, keys, sign-in
   seeds and "password/PIN/code is …" are refused on every write path (the `remember` tool, extraction, the compaction
   flush, the Memory page) with a kind line pointing to a password manager. IBANs and phone numbers are kept. [#125]
+- **The assistant's pictures** (Admin → Identity, #7) are never served as uploaded: PNG, JPEG, WebP or GIF by their bytes,
+  10 MB and 40 megapixels at most (read from the header before decoding), then drawn again as a new WebP, so EXIF
+  (location, camera), XMP, comments and appended bytes are dropped. They live in `data/assistant/` under random ids and
+  are served only to signed-in people, with `nosniff` and a CSP that allows nothing. [#235]
 - Backups hold the database and people's files — never browser profiles (sign-in cookies). Restores refuse to run while
   Jessbot is running and keep what was there before. [#71]
 - Audit log: admin actions, approvals, backups, connections and skill reviews are recorded (Admin → Overview), and so are
