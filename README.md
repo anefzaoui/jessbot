@@ -1,7 +1,27 @@
-# Jessbot
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/images/brand/wordmark-dark.png">
+    <img src="docs/images/brand/wordmark-light.png" alt="Jessbot" width="300">
+  </picture>
+</p>
 
-**A self-hosted AI agent for your household: one assistant the people at home can talk to, that keeps working in the
-background, and never sends or spends anything without asking.**
+<p align="center"><b>A self-hosted AI agent for your household.</b><br>
+One assistant the people at home can talk to, that keeps working in the background, and never sends or spends anything
+without asking.</p>
+
+<p align="center">
+  <a href="https://github.com/anefzaoui/jessbot/actions/workflows/ci.yml"><img src="https://github.com/anefzaoui/jessbot/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/licence-GPL--3.0--or--later-0f6e7a" alt="Licence: GPL-3.0-or-later"></a>
+  <img src="https://img.shields.io/badge/status-early%20preview-c98a1a" alt="Status: early preview">
+  <img src="https://img.shields.io/badge/node-%E2%89%A5%2024.19-3c4a5c" alt="Node.js 24.19 or newer">
+</p>
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/images/chat-desktop-dark.webp">
+    <img src="docs/images/chat-desktop-light.webp" alt="Jessbot's chat on a desktop: Jess has booked a table, found cinema seats and asks three quick questions before buying; the activity log on the right" width="880">
+  </picture>
+</p>
 
 > **Early preview.** Jessbot works, but it is young, it was built quickly, and installing it still takes some comfort
 > with a terminal. Run it on your own computer or home network (or behind a VPN such as Tailscale or WireGuard).
@@ -17,49 +37,158 @@ spends, books or shares stops at an approval card with the exact text first.
 You bring the AI model: Jessbot talks to [OpenRouter](https://openrouter.ai) by default, or to any OpenAI-compatible
 endpoint (see [Providers](#providers)).
 
-<p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/images/chat-dark.png">
-    <img src="docs/images/chat-light.png" alt="Jessbot's chat: the agent answers two questions it looked up on the web, with the sources it checked; the activity log on the right" width="900">
-  </picture>
-</p>
+[Install](#install) · [What it does](#what-it-does) · [Screenshots](#more-screenshots) · [Safety](#safety-model) ·
+[Privacy](#privacy) · [Docs](#documentation)
+
+## See it work
+
+A real run, sped up where it waits: asked to find a hike in the background and email Maya the plan, Jess hands the work
+to a side chat, searches the web, writes the email, and stops at an approval card showing the recipient, the exact text
+and why it is asking. The email goes out only after Approve.
 
 <p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/images/chat-phone-dark.png">
-    <img src="docs/images/chat-phone-light.png" alt="The same chat on a phone" width="260">
-  </picture>
-  &nbsp;
-  <img src="docs/images/admin-people-light.png" alt="Admin → People: who uses Jessbot, whether admins may read other people's chats (off by default), and instructions for everyone" width="560">
+  <img src="docs/images/flow-approval.webp" alt="A real run: the request, Jess working in the background, the approval card for the email to Maya, Approve, and the email sent" width="880">
 </p>
-
-<sub>Screenshots from a test install with made-up people.</sub>
 
 ## What it does
 
-- **Chat, one main conversation per person**, plus side chats and projects (a side chat with its own brief and files).
-  Replies stream; voice notes go both ways; files and photos can be dropped in. "Off the record" chats never become
-  memories.
-- **Works in the background.** Ask it to research something "in the background" and it opens its own side chat,
-  works there with the same approvals and spending limits, and posts back when it is done. Runs survive a restart and
-  never repeat a send.
-- **Reminders, alarms, timers and scheduled tasks**, including reminders that nudge until you confirm (the bins,
-  medicine, homework) and quiet watches that only speak when something changed.
-- **A personal Feed**: you say what you want to follow in plain words; Jessbot picks sources (news searches, RSS, your
-  own OPML) and writes short posts for you. Likes and "less of this" shape the next pick.
-- **Goals and ideas**: goals it noticed you care about, broken into steps with "done when" lines and real numbers;
-  ideas it suggests, with a reason you can turn down.
-- **A Library of everything it makes**: Word, Excel and PowerPoint files, PDFs (made, filled, merged), pages,
-  pictures and audio, with versions, previews and export.
-- **Household tools**: shared lists (shopping, chores, wish lists that hide what was bought), birthdays, weather and
-  holidays where you live, fair random draws and Secret Santa, upcoming events across the household.
-- **Mail and calendar (optional)**: IMAP/SMTP and CalDAV accounts, each usable only by its owner. Sending mail and
-  changing calendars always asks first.
-- **Memory with private scopes**: what it learns about each person stays theirs unless they share it with a group.
-- **A real multi-person setup**: the admin decides, per person or group, which tools the agent may use for them, how it
-  behaves with them, and how much it may spend a week.
-- **An installable web app (PWA)** with push notifications, light and dark themes, phone and desktop layouts, and
-  right-to-left text.
+### Chat, and work that carries on in the background
+
+One main conversation per person, plus side chats and projects (a side chat with its own brief and files). Replies
+stream; voice notes go both ways; files and photos can be dropped in; "off the record" chats never become memories. Ask
+it to do something "in the background" and it opens its own side chat, works there with the same approvals and spending
+limits, and posts back when it is done. Runs survive a restart and never repeat a send.
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/images/chat-background-desktop-dark.webp">
+    <img src="docs/images/chat-background-desktop-light.webp" alt="A chat where Jess hands research to a background task and later reports back with the result" width="880">
+  </picture>
+</p>
+
+### Approvals: it asks before it acts
+
+Sending email, changing a calendar, buying, booking, sharing a memory, uploading a file to a website: each stops at a
+card showing the exact action and text, what it reaches, whether it can be undone, and why it is asking.
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/images/approvals-desktop-dark.webp">
+    <img src="docs/images/approvals-desktop-light.webp" alt="The Approvals page: buying two cinema tickets and emailing Maya the weekend itinerary, each with the exact text and a Why I'm asking line" width="880">
+  </picture>
+</p>
+
+### A Feed written for you
+
+You say what you want to follow in plain words; Jessbot picks sources (news searches, RSS, your own OPML) and writes short
+posts for you. Likes and "less of this" shape the next pick.
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/images/feed-desktop-dark.webp">
+    <img src="docs/images/feed-desktop-light.webp" alt="The Feed: an evening greeting with the weather, Jess's evening brief, and topic filters" width="880">
+  </picture>
+</p>
+
+### Goals and ideas
+
+Goals it noticed you care about, broken into steps with "done when" lines and real numbers; ideas it suggests, each with
+a reason, that you can start or turn down.
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/images/goals-desktop-dark.webp">
+    <img src="docs/images/goals-desktop-light.webp" alt="Goals: suggested goals to adopt, and goals in progress with their percentage and next step" width="400">
+  </picture>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/images/ideas-desktop-dark.webp">
+    <img src="docs/images/ideas-desktop-light.webp" alt="Ideas: things Jess can do, each with the reason it suggests it, and Let's do it or Later" width="400">
+  </picture>
+</p>
+
+### A Library of everything it makes
+
+Word, Excel and PowerPoint files, PDFs (made, filled, merged), pages, pictures and audio, with versions, previews and
+export.
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/images/library-desktop-dark.webp">
+    <img src="docs/images/library-desktop-light.webp" alt="The Library: pages, audio and calendar files Jess made, filtered by kind" width="880">
+  </picture>
+</p>
+
+### Household tools
+
+Shared lists (shopping, chores, wish lists that hide what was bought), birthdays, weather and holidays where you live,
+fair random draws and Secret Santa, reminders that nudge until you confirm (the bins, medicine, homework), quiet watches
+that only speak when something changed, alarms and timers, and everything coming up across the household.
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/images/lists-desktop-dark.webp">
+    <img src="docs/images/lists-desktop-light.webp" alt="Lists: the weekly shop, house to-dos, Keiko's birthday wish list and a packing list" width="400">
+  </picture>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/images/upcoming-desktop-dark.webp">
+    <img src="docs/images/upcoming-desktop-light.webp" alt="Upcoming: the week ahead, dates Jess remembers, and alarms, reminders and timers" width="400">
+  </picture>
+</p>
+
+### Mail, calendar and memory
+
+IMAP/SMTP and CalDAV accounts (optional), each usable only by its owner. Sending mail and changing calendars ask first;
+"always allow" can skip that, but not once the task has read outside content (a web page, an email). Memory has private
+scopes: what it learns about each person stays theirs unless they share it with a group.
+
+### A real multi-person setup
+
+The admin decides, per person or group, which tools the agent may use for them, how it behaves with them, and how much
+it may spend a week.
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/images/admin-people-real-desktop-dark.webp">
+    <img src="docs/images/admin-people-real-desktop-light.webp" alt="Admin → People: who uses Jessbot, whether admins may read other people's chats (off by default), and instructions for everyone" width="880">
+  </picture>
+</p>
+
+### On your phone
+
+A web app that works in your phone's browser, with push notifications, light and dark themes, phone and desktop
+layouts, and right-to-left text.
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/images/chat-phone-dark.webp">
+    <img src="docs/images/chat-phone-light.webp" alt="The chat on a phone, with Jess's questions" width="210">
+  </picture>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/images/feed-phone-dark.webp">
+    <img src="docs/images/feed-phone-light.webp" alt="The Feed on a phone" width="210">
+  </picture>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/images/list-phone-dark.webp">
+    <img src="docs/images/list-phone-light.webp" alt="The weekly shopping list on a phone, sorted by aisle" width="210">
+  </picture>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/images/approvals-phone-dark.webp">
+    <img src="docs/images/approvals-phone-light.webp" alt="Approvals on a phone" width="210">
+  </picture>
+</p>
+
+### More screenshots
+
+| | | |
+|---|---|---|
+| [![Setup: your account](docs/images/setup-account-desktop-light.webp)](docs/images/setup-account-desktop-light.webp) Setup: your account | [![Setup: the model](docs/images/setup-model-desktop-dark.webp)](docs/images/setup-model-desktop-dark.webp) Setup: the model | [![Setup: who your agent is](docs/images/setup-identity-desktop-light.webp)](docs/images/setup-identity-desktop-light.webp) Setup: who your agent is |
+| [![Projects](docs/images/projects-desktop-light.webp)](docs/images/projects-desktop-light.webp) Projects | [![A goal](docs/images/goal-desktop-dark.webp)](docs/images/goal-desktop-dark.webp) A goal and its plan | [![Activity](docs/images/activity-desktop-light.webp)](docs/images/activity-desktop-light.webp) Activity |
+| [![Admin → Models](docs/images/admin-models-desktop-dark.webp)](docs/images/admin-models-desktop-dark.webp) Admin → Models | [![Admin → Skills](docs/images/admin-skills-desktop-light.webp)](docs/images/admin-skills-desktop-light.webp) Admin → Skills | [![Admin → Usage](docs/images/admin-usage-desktop-dark.webp)](docs/images/admin-usage-desktop-dark.webp) Admin → Usage |
+| [![You → Memory](docs/images/you-memory-desktop-light.webp)](docs/images/you-memory-desktop-light.webp) You → Memory | [![A list](docs/images/list-desktop-dark.webp)](docs/images/list-desktop-dark.webp) A shared list | [![Answers with their sources](docs/images/chat-real-desktop-light.webp)](docs/images/chat-real-desktop-light.webp) Answers with their sources |
+
+<sub>The setup wizard, Admin → People, the answers with their sources and the approval run come from a real install
+with made-up people. The other screens are the app's own pages filled with its built-in demo household (the dev
+styleguide), because a new install has no weeks of history to show. Every image is in [docs/images](docs/images).</sub>
 
 ## Safety model
 
@@ -103,7 +232,7 @@ everyone sees a line saying so in their chat and on their You page.
 **With Docker** (any system):
 
 ```bash
-git clone <this repository> jessbot && cd jessbot
+git clone https://github.com/anefzaoui/jessbot && cd jessbot
 docker compose up -d --build
 docker compose logs jessbot | grep "setup code"     # you'll need this code on the setup page
 ```
@@ -112,7 +241,7 @@ docker compose logs jessbot | grep "setup code"     # you'll need this code on t
 Windows and Linux; macOS should work but hasn't been tested by a person yet (CI runs the tests there).
 
 ```bash
-git clone <this repository> jessbot
+git clone https://github.com/anefzaoui/jessbot
 cd jessbot
 npm install
 cp .env.example .env      # optional: put your model key here, or paste it in the setup page later
@@ -174,12 +303,11 @@ person caps what each person can spend.
 
 Honest list, roughly in order:
 
-- **Account hardening for internet exposure**: optional two-factor sign-in for admins, rate limits that survive a
-  restart, a password reset flow.
+- **Time in real use before internet exposure**: two-step sign-in, password resets and rate limits that survive a
+  restart are in, but Jessbot is new and needs more use and outside review; prompt injection is mitigated, not solved
+  (see [docs/SECURITY-MODEL.md](docs/SECURITY-MODEL.md)).
 - **Install options**: a published image per release (the Dockerfile and compose file are here), a Windows installer.
 - **Providers**: a provider picker with prices for non-OpenRouter endpoints, and tested local models (Ollama, LM Studio).
-- **Renaming everything**: the agent's name and look can be changed, but some interface text still says "Jess" and
-  "she"; uploading your own avatar and backgrounds.
 - **Interface languages**: the interface is English only for now (the agent itself reads and writes in many languages,
   including right-to-left ones).
 - Later: messaging channels (Telegram first), MCP tools, a mobile app.
