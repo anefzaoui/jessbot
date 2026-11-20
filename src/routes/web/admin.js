@@ -291,6 +291,15 @@ router.post('/browser/install', (req, res) => {
   res.json({ ok: true, status: browserStatus() });
 });
 
+// The browser engine (decision #218). Only the engine changes; every other browser setting stays as it is.
+router.post('/browser/engine', async (req, res) => {
+  const engine = String(req.body?.engine || '');
+  if (!browserStatus().engines.some(e => e.id === engine)) throw invalid({ engine: 'Pick one of the listed browsers.' });
+  const s = await saveBrowserSettings({ ...browserSettings(), engine });
+  audit('browser.engine', { actorId: req.user.id, detail: { engine: s.engine } });
+  res.json({ ok: true, redirect: '/admin/browser', status: browserStatus() });
+});
+
 router.post('/browser/restart', async (req, res) => {
   await closeBrowser();
   res.json({ ok: true, status: browserStatus() });

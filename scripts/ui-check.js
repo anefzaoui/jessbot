@@ -1,10 +1,10 @@
 // DEV: screenshot pages at desktop + phone widths in light + dark, and fail on any browser console error.
 // Uses the locally installed Edge/Chrome via playwright-core — localhost only (Jessbot's own web access
-// goes through CloakBrowser; see docs/DECISIONS.md #15).
+// goes through the browser; see docs/DECISIONS.md #15).
 //   node scripts/ui-check.js [--out dir] [--only chat,feed] [--base http://127.0.0.1:3738]
 import fs from 'node:fs';
 import path from 'node:path';
-import { chromium } from 'playwright-core';
+import { chromium, executablePath as exe } from './lib/test-browser.js';
 
 const arg = (name, fallback) => {
   const i = process.argv.indexOf(`--${name}`);
@@ -28,8 +28,6 @@ const VIEWPORTS = [['desktop', { width: 1440, height: 900 }], ['phone', { width:
 const THEMES = ['light', 'dark'].filter(t => !arg('theme') || t === arg('theme'));
 const WAIT = Number(arg('wait', 400));
 
-const exe = ['C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe', 'C:/Program Files/Google/Chrome/Application/chrome.exe',
-  '/usr/bin/google-chrome', '/usr/bin/chromium'].find(p => fs.existsSync(p));
 if (!exe) { console.error('No local Chromium-based browser found.'); process.exit(1); }
 
 fs.mkdirSync(OUT, { recursive: true });

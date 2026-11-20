@@ -2,7 +2,7 @@
 // looks at after filling a form), OCR of scans (opt-in per file, page cap, cost shown, budget-checked) and real previews
 // of office files when LibreOffice is installed (found like the browser; a fake soffice stands in here, and a guarded test
 // runs the real one only where it is installed). Run: npm test (throwaway data dir; model calls go to a local fake
-// OpenAI-compatible server, never the network). The PNG-export test needs CloakBrowser and is skipped without it.
+// OpenAI-compatible server, never the network). The PNG-export test needs the browser (npm run browser:install) and is skipped without it.
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -630,7 +630,7 @@ test('PNG export scale: paper sizes are drawn at 2 pixels per CSS pixel, the soc
   assert.equal(exp.pngScale('story'), 1);
 });
 
-test('make_pdf (real render): the first version comes with page 1 for Jess; a revision does not', { skip: !BROWSER && 'CloakBrowser is not installed (npm run browser:install)' }, async () => {
+test('make_pdf (real render): the first version comes with page 1 for Jess; a revision does not', { skip: !BROWSER && 'the browser is not installed (npm run browser:install)' }, async () => {
   const made = await getTool('make_pdf').run({ title: 'Menu', markdown: '# Menu\n\nSoup of the day.' }, toolCtx(alice));
   assert.ok(isShotRef(made.attachments?.[0]));
   assert.match(made.content, /Page 1 as it prints is shown below/);
@@ -639,7 +639,7 @@ test('make_pdf (real render): the first version comes with page 1 for Jess; a re
   await lib.previewsSettled();
 });
 
-test('PNG export (real render): an A5 PNG is 1118 px wide (2× its 559 px frame); a square stays 1080 px', { skip: !BROWSER && 'CloakBrowser is not installed (npm run browser:install)' }, async () => {
+test('PNG export (real render): an A5 PNG is 1118 px wide (2× its 559 px frame); a square stays 1080 px', { skip: !BROWSER && 'the browser is not installed (npm run browser:install)' }, async () => {
   const html = '<!doctype html><html><head><style>body{margin:0;font-family:"Noto Sans"}</style></head><body><h1>Menu</h1><p>Soup</p></body></html>';
   const a5 = await exp.exportPage(html, { format: 'png', size: 'A5' });
   assert.equal(pngWidth(a5.buffer), 1118);

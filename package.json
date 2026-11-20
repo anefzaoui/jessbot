@@ -46,7 +46,6 @@
     "@ghostery/adblocker": "2.18.2",
     "@mozilla/readability": "0.6.0",
     "@napi-rs/canvas": "1.0.9",
-    "cloakbrowser": "0.5.10",
     "croner": "10.0.1",
     "cronstrue": "3.27.0",
     "date-holidays": "3.37.0",
@@ -96,6 +95,9 @@
     "@tailwindcss/cli": "^4.3.3",
     "sharp": "^0.35.4",
     "tailwindcss": "^4.3.3"
+  },
+  "optionalDependencies": {
+    "cloakbrowser": "0.5.10"
   },
   "overrides": {
     "image-size": "2.0.4",

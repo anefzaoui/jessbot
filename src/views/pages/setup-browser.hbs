@@ -1,10 +1,10 @@
-{{#> setup/frame heading="Give it the internet." lead="Jessbot searches and reads the web through CloakBrowser, a private, stealth Chromium that runs right here on this machine. Nothing goes through a third-party service."}}
+{{#> setup/frame heading="Give it the internet." lead="Jessbot searches and reads the web through its own Chromium browser, running right here on this machine. Nothing goes through a third-party service."}}
   <div class="rounded-xl border border-line bg-surface p-4" data-browser-admin data-status-url="/setup/browser/status">
     <div data-browser-status>{{> admin/browser-status}}</div>
   </div>
 
   <ul class="mt-5 space-y-2 text-[13px] text-ink-2" role="list">
-    <li class="flex gap-2.5">{{icon "download" class="mt-0.5 size-4 shrink-0 text-ink-3"}}<span>One download of about 500 MB into <code class="font-mono text-xs">tools/cloakbrowser</code>. It moves with the folder.</span></li>
+    <li class="flex gap-2.5">{{icon "download" class="mt-0.5 size-4 shrink-0 text-ink-3"}}<span>{{#if (eq status.source 'system')}}It uses the Chrome or Chromium already on this computer.{{else}}One download of {{#if (eq status.engine.id 'cloakbrowser')}}about 500 MB into <code class="font-mono text-xs">tools/cloakbrowser</code>{{else}}about 200 MB into <code class="font-mono text-xs">tools/ms-playwright</code>{{/if}}. It moves with the folder.{{/if}}</span></li>
     <li class="flex gap-2.5">{{icon "clock" class="mt-0.5 size-4 shrink-0 text-ink-3"}}<span>It installs in the background: continue setting up while it finishes.</span></li>
     <li class="flex gap-2.5">{{icon "shield-check" class="mt-0.5 size-4 shrink-0 text-ink-3"}}<span>Public websites only; your home network stays off-limits unless you allow it later.</span></li>
   </ul>

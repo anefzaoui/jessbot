@@ -113,13 +113,15 @@ A Docker image and a Linux service file are on the way (see below).
 
 ### Web access (the agent's browser)
 
-Today the agent's browser is **CloakBrowser**, a Chromium build tuned to look like an ordinary browser to sites that
-block bots. The setup page downloads it into `tools/` for you. Its binary is proprietary: its terms allow internal use
-(yourself, your family, your company), not offering Jessbot as a service to others, and it is never included in this
-repository. Without it, chat, files, the Library,
-reminders, lists and mail still work, but web lookups, the Feed, weather and places, and exporting pages to PDF or PNG
-don't. **Switching the default to plain open-source Chromium, with CloakBrowser as an optional extra, is the next
-change** (see the list below).
+The agent's browser is **open-source Chromium**, driven by Playwright. The setup page (or `npm run browser:install`)
+downloads it once into `tools/ms-playwright`, about 200 MB. To use a Chrome or Chromium that is already installed
+instead, set `JESSBOT_CHROMIUM_PATH` to its executable. Until a browser is there, chat, files, the Library, reminders,
+lists and mail work, but web lookups, the Feed, weather and places, and exporting pages to PDF or PNG don't.
+
+Some sites (a few airlines and shops) refuse automated browsers. For those, Admin → Browser can switch to
+**CloakBrowser**, a Chromium build with stealth patches. It is optional and you install it yourself: its binary is
+proprietary, its terms allow internal use (yourself, your family, your company) but not offering Jessbot as a service to
+others, and it is never included in this repository.
 
 ## Providers
 
@@ -140,7 +142,6 @@ person caps what each person can spend.
 
 Honest list, roughly in order:
 
-- **Open-source browser by default**: plain Chromium through Playwright for every web path, CloakBrowser optional.
 - **Admin access to other people's chats** as a setting, off by default and visible to everyone when on.
 - **Account hardening for internet exposure**: optional two-factor sign-in for admins, rate limits that survive a
   restart, a password reset flow, an origin check against `PUBLIC_URL`.

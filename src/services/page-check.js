@@ -1,4 +1,4 @@
-// Jess looks at the pages she makes (decision #145). A Library HTML page is rendered once through CloakBrowser with the
+// Jess looks at the pages she makes (decision #145). A Library HTML page is rendered once through the browser with the
 // same sandbox CSP the viewer serves it with (services/library.js ARTIFACT_CSP): inline code plus the three CDNs, no
 // network APIs; the browser's own guard still blocks the local network. That one render gives
 //   - the 1024×640 thumbnail the person sees on the step and in the Library (as before);
@@ -23,8 +23,8 @@ const MAX_LISTED = 3;
 
 const trim = (s, n = 140) => { const t = String(s || '').replace(/\s+/g, ' ').trim(); return t.length > n ? `${t.slice(0, n - 1)}…` : t; };
 
-// CloakBrowser (an anti-detection build) sends no console or page-error events over DevTools, so the page reports on
-// itself: this runs before any of its own scripts (Page.addScriptToEvaluateOnNewDocument, not subject to its CSP) and
+// Some browser builds (CloakBrowser, an anti-detection build) send no console or page-error events over DevTools, so the
+// page reports on itself: this runs before any of its own scripts (Page.addScriptToEvaluateOnNewDocument, not subject to its CSP) and
 // keeps uncaught errors, rejected promises, console.error calls, resources that failed and CSP refusals in a hidden
 // array that readIssues() collects. A page could tamper with it, but it can only hide its own problems from its own check.
 const STORE = '__jessbotPageIssues';

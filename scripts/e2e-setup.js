@@ -6,7 +6,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
-import { chromium, request } from 'playwright-core';
+import { chromium, request, executablePath as exe } from './lib/test-browser.js';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname.replace(/^\/(\w:)/, '$1')), '..');
 const HOME = fs.mkdtempSync(path.join(os.tmpdir(), 'jessbot-e2e-'));
@@ -25,8 +25,6 @@ await new Promise((resolve, reject) => {
   server.stdout.on('data', () => { if (log.includes('listening')) { clearTimeout(t); resolve(); } });
 });
 
-const exe = ['C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe', 'C:/Program Files/Google/Chrome/Application/chrome.exe',
-  '/usr/bin/google-chrome', '/usr/bin/chromium'].find(p => fs.existsSync(p));
 const browser = await chromium.launch({ executablePath: exe, headless: true });
 const errors = [];
 const newPage = async () => {
@@ -184,7 +182,7 @@ try {
   });
 
   let shotHref = null;
-  await test('admin browser: real search + screenshot through CloakBrowser, settings persist, bad key rejected', async () => {
+  await test('admin browser: real search + screenshot through the browser, settings persist, bad key rejected', async () => {
     await owner.goto(`${BASE}/admin/browser`);
     const state = await owner.getAttribute('[data-browser-state]', 'data-browser-state');
     if (state !== 'ready') { console.log(`      (browser ${state} — skipping live checks)`); return; }
@@ -206,9 +204,22 @@ try {
     await owner.reload();
     expect(!(await owner.isChecked('input[name="blockMedia"]')), 'blockMedia setting not persisted');
 
+    // The engine (decision #218): Chromium by default, no licence section; switching keeps the other settings.
+    expect(await owner.isChecked('input[name="engine"][value="chromium"]'), 'Chromium is not the default engine');
+    expect(await owner.locator('form[action="/admin/browser/license"]').count() === 0, 'a licence form shows for Chromium');
+    await owner.click('label:has(input[name="engine"][value="cloakbrowser"])');
+    await Promise.all([owner.waitForEvent('framenavigated'), owner.click('form[action="/admin/browser/engine"] button')]);
+    await owner.waitForLoadState('load');
+    await owner.waitForSelector('form[action="/admin/browser/license"]');
+    expect((await owner.innerText('[data-browser-status] h2')).includes('CloakBrowser'), 'status card not on CloakBrowser');
+    expect(!(await owner.isChecked('input[name="blockMedia"]')), 'switching the engine reset another setting');
     await owner.fill('#bs-key', 'not-a-key');
     await owner.click('form[action="/admin/browser/license"] button');
     await owner.waitForSelector('form[action="/admin/browser/license"] [data-field-error]');
+    await owner.click('label:has(input[name="engine"][value="chromium"])');
+    await Promise.all([owner.waitForEvent('framenavigated'), owner.click('form[action="/admin/browser/engine"] button')]);
+    await owner.waitForLoadState('load');
+    expect(await owner.getAttribute('[data-browser-state]', 'data-browser-state') === 'ready', 'Chromium not ready after switching back');
   });
 
   const maya = await newPage();

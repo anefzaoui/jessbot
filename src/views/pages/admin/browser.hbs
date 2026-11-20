@@ -6,6 +6,21 @@
     {{> admin/browser-status}}
   </section>
 
+  {{!-- The browser engine (decision #218): open-source Chromium by default; CloakBrowser when the admin wants its stealth. --}}
+  <section class="card mt-6 p-5" aria-labelledby="h-engine">
+    <h2 id="h-engine" class="text-sm font-semibold">Browser engine</h2>
+    <p class="mb-4 text-xs text-ink-3">Which browser {{bot.name}} uses for everything on the web. Switching closes the running one; the next page opens in the new one.</p>
+    <form method="post" action="/admin/browser/engine" class="space-y-3" data-ajax data-busy="Switching…" data-redirect="/admin/browser">
+      {{#each status.engines}}
+        <label class="flex items-start gap-3">
+          <input type="radio" class="mt-1 size-4 shrink-0 accent-accent" name="engine" value="{{id}}" {{#if (eq id @root.status.engine.id)}}checked{{/if}}>
+          <span class="text-sm"><span class="font-medium">{{label}}</span>{{#if (eq id 'chromium')}} <span class="text-ink-3">(default, open source)</span>{{/if}}<span class="block text-xs text-ink-3">{{summary}}</span></span>
+        </label>
+      {{/each}}
+      <button class="btn btn-secondary btn-sm">Use this engine</button>
+    </form>
+  </section>
+
   <div class="mt-6 grid gap-6 @4xl/main:grid-cols-2">
     <section class="card p-5" aria-labelledby="h-try">
       <h2 id="h-try" class="text-sm font-semibold">Try it</h2>
@@ -73,6 +88,7 @@
 
   <div class="mt-6" data-browser-extras>{{> admin/browser-extras extras=extras}}</div>
 
+  {{#if (eq status.engine.id 'cloakbrowser')}}
   <section class="card mt-6 p-5" aria-labelledby="h-key">
     <div class="flex flex-wrap items-start gap-4">
       <div class="min-w-0 flex-1">
@@ -104,6 +120,7 @@
       </form>
     {{/unless}}
   </section>
+  {{/if}}
 
   <section class="mt-8" aria-labelledby="h-recent">
     <div class="mb-3 flex items-baseline gap-2">
@@ -114,8 +131,9 @@
   </section>
 
   <p class="mt-8 max-w-prose text-xs text-ink-3">
-    CloakBrowser's wrapper is MIT-licensed; its browser build is proprietary: free to use, not to redistribute. Each Jessbot install downloads its
-    own copy, and it is for your household and team only (offering {{bot.name}} to outside customers needs CloakHQ's commercial licence).
+    Chromium (the default) is open source. CloakBrowser's wrapper is MIT-licensed, but its browser build is proprietary: free to use, not to
+    redistribute. Each Jessbot install that picks it downloads its own copy, and it is for your household and team only (offering {{bot.name}}
+    to outside customers needs CloakHQ's commercial licence).
   </p>
 </div>
 <script type="module" src="/js/browser-admin.js"></script>
