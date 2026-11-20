@@ -56,12 +56,23 @@ The **Test the connection** button on the setup page (and saving in Admin → Mo
 - **"The account is out of credits."** Top up your account with the provider.
 - **"The model … wasn't found on this endpoint."** The model id is misspelled, or this provider doesn't offer it. Copy
   the id exactly from the provider's model list (on OpenRouter it looks like `openai/gpt-6-luna`).
-- **It can't reach the endpoint.** Check the Base URL under **Advanced: a different endpoint**, and that the machine
-  is online. The default is `https://openrouter.ai/api/v1`.
+- **It can't reach the endpoint.** Check the provider's address (the **Address** field under the provider you picked),
+  and that the machine is online. OpenRouter's is `https://openrouter.ai/api/v1`, Ollama's on this computer
+  `http://127.0.0.1:11434/v1`.
 - **It was rate limited.** Wait a minute and press the button again.
+- **"Check the context window" or "The context window is too small"** (Ollama, under "Connected"). The connection works,
+  but Ollama gives the model less context than Jessbot's instructions need, so real messages would be cut. Set
+  `OLLAMA_CONTEXT_LENGTH=32768` on the Ollama server and restart it: see
+  [Models and costs](providers.md#give-ollama-a-context-of-32768-tokens).
 
-For a server that doesn't use keys (a local one), put any text in the key field: the test needs one. More in
-[Models and costs](providers.md).
+Ollama needs no key, and neither does a model server on your own network (LM Studio, say): the key field is hidden or
+can stay empty. More in [Models and costs](providers.md).
+
+## Local models call tools at random or answer "…"
+
+With Ollama's default context the model only sees the end of Jessbot's prompt (`truncating input prompt` in Ollama's
+log). Jessbot stops such a task with "The model only read … of the about … tokens I sent", or before it starts with "The
+model's context window is too small", and says what to set; the fix is the same as above.
 
 ## Web lookups, the Feed or weather don't work
 

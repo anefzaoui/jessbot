@@ -40,7 +40,7 @@ export function currentProvider(baseUrl) {
 export const FEATURES = [
   { id: 'chat', label: 'Chat, tools, tasks, goals, the feed, projects', icon: 'message-circle',
     on: { openrouter: true, ollama: 'model', compatible: true },
-    without: 'Needs a model that can call tools and follow long instructions: with Ollama, 7B or larger (qwen2.5:7b, llama3.1:8b). Smaller ones connect but get lost.' },
+    without: 'Needs a model that can call tools and follow long instructions: with Ollama, 7B or larger (qwen2.5:7b, llama3.1:8b), and a context of 32,768 tokens set on the Ollama server (OLLAMA_CONTEXT_LENGTH=32768). Smaller ones connect but get lost.' },
   { id: 'fallbacks', label: 'Fallback models', icon: 'list-ordered',
     on: { openrouter: true, ollama: false, compatible: false },
     without: 'Only the main model answers; when it is down, the reply fails and can be retried.' },

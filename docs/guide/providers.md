@@ -21,6 +21,35 @@ no key is asked for, and the models Ollama has are listed. Pick one that can cal
 (`ollama pull qwen2.5:7b`, `llama3.1:8b`): smaller ones connect but get lost in Jessbot's instructions. For memory
 search by meaning, also `ollama pull nomic-embed-text`. A few features need OpenRouter and are off (below).
 
+### Give Ollama a context of 32,768 tokens
+
+Jessbot's instructions and its list of tools come to about 25,000 tokens before the conversation starts. Ollama's
+default context is much smaller (4,096 tokens on most graphics cards), and Ollama doesn't refuse a longer prompt: it
+drops the start of it. The model then never sees most of its instructions or tools, calls tools at random and answers
+"…", while the connection test (a tiny prompt) still passes. The context is set **on the Ollama server**, not by
+Jessbot: Ollama's OpenAI-compatible endpoint, the one Jessbot uses, ignores a context size sent with a request.
+
+Set it where Ollama runs, then restart Ollama:
+
+| Ollama runs as | Set |
+|---|---|
+| The Windows or macOS app | `OLLAMA_CONTEXT_LENGTH=32768` as a user environment variable (Windows: Settings → System → About → Advanced system settings → Environment Variables; macOS: `launchctl setenv OLLAMA_CONTEXT_LENGTH 32768`), then quit Ollama from its tray or menu bar icon and start it again |
+| Linux (systemd) | `sudo systemctl edit ollama`, add `[Service]` and `Environment="OLLAMA_CONTEXT_LENGTH=32768"`, then `sudo systemctl restart ollama` |
+| Docker | `-e OLLAMA_CONTEXT_LENGTH=32768` on `docker run` (or under `environment:` in compose) |
+| One model only | a Modelfile with `FROM qwen2.5:7b` and `PARAMETER num_ctx 32768`, then `ollama create qwen2.5-32k -f Modelfile` and pick `qwen2.5-32k` |
+
+On a graphics card with **8 GB** (an RTX 4060, say), a 7B model with a 32,768-token context no longer fits and spills
+onto the processor: replies slow to a couple of words a second. Two more settings make it fit again:
+`OLLAMA_FLASH_ATTENTION=1` and `OLLAMA_KV_CACHE_TYPE=q8_0` (the context's cache at 8 bits, half the memory). Measured
+with `qwen2.5:7b` on an RTX 4060: the whole model and its 32,768-token context on the graphics card (5.6 GB), a plain
+question answered in about 20 seconds, a task with several steps in one to two minutes. A bigger context helps long chats if your memory allows it: Jessbot folds older messages into a
+summary sooner when the context is small.
+
+Jessbot checks this for you. **Test the connection** (setup) and **Save and test** (Admin → Models) read the context
+Ollama loaded the model with and compare it with your own prompt: when it is too small, or Ollama doesn't say, a
+warning under "Connected" says what to set. A task that still doesn't fit stops with the same advice instead of
+running on a cut prompt, and the server log says why (`[agent] … doesn't fit the model's context`).
+
 ## Another OpenAI-compatible service
 
 OpenAI itself, LM Studio, a LiteLLM or vLLM server: pick **Another OpenAI-compatible service**, enter its address
@@ -35,7 +64,7 @@ configure is allowed, and only that one.
 
 | Feature | OpenRouter | Ollama | Another OpenAI-compatible service |
 |---|---|---|---|
-| Chat, tools, tasks, goals, the feed, projects | Yes | With a model that calls tools, 7B or larger | Yes, with a model that calls tools |
+| Chat, tools, tasks, goals, the feed, projects | Yes | With a model that calls tools, 7B or larger, and a 32,768-token context | Yes, with a model that calls tools |
 | Memory search by meaning | Yes | With `nomic-embed-text` pulled | If it serves an embedding model; otherwise by keywords |
 | Fallback models | Yes | No: the main model only | No: the main model only |
 | Quick decisions | Yes | Off: the full model or plain rules decide | Off |
