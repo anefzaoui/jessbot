@@ -4,6 +4,8 @@
 // 127.0.0.1) and makes the requests to the search engines itself. Used first when configured and healthy; when it fails
 // the usual browser engines take over, and it rests for a few minutes. The address lives in Admin → Browser.
 // Result pages are still read through the browser (web_read), as always.
+// The request goes through lib/outbound.js (decision #221): the admin's address may be local, a redirect away from it may not.
+import { outboundFetch } from '../lib/outbound.js';
 
 export const SEARXNG_LABEL = 'SearXNG';
 const TIMEOUT_MS = 12000;
@@ -58,7 +60,7 @@ async function getJson(url, { signal, timeout = TIMEOUT_MS } = {}) {
   const onAbort = () => ctrl.abort(signal.reason);
   signal?.addEventListener('abort', onAbort, { once: true });
   try {
-    const res = await fetch(url, { signal: ctrl.signal, headers: { Accept: 'application/json', 'User-Agent': 'Jessbot' }, redirect: 'follow' });
+    const res = await outboundFetch(url, { signal: ctrl.signal, headers: { Accept: 'application/json', 'User-Agent': 'Jessbot' } }, { trustedOrigin: url });
     const text = await res.text();
     if (res.status === 403) throw new Error('it refused JSON (HTTP 403) — add “json” to search.formats in its settings.yml');
     if (res.status === 429) throw new Error('it is rate-limiting us (HTTP 429) — turn its limiter off for this address');

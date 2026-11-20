@@ -18,6 +18,7 @@ import { recordUsage, spentThisWeek } from './usage.js';
 import { taskCapRefusal } from './spend-watch.js';
 import { effectivePolicy } from './policy.js';
 import { createFileItem, itemForUser, readBytes } from './library.js';
+import { outboundFetch } from '../lib/outbound.js';
 import { sniff } from './uploads.js';
 import { badRequest, invalid } from '../lib/errors.js';
 
@@ -85,8 +86,8 @@ async function modelInfo(model, { fresh = false } = {}) {
   if (!fresh && hit && Date.now() - hit.at < (hit.info ? DAY_MS : 10 * 60e3)) return hit.info;
   let info = null;
   try {
-    const res = await fetch(`${baseUrl.replace(/\/$/, '')}/images/models/${model.split('/').map(encodeURIComponent).join('/')}/endpoints`,
-      { signal: AbortSignal.timeout(8000), headers: { accept: 'application/json' } });
+    const res = await outboundFetch(`${baseUrl.replace(/\/$/, '')}/images/models/${model.split('/').map(encodeURIComponent).join('/')}/endpoints`,
+      { signal: AbortSignal.timeout(8000), headers: { accept: 'application/json' } }, { trustedOrigin: baseUrl });
     if (res.status === 404) info = { missing: true };
     else if (res.ok) info = parseEndpoints(await res.json());
   } catch { /* offline, or an endpoint without this list */ }

@@ -3478,3 +3478,25 @@ Note: most of Phase 23 part A landed in commit aa56076, whose message reads "Pha
     under their chat box, a note on their You page, and `adminsCanRead` on `GET /api/v1/me` for the apps. Turning it on or
     off is audited (`admin.oversight`). Migration 053 keeps it on for an install that already had accounts (their members
     were told under #36). The switch is the first card in Admin → People.
+
+## 2026-11-20: Security hardening (issues #9, #22, #6)
+
+221. **Every server-side request goes through one outbound module that connects to the address it checked.** Push
+    delivery, mail (imapflow, nodemailer), calendars (tsdav), the model provider (the OpenAI client's `fetch`), Jev,
+    SearXNG and the price and balance lookups each had their own `fetch` or socket, and the private-address check ran beside
+    the connection: the host was resolved for the check, then resolved again by the connection, so a name whose DNS answer
+    changes in between (rebinding) could reach this machine or the local network. `src/lib/outbound.js` now owns the rule:
+    `outboundFetch` uses undici with a connector whose `lookup` resolves once, checks every answer (a mixed public/private
+    answer is refused whole) and hands the socket only checked addresses; the connected peer is checked again; IPv4 carried
+    in IPv6 (mapped, compatible, NAT64, 6to4) is checked as the IPv4 it reaches. Redirects are followed by hand, each hop
+    under the rule, with `Authorization`/`Cookie` dropped across origins. Libraries that open their own sockets get
+    `resolveTarget()`: the checked address as `host` and the name as `servername` (SNI and certificate checks stay on the
+    name). The admin's switch (Admin → Browser, "allow the local network") is read live. Endpoints the admin typed (the model
+    provider's base URL, SearXNG) are trusted for that exact origin only (`trustedOrigin`): a local Ollama works, a redirect
+    from it to another local address doesn't. Why one module: the same rule written in five places drifts, and the check has
+    to be where the connection is made to mean anything. `undici` is a dependency so `fetch` and its `Agent` come from one
+    version (Node's bundled copy isn't importable). Not covered yet: the browser (Chromium resolves names itself after the
+    request guard), see SECURITY.md → Known limits. Tested: `tests/outbound.test.js` (a name resolving to 127.0.0.1 is
+    refused and the local server never sees a request; a rebinding resolver is asked once and its second answer never used;
+    redirects from a trusted origin to a local one are refused; credentials don't cross origins; mail targets carry the
+    checked address and the name; push to a name resolving to this machine is skipped).

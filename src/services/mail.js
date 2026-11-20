@@ -7,16 +7,19 @@ import { simpleParser } from 'mailparser';
 import nodemailer from 'nodemailer';
 import TurndownService from 'turndown';
 import { parseHTML } from 'linkedom';
-import { passwordOf, markConnection, assertReachable } from './connections.js';
+import { passwordOf, markConnection, reachableTarget } from './connections.js';
 import { pruneHiddenDocument } from '../lib/hidden-text.js';
 
 const TIMEOUT = 25000;
 const td = new TurndownService({ headingStyle: 'atx', bulletListMarker: '-' });
 td.remove(['style', 'script', 'head']);
 
-function imapFor(c) {
+// Both connect to the address that was checked, with the server's name kept for TLS (decision #221): a DNS answer that
+// changes after the check can't move the connection onto this machine or the local network.
+async function imapFor(c) {
+  const { host, servername } = await reachableTarget(c.config.imap.host);
   return new ImapFlow({
-    host: c.config.imap.host, port: c.config.imap.port, secure: c.config.imap.secure,
+    host, servername, port: c.config.imap.port, secure: c.config.imap.secure,
     auth: { user: c.config.username, pass: passwordOf(c) }, logger: false,
     tls: { rejectUnauthorized: !c.config.allowSelfSigned }, connectionTimeout: TIMEOUT, greetingTimeout: TIMEOUT, socketTimeout: 60000,
   });
@@ -33,28 +36,28 @@ const friendly = err => {
 
 /** Run fn(client) on a fresh IMAP session; the connection's status reflects the outcome. */
 async function withImap(c, fn) {
-  await assertReachable(c.config.imap.host);
-  const client = imapFor(c);
-  client.on('error', () => {}); // surfaced through the awaited calls below
+  let client;
   try {
+    client = await imapFor(c);
+    client.on('error', () => {}); // surfaced through the awaited calls below
     await client.connect();
     const out = await fn(client);
     markConnection(c);
     return out;
   } catch (err) {
+    if (err.code === 'EBLOCKED') throw err;
     const msg = friendly(err);
     markConnection(c, msg);
     throw Object.assign(new Error(msg), { status: 400 });
   } finally {
-    await client.logout().catch(() => client.close?.());
+    await client?.logout().catch(() => client.close?.());
   }
 }
 
 /** Both directions work: IMAP login and SMTP handshake. Throws a friendly error. */
 export async function testMail(c) {
-  await assertReachable(c.config.smtp.host);
   await withImap(c, async client => client.mailboxOpen('INBOX', { readOnly: true }));
-  const t = transportFor(c);
+  const t = await transportFor(c, 'Receiving works, but sending doesn’t: ');
   try { await t.verify(); } catch (err) { throw Object.assign(new Error(`Receiving works, but sending doesn’t: ${friendly(err)}`), { status: 400 }); } finally { t.close(); }
 }
 
@@ -286,9 +289,14 @@ export function organizeMail(c, { uids, folder = 'INBOX', action, toFolder = nul
   });
 }
 
-function transportFor(c) {
+async function transportFor(c, prefix = '') {
+  let target;
+  try { target = await reachableTarget(c.config.smtp.host); } catch (err) {
+    if (err.code === 'EBLOCKED') throw err;
+    throw Object.assign(new Error(`${prefix}${friendly(err)}`), { status: 400 });
+  }
   return nodemailer.createTransport({
-    host: c.config.smtp.host, port: c.config.smtp.port, secure: c.config.smtp.secure,
+    host: target.host, servername: target.servername, port: c.config.smtp.port, secure: c.config.smtp.secure,
     auth: { user: c.config.username, pass: passwordOf(c) }, tls: { rejectUnauthorized: !c.config.allowSelfSigned },
     connectionTimeout: TIMEOUT, greetingTimeout: TIMEOUT, socketTimeout: 60000,
   });
@@ -300,8 +308,7 @@ function transportFor(c) {
  * (Gmail files its own).
  */
 export async function sendMail(c, m, { fromName }) {
-  await assertReachable(c.config.smtp.host);
-  const t = transportFor(c);
+  const t = await transportFor(c, 'Couldn’t send: ');
   const mail = { from: { name: fromName, address: c.config.address }, to: m.to, cc: m.cc || undefined, bcc: m.bcc || undefined,
     subject: m.subject, text: m.text, inReplyTo: m.inReplyTo || undefined, references: m.references || undefined,
     attachments: m.attachments?.length ? m.attachments.map(a => ({ filename: a.filename, content: a.content, contentType: a.contentType })) : undefined };

@@ -6,6 +6,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { paths } from '../../config/index.js';
+import { outboundFetch } from '../../lib/outbound.js';
 
 export const id = 'cloakbrowser';
 export const label = 'CloakBrowser';
@@ -42,7 +43,7 @@ export async function install() {
 }
 async function expectedSize(m) {
   try {
-    const res = await fetch(m.binaryInfo().downloadUrl, { method: 'HEAD', redirect: 'follow' });
+    const res = await outboundFetch(m.binaryInfo().downloadUrl, { method: 'HEAD' });
     return Number(res.headers.get('content-length')) || null;
   } catch { return null; }
 }

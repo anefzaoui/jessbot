@@ -5,6 +5,7 @@
 // over the last 30 days (usage_events: dollars per token, prompt and completion blended). Neither → null: say it's unknown.
 import { get } from '../db/index.js';
 import { llmSettings } from './llm.js';
+import { outboundFetch } from '../lib/outbound.js';
 
 const DAY_MS = 864e5;
 const lists = new Map(); // baseUrl → { at, models: Map id → pricing, params: Map id → supported_parameters } (a failed fetch: 10 minutes)
@@ -14,7 +15,8 @@ async function modelList(baseUrl) {
   if (hit && Date.now() - hit.at < (hit.models ? DAY_MS : 10 * 60e3)) return hit;
   let models = null, params = null;
   try {
-    const res = await fetch(`${baseUrl.replace(/\/$/, '')}/models`, { signal: AbortSignal.timeout(8000), headers: { accept: 'application/json' } });
+    const res = await outboundFetch(`${baseUrl.replace(/\/$/, '')}/models`, { signal: AbortSignal.timeout(8000), headers: { accept: 'application/json' } },
+      { trustedOrigin: baseUrl });
     if (res.ok) {
       const body = await res.json();
       const data = Array.isArray(body?.data) ? body.data : [];
