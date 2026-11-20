@@ -21,6 +21,7 @@ import { createFileItem, itemForUser, readBytes } from './library.js';
 import { outboundFetch } from '../lib/outbound.js';
 import { sniff } from './uploads.js';
 import { badRequest, invalid } from '../lib/errors.js';
+import { botName } from './bot.js';
 
 // Shapes: what the tool offers → aspect ratios the models know. A model that lacks one gets its nearest listed ratio.
 export const IMAGE_SIZES = { square: '1:1', portrait: '2:3', landscape: '3:2', wide: '16:9', tall: '9:16' };
@@ -44,7 +45,7 @@ export const FALLBACK_ESTIMATE = 0.1;   // USD, when neither a price nor history
 const PICTURE_MEGAPIXELS = 1.05;         // what these models make by default (1024 × 1024 and its shape variants)
 const IMAGE_TOKENS = 1600;               // a picture as token-priced models count it (Gemini 1K ≈ 1290, OpenAI medium ≈ 1056)
 const PROMPT_TOKENS = 400;
-export const MADE_BY = 'Made by Jess';
+export const madeBy = () => `Made by ${botName()}`;
 
 const DAY_MS = 864e5;
 const infoCache = new Map(); // `${baseUrl}|${model}` → { at, info }
@@ -233,7 +234,7 @@ export async function makeImage(user, { prompt, size = 'square', style = null, s
   try { dims = imageSize(buffer); } catch { /* size unknown: still a picture sniff recognised */ }
   const item = createFileItem({
     user, title: String(title || '').trim() || titleFrom(text), type: 'image', ext: kind.ext, mime: kind.mime, buffer,
-    description: text, sourceLabel: MADE_BY, threadId, runId, sourceItemId: source?.item.id ?? null,
+    description: text, sourceLabel: madeBy(), threadId, runId, sourceItemId: source?.item.id ?? null,
     meta: { prompt: text, style: style || null, size, aspectRatio, depicts, model, cost, estimate: estimate.cost, width: dims.width ?? null,
       height: dims.height ?? null, source: source?.item.public_id ?? null },
   });

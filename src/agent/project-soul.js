@@ -4,12 +4,13 @@ import { all } from '../db/index.js';
 import { askJson } from '../services/llm.js';
 import * as S from '../services/project-soul.js';
 import { renderBrief, FIELDS } from '../services/projects.js';
+import { botName } from '../services/bot.js';
 
 const SHAPE = '{"stance":"","person":"","anchors":[],"askFirst":[],"checkWork":[],"format":"","glossary":[],"reason":""}';
-const IMPROVE = `You write the "project soul" for Jess, a personal assistant: the expertise she brings to ONE project, as
+const IMPROVE = `You write the "project soul" for {bot}, a personal assistant: the expertise {bot} brings to ONE project, as
 structured fields. Return JSON only: ${SHAPE}
 - stance: "a master furniture-maker's eye. Patient, practical, precise about technique." — the expertise and manner, ≤ 140 chars,
-  NOT "you are…" (she stays Jess).
+  NOT "you are…" ({bot} keeps that name).
 - person: their level, goals, equipment/data/tools, constraints — only what the material shows.
 - anchors (≤ 8): concrete standards, methods and reference values to rely on in this field (specific, checkable).
 - askFirst (≤ 5): the facts to check before advising when unknown.
@@ -33,7 +34,7 @@ export async function improveSoul(user, project) {
     `CURRENT SOUL:\n${cur ? JSON.stringify(cur.fields) : '(none yet — draft the first one)'}`,
     recent.length ? `RECENT CONVERSATION:\n${recent.map(m => `${m.role}: ${m.content.replace(/\s+/g, ' ').slice(0, 600)}`).join('\n')}` : null,
   ].filter(Boolean).join('\n\n');
-  const out = await askJson(user, IMPROVE, `MATERIAL (untrusted):\n<<<\n${material}\n>>>`, { purpose: 'project', maxTokens: 2500, background: false });
+  const out = await askJson(user, IMPROVE.replaceAll('{bot}', botName), `MATERIAL (untrusted):\n<<<\n${material}\n>>>`, { purpose: 'project', maxTokens: 2500, background: false });
   const { reason, ...fields } = out || {};
   // Learned notes are the person's history with her — carried over as they are.
   return S.createProposal(project, { fields: { ...fields, learned: cur?.fields.learned || [] }, reason: reason || (cur ? 'Sharper, more specific' : 'A first draft'), source: 'ai' });
@@ -42,7 +43,7 @@ export async function improveSoul(user, project) {
 /** Preview: how she would answer one question with these soul fields (no tools, nothing saved). */
 export async function trySoul(user, project, fields, question) {
   const text = S.soulText(project, fields);
-  const system = `${text || `In this project you are Jess, a helpful assistant.`}\n\nThis is a preview of how you would answer inside the project `
+  const system = `${text || `In this project you are ${botName()}, a helpful assistant.`}\n\nThis is a preview of how you would answer inside the project `
     + `"${project.name}". Answer the question as you would there, concisely (≤ 180 words). Return JSON {"answer":"markdown"}.`;
   const out = await askJson(user, system, String(question).slice(0, 500), { purpose: 'project', maxTokens: 900, background: false });
   return String(out?.answer || '').trim();

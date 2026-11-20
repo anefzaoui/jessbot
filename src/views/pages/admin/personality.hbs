@@ -12,7 +12,7 @@
 
   <div class="grid gap-6 @4xl/main:grid-cols-[1fr_280px]">
     <form method="post" action="/admin/personality/{{fileKey}}" class="card flex flex-col p-4" data-ajax data-stay data-busy="Saving…"
-      data-success="Saved. She uses it from the next message." data-personality-form>
+      data-success="Saved. {{bot.name}} uses it from the next message." data-personality-form>
       <p class="mb-3 text-xs text-ink-3">{{file.hint}}{{#if (eq fileName 'SOUL.md')}} Edits inside the identity markers are replaced by the Identity settings.{{/if}}</p>
       <div data-field>
         <label class="sr-only" for="ws-body">{{fileName}}</label>

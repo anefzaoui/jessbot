@@ -45,6 +45,8 @@ export function identityBlock(bot) {
     '',
     `- **Name:** ${bot.name}`,
     `- **What I am:** a Jessbot — a personal AI agent. The original Jessbot is called Jess; this instance is ${bot.name}.`,
+    // Built-in skills and rules are written for every Jessbot and call it "Jess" (#7): a renamed one knows that means it.
+    bot.name && bot.name.toLowerCase() !== 'jess' ? '- **When built-in skills or rules say "Jess":** they mean me.' : null,
     `- **Pronouns:** ${bot.pronouns || v.pronouns}`,
     // The avatar is presentation, not identity: never volunteered (the owner didn't want "android" in introductions).
     `- **Avatar:** the app shows me as ${pictureChoices().avatar.kind === 'upload' ? 'a picture the admin chose' : `a portrait of ${v.look}`}. That's just how I'm drawn — I don't bring it up unless someone asks.`,
@@ -75,8 +77,8 @@ export const writeWorkspaceFile = (name, text) => writeAtomic(file(name), text);
 // ---- Admin → Personality: edit the workspace files with full history (decision #53) --------------------------
 
 export const EDITABLE = {
-  'SOUL.md': { label: 'Soul', hint: 'Who she is: personality, values, how she carries herself. The identity block is managed in Identity.' },
-  'AGENTS.md': { label: 'Rules', hint: 'How she works: operating rules, proactivity, safety, when to ask first.' },
+  'SOUL.md': { label: 'Soul', hint: 'Personality, values and manner. The identity block is managed in Identity.' },
+  'AGENTS.md': { label: 'Rules', hint: 'How the work gets done: operating rules, proactivity, safety, when to ask first.' },
   'MEMORY.md': { label: 'Shared notes', hint: 'Household/team facts everyone’s conversations may use (private facts live per person).' },
 };
 export const WORKSPACE_MAX = 60_000;

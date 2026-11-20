@@ -3,7 +3,7 @@
 // Server contract (routes/api/v1/projects.js): GET /api/v1/projects/:id/soul → { editable, … } · POST …/soul { fields }
 // · POST …/soul/improve → { proposal } · POST …/soul/proposals/:pid { decision } → { status, cardHtml } · POST …/soul/restore/:v
 // · POST …/soul/forget { note } · POST …/soul/try { question, proposalId? } → { html }. The panel re-renders on project.updated.
-import { $, $$, on, api, h, withBusy, loader } from './core.js';
+import { $, $$, on, api, h, withBusy, loader, botName } from './core.js';
 import { toast } from './toast.js';
 import { openModal, closeModal, confirmDialog } from './modal.js';
 import { selectTab } from './tabs.js';
@@ -92,7 +92,7 @@ export function initProjectSoul() {
     try {
       await api(soulUrl(pageProject(), '/improve'), { method: 'POST' });
       showSoulTab();
-      t.done('A suggestion is ready under “Jess here”. Review the changes, try it, then accept or keep yours.');
+      t.done(`A suggestion is ready under “${botName()} here”. Review the changes, try it, then accept or keep yours.`);
     } catch (err) { t.fail(err.message); }
   }, 'Thinking…'));
 

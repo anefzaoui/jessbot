@@ -1,6 +1,6 @@
 // Admin → Browser: live install progress + status (server-rendered partials, polled), and a test drive
 // that runs the same search / screenshot code Jess uses.
-import { $, on, api, escapeHtml, icon, withBusy } from './core.js';
+import { $, on, api, escapeHtml, icon, withBusy, botName } from './core.js';
 import { toast } from './toast.js';
 
 const root = $('[data-browser-admin]');
@@ -48,7 +48,7 @@ if (root) {
   on(root, 'click', '[data-recipe-delete]', (e, btn) => {
     const row = btn.closest('[data-recipe]');
     return withBusy(btn, rowAction(row, () => api(`/admin/browser/recipes/${encodeURIComponent(row.dataset.recipe)}`, { method: 'DELETE' }),
-      `Forgot the search page on ${btn.dataset.host}. ${document.documentElement.dataset.botName || 'Jess'} uses its own form next time.`), 'Forgetting…');
+      `Forgot the search page on ${btn.dataset.host}. ${botName()} uses the site’s own form next time.`), 'Forgetting…');
   });
   on(root, 'click', '[data-adblock-on]', (e, btn) => {
     const row = btn.closest('[data-off-host]');
