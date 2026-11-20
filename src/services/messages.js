@@ -25,12 +25,20 @@ function offload(content, toolName, args) {
   return { ref: sha, stub };
 }
 
-export function readOffloaded(refPrefix, { start = 0, length = 20000 } = {}) {
-  if (!/^[a-f0-9]{8,64}$/.test(refPrefix)) return null;
-  const f = fs.existsSync(BLOBS) && fs.readdirSync(BLOBS).find(n => n.startsWith(refPrefix));
-  if (!f) return null;
-  const text = fs.readFileSync(path.join(BLOBS, f), 'utf8');
-  return { text: text.slice(start, start + length), total: text.length };
+/**
+ * A stored tool output, by the ref (or its first 8+ characters) shown in its stub — only one stored from this person's own
+ * chats: blobs are shared by content across the install, and a ref read off a page or an email must not open someone
+ * else's result. → { text, total, outside } | null. outside: the result was fenced outside content, so a part that starts
+ * past its opening tag still needs saying so.
+ */
+export function readOffloaded(refPrefix, { start = 0, length = 20000, userId = null } = {}) {
+  if (!/^[a-f0-9]{8,64}$/.test(String(refPrefix)) || userId == null) return null;
+  const row = get(`SELECT m.offloaded_ref AS ref FROM messages m JOIN threads t ON t.id = m.thread_id
+    WHERE t.user_id = ? AND m.offloaded_ref LIKE ? LIMIT 1`, Number(userId), `${refPrefix}%`);
+  const file = row && /^[a-f0-9]{64}$/.test(row.ref) ? path.join(BLOBS, `${row.ref}.txt`) : null;
+  if (!file || !fs.existsSync(file)) return null;
+  const text = fs.readFileSync(file, 'utf8');
+  return { text: text.slice(start, start + length), total: text.length, outside: / fence="[0-9a-f]{12}">/.test(text) };
 }
 
 export function addMessage({ threadId, runId = null, role, content = '', toolCalls = null, toolCallId = null, toolName = null,
