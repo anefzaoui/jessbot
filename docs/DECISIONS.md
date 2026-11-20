@@ -3610,3 +3610,15 @@ Note: most of Phase 23 part A landed in commit aa56076, whose message reads "Pha
     setup and confirm, the code page and its single-use codes, recovery codes, the stored code limit, the API step, password
     change with session rotation, reset links: only admins, once, expiry, newer replaces older, sessions revoked, two-step
     kept; the admin turning it off; the CLI), and a real instance driven in Chromium for the screenshots.
+
+## 2026-11-20: Prompt-injection review follow-ups (issue #40)
+
+234. **A tool's error reaches the model as one clean, capped line.** A failed tool's message went to the model as
+    `Error: <message>` whatever the message held, and many messages quote a remote party (a mail or calendar server's
+    refusal, SearXNG's answer, a page's error text): line breaks could start what looks like a new prompt section, and a
+    long body went in whole. `toolError()` in `agent/loop.js` (both places a tool result is made from an error) now runs it
+    through `oneLine()` from `lib/untrusted.js`, capped at 300 characters: invisible characters out, fence and chat-role
+    look-alikes defanged, no line breaks. The run-level error line shown to the person gets the same treatment. Why not
+    fence errors: they are short and the model needs them as plain facts ("the server refused the password"); one capped
+    line takes away what made them useful to an attacker. Tested: `tests/p22j.test.js` (a tool that throws a multi-line,
+    4,000-character error with a fence look-alike and "SYSTEM: new instructions" reaches the model as one capped line).
