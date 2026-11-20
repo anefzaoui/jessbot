@@ -3783,9 +3783,20 @@ Note: most of Phase 23 part A landed in commit aa56076, whose message reads "Pha
     every kind and its refusals, the inventory), and on a real install: the key moved out of `.env` at start, the model
     answered, Admin → System opened it; after `npm run secrets:rotate` it answered again with the new key.
 
+## 2026-11-20: A pending retry is the occurrence's run (issue #57)
+
+241. **A scheduled task whose automatic retry is still pending doesn't also fire its next occurrence.** A task that fails
+    with a passing error gets one automatic retry ten minutes later (Phase 19). When its next occurrence fell inside those ten
+    minutes (a daily 07:00 task that failed at 06:55), the scheduler fired both: a fresh run of the occurrence and then the
+    retry, the same task twice within minutes. The p19a tests found it by accident, failing only when run just before 07:00
+    (their test schedules used 07:00). Now `fireSchedule` (agent/proactive.js) skips the occurrence while the task's last
+    run is an error with a retry pending (`schedules.skipOccurrence`: next_run_at moves on, nothing else is recorded); the
+    retry is that occurrence's run. The p19a helper gives its schedules a time twelve hours from now in the schedule's own
+    time zone, and a new test pins the edge relative to now (occurrence in 5 minutes, retry in 10): only the retry runs.
+
 ## 2026-11-20: Logo, screenshots and the website
 
-241. **The project's public face is built from the app itself, and the site is static and built from the repository.**
+242. **The project's public face is built from the app itself, and the site is static and built from the repository.**
     The logo is Jess's default portrait over her night sky, layered the way the living avatar is
     (`scripts/build-brand.js`, no new image generation). Screenshots come from `scripts/docs-shots.js`: the setup
     wizard, Admin → People and an approval run from a real install with made-up people, the other screens from the dev
