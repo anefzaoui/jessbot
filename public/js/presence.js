@@ -16,9 +16,12 @@ let manifest = { avatars: {}, scenes: [] };
 let timers = [];
 
 const els = () => $$('[data-presence]');
-const hasFrame = (variant, f) => manifest.avatars?.[variant]?.includes(f);
-const frameUrl = (el, f) => `/img/avatars/${el.dataset.variant}/${f}${el.dataset.res || ''}.webp`;
-const sceneUrl = (el, s) => `/img/scenes/${s}${el.dataset.res || ''}.webp`;
+// Where frames and scenes come from: the built-in art, or the admin's pictures (#7: data-avatar-base, data-scene-base;
+// an uploaded avatar has one frame, listed in data-frames).
+const framesOf = el => (el.dataset.frames ? el.dataset.frames.split(',') : manifest.avatars?.[el.dataset.variant] || []);
+const hasFrame = (el, f) => framesOf(el).includes(f);
+const frameUrl = (el, f) => `${el.dataset.avatarBase || `/img/avatars/${el.dataset.variant}`}/${f}${el.dataset.res || ''}.webp`;
+const sceneUrl = (el, s) => `${el.dataset.sceneBase || '/img/scenes'}/${s}${el.dataset.res || ''}.webp`;
 
 // Swap one layer group (portrait or scene) to a new image WITHOUT a see-through dip:
 // the incoming frame fades in ON TOP of the fully-opaque current frame; the old frame is hidden only after the
@@ -64,13 +67,13 @@ function warm(url) {
   img.decode?.().catch(() => warmed.delete(url));
 }
 function warmFrames(frames, idle = false) {
-  const run = () => { for (const el of els()) for (const f of frames) if (hasFrame(el.dataset.variant, f)) warm(frameUrl(el, f)); };
+  const run = () => { for (const el of els()) for (const f of frames) if (hasFrame(el, f)) warm(frameUrl(el, f)); };
   if (idle && 'requestIdleCallback' in window) requestIdleCallback(run, { timeout: 4000 }); else run();
 }
 
 function show(frame, fade = 450) {
   for (const el of els()) {
-    const f = hasFrame(el.dataset.variant, frame) ? frame : (hasFrame(el.dataset.variant, soul.base) ? soul.base : 'neutral');
+    const f = hasFrame(el, frame) ? frame : (hasFrame(el, soul.base) ? soul.base : 'neutral');
     if (soul.shown.get(el) === f) continue;
     soul.shown.set(el, f);
     swap(el.querySelector('.presence-portrait'), frameUrl(el, f), fade);
@@ -101,7 +104,12 @@ export function presenceMoment(kind, ms = 3200) {
 // Switch every presence to another character (setup identity picker, admin identity edits).
 export function setPresenceVariant(variant) {
   if (!manifest.avatars?.[variant]) return;
-  for (const el of els()) el.dataset.variant = variant;
+  for (const el of els()) {
+    if (el.hasAttribute('data-avatar-upload')) continue; // the admin's own picture stays; the look still sets the voice
+    el.dataset.variant = variant;
+    el.dataset.avatarBase = `/img/avatars/${variant}`;
+    delete el.dataset.frames;
+  }
   soul.shown = new WeakMap();
   warmFrames(manifest.avatars[variant], true);
   presenceMoment('greeting', 2200); // a friendly hello from the newly chosen face
@@ -164,21 +172,22 @@ function sceneFor(time, weather) {
   return [`${time}-${weather}`, `${time}-clear`, 'day-clear'].find(s => have.has(s)) || null;
 }
 export function updateScene({ weather, sunrise, sunset } = {}) {
+  let live = null; // the sky right now, for the covers that follow it even when the avatar's background is pinned
   for (const el of els()) {
-    if (el.hasAttribute('data-pinned')) continue; // demo/test scenes stay as rendered
     if (weather) el.dataset.weather = weather;
     if (sunrise && sunset) { el.dataset.sunrise = sunrise; el.dataset.sunset = sunset; }
     const time = timeOfDay(new Date(), el);
-    el.dataset.time = time;
     const scene = sceneFor(time, el.dataset.weather || 'clear');
+    live ??= scene;
+    if (el.hasAttribute('data-pinned')) continue; // a picked or uploaded background (and demo scenes) stays as rendered
+    el.dataset.time = time;
     if (scene && scene !== el.dataset.scene) {
       el.dataset.scene = scene;
       swap(el.querySelector('.presence-scene'), sceneUrl(el, scene), 1400);
     }
   }
-  // Sky headers (chat) follow the same scene as the avatar.
-  const scene = els().find(el => !el.hasAttribute('data-pinned'))?.dataset.scene;
-  if (scene) for (const sky of document.querySelectorAll('[data-sky]')) sky.style.setProperty('--scene', `url('/img/scenes/${scene}.webp')`);
+  // Covers that follow the sky (chat header, Feed greeting): [data-sky] is left out when the admin picked or uploaded one.
+  if (live) for (const sky of document.querySelectorAll('[data-sky]')) sky.style.setProperty('--scene', `url('/img/scenes/${live}.webp')`);
 }
 
 // Weather chip in the chat header (server-rendered; refreshed live from weather.updated).

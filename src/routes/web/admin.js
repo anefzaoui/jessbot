@@ -64,6 +64,9 @@ import { oversightOn, oversightState, setOversight } from '../../services/oversi
 import { baseUrl } from '../../lib/origin.js';
 import { createResetLink } from '../../services/password-reset.js';
 import { twoFactorOn, disableTwoFactor } from '../../services/twofactor.js';
+import multer from 'multer';
+import { SLOTS as PICTURE_SLOTS, UPLOAD_MAX_BYTES, ACCEPT as PICTURE_ACCEPT, pictureChoices, savePicture, pickPicture } from '../../services/assistant-pictures.js';
+import { presenceManifest } from '../../services/presence.js';
 
 const router = Router();
 const base = { nav: 'admin' };
@@ -282,14 +285,53 @@ router.get('/personality/:key/versions/:id', (req, res) => {
 });
 
 // ---- Identity (post-setup edits) ---------------------------------------------------
+const SCENE_WORDS = { dawn: 'Dawn', day: 'Day', dusk: 'Dusk', night: 'Night', clear: 'clear', cloudy: 'cloudy', fog: 'fog', rain: 'rain', snow: 'snow', storm: 'storm' };
+const sceneLabel = s => s.split('-').map(w => SCENE_WORDS[w] || w).join(', ');
 const identityData = () => ({
   ...base, title: 'Identity',
   variants: Object.entries(VARIANTS).map(([value, v]) => ({ value, ...v })),
   tones: Object.entries(TONES).map(([value, t]) => ({ value, ...t })),
   values: { ...settings.get('bot', {}) },
+  // The pictures (#7): the admin's choices; the previews come from res.locals.presence.
+  pictures: { ...pictureChoices(), scenes: presenceManifest().scenes.map(value => ({ value, label: sceneLabel(value) })),
+    lookLabel: (VARIANTS[settings.get('bot', {})?.variant] || VARIANTS.female).label.toLowerCase(),
+    accept: PICTURE_ACCEPT, maxMb: Math.round(UPLOAD_MAX_BYTES / 1048576) },
 });
 
 router.get('/identity', (req, res) => res.render('admin/identity', identityData()));
+
+// ---- Pictures (#7, services/assistant-pictures.js): upload one, or pick the built-in art --------------------------
+const pictureUpload = multer({ storage: multer.memoryStorage(), limits: { fileSize: UPLOAD_MAX_BYTES, files: 1, fields: 4 } }).single('picture');
+const receivePicture = (req, res) => new Promise((resolve, reject) => pictureUpload(req, res, err => {
+  if (!err) return resolve(req.file || null);
+  reject(invalid({ picture: err.code === 'LIMIT_FILE_SIZE' ? 'That picture is over 10 MB. Pick a smaller one.' : 'That upload didn’t arrive whole. Try again.' }));
+}));
+const slotOf = req => { if (!PICTURE_SLOTS.includes(req.params.slot)) throw notFound(); return req.params.slot; };
+// The identity block says how the assistant is drawn (an uploaded avatar or the look's portrait).
+const refreshIdentity = () => { const bot = settings.get('bot', null); if (bot?.name) writeIdentity(bot); };
+// Without JS, an error re-renders the page with the posted fields as its values: keep the identity form's as saved.
+const keepIdentityValues = req => { req.body = { ...settings.get('bot', {}), ...(req.body || {}) }; };
+
+router.post('/identity/pictures/:slot', formPost('admin/identity', identityData, async (req, res) => {
+  const slot = slotOf(req);
+  try {
+    const file = await receivePicture(req, res);
+    const choice = await savePicture(slot, file?.buffer);
+    if (slot === 'avatar') refreshIdentity();
+    audit('identity.picture', { actorId: req.user.id, detail: { slot, kind: 'upload', bytes: file.size } });
+    return { redirect: '/admin/identity#pictures', json: { choice } };
+  } finally { keepIdentityValues(req); }
+}));
+
+router.post('/identity/pictures/:slot/choice', formPost('admin/identity', identityData, req => {
+  const slot = slotOf(req);
+  try {
+    const choice = pickPicture(slot, { kind: req.body?.kind, scene: req.body?.scene });
+    if (slot === 'avatar') refreshIdentity();
+    audit('identity.picture', { actorId: req.user.id, detail: { slot, ...choice } });
+    return { redirect: '/admin/identity#pictures', json: { choice } };
+  } finally { keepIdentityValues(req); }
+}));
 
 router.post('/identity', formPost('admin/identity', identityData, req => {
   const bot = validateIdentity(req.body);

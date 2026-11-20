@@ -1,0 +1,6 @@
+{{!-- One picture's upload form (admin/pictures). slot: avatar | background | cover. --}}
+<form method="post" action="/admin/identity/pictures/{{slot}}" enctype="multipart/form-data" data-ajax data-stay data-reload data-busy="Uploading…" data-picture-form>
+  <label class="btn btn-secondary btn-sm cursor-pointer" data-field>{{icon "upload" class="size-3.5"}} Upload a picture
+    <input type="file" name="picture" accept="{{@root.pictures.accept}}" class="sr-only" required data-picture-file></label>
+  <noscript><button class="btn btn-primary btn-sm">Upload</button></noscript>
+</form>

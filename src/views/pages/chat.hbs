@@ -9,7 +9,7 @@
 <div class="flex h-full min-h-0" {{#if project}}data-project-page="{{project.id}}"{{/if}}>
 <div class="flex h-full min-h-0 min-w-0 flex-1 flex-col" data-chat data-thread-id="{{thread.id}}" {{#if project}}data-project-id="{{project.id}}"{{/if}}>
   {{!-- The header IS the living sky when it's your own chat: time-of-day × weather scene, greeting, weather, what's next. --}}
-  <header class="chat-head {{#if now}}has-sky{{/if}}" {{#if now}}data-sky {{#if presence.scene}}style="--scene: url('/img/scenes/{{presence.scene}}.webp')"{{/if}}{{/if}}>
+  <header class="chat-head {{#if now}}has-sky{{/if}}" {{#if now}}{{#if presence.cover.live}}data-sky {{/if}}{{#if presence.cover.url}}style="--scene: url('{{presence.cover.url}}')"{{/if}}{{/if}}>
     <button type="button" class="shrink-0 rounded-full" data-panel-open="activity" aria-label="Open {{bot.name}}'s activity">
       {{> avatar size="xl" activity=agent.activity avatarId="chat-avatar"}}
     </button>

@@ -23,7 +23,8 @@ import { officeRenderStatus } from './office-render.js';
 import { spendSpike, balanceView } from './spend-watch.js';
 import { botName } from './bot.js';
 
-const INCLUDE = ['workspace', 'users', 'artifacts', 'uploads', 'blobs', 'feed', 'shots', 'voice'];
+// What a backup holds; scripts/restore.js puts back the same list (keep them together). assistant: the admin's pictures (#7).
+const INCLUDE = ['workspace', 'users', 'artifacts', 'uploads', 'blobs', 'feed', 'shots', 'voice', 'assistant'];
 const KEEP = { auto: 7, manual: 20, 'pre-migrate': 10 };
 const NAME = /^jessbot-(auto|manual)-(\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2})\.tar\.gz$/;
 const stampNow = () => new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
