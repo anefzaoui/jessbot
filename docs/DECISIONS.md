@@ -3468,3 +3468,13 @@ Note: most of Phase 23 part A landed in commit aa56076, whose message reads "Pha
     licensed for internal use only, so a public project can't depend on it. Tested: `npm test` with Chromium installed runs
     the four real-render tests CloakBrowser used to gate (page check, export to PDF/PNG, make_pdf); e2e switches the engine
     both ways.
+
+219. **Admin oversight of other people's chats is a setting, off for a new install (#36 revisited).** A household assistant
+    hears private things; for strangers' households, "the admin reads everything" can't be the default. `settings.oversight`
+    (`{ readChats }`, `services/oversight.js`): `adminMayView(viewer)` is the one check, used wherever an admin could open
+    someone else's thing (threads, Library items, projects, voice clips, screenshots). Off: those don't exist for the admin
+    (404, like for anyone else), the person page says their chats are private, and nobody is told anything is read. On:
+    read-only as before, every chat view audited (`thread.view_as_admin`), and everyone is told — the invite page, a line
+    under their chat box, a note on their You page, and `adminsCanRead` on `GET /api/v1/me` for the apps. Turning it on or
+    off is audited (`admin.oversight`). Migration 053 keeps it on for an install that already had accounts (their members
+    were told under #36). The switch is the first card in Admin → People.

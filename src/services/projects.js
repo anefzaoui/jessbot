@@ -15,6 +15,7 @@ import { oneLine } from '../lib/untrusted.js';
 import { publish } from '../lib/bus.js';
 import { saveSoul, soulText, activeSoul, soulView, SAFETY } from './project-soul.js';
 import { onProjectFile, fileMode, fullTexts } from './project-files.js';
+import { adminMayView } from './oversight.js';
 
 export const FIELDS = {
   general: { label: 'General', iconName: 'folder', hue: 250 },
@@ -52,8 +53,8 @@ export function projectForUser(user, publicId, { write = false } = {}) {
   const p = get(`SELECT * FROM projects WHERE public_id = ? AND ${live}`, String(publicId || ''));
   if (!p) throw notFound('That project is gone.');
   if (p.user_id === user.id) return p;
-  if (user.role === 'admin' && !write) return p;
-  if (user.role === 'admin') throw forbidden("You can look at this project, but only its owner can change it.");
+  if (adminMayView(user) && !write) return p;
+  if (adminMayView(user)) throw forbidden("You can look at this project, but only its owner can change it.");
   throw notFound('That project is gone.');
 }
 

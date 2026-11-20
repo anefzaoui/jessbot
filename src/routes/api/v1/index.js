@@ -27,6 +27,7 @@ import listRoutes from './lists.js';
 import imageRoutes from './images.js';
 import systemRoutes from './system.js';
 import lessonRoutes from './lessons.js';
+import { oversightOn } from '../../../services/oversight.js';
 
 const router = Router();
 router.use(requireSetup);
@@ -50,7 +51,8 @@ router.post('/auth/logout', (req, res) => {
 });
 
 // ---- Me -----------------------------------------------------------------------------
-router.get('/me', (req, res) => res.json({ user: req.user }));
+// adminsCanRead (decision #219): whether admins may read this person's chats and files (the apps show it, like the web).
+router.get('/me', (req, res) => res.json({ user: req.user, adminsCanRead: req.user.role !== 'admin' && oversightOn() }));
 
 router.post('/me/profile', (req, res) => {
   const user = updateProfile(req.user.id, req.body);

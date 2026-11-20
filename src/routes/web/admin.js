@@ -60,6 +60,7 @@ function parsePolicy(body) {
 }
 import { formPost, isAjax } from '../../lib/respond.js';
 import { HttpError, badRequest, invalid, notFound } from '../../lib/errors.js';
+import { oversightOn, oversightState, setOversight } from '../../services/oversight.js';
 
 const router = Router();
 const base = { nav: 'admin' };
@@ -91,9 +92,17 @@ const peopleData = () => ({
   ...base, title: 'People', users: listUsers().map(u => ({ ...u, groups: groupsOfUser(u.id) })),
   invites: listPendingInvites(), groups: listGroups(),
   everyone: currentInstructions('global'), instructionsMax: INSTRUCTIONS_MAX, values: {},
+  oversight: oversightState(), // decision #219
 });
 
 router.get('/people', (req, res) => res.render('admin/people', peopleData()));
+
+// Reading other people's chats and files (decision #219): off unless the admin turns it on; everyone is told when it is.
+router.post('/oversight', (req, res) => {
+  const on = req.body?.readChats === true || req.body?.readChats === 'on' || req.body?.readChats === 'true';
+  const state = setOversight(on, req.user.id);
+  res.json({ ok: true, oversight: state });
+});
 
 router.post('/people/invite', formPost('admin/people', peopleData, (req, res) => {
   const { token } = createInvite({ ...req.body, groupId: Number(req.body.groupId) || null, invitedBy: req.user.id });
@@ -123,7 +132,7 @@ const personData = req => {
     ...base, title: person.name, person, groups: listGroups(), memberOf: groupsOfUser(person.id).map(g => g.id),
     instructions: currentInstructions('user', person.id), history: instructionHistory('user', person.id),
     sessions: listSessions(person.id), instructionsMax: INSTRUCTIONS_MAX, isSelf: person.id === req.user.id, values: {},
-    threads: threadsOfUser(person.id),
+    threads: oversightOn() ? threadsOfUser(person.id) : [], oversight: oversightOn(),
     policy: policyForm(`/admin/policy/user/${person.id}`, getPolicy('user', person.id), inheritedPolicy(person), true),
     grants: grantsOf(person.id),
   };

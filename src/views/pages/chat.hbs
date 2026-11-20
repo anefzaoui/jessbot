@@ -111,7 +111,7 @@
       {{else}}
         {{#if pendingQuestion}}{{> chat/ask-dock pendingQuestion}}{{else if whatsNew.length}}{{> chat/whats-new whatsNew=whatsNew}}{{/if}}
         {{> chat/composer threadId=thread.id sendUrl=sendUrl running=running}}
-        {{#if memberNotice}}<p class="-mt-1 text-center text-[11px] text-ink-3">{{icon "eye" class="size-3"}} The owner of this {{bot.name}} can read your chats.</p>{{/if}}
+        {{#if memberNotice}}<p class="-mt-1 text-center text-[11px] text-ink-3">{{icon "eye" class="size-3"}} Admins can read your chats here (read-only, every view is logged).</p>{{/if}}
       {{/if}}
     </div>
   </div>

@@ -35,7 +35,7 @@ Revokes the current session. → `{ ok: true }`
 ## Me
 | Method & path | Body | Result |
 |---|---|---|
-| `GET /me` | — | `{ user }` |
+| `GET /me` | — | `{ user, adminsCanRead }` — `adminsCanRead`: admins may read this person's chats and files (decision #219; always false for an admin) |
 | `POST /me/profile` | `{ name?, callMe?, email?, timezone?, about? }` | `{ ok, user }` (422 with field errors) |
 | `GET /me/sessions` | — | `{ sessions: [{ id, device, kind: web\|app, where, lastSeen, createdAt, current }] }` |
 | `POST /me/sessions/:id/revoke` | — | `{ ok }` |

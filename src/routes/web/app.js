@@ -42,6 +42,7 @@ import { backgroundOf } from '../../agent/tools/delegate.js';
 import { unseenFor } from '../../services/whats-new.js';
 import { prepView } from '../../services/prep.js';
 import { notesFor } from '../../services/notes.js';
+import { adminMayView, oversightOn } from '../../services/oversight.js';
 
 const router = Router();
 
@@ -62,7 +63,7 @@ function renderChat(req, res, thread, { asAdmin = false, project = null } = {}) 
     sendUrl: `/api/v1/threads/${thread.id}/messages`,
     suggestions: view.days.length ? null : CHAT_SUGGESTIONS,
     readOnly: asAdmin, viewingAs: asAdmin ? owner : null, context: contextStats(thread),
-    memberNotice: req.user.role !== 'admin', now: asAdmin ? null : nowFor(req.user),
+    memberNotice: req.user.role !== 'admin' && oversightOn(), now: asAdmin ? null : nowFor(req.user),
     // Phase 25 (#212): a background task's side chat says what it was asked and where from; the main chat shows What's new in
     // Jess once (the card's Got it marks it seen, #213).
     background: thread.kind === 'side' ? backgroundOf(thread.id) : null,
@@ -73,7 +74,7 @@ function renderChat(req, res, thread, { asAdmin = false, project = null } = {}) 
 // Web screenshots (web_screenshot): only the person they were taken for, or an admin.
 router.get('/shots/:file', (req, res) => {
   const m = /^u(\d+)-[a-f0-9]{16}\.jpg$/.exec(req.params.file);
-  if (!m || (Number(m[1]) !== req.user.id && req.user.role !== 'admin')) throw notFound('That screenshot is gone.');
+  if (!m || (Number(m[1]) !== req.user.id && !adminMayView(req.user))) throw notFound('That screenshot is gone.');
   res.sendFile(req.params.file, { root: paths.shots, maxAge: '7d', immutable: true }, err => { if (err && !res.headersSent) res.status(404).end(); });
 });
 
@@ -210,6 +211,7 @@ router.get(['/me', '/me/:tab'], (req, res) => {
   if (!ME_TABS.some(([k]) => k === tab)) throw notFound();
   res.render('me', {
     nav: 'me', title: `You · ${ME_TABS.find(([k]) => k === tab)[1]}`, tab, tabs: ME_TABS.map(([key, label]) => ({ key, label })),
+    readByAdmins: req.user.role !== 'admin' && oversightOn(), // the "admins can read your chats" note (#219)
     me: { profile: req.user, memories: listForUser(req.user), episodes: listEpisodes(req.user, { limit: 60 }), groups: groupsOfUser(req.user.id),
       // Phase 25 (#204): "How I work with you" and the weekly tidy (?tidy=<id> from its Activity item opens that one).
       lessons: personLessonsView(req.user), tidy: memoryTidy(req.user, req.query.tidy),

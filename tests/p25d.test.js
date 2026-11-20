@@ -129,6 +129,7 @@ test('POST feedback: noteFirst saves the thumbs-down and waits; Skip / Send retu
 });
 
 test('the chat page: every reply is an anchor (#run-<id>), the chip renders on load, the "What was off?" template is there for the owner only', async () => {
+  (await import('../src/services/oversight.js')).setOversight(true, null); // admins view others' things only with oversight on (#219)
   const t = mainThread(bob.id);
   const { message, run: r } = reply(bob, t.id, 'Answer for Bob.');
   addLesson({ scope: 'person', user: bob, rule: 'Use 24-hour times', source: 'thumbs_down', sourceMessageId: message.id, status: 'active' });
