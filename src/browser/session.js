@@ -8,7 +8,7 @@ import os from 'node:os';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
-import { openSessionContext, note, browserSettings } from './index.js';
+import { openSessionContext, note, browserSettings, engineCaps } from './index.js';
 import { learnRecipe, recipeHint, noteRecipeUse } from './recipes.js';
 import { trustSignals, cautionLine, brandsFor } from './trust.js';
 import { antiAdblockWall, adblockOffFor, switchOffFor } from './adblock.js';
@@ -26,6 +26,7 @@ import { saveDownload as saveDownloadedFile, UPLOAD_MAX_BYTES, DOWNLOAD_SESSION_
 import { renderFragment } from '../views/render.js';
 import { badRequest } from '../lib/errors.js';
 import { decide, choice, noul, picked, yes, note as noteDecision, threshold } from '../services/decide.js';
+import { openRead } from '../lib/safe-path.js';
 
 const IDLE_MS = 10 * 60000;
 const MAX_SESSIONS = 4;
@@ -110,13 +111,15 @@ export async function keepDownload(s, d) {
     dir = fs.mkdtempSync(path.join(os.tmpdir(), 'jessbot-dl-'));
     const file = path.join(dir, 'download');
     await d.saveAs(file);
-    const size = fs.statSync(file).size;
-    if (size > UPLOAD_MAX_BYTES) { s.events.push(`A download (“${name}”, ${sizeLabel(size)}) was not kept: files over ${sizeLabel(UPLOAD_MAX_BYTES)} aren’t saved to the Library.`); return null; }
-    if (s.saved.bytes + size > DOWNLOAD_SESSION_BYTES) { s.events.push(capped()); return null; }
+    const saved = openRead(file);
+    const size = saved.stat.size;
+    if (size > UPLOAD_MAX_BYTES) { saved.close(); s.events.push(`A download (“${name}”, ${sizeLabel(size)}) was not kept: files over ${sizeLabel(UPLOAD_MAX_BYTES)} aren’t saved to the Library.`); return null; }
+    if (s.saved.bytes + size > DOWNLOAD_SESSION_BYTES) { saved.close(); s.events.push(capped()); return null; }
+    const buffer = saved.read();
     const user = getUser(s.meta.userId);
     if (!user) throw new Error('the person this browser belongs to no longer exists');
     const url = /^https?:/.test(d.url?.() || '') ? d.url() : d.page?.()?.url?.() || '';
-    const view = await saveDownloadedFile(user, { buffer: fs.readFileSync(file), filename: name, url }, { threadId: s.meta.threadId || null, runId: s.meta.runId || null });
+    const view = await saveDownloadedFile(user, { buffer, filename: name, url }, { threadId: s.meta.threadId || null, runId: s.meta.runId || null });
     s.saved.files++;
     s.saved.bytes += size;
     s.imported.push({ id: view.id, title: view.title });
@@ -160,7 +163,9 @@ export async function sessionFor(key, { userId, threadId = null, runId = null, c
     const profile = profileFile(userId);
     const ctx = await openSessionContext({ storageState: loadProfile(profile) });
     s = new Session(key, ctx, { userId, profile, threadId, runId });
-    await withConsent(s, ctx);
+    // DuckDuckGo's autoconsent talks to us through a binding; engines without bindings (Patchright, #227) skip it, and
+    // consent pages are still handled by walls.js.
+    if (engineCaps().bindings) await withConsent(s, ctx);
     ctx.on('page', p => { s.adopt(p); s.active = p; s.events.push('A new tab opened — it is now the active tab.'); });
     ctx.on('close', () => { if (sessions.get(key) === s) sessions.delete(key); clearTimeout(s.timer); });
     sessions.set(key, s);

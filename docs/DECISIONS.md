@@ -3528,9 +3528,60 @@ Note: most of Phase 23 part A landed in commit aa56076, whose message reads "Pha
     never sees a request; a bare context without the request guard still can't reach 127.0.0.1 or localhost), and real
     sites over HTTPS and plain HTTP load through it.
 
+227. **Where Google Chrome is installed, the browser is that Chrome driven by Patchright.** A comparison of open-source
+    alternatives to CloakBrowser (on Windows and in Linux Docker, against the common bot checks) found Patchright
+    (`patchright-core`, Apache-2.0: the Playwright API with its automation traces removed) driving the person's own Google
+    Chrome as good as or better than CloakBrowser, with nothing to download; plain Playwright Chromium is flagged
+    everywhere. `engines/chrome.js` is the default when Chrome is found (Windows, macOS and Linux install paths; its
+    version read without starting it, for the `--user-agent` launch switch); `chromium` (plain Playwright) is the default
+    elsewhere. Jessbot never downloads or ships Chrome. Patchright's differences are handled, not hidden: `page.evaluate`
+    runs in an isolated world, so a reader that needs the page's own globals uses `evaluateInPage()` (the YouTube player
+    data); console events and bindings from init scripts don't exist, so Jessbot's own pages (page checks, print, export:
+    `withPage({ render: true })`) open in a plain Playwright browser on the same Chrome, and DuckDuckGo's autoconsent (which
+    needs a binding) is off with this engine — consent pages are still handled by walls.js. Engines declare this as
+    `caps`. Shared launching (a browser server on 127.0.0.1 that can always be killed, no stray WebRTC UDP) lives in
+    `engines/server.js`. Not taken: Camoufox (Firefox: no PDF, no CDP, 2.8 GB, needs an older Playwright) as a possible
+    later optional engine; Clearcote (young, its SDK crashes on a second context); anything AGPL. Cloudflare challenges stay
+    a hand-over to the person.
+
+## 2026-11-20: Rate limits that survive a restart (issues #6, #22)
+
+228. **Rate limits are stored in SQLite, and one middleware limits routes.** The sign-in, setup and invite limits lived in a
+    `Map` in the process, so every restart (or a crash someone could provoke) started them over, and most routes had no
+    limit at all. Now `src/lib/ratelimit.js` keeps fixed-window counters in `rate_limits` (migration 054; one UPSERT per
+    hit, expired rows swept every 500 hits): `hit()` keeps its signature for the per-account checks inside handlers, and
+    `limiter()` is the one route middleware: express-rate-limit (maintained, the standard `RateLimit` headers) with a store
+    on the same table, answering a 429 through the normal error handler with `Retry-After`. Applied: a general limit of
+    1,200 requests a minute per person (signed out: per address, IPv6 by its /56) on every page and API call, and
+    `signInLimit`, 30 per 15 minutes per address across `POST /login`, `/api/v1/auth/login`, `/setup/account` and
+    `/invite/:token`, on top of the existing 8 per 15 minutes per address and email. Why fixed windows: one row per key and
+    one write per hit, and the limits are generous enough that the edge of a window doesn't matter. Tested:
+    `tests/ratelimit.test.js` (a count survives closing and reopening the database; eight wrong passwords against the real
+    server, the ninth refused, and still refused after the server process is restarted; the middleware's 429, headers and
+    message).
+
+## 2026-11-20: Code scanning, first pass (issue #22)
+
+229. **Untrusted text is parsed in linear time, escapes cover the escape character, and request-supplied names go through
+    one safe-path helper.** CodeQL (security-extended) listed 88 alerts. The real ones are fixed at the root, with shared
+    helpers so the next caller gets it right: `src/lib/text-safe.js` (`escapeRegExp`, `escapeMarkdown` that escapes the
+    backslash first, `decodeEntities` in one pass so "&amp;lt;" stays "&lt;", `trimEndChars`, `replaceSpaced`, and
+    `isEmail`, capped at 254 characters with a pattern that can't backtrack) and `src/lib/safe-path.js` (`inside(root,
+    name)`: a plain name resolved inside its folder; `openRead` checks size or age on the same open file it reads;
+    `writeNew` creates content-addressed files exclusively). Patterns that could take seconds or forever on hostile input
+    are rewritten: feed sniffing (a nested pattern was exponential on unclosed comments in a fetched page), the skill
+    linter's code-block and comment scans, the bearer-token, email and page-range patterns. Also: a Cloudflare challenge
+    frame and Bing's redirect host are matched by host, not substring; the error log line uses a fixed format string; the
+    upload log line is one line; a form's redirect back stays on this site (`localPath`, which `safeNext` now uses); ad-block
+    switch-offs and admin toolset fields only touch known keys; client-side icon names are escaped; the admin's voice
+    preview direction is capped like the saved one. False positives (Handlebars-escaped output, the admin's own settings,
+    test and developer scripts) are dismissed in code scanning with a one-line reason each. Tested:
+    `tests/hardening.test.js` (each helper; the old patterns' worst inputs now finish in milliseconds; feeds, code blocks
+    and comments are still found; path, redirect and property-name refusals).
+
 ## 2026-11-20: Prompt-injection review (issue #8)
 
-225. **Every place outside content reaches the model was reviewed; the gaps are closed at the source, and the model is
+231. **Every place outside content reaches the model was reviewed; the gaps are closed at the source, and the model is
     written down for strangers.** Issue #8 asked for a review of every untrusted input: kept apart from instructions, never
     able to grant itself tools or skip an approval, documented. The review walked each entry point (web, browser, search,
     email and attachments, calendar and "Coming up", feeds, uploads and Library files, PDF forms, OCR, pictures, projects,

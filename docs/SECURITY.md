@@ -8,7 +8,9 @@ The overview (who is trusted, every place outside content enters and how it is h
 ## Who can see what
 - **Accounts.** Passwords are hashed with argon2id. Sessions are HttpOnly, SameSite=Lax cookies (Secure over HTTPS);
   the Android app uses bearer tokens (revocable per device in You → Devices). Logins, invites and password attempts are
-  rate-limited. [#6, #12]
+  rate-limited (per address and email, and per address across sign-in, setup and invites), and every request counts
+  against a general per-person limit. The counters live in the database (`rate_limits`), so a restart, or a crash someone
+  provokes, doesn't hand out a fresh set of attempts. [#6, #12, #228]
 - **Host and origin.** When Jessbot listens on loopback (the default) or `PUBLIC_URL` is set, a request must name an
   expected host (loopback names, `PUBLIC_URL`'s host, `ALLOWED_HOSTS`); anything else gets 421, which closes DNS
   rebinding against a local install. Cookie-authenticated changes and WebSocket upgrades must come from `PUBLIC_URL`'s
@@ -114,9 +116,9 @@ The overview (who is trusted, every place outside content enters and how it is h
   `web_read`, `web_search` titles and snippets, browser snapshots and `browser_read`, `email_list` senders/subjects and
   `email_read`, `library_read` (a picture's caption too), `pdf_form_fields` (field names, labels, tooltips, values and a flat
   form's text), `project_search` and `project_files`, `calendar_events`, `feed_stories`, files attached to a message, a
-  small project's files in the prompt, and the calendar entries in the "Coming up" block. [#43, #76, #78, #118, #225]
+  small project's files in the prompt, and the calendar entries in the "Coming up" block. [#43, #76, #78, #118, #231]
   File titles (often a download's or an attachment's name) are stored as one clean line. `read_offloaded` reopens only
-  the person's own stored results, and a later part of a fenced one carries the notice line again. [#225]
+  the person's own stored results, and a later part of a fenced one carries the notice line again. [#231]
   A watch's memo (its own NOTE line from the last check, usually read off a page) is cleaned to one line of at most 500
   characters and fenced as data in the next check's prompt; `list_schedules` doesn't repeat it. [#149]
   - **Cleaned:** bidi overrides/isolates, zero-width spaces, invisible operators, BOMs, soft hyphens and Unicode tag
@@ -154,11 +156,11 @@ The overview (who is trusted, every place outside content enters and how it is h
     before it asked (`taintOf(runId)`, `isTainted(runId, level)`). Tools that bring outside content in without a fence
     (a reopened stored result, `view_image`, PDF tools, a project's file list) are marked by the loop after they run. Prompt
     blocks (attached files, a small project's files, the calendar in "Coming up") and the project file list mark the run
-    `high` on a stage-1 hit, once, with the audit row. See *What Jess may do* for how approvals use it. [#124, #225]
+    `high` on a stage-1 hit, once, with the audit row. See *What Jess may do* for how approvals use it. [#124, #231]
   - **Compaction can't launder it into memory:** the summary prompt treats TOOL lines as outside content, and a memory
     candidate is kept only if most of its words are the person's own (≥ 60% of content words in the span's USER rows). [#125]
     The summary itself sits in the system prompt of later turns, so an entry that trips the stage-1 patterns is dropped
-    before it is stored. [#225]
+    before it is stored. [#231]
   - **Lessons can't be taught by a page:** `learn_rule` needs a quote of the person's own message (this turn or the one before)
     and refuses in a run that read outside content (taint); a thumbs-down post-mortem and the pushed-task lesson see only
     the request, the reply and step labels, as data; every lesson goes through the memory filters (instruction-looking text,

@@ -17,6 +17,7 @@ import { officeToPdf, findSoffice, OFFICE_EXTS } from './office-render.js';
 import { publish } from '../lib/bus.js';
 import { adminMayView } from './oversight.js';
 import { stripInvisible } from '../lib/untrusted.js';
+import { decodeEntities } from '../lib/text-safe.js';
 
 export const FORMATS = {
   html: { ext: 'html', mime: 'text/html; charset=utf-8', label: 'Interactive page' },
@@ -60,8 +61,8 @@ export function normalizeHtml(content, title) {
 // Plain text of a version, for search and for the model.
 export function textOf(type, content) {
   if (type !== 'html') return String(content);
-  return String(content).replace(/<(script|style)[\s\S]*?<\/\1>/gi, ' ').replace(/<[^>]+>/g, ' ')
-    .replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/\s+/g, ' ').trim();
+  return decodeEntities(String(content).replace(/<(script|style)[\s\S]*?<\/\1>/gi, ' ').replace(/<[^>]+>/g, ' '))
+    .replace(/\s+/g, ' ').trim(); // plain text; entities decoded once
 }
 
 const titleError = t => (!t ? 'Give it a title.' : t.length > TITLE_MAX ? `Keep the title under ${TITLE_MAX} characters.` : null);

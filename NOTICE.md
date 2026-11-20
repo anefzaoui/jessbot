@@ -21,7 +21,8 @@ The server embeds these fonts in the documents and PDFs it makes: Noto Sans, Not
 Every other dependency is listed in `package.json` and keeps its own licence (MIT, Apache-2.0, BSD, ISC or MPL-2.0;
 `npm ls` and each package's `LICENSE` file have the details). The ad and cookie-banner blocking uses
 `@ghostery/adblocker` and `@duckduckgo/autoconsent` (both MPL-2.0); PDF rendering uses `pdfjs-dist` (Apache-2.0); the
-browser is driven by `playwright-core` (Apache-2.0).
+browser is driven by `playwright-core` (Apache-2.0) and, with the installed Google Chrome, by `patchright-core`
+(Apache-2.0). Google Chrome itself is only used where the person installed it; Jessbot never downloads or ships it.
 
 ## Skills adapted from other projects
 

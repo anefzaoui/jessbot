@@ -3,6 +3,7 @@ import crypto from 'node:crypto';
 import { get, all, run, tx } from '../db/index.js';
 import { createUser } from './users.js';
 import { invalid, notFound } from '../lib/errors.js';
+import { isEmail } from '../lib/text-safe.js';
 
 const TTL_DAYS = 7;
 const sha256 = t => crypto.createHash('sha256').update(t).digest('hex');
@@ -10,7 +11,7 @@ const sha256 = t => crypto.createHash('sha256').update(t).digest('hex');
 export function createInvite({ name, email, role = 'member', groupId = null, invitedBy }) {
   const errors = {};
   if (!String(name || '').trim()) errors.name = 'Who is this invite for?';
-  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.email = "That doesn't look like an email address.";
+  if (email && !isEmail(email)) errors.email = "That doesn't look like an email address.";
   if (!['admin', 'member'].includes(role)) errors.role = 'Pick a role.';
   if (Object.keys(errors).length) throw invalid(errors);
   const token = crypto.randomBytes(24).toString('base64url');

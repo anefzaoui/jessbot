@@ -103,11 +103,13 @@ Each layer assumes the ones before it can fail.
 12. **Sandboxed Library pages** [#47]. Pages Jess builds run in a sandboxed frame with an opaque origin and a content
     security policy that blocks network calls, cookies and storage, so they can't reach the app or its API.
 
-Around all of this sit the ordinary web-app controls: argon2id password hashes, HttpOnly SameSite cookies, rate-limited
-sign-ins, invites and password attempts, a check of the requested host and of the origin of every cookie-authenticated
-change (which closes DNS rebinding against a local install) [#12, #220], mail and calendar passwords sealed with a
-per-install key [#78], a strict content security policy, and an audit log. Pull requests are checked by CI (lint,
-tests on three systems, `npm audit`) and CodeQL. See [docs/SECURITY.md](SECURITY.md) for each in detail.
+Around all of this sit the ordinary web-app controls: argon2id password hashes, HttpOnly SameSite cookies, a check of
+the requested host and of the origin of every cookie-authenticated change (which closes DNS rebinding against a local
+install) [#12, #220], rate limits on sign-in, setup, invites and every request, kept in the database so a restart doesn't
+reset them [#228], mail and calendar passwords sealed with a per-install key [#78], a strict content security policy,
+and an audit log. Text from outside is parsed with patterns that can't be made slow, escapes cover the escape
+character, and file names from requests only become paths inside their own folder [#229]. Pull requests are checked by
+CI (lint, tests on three systems, `npm audit`) and CodeQL. See [docs/SECURITY.md](SECURITY.md) for each in detail.
 
 ## Every place outside content enters
 
@@ -179,7 +181,7 @@ The full list of known limits is in [docs/SECURITY.md → Known limits](SECURITY
 ## Hardened in this review
 
 The review for issue #8 walked every entry point above, in the code and in the tests, and fixed what was missing
-[#225]. Each fix has a test in `tests/injection-review.test.js`.
+[#231]. Each fix has a test in `tests/injection-review.test.js`.
 
 - **PDF form fields were returned raw.** `pdf_form_fields` passed field names, labels, tooltips (which never appear on
   the printed page), values, options and a flat form's text straight to the model. They are now fenced, cleaned and
