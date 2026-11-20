@@ -1,6 +1,7 @@
-# Checks every pull request and every push to main: syntax, the unit tests on Linux, Windows and macOS, and a
-# dependency audit that fails on high or critical advisories. No secrets are used: the tests run against fake model
-# servers and throwaway data folders. Actions are pinned by commit (Dependabot keeps them current).
+# Checks every pull request and every push to main: syntax, the unit tests on Linux, Windows and macOS with Node 24 and
+# 26 (both LTS lines; 26 is the Docker image's), and a dependency audit that fails on high or critical advisories. No
+# secrets are used: the tests run against fake model servers and throwaway data folders. Actions are pinned by commit
+# (Dependabot keeps them current).
 name: CI
 
 on:
@@ -22,7 +23,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: 24
+          node-version: 26
           cache: npm
       - run: npm ci --no-audit --no-fund
       - run: npm run lint
@@ -34,7 +35,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: 24
+          node-version: 26
       - name: npm audit (fails on high or critical)
         run: npm audit --audit-level=high
 
@@ -43,12 +44,13 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
+        node: [24, 26]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: 24
+          node-version: ${{ matrix.node }}
           cache: npm
       - run: npm ci --no-audit --no-fund
       - run: npm run build

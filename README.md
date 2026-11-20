@@ -13,7 +13,7 @@ without asking.</p>
   <a href="https://github.com/anefzaoui/jessbot/actions/workflows/ci.yml"><img src="https://github.com/anefzaoui/jessbot/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/licence-GPL--3.0--or--later-0f6e7a" alt="Licence: GPL-3.0-or-later"></a>
   <img src="https://img.shields.io/badge/status-early%20preview-c98a1a" alt="Status: early preview">
-  <img src="https://img.shields.io/badge/node-%E2%89%A5%2024.19-3c4a5c" alt="Node.js 24.19 or newer">
+  <img src="https://img.shields.io/badge/node-24.19%2B%20%7C%2026-3c4a5c" alt="Node.js 24.19 or newer, or 26">
 </p>
 
 <p align="center">
@@ -237,7 +237,7 @@ docker compose up -d --build
 docker compose logs jessbot | grep "setup code"     # you'll need this code on the setup page
 ```
 
-**With Node.js**: you need **Node.js 24.19 or newer** and about 1 GB of disk (plus the browser download). It runs on
+**With Node.js**: you need **Node.js 26** (the current LTS; 24.19 or newer works too) and about 1 GB of disk (plus the browser download). It runs on
 Windows and Linux; macOS should work but hasn't been tested by a person yet (CI runs the tests there).
 
 ```bash

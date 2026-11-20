@@ -9,7 +9,7 @@ Jessbot is an early preview. Run it at home or behind a VPN, not on the open int
 
 ## What you need
 
-- **Node.js 24.19 or newer**, or **Docker** with Compose (Docker Desktop on Windows and macOS).
+- **Node.js 26** (the current LTS; 24.19 or newer works too), or **Docker** with Compose (Docker Desktop on Windows and macOS).
 - **A key for an AI model.** [OpenRouter](https://openrouter.ai) is the default; any OpenAI-compatible service works too
   (see [Models and costs](providers.md)).
 - **About 1 GB of disk**, plus about 200 MB for the agent's browser if Google Chrome isn't installed on the machine.

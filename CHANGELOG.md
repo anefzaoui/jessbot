@@ -28,7 +28,8 @@ in their chat.
 - People, groups and permissions; two-step sign-in, password reset links; per-person weekly budgets.
 - The assistant's own name, pronouns, avatar, background and cover.
 - Model providers: OpenRouter, Ollama, or any OpenAI-compatible service.
-- Docker image and compose file, a systemd unit, install guides for Windows, macOS and Linux.
+- Docker image and compose file, a systemd unit, install guides for Windows, macOS and Linux. The image runs Node.js
+  26 (the current LTS); a Node.js install needs 26, or 24.19 or newer.
 - The project site, with the user guide and screenshots: https://anefzaoui.github.io/jessbot/. Its home page is "Jess's
   day": Jess in her sky through four hours of a day, what she does at each, one real run with its timeline, and the
   install; the guide, the gallery and the 404 share its look.

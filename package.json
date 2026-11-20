@@ -7,7 +7,7 @@
   "type": "module",
   "main": "server.js",
   "engines": {
-    "node": ">=24.19.0"
+    "node": "^24.19.0 || >=26.13.0"
   },
   "scripts": {
     "assets": "node scripts/build-assets.js",
@@ -63,7 +63,7 @@
     "exceljs": "4.4.0",
     "express": "^5.3.0",
     "express-handlebars": "^9.0.6",
-    "express-rate-limit": "8.7.3",
+    "express-rate-limit": "8.7.5",
     "fast-formula-parser": "1.0.19",
     "feedscout": "2.3.0",
     "feedsmith": "3.1.0",
@@ -113,10 +113,14 @@
     "tailwindcss": "^4.3.5"
   },
   "optionalDependencies": {
-    "cloakbrowser": "0.7.2"
+    "cloakbrowser": "0.7.3"
   },
   "overrides": {
     "image-size": "2.1.0",
     "uuid": "11.1.1"
+  },
+  "allowScripts": {
+    "@parcel/watcher": false,
+    "tesseract.js": false
   }
 }
