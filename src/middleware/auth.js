@@ -3,6 +3,7 @@ import { resolveSession } from '../services/sessions.js';
 import { toPublic } from '../services/users.js';
 import { isSetupComplete } from '../services/setup.js';
 import { unauthorized, forbidden } from '../lib/errors.js';
+import { originAllowed } from '../lib/origin.js';
 
 export const COOKIE = 'jb_session';
 
@@ -42,9 +43,7 @@ export function sameOrigin(req, res, next) {
   if (['GET', 'HEAD', 'OPTIONS'].includes(req.method) || req.session?.via !== 'cookie') return next();
   const origin = req.headers.origin || req.headers.referer;
   if (!origin) return next(forbidden('Missing origin.'));
-  try {
-    if (new URL(origin).host !== req.headers.host) return next(forbidden('Cross-site request blocked.'));
-  } catch { return next(forbidden('Bad origin.')); }
+  if (!originAllowed(origin, req.headers.host)) return next(forbidden('Cross-site request blocked.')); // PUBLIC_URL, ALLOWED_ORIGINS or this host (#220)
   next();
 }
 

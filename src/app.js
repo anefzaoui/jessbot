@@ -12,6 +12,7 @@ import { isAjax } from './lib/respond.js';
 import { HttpError } from './lib/errors.js';
 import { configureRenderer } from './views/render.js';
 import { staticCacheHeaders } from './lib/assets.js';
+import { checkHost } from './lib/origin.js';
 import './agent/tools/index.js'; // register the built-in tools
 
 export function createApp() {
@@ -30,6 +31,7 @@ export function createApp() {
   app.set('views', path.join(paths.views, 'pages'));
   configureRenderer(app);
 
+  app.use(checkHost); // an unexpected Host name stops here: DNS rebinding, forged links (#220)
   app.use(securityHeaders);
   app.use(express.static(paths.public, { index: false, setHeaders: staticCacheHeaders }));
   app.use(express.json({ limit: '1mb' }));

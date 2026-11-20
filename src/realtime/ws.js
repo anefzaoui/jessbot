@@ -7,6 +7,7 @@ import { resolveSession } from '../services/sessions.js';
 import { COOKIE } from '../middleware/auth.js';
 import { subscribe, replay, latestSeq } from '../lib/bus.js';
 import { agentState } from '../services/runs.js';
+import { originAllowed, hostAllowed } from '../lib/origin.js';
 
 const HEARTBEAT_MS = 25_000;
 
@@ -25,9 +26,7 @@ function authenticate(req) {
   const cookie = cookieToken(req.headers.cookie);
   if (!cookie) return { session: null };
   // Cross-site WebSocket hijacking guard: browsers always send Origin on WS upgrades.
-  try {
-    if (new URL(req.headers.origin).host !== req.headers.host) return { session: null, reason: 'origin' };
-  } catch { return { session: null, reason: 'origin' }; }
+  if (!originAllowed(req.headers.origin, req.headers.host)) return { session: null, reason: 'origin' }; // #220
   return { session: resolveSession(cookie), via: 'cookie' };
 }
 
@@ -35,7 +34,7 @@ export function attachWebSocket(server) {
   const wss = new WebSocketServer({ noServer: true, maxPayload: 64 * 1024 });
 
   server.on('upgrade', (req, socket, head) => {
-    if (new URL(req.url, 'http://x').pathname !== '/ws') return socket.destroy();
+    if (new URL(req.url, 'http://x').pathname !== '/ws' || !hostAllowed(req.headers.host)) return socket.destroy();
     const { session } = authenticate(req);
     if (!session) {
       socket.write('HTTP/1.1 401 Unauthorized\r\nConnection: close\r\n\r\n');
