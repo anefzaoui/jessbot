@@ -1,0 +1,12 @@
+# Not part of the image: dependencies are installed fresh, data and downloaded browsers stay out, secrets never go in.
+node_modules
+data
+tools
+ui-shots
+.git
+.github
+.env
+.env.*
+!.env.example
+assets/**/*.png
+*.log
