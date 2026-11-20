@@ -8,6 +8,21 @@
 
   {{#if newLink}}<div class="mb-6">{{> setup/invite-link name=newLinkName link=newLink}}</div>{{/if}}
 
+  {{!-- Decision #219: admins read other people's chats only when this is on, and then everyone is told. --}}
+  <section class="card mb-6 p-5" aria-labelledby="h-oversight" data-oversight>
+    <form method="post" action="/admin/oversight" data-ajax data-stay data-busy="Saving…"
+      data-success="Saved. Everyone sees whether chats can be read.">
+      <label class="flex items-start gap-3">
+        <input type="checkbox" role="switch" class="switch mt-0.5" name="readChats" data-bool {{#if oversight.readChats}}checked{{/if}}>
+        <span class="min-w-0 flex-1">
+          <span id="h-oversight" class="block text-sm font-semibold">Let admins read other people’s chats</span>
+          <span class="block text-xs text-ink-3">Off: each person’s chats, projects, Library and voice notes are theirs alone. On: admins can open them read-only (every chat view is logged), and everyone sees a line saying so under their chat box and on their You page.</span>
+        </span>
+      </label>
+      <button class="btn btn-secondary btn-sm mt-3">Save</button>
+    </form>
+  </section>
+
   <section class="card mb-8 p-5" aria-labelledby="h-everyone">
     <div class="flex items-start gap-3">
       <span class="grid size-9 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent-text">{{icon "globe" class="size-[18px]"}}</span>

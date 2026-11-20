@@ -15,6 +15,7 @@ import { onProjectFile } from './project-files.js';
 import { renderPdfPages, renderPdfPage, fitImage, MODEL_EDGE } from './pdf-render.js';
 import { officeToPdf, findSoffice, OFFICE_EXTS } from './office-render.js';
 import { publish } from '../lib/bus.js';
+import { adminMayView } from './oversight.js';
 
 export const FORMATS = {
   html: { ext: 'html', mime: 'text/html; charset=utf-8', label: 'Interactive page' },
@@ -467,15 +468,15 @@ export function versionsOf(item) {
 }
 
 /**
- * The item a person may see. Owners can do anything; admins may VIEW anyone's items (oversight, like chats —
- * decision #36), never change them. `publicId` is the id used in URLs.
+ * The item a person may see. Owners can do anything; admins may VIEW anyone's items when oversight is on (like chats,
+ * decisions #36, #219), never change them. `publicId` is the id used in URLs.
  */
 export function itemForUser(user, publicId, { write = false, includeDeleted = false } = {}) {
   const item = get('SELECT * FROM library_items WHERE public_id = ?', String(publicId || ''));
   if (!item || (item.deleted_at && !includeDeleted)) throw notFound('That item isn’t in the library.');
   if (item.owner_id === user.id) return item;
-  if (user.role === 'admin' && !write) return item;
-  if (user.role === 'admin') throw forbidden('You can view this item, but only its owner can change it.');
+  if (adminMayView(user) && !write) return item;
+  if (adminMayView(user)) throw forbidden('You can view this item, but only its owner can change it.');
   throw notFound('That item isn’t in the library.');
 }
 
