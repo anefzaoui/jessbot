@@ -5,6 +5,7 @@ import { get, all, run } from '../db/index.js';
 import { fetchJson } from '../browser/read.js';
 import { invalid, notFound } from '../lib/errors.js';
 import { validTimezone } from '../lib/when.js';
+import { oneLine } from '../lib/untrusted.js';
 
 const LABEL_RE = /^[\p{L}\p{N} _-]{1,24}$/u;
 
@@ -25,7 +26,10 @@ export async function geocode(query, { count = 5 } = {}) {
   return results.slice(0, count);
 }
 
-export const placeName = r => [r.name, r.region && r.region !== r.name ? r.region : null, r.country].filter(Boolean).join(', ');
+// Names come from community-edited map data (#40, decision #235): each part one clean line, the whole capped.
+export const placeName = r => oneLine([r.name, r.region && r.region !== r.name ? r.region : null, r.country]
+  .map(x => (x ? oneLine(x, 60) : null)).filter(Boolean).join(', '), PLACE_NAME_MAX);
+export const PLACE_NAME_MAX = 120;
 
 /** Coordinates → a readable place (best effort; falls back to the coordinates). */
 export async function reverseGeocode(lat, lon) {
@@ -34,7 +38,8 @@ export async function reverseGeocode(lat, lon) {
     const d = await fetchJson(url);
     const a = d.address || {};
     const town = a.city || a.town || a.village || a.municipality || a.county;
-    return { name: [town, a.state, a.country].filter(Boolean).join(', ') || d.display_name, countryCode: a.country_code?.toUpperCase() || null };
+    return { name: oneLine([town, a.state, a.country].filter(Boolean).join(', ') || d.display_name, PLACE_NAME_MAX) || `Near ${Number(lat).toFixed(2)}, ${Number(lon).toFixed(2)}`,
+      countryCode: a.country_code?.toUpperCase() || null };
   } catch {
     return { name: `Near ${Number(lat).toFixed(2)}, ${Number(lon).toFixed(2)}`, countryCode: null };
   }

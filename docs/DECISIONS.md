@@ -3665,3 +3665,16 @@ Note: most of Phase 23 part A landed in commit aa56076, whose message reads "Pha
     pictures are not screened, both listed as limits. `docs/SECURITY-MODEL.md` is the overview for strangers (trust,
     layers, a table of every entry point, what is not defended, this review's fixes); `docs/SECURITY.md` stays the detailed
     control list and links to it. Tested: `tests/injection-review.test.js` (each fix fails without it).
+
+## 2026-11-20: Prompt-injection review follow-ups (issue #40)
+
+235. **Names other people set are one clean line: calendars, mail folders, places.** A shared calendar's name is set by
+    its owner, a shared mailbox's folders by whoever made them, and place names come from community-edited map data; all
+    reached the model as given (`Added to <calendar>`, `Moved … to <folder>`, `Saved home = <place>`, the list of other
+    geocoding matches). Now `calendarLabel()` (services/calendar.js) and `placeName()` / reverse geocoding
+    (services/places.js) make them one clean line at the source (60 characters per name, 120 for a whole place), the email
+    tool does the same for folder names in what it reports, and the other geocoding matches are fenced
+    (`geocoding_matches`). Why one line and not a fence everywhere: they are labels the model must repeat to the person;
+    one line without invisible characters or fence look-alikes takes away what an author could do with them. Tested:
+    `tests/injection-review.test.js` (a multi-line calendar and place name with a fence look-alike and "SYSTEM:"
+    instructions comes out as one capped, defanged line; normal names are unchanged).

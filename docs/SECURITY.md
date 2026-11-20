@@ -139,7 +139,8 @@ The overview (who is trusted, every place outside content enters and how it is h
     so the prompt stays stable); blocks rebuilt every step (attached files, project files, calendar) use an id that is
     stable for the process but unknowable to an author. Inside, anything that looks like a fence or a chat role
     (`</web_page>`, `<system>`, `<|im_start|>`, `[INST]`, `<<SYS>>`, any tag with `fence=`) is defanged (`<` → `‹`), so
-    content cannot close its fence or open a turn. Header values (email From/Subject, calendar titles and places, file
+    content cannot close its fence or open a turn. Header values (email From/Subject, calendar titles and places, the
+    names of calendars and mail folders and of places from geocoding [#235], file
     names, page titles in Jess's own step lines) are single lines, capped; a calendar title can't start a prompt section.
   - **Hidden text left out:** before a page's HTML is taken (`web_read`, `browser_read`, reader mode), one bounded pass
     runs inside the page with computed styles (`lib/hidden-text.js` `pruneInPage`, ≤ 1.5 s, a copy of the page, the live

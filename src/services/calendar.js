@@ -13,7 +13,9 @@ import { audit } from './audit.js';
 import { tzOf } from '../lib/when.js';
 import { oneLine } from '../lib/untrusted.js';
 
-const EVENT_FIELD_MAX = 120; // characters of a title or place in the prompt and on Upcoming
+const EVENT_FIELD_MAX = 120;
+// A calendar's name is set by whoever owns it, which for a shared calendar is someone else (#40, decision #235): one line.
+export const calendarLabel = cal => (typeof cal?.displayName === 'string' && oneLine(cal.displayName, 60)) || 'Calendar'; // characters of a title or place in the prompt and on Upcoming
 
 const WINDOW_BACK_MS = 864e5;
 const WINDOW_AHEAD_MS = 60 * 864e5;
@@ -46,7 +48,7 @@ const wrap = async (c, fn) => {
 export const listCalendars = c => wrap(c, async () => {
   const client = await clientFor(c);
   return (await client.fetchCalendars()).filter(cal => !cal.components || cal.components.includes('VEVENT'))
-    .map(cal => ({ url: cal.url, name: typeof cal.displayName === 'string' ? cal.displayName : 'Calendar', color: cal.calendarColor || null }));
+    .map(cal => ({ url: cal.url, name: calendarLabel(cal), color: cal.calendarColor || null }));
 });
 
 // ---- iCalendar → occurrences -------------------------------------------------------------------------------------
@@ -155,7 +157,7 @@ export function syncConnection(c, user) {
       for (const o of objects) {
         if (!o.data) continue;
         try {
-          for (const ev of occurrences(o.data, from, to, tz)) rows.push({ ...ev, calendar_url: cal.url, calendar_name: typeof cal.displayName === 'string' ? cal.displayName : 'Calendar', href: o.url, etag: o.etag || null });
+          for (const ev of occurrences(o.data, from, to, tz)) rows.push({ ...ev, calendar_url: cal.url, calendar_name: calendarLabel(cal), href: o.url, etag: o.etag || null });
         } catch (err) { console.warn('[calendar] unreadable event', o.url, err.message); }
       }
     }
@@ -409,7 +411,7 @@ export function createEvent(c, user, ev) {
     if (!res.ok) throw Object.assign(new Error(`The calendar refused the new event (${res.status}).`), { status: 400 });
     lastSync.delete(user.id);
     await syncConnection(c, user).catch(() => {});
-    return { uid, calendar: typeof cal.displayName === 'string' ? cal.displayName : 'Calendar' };
+    return { uid, calendar: calendarLabel(cal) };
   });
 }
 
