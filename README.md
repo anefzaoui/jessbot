@@ -82,8 +82,16 @@ everyone sees a line saying so in their chat and on their You page.
 
 ## Install
 
-You need **Node.js 24.19 or newer** and about 1 GB of disk (plus the browser download). It runs on Windows and Linux;
-macOS should work but hasn't been tested yet.
+**With Docker** (any system):
+
+```bash
+git clone <this repository> jessbot && cd jessbot
+docker compose up -d --build
+docker compose logs jessbot | grep "setup code"     # you'll need this code on the setup page
+```
+
+**With Node.js**: you need **Node.js 24.19 or newer** and about 1 GB of disk (plus the browser download). It runs on
+Windows and Linux; macOS should work but hasn't been tested by a person yet (CI runs the tests there).
 
 ```bash
 git clone <this repository> jessbot
@@ -111,7 +119,8 @@ address people use (invite links use it, and Jessbot then refuses requests for o
 Moving an install: stop it and copy the whole folder (including `data/`). Backups: Jessbot makes a full backup a day
 and keeps a week (`npm run restore` lists and restores them); copy `data/backups/` somewhere else too.
 
-A Docker image and a Linux service file are on the way (see below).
+[docs/INSTALL.md](docs/INSTALL.md) has the details for each system: the Docker image (non-root, read-only, health
+check), a hardened systemd service for Linux, starting it at sign-in on Windows, macOS, and a reverse proxy with HTTPS.
 
 ### Web access (the agent's browser)
 
@@ -146,8 +155,7 @@ Honest list, roughly in order:
 
 - **Account hardening for internet exposure**: optional two-factor sign-in for admins, rate limits that survive a
   restart, a password reset flow.
-- **Install options**: a Docker image (non-root, data volume, healthcheck), a systemd unit, documented Windows and
-  macOS service setups, and CI for every pull request.
+- **Install options**: a published image per release (the Dockerfile and compose file are here), a Windows installer.
 - **Providers**: a provider picker with prices for non-OpenRouter endpoints, and tested local models (Ollama, LM Studio).
 - **Renaming everything**: the agent's name and look can be changed, but some interface text still says "Jess" and
   "she"; uploading your own avatar and backgrounds.

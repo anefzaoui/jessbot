@@ -1,0 +1,44 @@
+# Jessbot as a systemd service (Linux). Install steps: docs/INSTALL.md → "Linux service".
+#   sudo cp deploy/jessbot.service /etc/systemd/system/ && sudo systemctl daemon-reload && sudo systemctl enable --now jessbot
+#   journalctl -u jessbot -f        # the setup code for the first admin account is printed here
+[Unit]
+Description=Jessbot, a self-hosted household AI agent
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=jessbot
+Group=jessbot
+WorkingDirectory=/opt/jessbot
+Environment=NODE_ENV=production
+# Data, the browser download and the .env the setup page writes live here (see .env.example for the rest).
+Environment=JESSBOT_HOME=/var/lib/jessbot
+Environment=JESSBOT_ENV_FILE=/var/lib/jessbot/.env
+Environment=JESSBOT_TOOLS=/var/lib/jessbot/tools
+ExecStart=/usr/bin/node server.js
+Restart=on-failure
+RestartSec=5
+# It stops cleanly on SIGTERM (closes the browser, finishes the request in flight).
+KillSignal=SIGTERM
+TimeoutStopSec=20
+
+# Hardening: its own user, no new privileges, a read-only system, writable only where its data is.
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/jessbot
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+RestrictRealtime=true
+RestrictNamespaces=false
+SystemCallArchitectures=native
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target
