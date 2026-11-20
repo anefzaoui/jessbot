@@ -3478,3 +3478,13 @@ Note: most of Phase 23 part A landed in commit aa56076, whose message reads "Pha
     under their chat box, a note on their You page, and `adminsCanRead` on `GET /api/v1/me` for the apps. Turning it on or
     off is audited (`admin.oversight`). Migration 053 keeps it on for an install that already had accounts (their members
     were told under #36). The switch is the first card in Admin → People.
+
+220. **The server checks which host it is asked for, and origins against PUBLIC_URL.** The same-origin check compared the
+    Origin's host with the request's Host header, both of which a DNS-rebinding page controls (its own name, rebound to
+    127.0.0.1), and invite links were built from that Host header. `src/lib/origin.js`: when Jessbot listens on loopback
+    (the default) or `PUBLIC_URL` is set, a request must name a loopback name, `PUBLIC_URL`'s host or an `ALLOWED_HOSTS`
+    entry, else 421 before any route runs (`checkHost`, first middleware; the WebSocket upgrade too). Listening on all
+    interfaces without `PUBLIC_URL` (a LAN install reached by IP) accepts any host, as before. Cookie-authenticated changes
+    and WebSocket upgrades accept `PUBLIC_URL`'s origin (scheme included), an `ALLOWED_ORIGINS` entry, or the request's own
+    host once it passed. Links handed out (invites, setup) use `PUBLIC_URL` when set. Tests: `tests/origin.test.js` (forged
+    Host refused, PUBLIC_URL behind a proxy that rewrites Host, scheme counts, allow-lists, the LAN case).
