@@ -11,6 +11,7 @@ import path from 'node:path';
 import { FiltersEngine, Request, adsAndTrackingLists } from '@ghostery/adblocker';
 import { paths } from '../config/index.js';
 import { settings } from '../db/index.js';
+import { openRead } from '../lib/safe-path.js';
 
 const MAX_AGE_MS = 7 * 864e5;
 const OFF_MS = 30 * 864e5;
@@ -25,8 +26,9 @@ export const currentEngine = () => engine;
 export async function loadEngine({ fetcher, now = Date.now() } = {}) {
   const file = engineFile();
   try {
-    const st = fs.statSync(file);
-    if (now - st.mtimeMs < MAX_AGE_MS) { engine = FiltersEngine.deserialize(new Uint8Array(fs.readFileSync(file))); return engine; }
+    const f = openRead(file);
+    if (now - f.stat.mtimeMs < MAX_AGE_MS) { engine = FiltersEngine.deserialize(new Uint8Array(f.read())); return engine; }
+    f.close();
   } catch { /* none yet, or an older engine version: build */ }
   if (!fetcher) throw new Error('no way to download the filter lists');
   const built = await FiltersEngine.fromLists(fetcher, adsAndTrackingLists);
@@ -68,10 +70,9 @@ export const sitesSwitchedOff = () => Object.entries(offList()).filter(([, until
   .map(([host, until]) => ({ host, until })).sort((a, b) => a.until.localeCompare(b.until));
 /** The admin turns blocking back on for a site before its 30 days are up. → true when it was off. */
 export function switchOnFor(host) {
-  const list = { ...offList() };
-  if (!(bare(host) in list)) return false;
-  delete list[bare(host)];
-  settings.set('browser.adblockOff', list);
+  const key = bare(host);
+  if (!Object.hasOwn(offList(), key)) return false;
+  settings.set('browser.adblockOff', Object.fromEntries(Object.entries(offList()).filter(([h]) => h !== key)));
   offCache = null;
   return true;
 }

@@ -9,6 +9,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import * as tar from 'tar';
+import { inside } from '../lib/safe-path.js';
 import { exec, get, all, migrationStatus } from '../db/index.js';
 import { paths, config } from '../config/index.js';
 import { llmSettings } from './llm.js';
@@ -75,7 +76,7 @@ export function listBackups() {
 export function pruneBackups() {
   if (!fs.existsSync(paths.backups)) return;
   for (const n of fs.readdirSync(paths.backups)) {
-    if (/^\.snapshot-|\.part$/.test(n) && Date.now() - fs.statSync(path.join(paths.backups, n)).mtimeMs > 3600000) fs.rmSync(path.join(paths.backups, n), { force: true });
+    if (/^(?:\.snapshot-.*|.*\.part)$/.test(n) && Date.now() - fs.statSync(path.join(paths.backups, n)).mtimeMs > 3600000) fs.rmSync(path.join(paths.backups, n), { force: true });
   }
   const byKind = {};
   for (const b of listBackups()) (byKind[b.kind] ||= []).push(b);
@@ -84,7 +85,9 @@ export function pruneBackups() {
 
 /** A backup's file path, only for names we made (no path tricks). */
 export function backupPath(name) {
-  return (NAME.test(name) || /^pre-migrate-[\dT-]+\.sqlite$/.test(name)) && fs.existsSync(path.join(paths.backups, name)) ? path.join(paths.backups, name) : null;
+  if (!(NAME.test(name) || /^pre-migrate-[\dT-]+\.sqlite$/.test(name))) return null;
+  const file = inside(paths.backups, name);
+  return file && fs.existsSync(file) ? file : null;
 }
 
 /** A daily backup when the last full one is a day old (checked at boot and hourly). */

@@ -7,7 +7,7 @@ import { findInvite, acceptInvite } from '../../services/invites.js';
 import { getUser } from '../../services/users.js';
 import { audit } from '../../services/audit.js';
 import { setSessionCookie, clearSessionCookie } from '../../middleware/auth.js';
-import { formPost } from '../../lib/respond.js';
+import { formPost, localPath } from '../../lib/respond.js';
 import { HttpError, invalid, tooMany } from '../../lib/errors.js';
 import { hit, reset, signInLimit } from '../../lib/ratelimit.js';
 import { oversightOn } from '../../services/oversight.js';
@@ -15,7 +15,7 @@ import { oversightOn } from '../../services/oversight.js';
 const router = Router();
 
 // Only same-site relative paths are allowed as post-login destinations (no open redirects).
-export const safeNext = next => (typeof next === 'string' && /^\/(?!\/|\\)[^\s]*$/.test(next) ? next : '/chat');
+export const safeNext = next => localPath(next, '/chat');
 
 // Shared by the web form and POST /api/v1/auth/login.
 export async function authenticate(req, { email, password }) {
