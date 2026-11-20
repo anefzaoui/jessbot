@@ -443,3 +443,26 @@ body:has(.stage[data-cue="dawn"]) .site-head, body:has(.stage[data-cue="day"]) .
   .line-wrap.swap .line, .line-wrap.swap .state, .line-wrap.swap .ask, .stage.playing .board button[aria-pressed="true"] i { animation: none !important; }
   .btn:active, .copy-btn:active, .go:active, .hold:active { transform: none; }
 }
+
+/* ---- The lightbox (SiteKit, website/kit/kit.css: its look from these properties) -----------------------------------
+   The house lights: day white in the light theme, the night stage in the dark one. Cue type for the count, the
+   pictures' own corners and shadow, the site's decelerating motion. */
+:root {
+  --kit-font: var(--body); --kit-ease: var(--ease); --kit-dur: 300ms; --kit-dur-out: 240ms; --kit-dur-fast: var(--t-fast);
+  --kit-focus: var(--mark);
+  --kit-lb-scrim: rgb(245 246 250 / 0.97); --kit-lb-fg: var(--ink); --kit-lb-fg-2: var(--page-ink-2);
+  --kit-lb-btn: rgba(11, 16, 48, 0.07); --kit-lb-btn-hover: rgba(11, 16, 48, 0.14);
+  --kit-lb-btn-radius: var(--r-control); --kit-lb-media-radius: var(--r-media); --kit-lb-media-shadow: var(--shadow-lg);
+  --kit-lb-cap-size: 0.98rem;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --kit-lb-scrim: rgb(5 6 10 / 0.96); --kit-lb-fg: #eef0ff; --kit-lb-fg-2: #aeb4da;
+    --kit-lb-btn: rgba(238, 240, 255, 0.1); --kit-lb-btn-hover: rgba(238, 240, 255, 0.18);
+  }
+}
+:root[data-theme="dark"] {
+  --kit-lb-scrim: rgb(5 6 10 / 0.96); --kit-lb-fg: #eef0ff; --kit-lb-fg-2: #aeb4da;
+  --kit-lb-btn: rgba(238, 240, 255, 0.1); --kit-lb-btn-hover: rgba(238, 240, 255, 0.18);
+}
+.kit-lb-count { font-family: var(--cue); font-size: 1.15rem; font-weight: 600; letter-spacing: 0.04em; }

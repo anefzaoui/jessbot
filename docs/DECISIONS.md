@@ -3975,3 +3975,22 @@ Note: most of Phase 23 part A landed in commit aa56076, whose message reads "Pha
     tablet and laptop widths, so no cue moves the page and the words never sit on her face. Reduced motion: nothing
     moves through space, the cues wait for a click, a picked cue's light changes in 200 ms. The rules are in
     docs/DESIGN.md → Website.
+
+## 2026-11-20: The website's lightbox
+
+251. **The site's pictures open in SiteKit, the owner's own small lightbox, shared with his other sites.** The gallery
+    said "click any picture for the full size" and sent the visitor to a bare image file; the home page's and the
+    guide's screenshots didn't open at all. Rule 7 keeps the browser free of front-end libraries, and the owner wanted
+    one lightbox written once for his three sites (Mister Download Manager's, Minecraft Server Manager's and this one),
+    each in its own look. Its master copy lives in Mister Download Manager's repository (`website/kit/`, with its
+    README and API); `website/kit/` here is a byte-for-byte copy of one version, its header naming it, and
+    `scripts/check-kit.mjs` (run by `tests/site-kit.test.js`) fails when a file differs from that version, so it is
+    changed there and synced, never edited here. It runs on the browser's own `<dialog>`: the picture flies from its
+    thumbnail and back (a cropped one too), arrows, Home, End and swipes go through the group, a click, double tap,
+    pinch or the wheel zooms with clamped panning, a swipe down or Back closes it, the scroll locks without moving the
+    page, the focus goes in and comes back, a live region says "3 of 14", right to left mirrors it, reduced motion
+    fades it. Here: the gallery's two lists, the home page's screenshots (one group) and every guide picture
+    (`.prose`); the site's words, its fonts (the count in the cue face) and motion curves; day white behind the
+    pictures in the light theme, the night stage in the dark one (docs/DESIGN.md → Website). A gallery link still opens
+    the picture with no script. The build gives gallery and guide pictures their width and height (read from the WebP),
+    so they keep their place while they load and open at the right size.

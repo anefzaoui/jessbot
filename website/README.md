@@ -9,7 +9,8 @@ publishes it from `.github/workflows/pages.yml`.
 | `layout.html` | the page frame every page shares: head, header, footer |
 | `index.html` | the home page's content |
 | `styles.css` | every style: the site's own world, "Jess's day" (cyclorama colours, Anybody, Hanken Grotesk, Big Shoulders Stencil; see `docs/DESIGN.md` → Website) |
-| `site.js` | the theme switch (guide and gallery), the home page's cues, the recorded run's timetable, copy buttons, install tabs |
+| `site.js` | the theme switch (guide and gallery), the home page's cues, the recorded run's timetable, copy buttons, install tabs, and the lightbox's set-up (its words, which pictures) |
+| `kit/` | SiteKit, the lightbox: a copy synced from Mister Download Manager's `website/kit/` (its README there has the API), checked by `scripts/check-kit.mjs` (`tests/site-kit.test.js`); never edit it here, change the master and sync it (decision #251) |
 | `run-poster.webp` | the recorded run's poster: the frame of `docs/images/flow-approval.mp4` at 11.5 s (the approval card), a still so the page doesn't load the animated preview |
 
 Everything else comes from the repository, so the site can't drift from it: the docs pages from `docs/guide/*.md`,

@@ -24,6 +24,7 @@
 <link rel="manifest" href="{{root}}site.webmanifest">
 <link rel="preload" href="{{root}}assets/anybody.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="{{root}}assets/hanken-grotesk.woff2" as="font" type="font/woff2" crossorigin>{{preload}}
+<link rel="stylesheet" href="{{root}}assets/kit/kit.css">
 <link rel="stylesheet" href="{{root}}assets/styles.css">
 <script>
   // The theme before first paint: the visitor's choice if they made one here, else their system's.
@@ -32,6 +33,8 @@
     if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
   })();
 </script>
+<script src="{{root}}assets/kit/core.js" defer></script>
+<script src="{{root}}assets/kit/lightbox.js" defer></script>
 <script src="{{root}}assets/site.js" defer></script>
 </head>
 <body class="{{bodyClass}}">

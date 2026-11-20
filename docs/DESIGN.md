@@ -107,5 +107,9 @@ The public site (`website/`, built by `scripts/build-site.js`; see `website/READ
   (`--ease-ui`); the only ambient motion is Jess breathing. The strip keeps room for the day cue's buttons, so no cue
   moves the page. With reduced motion nothing moves through space, the cues wait for a click, and a picked cue's light
   changes in 200 ms.
+- **Pictures, big** (decision #251): screenshots open in SiteKit's lightbox (`website/kit/`, synced from Mister Download
+  Manager's site, themed in `styles.css` with its `--kit-` properties): day white at 97% behind the picture in the light
+  theme, the stage's black in the dark one, the pictures' own 14 px corners and shadow, the count in Big Shoulders
+  Stencil, the site's `--ease` and 300 ms flights; reduced motion fades.
 - **Performance:** only the visitor's sky and portrait load first; the rest after the page has loaded; the recorded run's
   video only when it comes near.
