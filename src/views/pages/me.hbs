@@ -1,0 +1,312 @@
+{{!--
+  Profile, places + weather, memory, notifications + check-ins, devices, usage.
+  Data: me { profile: { name, email, timezone, callMe?, about?, nameSay?, shareBusy },
+    memories: partials/me/memory-list.hbs, episodes: [{ id, text, date, threadId }] (services/memory.js listEpisodes),
+    lessons: partials/me/lessons.hbs, tidy: { tidy (partials/me/tidy.hbs), open } | { missing } | null (app.js memoryTidy),
+    groups: [{ id, name }], busyLookups: [{ at, who, rangeLabel, blocks }] (calendar.js busyLookupsFor, #196), sites: [{ site, cookies, signIn, expires, iconUrl }] (browser/profiles.js signedInSites),
+    sessions: [{ id, device, where?, lastSeen, current? }], prep + notes: partials/me/prep.hbs (#212),
+    usage: { pct, spentLabel, budgetLabel, resetsLabel, days: [{ label, pct, valueLabel }], top: [{ title, costLabel }] } }
+--}}
+{{> page-header title="You" subtitle="Your profile, what I remember, and your devices" width="max-w-3xl"}}
+
+<div class="mx-auto max-w-3xl px-4 py-6 sm:px-6">
+  <nav class="tabs mb-6 overflow-x-auto" aria-label="Sections" data-me-tabs>
+    {{#each tabs}}<a href="/me/{{key}}" data-me-tab="{{key}}" {{#if (eq key @root.tab)}}aria-current="page"{{/if}}>{{label}}</a>{{/each}}
+  </nav>
+
+  {{!-- Profile --}}
+  <section id="profile" data-me-panel="profile" {{#unless (eq tab 'profile')}}hidden{{/unless}} aria-labelledby="h-profile">
+    <h2 id="h-profile" class="mb-3 text-sm font-semibold">Profile</h2>
+    <form class="card space-y-4 p-5" data-ajax method="post" action="/api/v1/me/profile" data-success="Profile saved." data-busy="Saving…">
+      <div class="grid gap-4 sm:grid-cols-2">
+        <div data-field><label class="label" for="p-name">Name</label><input id="p-name" name="name" class="input" value="{{me.profile.name}}" required></div>
+        <div data-field><label class="label" for="p-call">What should I call you?</label><input id="p-call" name="callMe" class="input" value="{{me.profile.callMe}}" placeholder="{{me.profile.name}}"></div>
+        <div data-field class="sm:col-span-2">
+          <label class="label" for="p-say">How to say my name</label>
+          <input id="p-say" name="nameSay" class="input" value="{{me.profile.nameSay}}" maxlength="60" placeholder="e.g. Shi-vawn, or Nour as in noor" autocomplete="off">
+          <p class="hint">How it sounds, spelled out, so my voice says it right. Leave it empty if I already do.</p>
+        </div>
+        <div data-field><label class="label" for="p-email">Email</label><input id="p-email" name="email" type="email" class="input" value="{{me.profile.email}}"></div>
+        <div data-field><label class="label" for="p-tz">Time zone</label><input id="p-tz" name="timezone" class="input" value="{{me.profile.timezone}}" list="tz-list" data-tz-default></div>
+      </div>
+      <div data-field>
+        <label class="label" for="p-about">Anything I should always keep in mind?</label>
+        <textarea id="p-about" name="about" class="textarea text-sm" rows="3" placeholder="e.g. I'm vegetarian. Keep answers short on weekdays.">{{me.profile.about}}</textarea>
+        <p class="hint">Saved to your personal profile. Only you and the admin can see it.</p>
+      </div>
+      <div class="flex justify-end"><button class="btn btn-primary btn-sm">Save profile</button></div>
+    </form>
+  </section>
+
+  {{!-- Places + weather --}}
+  <section id="places" data-me-panel="places" {{#unless (eq tab 'places')}}hidden{{/unless}} aria-labelledby="h-places">
+    <h2 id="h-places" class="mb-3 text-sm font-semibold">Where you live</h2>
+    <div class="card divide-y divide-line">
+      {{#each me.places}}
+        <div class="flex items-center gap-3 p-4" data-place-id="{{id}}">
+          <span class="grid size-9 shrink-0 place-items-center rounded-xl {{#if primary}}bg-accent-soft text-accent-text{{else}}bg-surface-2 text-ink-2{{/if}}">{{#if primary}}{{icon "map-pin-house" class="size-[18px]"}}{{else}}{{icon "map-pin" class="size-[18px]"}}{{/if}}</span>
+          <div class="min-w-0 flex-1">
+            <p class="truncate text-sm font-medium">{{name}}</p>
+            <p class="text-xs text-ink-3"><span class="capitalize">{{label}}</span>{{#if timezone}} · {{timezone}}{{/if}}
+              {{#if primary}}{{#if @root.me.weather}} · <span class="text-ink-2">{{@root.me.weather}}</span>{{/if}}{{/if}}</p>
+          </div>
+          <form method="delete" action="/api/v1/me/places/{{id}}" data-ajax data-stay data-remove-closest="[data-place-id]" data-success="Removed.">
+            <button class="btn btn-ghost btn-icon btn-sm" data-tooltip="Remove" aria-label="Remove {{name}}">{{icon "x" class="size-4"}}</button>
+          </form>
+        </div>
+      {{/each}}
+      <form method="post" action="/api/v1/me/places" class="flex flex-wrap items-start gap-2 p-4" data-ajax data-stay data-places-form data-busy="Finding…" data-success="Saved.">
+        <div class="min-w-48 flex-1" data-field>
+          <label class="sr-only" for="pl-q">Town or city</label>
+          <input id="pl-q" name="query" class="input" placeholder="{{#if me.places}}Add a place: town or city{{else}}Your town or city, e.g. Lyon{{/if}}" autocomplete="address-level2" required>
+        </div>
+        <label class="sr-only" for="pl-label">Label</label>
+        <select id="pl-label" name="label" class="select w-28">
+          <option value="home">Home</option><option value="work" {{#if me.places}}selected{{/if}}>Work</option><option value="school">School</option>
+        </select>
+        <button class="btn btn-secondary">Save</button>
+        <button type="button" class="btn btn-ghost" data-use-location>{{icon "locate-fixed" class="size-4"}} Use my location</button>
+      </form>
+    </div>
+    <p class="mt-2 text-xs text-ink-3">Your home sets your weather, local suggestions, my sky and your time zone. Only you and the admin can see it.
+      <a href="https://open-meteo.com/" target="_blank" rel="noopener" class="hover:underline">Weather data by Open-Meteo.com</a></p>
+  </section>
+
+  {{!-- Connections: mailboxes and calendars, busy sharing, the sites my browser is signed in to --}}
+  <section id="connections" data-me-panel="connections" {{#unless (eq tab 'connections')}}hidden{{/unless}} aria-label="Connections">
+    {{> me/connections connections=me.connections presets=me.presets}}
+
+    <section class="mt-8" aria-labelledby="h-busy">
+      <h2 id="h-busy" class="mb-3 text-sm font-semibold">Finding a time together</h2>
+      <div class="card flex items-start gap-3 p-4" data-share-busy>
+        <span class="grid size-9 shrink-0 place-items-center rounded-xl bg-surface-2 text-ink-2">{{icon "calendar-range" class="size-[18px]"}}</span>
+        <div class="min-w-0 flex-1">
+          <label class="text-sm font-medium" for="share-busy">Share when I’m busy with {{#if me.groups}}{{#each me.groups}}{{name}}{{#unless @last}}, {{/unless}}{{/each}}{{else}}my household{{/if}}</label>
+          <p class="mt-0.5 text-xs leading-relaxed text-ink-3">When someone asks me for a time that suits everyone, I can count the hours you’re busy. Only the busy times, never what the events are or who they’re with.
+            {{#unless me.groups}}<span class="text-ink-2">You’re not in a group yet, so there’s nobody to share with.</span>{{/unless}}</p>
+          <p class="mt-1 text-xs font-medium" data-share-busy-state role="status" aria-live="polite"></p>
+        </div>
+        <input type="checkbox" id="share-busy" class="switch mt-1" role="switch" data-share-busy-switch {{#if me.profile.shareBusy}}checked{{/if}} {{#unless me.groups}}disabled{{/unless}}>
+      </div>
+      {{!-- Who looked (#196): every time someone's request counted my busy hours, from the audit trail. --}}
+      <div class="card mt-3" data-busy-lookups>
+        <p class="flex items-baseline gap-2 border-b border-line px-4 py-2.5 text-xs font-medium text-ink-2"><span class="flex-1">Who looked at my availability</span>
+          <span class="font-normal text-ink-3">last 90 days</span></p>
+        {{#if me.busyLookups.length}}
+          <ul class="divide-y divide-line" role="list">
+            {{#each me.busyLookups}}
+              <li class="busy-lookup">{{> person name=who size="size-8 text-xs shrink-0"}}
+                <p class="min-w-0 flex-1 text-[13px]"><span class="font-medium text-ink">{{who}}</span> <span class="text-ink-2">looked for a time{{#if rangeLabel}}, {{rangeLabel}}{{/if}}</span>
+                  <span class="block text-xs text-ink-3">{{#if blocks}}{{plural blocks "busy time"}} counted{{else}}you were free the whole time{{/if}} · <time datetime="{{at}}" data-relative>{{timeAgo at}}</time></span></p>
+              </li>
+            {{/each}}
+          </ul>
+        {{else}}
+          <p class="px-4 py-4 text-[13px] text-ink-3">Nobody yet. Each time someone asks me for a time that includes you, it shows here: who asked and for which hours.</p>
+        {{/if}}
+      </div>
+    </section>
+
+    <section class="mt-8" aria-labelledby="h-sites">
+      <div class="mb-3 flex items-baseline gap-2">
+        <h2 id="h-sites" class="flex-1 text-sm font-semibold">Sites I’m signed in to for you</h2>
+        {{#if me.sites}}<span class="text-xs text-ink-3" data-sites-count>{{plural me.sites.length "site"}}</span>{{/if}}
+      </div>
+      <ul class="card divide-y divide-line" role="list" data-sites>
+        {{#each me.sites}}
+          <li class="flex items-center gap-3 px-4 py-3" data-site="{{site}}">
+            <img src="{{iconUrl}}" alt="" class="size-8 shrink-0 rounded-lg border border-line bg-surface-2 p-1" loading="lazy">
+            <div class="min-w-0 flex-1">
+              <p class="truncate text-sm font-medium">{{site}}</p>
+              <p class="text-xs text-ink-3">{{#if expires}}Stays signed in until {{longDate expires}}{{else}}Signed in until my browser closes{{/if}}</p>
+            </div>
+            <button type="button" class="btn btn-ghost btn-sm shrink-0 hover:text-bad" data-site-forget="{{site}}" aria-label="Sign me out of {{site}}">{{icon "log-out" class="size-3.5"}} <span class="hidden sm:inline">Sign me out</span></button>
+          </li>
+        {{/each}}
+        <li class="px-5 py-4 text-sm text-ink-3" data-sites-empty {{#if me.sites}}hidden{{/if}}>I’m not signed in anywhere for you. When you sign in to a site in my browser, for example when I hand the browser over to you, it shows up here so you can sign me out.</li>
+      </ul>
+      <p class="mt-2 text-xs text-ink-3">Your sign-ins are kept sealed on this computer. Signing me out removes that site’s cookies and saved data, from my open browser too.</p>
+    </section>
+  </section>
+
+  {{!-- Memory --}}
+  <section id="memory" data-me-panel="memory" {{#unless (eq tab 'memory')}}hidden{{/unless}} aria-labelledby="h-memory">
+    {{!-- The weekly tidy (Phase 25 #204): opened from its Activity item, else the latest recent one folded. --}}
+    {{#if me.tidy.tidy}}<div class="mb-5" data-tidy-slot>{{> me/tidy tidy=me.tidy.tidy open=me.tidy.open}}</div>
+    {{else if me.tidy.missing}}<p class="mb-5 flex items-center gap-2 rounded-xl bg-surface-2/60 px-4 py-3 text-sm text-ink-2" role="status">{{icon "info" class="size-4 shrink-0 text-ink-3"}} That tidy isn’t here any more. Your memories below are as they are now.</p>{{/if}}
+    <div class="mb-3 flex flex-wrap items-center gap-x-3 gap-y-2">
+      <h2 id="h-memory" class="text-sm font-semibold">What I remember about you</h2>
+      <span class="text-xs text-ink-3" data-memory-count>{{plural me.memories.length "memory" "memories"}}</span>
+      <div class="ms-auto flex items-center gap-2">
+        <input type="search" class="input h-8 w-40 text-[13px] sm:w-44" placeholder="Search memories" aria-label="Search memories" data-memory-search>
+        <button type="button" class="btn btn-secondary btn-sm" data-import-open aria-expanded="false" aria-controls="memory-import">{{icon "clipboard-paste" class="size-3.5"}} Import</button>
+      </div>
+    </div>
+
+    {{!-- Import: paste or a .vcf → what I found (ticked) → save the chosen ones. Client: memory.js --}}
+    <div id="memory-import" class="card mem-import mb-4" data-import hidden>
+      <div class="flex items-start gap-3">
+        <span class="grid size-9 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent-text">{{icon "clipboard-paste" class="size-[18px]"}}</span>
+        <div class="min-w-0 flex-1">
+          <h3 class="text-[15px] font-semibold">Import memories</h3>
+          <p class="text-xs leading-relaxed text-ink-3">Paste notes, a list, or what another assistant remembers about you, or choose a contacts file (.vcf) for birthdays. Nothing is saved until you choose.</p>
+        </div>
+        <button type="button" class="btn btn-ghost btn-icon btn-sm" data-import-close aria-label="Close import">{{icon "x" class="size-4"}}</button>
+      </div>
+      <div class="mt-4" data-import-step="input">
+        <label class="sr-only" for="import-text">What to import</label>
+        <textarea id="import-text" class="textarea text-sm" rows="5" data-import-text placeholder="One thing per line, for example:&#10;I’m allergic to penicillin&#10;Maya’s birthday is 14 March&#10;We go to Madeira every August"></textarea>
+        <div class="mt-3 flex flex-wrap items-center gap-2">
+          <label class="btn btn-ghost btn-sm cursor-pointer">{{icon "contact" class="size-3.5"}} Choose a .vcf file
+            <input type="file" accept=".vcf,text/vcard,text/x-vcard" class="sr-only" data-import-file></label>
+          <span class="hidden min-w-0 items-center gap-1.5 truncate text-xs text-ink-2" data-import-filename></span>
+          <span class="flex-1"></span>
+          <button type="button" class="btn btn-primary btn-sm" data-import-preview-btn>{{icon "search" class="size-3.5"}} See what I’d keep</button>
+        </div>
+      </div>
+      <div class="mt-4" data-import-step="preview" hidden>
+        <div data-import-preview-slot></div>
+        <div class="mt-4 flex flex-wrap items-center gap-2 border-t border-line pt-3">
+          <button type="button" class="btn btn-ghost btn-sm" data-import-back>{{icon "arrow-left" class="size-3.5"}} Edit</button>
+          <span class="flex-1"></span>
+          <button type="button" class="btn btn-primary btn-sm" data-import-save disabled>Save</button>
+        </div>
+      </div>
+      <div class="mt-4" data-import-step="done" hidden>
+        <div class="flex items-start gap-3 rounded-xl bg-ok-soft px-4 py-3" role="status">
+          <span class="text-ok">{{icon "circle-check" class="size-5"}}</span>
+          <div class="min-w-0 flex-1 text-sm" data-import-result></div>
+        </div>
+        <div class="mt-3 flex justify-end gap-2">
+          <button type="button" class="btn btn-ghost btn-sm" data-import-again>Import more</button>
+          <button type="button" class="btn btn-secondary btn-sm" data-import-close>Done</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="mb-3 flex flex-wrap gap-1.5" role="group" aria-label="Show" data-memory-filters>
+      <button type="button" class="chip" aria-pressed="true" data-memory-filter="all">All</button>
+      <button type="button" class="chip" aria-pressed="false" data-memory-filter="dated">{{icon "calendar-days" class="size-3.5"}} Dates</button>
+      <button type="button" class="chip" aria-pressed="false" data-memory-filter="essential">Essential</button>
+      <button type="button" class="chip" aria-pressed="false" data-memory-filter="pinned">{{icon "pin" class="size-3.5"}} Pinned</button>
+      <button type="button" class="chip" aria-pressed="false" data-memory-filter="shared">{{icon "users" class="size-3.5"}} Shared</button>
+    </div>
+    <div data-memory-slot>{{> me/memory-list memories=me.memories}}</div>
+    <p class="py-8 text-center text-sm text-ink-3" data-memory-nomatch hidden>No memories match that.</p>
+
+    {{!-- How I work with you (lessons, Phase 25 #204). Client: me-lessons.js --}}
+    <section class="mt-8" aria-labelledby="h-lessons" data-my-lessons-section>
+      <h2 id="h-lessons" class="text-sm font-semibold">How I work with you</h2>
+      <p class="mb-3 text-xs text-ink-3">Rules I follow for you, from what you told me or corrected. Change, retire or delete any of them.</p>
+      <div data-lessons-slot>{{> me/lessons lessons=me.lessons}}</div>
+    </section>
+
+    <section class="mt-8" aria-labelledby="h-episodes">
+      <h2 id="h-episodes" class="text-sm font-semibold">Conversations I remember</h2>
+      <p class="mb-3 text-xs text-ink-3">A line about each conversation worth keeping, so I can pick up where we left off.</p>
+      {{#if me.episodes}}
+        <ol class="card mem-episodes" role="list">
+          {{#each me.episodes}}
+            <li class="mem-episode">
+              <time class="mem-episode-date tabular" datetime="{{date}}">{{dayDate date}}</time>
+              <p class="min-w-0 flex-1 text-sm leading-relaxed" dir="auto">{{text}}</p>
+              {{#if threadId}}<a href="/chat/{{threadId}}" class="btn btn-ghost btn-icon btn-sm shrink-0" aria-label="Open that chat" data-tooltip="Open that chat">{{icon "message-circle" class="size-4"}}</a>{{/if}}
+            </li>
+          {{/each}}
+        </ol>
+      {{else}}
+        <p class="card px-5 py-4 text-sm text-ink-3">None yet. After a conversation that matters, I keep a line about it here.</p>
+      {{/if}}
+    </section>
+
+    <aside class="mem-offrecord mt-8" aria-labelledby="h-offrecord">
+      <span class="grid size-9 shrink-0 place-items-center rounded-xl bg-surface-2 text-ink-2">{{icon "message-circle-off" class="size-[18px]"}}</span>
+      <div class="min-w-0">
+        <h2 id="h-offrecord" class="text-sm font-semibold">Off the record</h2>
+        <p class="mt-0.5 text-xs leading-relaxed text-ink-3">In a side chat, turn on <span class="font-medium text-ink-2">Off the record</span> from its header and nothing said there becomes a memory. I still remember something there if you ask me to in so many words. Your main chat always remembers.</p>
+      </div>
+      <a href="/chat/new" class="btn btn-secondary btn-sm shrink-0">{{icon "message-square-plus" class="size-3.5"}} New side chat</a>
+    </aside>
+  </section>
+
+  {{!-- Devices --}}
+  <section id="notifications" data-me-panel="notifications" {{#unless (eq tab 'notifications')}}hidden{{/unless}} aria-labelledby="h-notif">
+    <h2 id="h-notif" class="mb-3 text-sm font-semibold">Notifications &amp; check-ins</h2>
+    <div class="card divide-y divide-line">
+      <div class="flex flex-wrap items-center gap-3 p-4">
+        <span class="grid size-9 shrink-0 place-items-center rounded-xl bg-surface-2 text-ink-2">{{icon "bell-ring" class="size-[18px]"}}</span>
+        <div class="min-w-0 flex-1">
+          <p class="text-sm font-medium">Notifications on this device</p>
+          <p class="text-xs text-ink-3">Alarms, reminders and messages I start on my own reach you, even when Jessbot isn’t open.
+            <span class="font-medium text-ink-2" data-notifications-state></span></p>
+        </div>
+        <button type="button" class="btn btn-secondary btn-sm" data-enable-notifications hidden>Turn on</button>
+        <button type="button" class="btn btn-ghost btn-sm" data-test-push hidden>{{icon "send" class="size-3.5"}} Send a test</button>
+        <button type="button" class="btn btn-ghost btn-sm" data-disable-push hidden>Turn off</button>
+      </div>
+      {{#if me.checkins}}
+        <div class="flex flex-wrap items-center gap-3 p-4">
+          <span class="grid size-9 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent-text">{{icon "hand-heart" class="size-[18px]"}}</span>
+          <div class="min-w-0 flex-1">
+            <p class="text-sm font-medium">Check-ins</p>
+            <p class="text-xs text-ink-3">How often I look in on my own. I only message when it’s useful, never in quiet hours.</p>
+          </div>
+          <form method="put" action="/api/v1/me/checkins" data-ajax data-stay data-autosubmit data-success="Check-ins updated.">
+            <div class="segmented" role="radiogroup" aria-label="Check-ins">
+              {{#each me.checkins.options}}
+                <label class="segment-choice" title="{{hint}}"><input type="radio" class="sr-only" name="checkins" value="{{value}}" {{#if (eq value ../me.checkins.value)}}checked{{/if}}><span>{{label}}</span></label>
+              {{/each}}
+            </div>
+          </form>
+        </div>
+      {{/if}}
+    </div>
+    {{> me/prep prep=me.prep notes=me.notes}}
+  </section>
+
+  <section id="devices" data-me-panel="devices" {{#unless (eq tab 'devices')}}hidden{{/unless}} aria-labelledby="h-devices">
+    <h2 id="h-devices" class="mb-3 text-sm font-semibold">Devices &amp; app tokens</h2>
+    <ul class="card divide-y divide-line" role="list">
+      {{#each me.sessions}}
+        <li class="flex items-center gap-3 px-4 py-3" data-session-id="{{id}}">
+          <span class="grid size-9 place-items-center rounded-lg bg-surface-2 text-ink-2">{{#if (eq device 'Android app')}}{{icon "smartphone" class="size-4"}}{{else}}{{icon "monitor" class="size-4"}}{{/if}}</span>
+          <div class="min-w-0 flex-1">
+            <p class="text-sm font-medium">{{device}} {{#if current}}<span class="badge badge-ok ml-1">This device</span>{{/if}}</p>
+            <p class="text-xs text-ink-3">{{#if where}}{{where}} · {{/if}}active <time datetime="{{iso lastSeen}}" data-relative>{{timeAgo lastSeen}}</time></p>
+          </div>
+          {{#unless current}}<form method="post" action="/api/v1/me/sessions/{{id}}/revoke" data-ajax data-stay data-remove-closest="li" data-success="Signed out that device."><button class="btn btn-ghost btn-sm">Sign out</button></form>{{/unless}}
+        </li>
+      {{/each}}
+    </ul>
+  </section>
+
+  {{!-- Usage --}}
+  {{#if me.usage}}
+    <section id="usage" data-me-panel="usage" {{#unless (eq tab 'usage')}}hidden{{/unless}} aria-labelledby="h-usage">
+      <h2 id="h-usage" class="mb-3 text-sm font-semibold">Usage</h2>
+      <div class="card p-5">
+        <div class="flex items-baseline justify-between">
+          <p><span class="tabular text-2xl font-semibold">{{me.usage.spentLabel}}</span> <span class="text-sm text-ink-3">{{#if me.usage.limited}}of {{me.usage.budgetLabel}} {{/if}}this week</span></p>
+          <p class="text-xs text-ink-3">{{me.usage.resetsLabel}}</p>
+        </div>
+        {{#if me.usage.limited}}<div class="mt-3 h-2 overflow-hidden rounded-full bg-surface-3" role="progressbar" aria-valuenow="{{me.usage.pct}}" aria-valuemin="0" aria-valuemax="100" aria-label="Weekly budget used">
+          <div class="h-full rounded-full {{#if (gt me.usage.pct 80)}}bg-warn{{else}}bg-accent{{/if}}" style="width: {{me.usage.pct}}%"></div>
+        </div>{{else}}<p class="mt-2 text-xs text-ink-3">{{me.usage.label}}</p>{{/if}}
+        <div class="mt-6 flex h-28 items-end gap-2" aria-label="Daily usage">
+          {{#each me.usage.days}}
+            <div class="flex flex-1 flex-col items-center gap-1.5" data-tooltip="{{valueLabel}}">
+              <div class="w-full rounded-md bg-accent/80 transition hover:bg-accent" style="height: max(3px, {{pct}}%)"></div>
+              <span class="text-[11px] text-ink-3">{{label}}</span>
+            </div>
+          {{/each}}
+        </div>
+        {{#if me.usage.top}}
+          <h3 class="mt-6 mb-2 text-xs font-semibold text-ink-2">Biggest tasks this week</h3>
+          <ul class="space-y-1.5 text-sm" role="list">
+            {{#each me.usage.top}}<li class="flex justify-between gap-3"><span class="truncate text-ink-2">{{title}}</span><span class="tabular shrink-0 text-ink-3">{{costLabel}}</span></li>{{/each}}
+          </ul>
+        {{/if}}
+      </div>
+    </section>
+  {{/if}}
+</div>

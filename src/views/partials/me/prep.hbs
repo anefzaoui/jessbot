@@ -1,0 +1,54 @@
+{{!--
+  You → Notifications (Phase 25 #212): overnight prep's switch (decision #199) and the notes background work left for the next
+  check-in (#200). Contract: prep = services/prep.js prepView() { value: off|ideas, capLabel, quiet, stopped, last: { title,
+  ideaTitle, href, at } | null }; notes = services/notes.js notesFor() { pending: [note], delivered: [note] } with note { id,
+  text, priority: low|normal|high, kind: note|prep, href, sourceLabel, createdAt, deliveredAt }.
+  Client: public/js/prep.js (the switch waits for the server, says what changed, goes back when it failed).
+--}}
+<section class="mt-8" aria-labelledby="h-prep">
+  <h2 id="h-prep" class="mb-3 text-sm font-semibold">While you sleep</h2>
+  <div class="card prep-card" data-prep data-value="{{prep.value}}">
+    <div class="flex items-start gap-3 p-4">
+      <span class="prep-icon" aria-hidden="true">{{icon "moon" class="size-[18px]"}}</span>
+      <div class="min-w-0 flex-1">
+        <label class="text-sm font-medium" for="prep-switch">Prepare one of my ideas overnight</label>
+        <p class="mt-0.5 text-xs leading-relaxed text-ink-3">In your quiet hours{{#if prep.quiet}} ({{prep.quiet}}){{/if}}, I pick one idea from your
+          <a href="/ideas" class="font-medium text-ink-2 hover:underline">Ideas</a> that you’re likely to want, look things up and save a first draft
+          to your Library. I only search, read and save: nothing is sent, booked or bought. Up to {{prep.capLabel}} a night.</p>
+        <p class="prep-stopped" data-prep-stopped {{#unless prep.stopped}}hidden{{/unless}}>{{icon "circle-alert" class="size-3.5 shrink-0"}} <span>{{prep.stopped}}</span></p>
+        <p class="mt-1 text-xs font-medium" data-prep-state role="status" aria-live="polite"></p>
+      </div>
+      <input type="checkbox" id="prep-switch" class="switch mt-1" role="switch" data-prep-switch {{#if (eq prep.value 'ideas')}}checked{{/if}}>
+    </div>
+    {{#if prep.last}}
+      <a href="{{prep.last.href}}" class="prep-last">
+        {{icon "file-text" class="size-4 shrink-0 text-ink-3"}}
+        <span class="min-w-0 flex-1"><span class="block truncate text-[13px] font-medium text-ink" dir="auto">{{prep.last.title}}</span>
+          <span class="block truncate text-xs text-ink-3">Last draft, for your idea “{{prep.last.ideaTitle}}”{{#if prep.last.at}} · <time datetime="{{iso prep.last.at}}" data-relative>{{timeAgo prep.last.at}}</time>{{/if}}</span></span>
+        {{icon "arrow-up-right" class="size-4 shrink-0 text-ink-3"}}
+      </a>
+    {{/if}}
+  </div>
+</section>
+
+<section class="mt-8" aria-labelledby="h-notes">
+  <div class="mb-3 flex items-baseline gap-2">
+    <h2 id="h-notes" class="flex-1 text-sm font-semibold">Notes for your next check-in</h2>
+    {{#if notes.pending.length}}<span class="count count-quiet tabular">{{notes.pending.length}} waiting</span>{{/if}}
+  </div>
+  <div class="card" data-notes>
+    {{#if notes.pending.length}}
+      <ul class="divide-y divide-line" role="list">
+        {{#each notes.pending}}{{> me/note-row this waiting=true}}{{/each}}
+      </ul>
+    {{else}}
+      <p class="notes-empty">{{icon "notebook-pen" class="size-4 shrink-0 text-ink-3"}} <span>Nothing waiting. When a scheduled task, a background task or overnight prep finds something that can wait, it leaves a line here, and I mention it at your next check-in.</span></p>
+    {{/if}}
+    {{#if notes.delivered.length}}
+      <details class="notes-earlier">
+        <summary>{{icon "chevron-right" class="notes-chevron size-3.5"}} Already told you <span class="text-ink-3">· {{notes.delivered.length}}</span></summary>
+        <ul class="divide-y divide-line" role="list">{{#each notes.delivered}}{{> me/note-row this}}{{/each}}</ul>
+      </details>
+    {{/if}}
+  </div>
+</section>

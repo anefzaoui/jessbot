@@ -1,0 +1,78 @@
+{{!--
+  You → Memory, "How I work with you" (lessons, decisions #186–#187; the screen is Phase 25 #204): the rules Jess keeps for
+  this person, learned from what they told her or corrected. The page renders it; GET /api/v1/me/lessons?fragment=1
+  re-renders it after every change. Contract: lessons = services/lessons.js personLessonsView() [{ id, rule, why, domain,
+  status: active|proposed|retired, sourceLabel, uses, lastUsedAt, retireSuggested }]. Client: public/js/me-lessons.js.
+--}}
+<div data-lessons-body>
+  {{#if lessons}}
+    <ul class="space-y-2" role="list" data-my-lessons>
+      {{#each lessons}}{{#unless (eq status 'retired')}}
+        <li class="card my-lesson" data-my-lesson="{{id}}" data-status="{{status}}">
+          <div class="my-lesson-row">
+            <span class="my-lesson-icon" aria-hidden="true">{{icon "graduation-cap" class="size-4"}}</span>
+            <div class="min-w-0 flex-1">
+              {{#if (eq status 'proposed')}}<p class="mb-1 text-xs font-medium text-warn-text">I noted this after you pointed something out. Keep it?</p>{{/if}}
+              <p class="text-sm leading-relaxed text-ink" dir="auto" data-my-lesson-rule>{{rule}}</p>
+              {{#if why}}<p class="text-xs leading-relaxed text-ink-3" dir="auto">{{why}}</p>{{/if}}
+              <p class="mt-1.5 flex flex-wrap items-center gap-1.5 text-xs text-ink-3">
+                {{#if domain}}<span class="mem-chip">{{icon "globe" class="size-3"}} On {{domain}}</span>{{/if}}
+                {{#if retireSuggested}}<span class="mem-chip is-stale">{{icon "clock" class="size-3"}} Not used in a while</span>{{/if}}
+                <span>{{default sourceLabel "Learned"}} · {{#if uses}}used {{plural uses "time" "times"}}{{#if lastUsedAt}}, last <time datetime="{{iso lastUsedAt}}" data-relative>{{timeAgo lastUsedAt}}</time>{{/if}}{{else}}not used yet{{/if}}</span>
+              </p>
+            </div>
+            <div class="my-lesson-actions">
+              {{#if (eq status 'proposed')}}
+                <button type="button" class="btn btn-primary btn-sm" data-my-lesson-action="keep">{{icon "check" class="size-3.5"}} Keep</button>
+                <button type="button" class="btn btn-ghost btn-sm" data-my-lesson-action="reject">No</button>
+              {{else}}
+                {{#if retireSuggested}}<button type="button" class="btn btn-secondary btn-sm" data-my-lesson-action="retire">{{icon "archive" class="size-3.5"}} Retire</button>{{/if}}
+                <button type="button" class="btn btn-ghost btn-icon btn-sm size-7" data-my-lesson-edit aria-label="Edit this rule" data-tooltip="Edit">{{icon "pencil" class="size-3.5"}}</button>
+                {{#unless retireSuggested}}<button type="button" class="btn btn-ghost btn-icon btn-sm size-7" data-my-lesson-action="retire" aria-label="Retire this rule" data-tooltip="Retire: stop using it, keep it below">{{icon "archive" class="size-3.5"}}</button>{{/unless}}
+                <button type="button" class="btn btn-danger-ghost btn-icon btn-sm size-7" data-my-lesson-action="delete" aria-label="Delete this rule" data-tooltip="Delete">{{icon "trash-2" class="size-3.5"}}</button>
+              {{/if}}
+            </div>
+          </div>
+          <form class="my-lesson-edit" data-my-lesson-form hidden novalidate>
+            <div data-field>
+              <label class="label" for="ml-rule-{{id}}">The rule</label>
+              <textarea id="ml-rule-{{id}}" name="rule" rows="2" maxlength="220" class="textarea text-sm" dir="auto">{{rule}}</textarea>
+            </div>
+            <div data-field>
+              <label class="label" for="ml-why-{{id}}">Why <span class="font-normal text-ink-3">(optional)</span></label>
+              <input id="ml-why-{{id}}" name="why" maxlength="160" class="input text-sm" dir="auto" value="{{why}}">
+            </div>
+            <div class="flex justify-end gap-2">
+              <button type="button" class="btn btn-ghost btn-sm" data-my-lesson-cancel>Cancel</button>
+              <button type="submit" class="btn btn-primary btn-sm">Save</button>
+            </div>
+          </form>
+        </li>
+      {{/unless}}{{/each}}
+    </ul>
+    {{#if (countWhere lessons 'status' 'retired')}}
+      <details class="my-lessons-retired mt-3">
+        <summary class="li-archived-h">{{icon "chevron-right" class="size-4 li-archived-chevron"}} Retired <span class="tabular text-ink-3">{{countWhere lessons 'status' 'retired'}}</span></summary>
+        <ul class="mt-2 space-y-2" role="list">
+          {{#each lessons}}{{#if (eq status 'retired')}}
+            <li class="card my-lesson" data-my-lesson="{{id}}" data-status="retired">
+              <div class="my-lesson-row">
+                <span class="my-lesson-icon" aria-hidden="true">{{icon "archive" class="size-4"}}</span>
+                <p class="min-w-0 flex-1 text-sm leading-relaxed text-ink-2" dir="auto">{{rule}}</p>
+                <div class="my-lesson-actions">
+                  <button type="button" class="btn btn-secondary btn-sm" data-my-lesson-action="restore">{{icon "rotate-ccw" class="size-3.5"}} Use again</button>
+                  <button type="button" class="btn btn-danger-ghost btn-icon btn-sm size-7" data-my-lesson-action="delete" aria-label="Delete this rule" data-tooltip="Delete">{{icon "trash-2" class="size-3.5"}}</button>
+                </div>
+              </div>
+            </li>
+          {{/if}}{{/each}}
+        </ul>
+      </details>
+    {{/if}}
+  {{else}}
+    <div class="card my-lessons-empty">
+      <span class="grid size-9 shrink-0 place-items-center rounded-xl bg-surface-2 text-ink-2">{{icon "graduation-cap" class="size-[18px]"}}</span>
+      <p class="text-sm text-ink-3">Nothing yet. When you correct how I do something (“use Celsius”, “shorter, please”), I keep a short rule here so you never have to say it twice.</p>
+    </div>
+  {{/if}}
+</div>

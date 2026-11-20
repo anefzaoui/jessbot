@@ -1,0 +1,65 @@
+{{!-- Admin → System (Phase 9): health check, the weekly self-review, How I'm doing and What's new (Phase 25 #212–#213), the wish
+     log (#203), backups, server log, about. Clients: public/js/admin-system.js, admin-review.js, admin-wishes.js --}}
+{{> page-header title="System" subtitle="Health, how I’m doing, backups and logs" width="max-w-5xl"}}
+<div class="mx-auto max-w-5xl px-4 py-6 sm:px-6" data-admin-system>
+  {{> admin/nav active="system"}}
+
+  <section class="card overflow-hidden p-0" aria-label="Health check" data-health>
+    {{> admin/health}}
+  </section>
+
+  <div class="mt-6">{{> admin/self-review review=review}}</div>
+  <div data-doing-slot>{{> admin/how-im-doing summary=summary}}</div>
+  <div data-wn-admin-slot>{{> admin/whats-new whatsNew=whatsNew}}</div>
+
+  {{> admin/wishes wishes=wishes}}
+
+  <section id="backups" class="mt-6 scroll-mt-20" aria-labelledby="h-backups">
+    <div class="mb-3 flex flex-wrap items-center gap-3">
+      <div class="min-w-0 flex-1">
+        <h2 id="h-backups" class="text-sm font-semibold">Backups</h2>
+        <p class="text-xs text-ink-3">Everything people made and saved (conversations, memories, library, goals, feed, settings) in one file. A new one is made every day and kept for a week. Sign-in cookies are never included.</p>
+      </div>
+      <button type="button" class="btn btn-primary btn-sm" data-backup-now>{{icon "archive" class="size-3.5"}} Back up now</button>
+    </div>
+    <div class="card overflow-hidden p-0" data-backups>{{> admin/backups}}</div>
+    <details class="mt-2 text-xs text-ink-3">
+      <summary class="cursor-pointer select-none hover:text-ink-2">How to restore</summary>
+      <ol class="mt-2 list-decimal space-y-1 ps-5">
+        <li>Stop Jessbot.</li>
+        <li>In the Jessbot folder run <code>npm run restore</code> to list backups, then <code>npm run restore -- &lt;name&gt;</code>.</li>
+        <li>Start Jessbot again. What was there before is kept in <code>data/backups/before-restore-…</code>.</li>
+      </ol>
+    </details>
+  </section>
+
+  <section id="logs" class="mt-6 scroll-mt-20" aria-labelledby="h-logs" data-logs data-level="{{log.level}}">
+    <div class="mb-3 flex flex-wrap items-center gap-2">
+      <h2 id="h-logs" class="flex-1 text-sm font-semibold">Server log <span class="font-normal text-ink-3">· live</span></h2>
+      <div class="segmented" role="group" aria-label="Show">
+        <button type="button" data-log-level="error" aria-pressed="{{eq log.level 'error'}}">Errors</button>
+        <button type="button" data-log-level="warn" aria-pressed="{{eq log.level 'warn'}}">Warnings</button>
+        <button type="button" data-log-level="info" aria-pressed="{{eq log.level 'info'}}">Everything</button>
+      </div>
+      <input type="search" class="input h-8 w-44 text-xs" placeholder="Filter…" aria-label="Filter the log" data-log-filter>
+    </div>
+    <div class="log-view" data-log-view tabindex="0" aria-label="Server log lines">
+      {{#each log.lines}}<div class="log-line" data-seq="{{seq}}" data-level="{{level}}"><time datetime="{{at}}">{{time at}}</time><span>{{text}}</span></div>{{else}}<p class="px-1.5 py-2 opacity-60" data-log-empty>Nothing at this level. That’s good.</p>{{/each}}
+    </div>
+    {{#if log.files}}
+      <p class="mt-2 text-xs text-ink-3">Daily files (kept 14 days):
+        {{#each log.files}}<a href="/admin/system/logs/{{name}}" class="font-mono hover:underline" download>{{name}}</a>{{#unless @last}} · {{/unless}}{{/each}}</p>
+    {{/if}}
+  </section>
+
+  <section class="card mt-6 p-5" aria-labelledby="h-about">
+    <h2 id="h-about" class="mb-3 text-sm font-semibold">About this Jessbot</h2>
+    <dl class="grid gap-x-6 gap-y-2 text-sm sm:grid-cols-2">
+      <div class="flex justify-between gap-3"><dt class="text-ink-3">Version</dt><dd class="font-mono">{{default about.version "unknown"}}{{#if about.commit}} · {{about.commit}}{{/if}}</dd></div>
+      <div class="flex justify-between gap-3"><dt class="text-ink-3">Node</dt><dd class="font-mono">{{about.node}}</dd></div>
+      <div class="flex justify-between gap-3"><dt class="text-ink-3">Address</dt><dd class="font-mono">{{about.host}}:{{about.port}}</dd></div>
+      <div class="flex justify-between gap-3"><dt class="text-ink-3">Running for</dt><dd class="tabular" data-uptime="{{about.uptime}}">{{about.uptime}}s</dd></div>
+      <div class="flex justify-between gap-3 sm:col-span-2"><dt class="text-ink-3">Data folder</dt><dd class="truncate font-mono text-xs" dir="ltr">{{about.dataDir}}</dd></div>
+    </dl>
+  </section>
+</div>

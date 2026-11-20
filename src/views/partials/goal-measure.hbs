@@ -1,0 +1,37 @@
+{{!--
+  One number a goal counts (services/goals.js measureView; decision #196). Contract: { id, label, unit?, start?, target?, direction:
+  up|down, perWeek?, latest?, latestAt?, progress? (0–100), thisWeek?, weekLabel? ("4 of 3 this week"), line, points: [{ at, value }] }
+  + goalId, disabled? (the goal isn't active). Logging: public/js/goals.js POSTs /api/v1/goals/:goalId/measures/:id/logs and swaps
+  in the card the server renders back.
+--}}
+<article class="card goal-measure" data-measure-id="{{id}}" aria-labelledby="measure-{{id}}">
+  <div class="flex items-start gap-3">
+    <div class="min-w-0 flex-1">
+      <h3 id="measure-{{id}}" class="text-sm font-semibold" dir="auto">{{label}}</h3>
+      <p class="mt-1 flex items-baseline gap-1.5">
+        {{#if (neq latest null)}}<span class="tabular text-2xl leading-none font-semibold tracking-tight" data-measure-latest>{{num latest}}</span>{{#if unit}}<span class="text-sm text-ink-3">{{unit}}</span>{{/if}}
+        {{else}}<span class="text-sm text-ink-3" data-measure-latest>Nothing logged yet</span>{{/if}}
+      </p>
+      <p class="mt-1 flex flex-wrap gap-x-2 text-xs text-ink-3">
+        {{#if (neq target null)}}<span>Target {{num target}}{{#if unit}} {{unit}}{{/if}}</span>{{/if}}
+        {{#if (neq start null)}}<span>Started at {{num start}}</span>{{/if}}
+        {{#if latestAt}}<span>Last <time datetime="{{latestAt}}" data-relative>{{timeAgo latestAt}}</time></span>{{/if}}
+      </p>
+    </div>
+    <div class="goal-spark">{{#if points.[1]}}{{sparkline points unit=unit}}{{else}}<span class="text-[11px] text-ink-3">The line shows after two readings</span>{{/if}}</div>
+  </div>
+  {{#if weekLabel}}<p class="goal-week {{#if (gt thisWeek (default perWeek 0))}}is-over{{else if (eq thisWeek perWeek)}}is-met{{/if}}">{{icon "calendar-check" class="size-3.5"}} {{weekLabel}}</p>{{/if}}
+  {{#if (neq progress null)}}<div class="mt-3 flex items-center gap-3">{{> progress-bar value=progress label=(concat label " progress") class="flex-1"}}<span class="tabular text-xs font-medium text-ink-2">{{progress}}%</span></div>{{/if}}
+  {{#unless disabled}}
+    <form class="goal-log" data-measure-log novalidate>
+      <label class="sr-only" for="log-{{id}}">New {{label}} reading</label>
+      <div class="goal-log-field" data-field>
+        <input id="log-{{id}}" name="value" type="number" step="any" inputmode="decimal" class="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-ink-3" placeholder="{{#if (neq latest null)}}{{num latest}}{{else}}Today’s number{{/if}}" required>
+        {{#if unit}}<span class="text-xs text-ink-3">{{unit}}</span>{{/if}}
+      </div>
+      <label class="sr-only" for="log-note-{{id}}">Note</label>
+      <input id="log-note-{{id}}" name="note" class="input h-9 min-w-0 flex-1 basis-32 text-sm" maxlength="200" placeholder="Note (optional)">
+      <button class="btn btn-secondary btn-sm h-9">{{icon "plus" class="size-3.5"}} Log it</button>
+    </form>
+  {{/unless}}
+</article>

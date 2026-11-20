@@ -1,0 +1,26 @@
+{{!--
+  Admin → Models → recent quick decisions (services/decide.js recentDecisions). Contract: decisions [{ id, use, label, iconName,
+  outcome, confidence (0–100|null), acted, fallback, ms, at }]. Re-rendered by GET /api/v1/admin/decide/recent (admin-decide.js).
+--}}
+{{#if decisions}}
+  <ol class="dec-list" role="list">
+    {{#each decisions}}
+      <li class="dec-row {{#unless acted}}is-fallback{{/unless}}">
+        <span class="dec-icon" aria-hidden="true">{{icon iconName class="size-3.5"}}</span>
+        <div class="min-w-0 flex-1">
+          <p class="flex flex-wrap items-center gap-x-2 text-[13px]"><span class="font-medium">{{label}}</span>
+            {{#if fallback}}<span class="badge">{{fallback}}</span>{{/if}}</p>
+          <p class="truncate text-xs text-ink-3" title="{{outcome}}">{{outcome}}</p>
+        </div>
+        {{#if confidence}}<span class="dec-conf" style="--p:{{confidence}}%" title="{{confidence}}% sure"><span></span></span>{{/if}}
+        <span class="w-14 shrink-0 text-right text-[11px] text-ink-3 tabular">{{#if ms}}{{ms}} ms{{/if}}</span>
+        <time class="w-16 shrink-0 text-right text-[11px] text-ink-3" datetime="{{iso at}}" data-relative>{{timeAgo at}}</time>
+      </li>
+    {{/each}}
+  </ol>
+{{else}}
+  <div class="rounded-xl border border-dashed border-line px-4 py-8 text-center">
+    <p class="text-sm font-medium">No decisions yet</p>
+    <p class="mt-1 text-xs text-ink-3">They appear here as Jess uses them, or try one on the right.</p>
+  </div>
+{{/if}}

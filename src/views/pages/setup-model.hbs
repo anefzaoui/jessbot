@@ -1,0 +1,45 @@
+{{#> setup/frame heading="Give it a brain." lead="Jessbot thinks with a language model through any OpenAI-compatible service. The default is fast, capable and very cheap."}}
+  <form class="space-y-4" data-model-test action="/setup/model/test">
+    <div class="rounded-xl border border-line bg-surface px-4 py-3">
+      <div class="flex items-center gap-3">
+        <span class="grid size-9 place-items-center rounded-lg bg-accent-soft text-accent-text">{{icon "key-round" class="size-[18px]"}}</span>
+        <div class="min-w-0 flex-1">
+          <p class="text-sm font-semibold">OpenRouter API key</p>
+          {{#if llm.hasKey}}
+            <p class="text-xs text-ink-3">Found in <code class="font-mono">.env</code> · <span class="font-mono">{{llm.maskedKey}}</span></p>
+          {{else}}
+            <p class="text-xs text-ink-3">Paste it once. It's saved to <code class="font-mono">.env</code> on this machine, never in the database.</p>
+          {{/if}}
+        </div>
+      </div>
+      <div class="mt-3 {{#if llm.hasKey}}hidden{{/if}}" data-key-field>
+        <label class="sr-only" for="f-apiKey">API key</label>
+        <input id="f-apiKey" name="apiKey" type="password" class="input font-mono text-[13px]" placeholder="sk-or-…" autocomplete="off">
+      </div>
+      {{#if llm.hasKey}}<button type="button" class="mt-2 text-xs font-medium text-accent-text hover:underline" data-show-key-field>Use a different key</button>{{/if}}
+    </div>
+
+    <div data-field>
+      <label class="label" for="f-model">Model</label>
+      <input id="f-model" name="model" class="input font-mono text-[13px]" value="{{llm.model}}" autocomplete="off">
+      <p class="hint">Default: <span class="font-mono">openai/gpt-6-luna</span>, about $0.10 per million words read.</p>
+    </div>
+    <details class="group">
+      <summary class="cursor-pointer text-xs font-medium text-ink-3 hover:text-ink-2">Advanced: a different endpoint</summary>
+      <div class="mt-3" data-field>
+        <label class="label" for="f-baseUrl">Base URL</label>
+        <input id="f-baseUrl" name="baseUrl" class="input font-mono text-[13px]" value="{{llm.baseUrl}}">
+        <p class="hint">Works with OpenRouter, OpenAI, or a local server (Ollama, LM Studio).</p>
+      </div>
+    </details>
+
+    <button type="submit" class="btn btn-secondary btn-block" data-test-button>{{icon "plug-zap" class="size-4"}} Test the connection</button>
+    <div data-test-result aria-live="polite"></div>
+  </form>
+
+  <form method="post" action="/setup/model" class="mt-6 flex items-center gap-3">
+    <button class="btn btn-primary btn-lg flex-1" data-continue {{#unless modelDone}}disabled{{/unless}}>Continue {{icon "arrow-right" class="size-4"}}</button>
+    <button name="skip" value="1" class="btn btn-ghost">Skip for now</button>
+  </form>
+{{/setup/frame}}
+<script type="module" src="/js/setup.js"></script>

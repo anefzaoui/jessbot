@@ -1,0 +1,144 @@
+{
+  "model": "openai/gpt-image-2.5-flare",
+  "endpoint": "https://openrouter.ai/api/v1/images",
+  "anchor": "day-clear.png",
+  "created": "2026-09-24T16:10:41.471Z",
+  "updated": "2026-09-24T16:11:24.108Z",
+  "totalCost": 0.097843,
+  "images": [
+    {
+      "timeOfDay": "day",
+      "weather": "clear",
+      "file": "day-clear.png",
+      "prompt": "Cinematic, photorealistic interior view from inside an elegant, modern, minimal luxury home, looking straight out through a large floor-to-ceiling glass window that fills most of the frame. Slim dark window frames appear only near the left and right edges; the centre of the image is an unobstructed view through the glass. A subtle hint of the calm, minimal interior at the very bottom edge (a low, clean sill and soft floor reflections) and at the extreme sides; nothing in the centre of the frame. Outside: a softly blurred, location-neutral landscape of gentle rolling hills and scattered trees, with a distant small city whose soft lights sit along the horizon; no recognizable landmarks. The horizon sits slightly below the middle of the frame. A gentle depth-of-field blur over the whole scene, as if the camera is focused on a person standing close in front of it, so a portrait reads clearly on top. Calm, premium, cinematic colour grading. Landscape 3:2 image. No people, no animals, no text, no logos. Time of day: full daytime. Bright, natural daylight and a luminous sky. Weather: clear. An open, cloudless sky; if the sun is up, warm sunlight streams in through the glass and falls softly into the room.",
+      "referenceUsed": null,
+      "cost": 0.04249,
+      "generationId": "gen-img-1790266241-h9SgKpCAPo3w49ZWswVh",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1536x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 266,
+        "completion_tokens": 1372,
+        "total_tokens": 1638,
+        "cost": 0.04249,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.04249,
+          "upstream_inference_prompt_cost": 0.00133,
+          "upstream_inference_completions_cost": 0.04116
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1372
+        }
+      },
+      "createdAt": "2026-09-24T16:10:59.727Z"
+    },
+    {
+      "timeOfDay": "night",
+      "weather": "rain",
+      "file": "night-rain.png",
+      "prompt": "The attached reference image shows the scene. Keep the same room, the same floor-to-ceiling window and frames, the same vantage point, camera position, lens and composition, and the same landscape (hills, trees and distant city in the same places). Change ONLY the time of day, the light, the sky and the weather as described. Cinematic, photorealistic interior view from inside an elegant, modern, minimal luxury home, looking straight out through a large floor-to-ceiling glass window that fills most of the frame. Slim dark window frames appear only near the left and right edges; the centre of the image is an unobstructed view through the glass. A subtle hint of the calm, minimal interior at the very bottom edge (a low, clean sill and soft floor reflections) and at the extreme sides; nothing in the centre of the frame. Outside: a softly blurred, location-neutral landscape of gentle rolling hills and scattered trees, with a distant small city whose soft lights sit along the horizon; no recognizable landmarks. The horizon sits slightly below the middle of the frame. A gentle depth-of-field blur over the whole scene, as if the camera is focused on a person standing close in front of it, so a portrait reads clearly on top. Calm, premium, cinematic colour grading. Landscape 3:2 image. No people, no animals, no text, no logos. Time of day: night. A deep navy-blue sky, the distant city lights glowing as soft bokeh along the horizon, faint moonlight on the hills, a dim warm ambient glow inside the room. Weather: rain. Steady rain falls outside; raindrops cling to the window glass and rain streaks run down it in the foreground, with soft, misty hills and wet, reflective surfaces.",
+      "referenceUsed": "day-clear.png",
+      "cost": 0.055353,
+      "generationId": "gen-img-1790266263-ocFTila7N0m4xXDq85Oa",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1536x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 1917,
+        "completion_tokens": 1372,
+        "total_tokens": 3289,
+        "cost": 0.055353,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.055353,
+          "upstream_inference_prompt_cost": 0.014193,
+          "upstream_inference_completions_cost": 0.04116
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1372
+        }
+      },
+      "createdAt": "2026-09-24T16:11:24.100Z"
+    }
+  ],
+  "history": [
+    {
+      "timeOfDay": "day",
+      "weather": "clear",
+      "file": "day-clear.png",
+      "prompt": "Cinematic, photorealistic interior view from inside an elegant, modern, minimal luxury home, looking straight out through a large floor-to-ceiling glass window that fills most of the frame. Slim dark window frames appear only near the left and right edges; the centre of the image is an unobstructed view through the glass. A subtle hint of the calm, minimal interior at the very bottom edge (a low, clean sill and soft floor reflections) and at the extreme sides; nothing in the centre of the frame. Outside: a softly blurred, location-neutral landscape of gentle rolling hills and scattered trees, with a distant small city whose soft lights sit along the horizon; no recognizable landmarks. The horizon sits slightly below the middle of the frame. A gentle depth-of-field blur over the whole scene, as if the camera is focused on a person standing close in front of it, so a portrait reads clearly on top. Calm, premium, cinematic colour grading. Landscape 3:2 image. No people, no animals, no text, no logos. Time of day: full daytime. Bright, natural daylight and a luminous sky. Weather: clear. An open, cloudless sky; if the sun is up, warm sunlight streams in through the glass and falls softly into the room.",
+      "referenceUsed": null,
+      "cost": 0.04249,
+      "generationId": "gen-img-1790266241-h9SgKpCAPo3w49ZWswVh",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1536x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 266,
+        "completion_tokens": 1372,
+        "total_tokens": 1638,
+        "cost": 0.04249,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.04249,
+          "upstream_inference_prompt_cost": 0.00133,
+          "upstream_inference_completions_cost": 0.04116
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1372
+        }
+      },
+      "createdAt": "2026-09-24T16:10:59.727Z"
+    },
+    {
+      "timeOfDay": "night",
+      "weather": "rain",
+      "file": "night-rain.png",
+      "prompt": "The attached reference image shows the scene. Keep the same room, the same floor-to-ceiling window and frames, the same vantage point, camera position, lens and composition, and the same landscape (hills, trees and distant city in the same places). Change ONLY the time of day, the light, the sky and the weather as described. Cinematic, photorealistic interior view from inside an elegant, modern, minimal luxury home, looking straight out through a large floor-to-ceiling glass window that fills most of the frame. Slim dark window frames appear only near the left and right edges; the centre of the image is an unobstructed view through the glass. A subtle hint of the calm, minimal interior at the very bottom edge (a low, clean sill and soft floor reflections) and at the extreme sides; nothing in the centre of the frame. Outside: a softly blurred, location-neutral landscape of gentle rolling hills and scattered trees, with a distant small city whose soft lights sit along the horizon; no recognizable landmarks. The horizon sits slightly below the middle of the frame. A gentle depth-of-field blur over the whole scene, as if the camera is focused on a person standing close in front of it, so a portrait reads clearly on top. Calm, premium, cinematic colour grading. Landscape 3:2 image. No people, no animals, no text, no logos. Time of day: night. A deep navy-blue sky, the distant city lights glowing as soft bokeh along the horizon, faint moonlight on the hills, a dim warm ambient glow inside the room. Weather: rain. Steady rain falls outside; raindrops cling to the window glass and rain streaks run down it in the foreground, with soft, misty hills and wet, reflective surfaces.",
+      "referenceUsed": "day-clear.png",
+      "cost": 0.055353,
+      "generationId": "gen-img-1790266263-ocFTila7N0m4xXDq85Oa",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1536x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 1917,
+        "completion_tokens": 1372,
+        "total_tokens": 3289,
+        "cost": 0.055353,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.055353,
+          "upstream_inference_prompt_cost": 0.014193,
+          "upstream_inference_completions_cost": 0.04116
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1372
+        }
+      },
+      "createdAt": "2026-09-24T16:11:24.100Z"
+    }
+  ]
+}

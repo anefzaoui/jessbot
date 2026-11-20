@@ -1,0 +1,10 @@
+{{!-- Source line: site icon · name · time (· read time) (· +N sources). source { name, host }, favicon?, sources? --}}
+<p class="flex items-center gap-2 text-xs text-ink-3">
+  {{#if favicon}}<img src="{{favicon}}" alt="" class="size-5 shrink-0 rounded-md object-contain" loading="lazy" width="20" height="20">
+  {{else}}<span class="grid size-5 shrink-0 place-items-center rounded-md bg-surface-3 text-[10px] font-bold text-ink-2 uppercase">{{initials source.name}}</span>{{/if}}
+  <span class="truncate font-medium text-ink-2">{{source.name}}</span>
+  <span aria-hidden="true">·</span>
+  <time datetime="{{iso createdAt}}" data-relative class="shrink-0">{{timeAgo createdAt}}</time>
+  {{#if readMinutes}}<span aria-hidden="true">·</span><span class="shrink-0">{{readMinutes}} min</span>{{/if}}
+  {{#if sources}}<span class="badge badge-neutral shrink-0" title="The same story from {{sources}} outlets">+{{sources}} sources</span>{{/if}}
+</p>

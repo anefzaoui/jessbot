@@ -1,0 +1,175 @@
+{{!--
+  Chat — one main thread per user + side chats.
+  Data: thread { id, title, isMain, offRecord? (a side chat nothing is remembered from, decision #123) }, days [{ label, messages: [message] }], agent (status-strip),
+        pendingQuestion? (ask-dock), running (bool), sendUrl, suggestions [{ label, text, iconName }],
+        project? (projectView — a project chat: its panel beside the chat), panel? (projects/panel), projectOptions (edit dialog),
+        background? (chat/background-brief: a background task's side chat, #212), whatsNew? [{ id, lines, publishedAt }] (chat/whats-new, #213)
+  The title is a switcher (Main · projects · side chats) — on phones it's the way between chats (decision #91).
+--}}
+<div class="flex h-full min-h-0" {{#if project}}data-project-page="{{project.id}}"{{/if}}>
+<div class="flex h-full min-h-0 min-w-0 flex-1 flex-col" data-chat data-thread-id="{{thread.id}}" {{#if project}}data-project-id="{{project.id}}"{{/if}}>
+  {{!-- The header IS the living sky when it's your own chat: time-of-day × weather scene, greeting, weather, what's next. --}}
+  <header class="chat-head {{#if now}}has-sky{{/if}}" {{#if now}}data-sky {{#if presence.scene}}style="--scene: url('/img/scenes/{{presence.scene}}.webp')"{{/if}}{{/if}}>
+    <button type="button" class="shrink-0 rounded-full" data-panel-open="activity" aria-label="Open {{bot.name}}'s activity">
+      {{> avatar size="xl" activity=agent.activity avatarId="chat-avatar"}}
+    </button>
+    <div class="min-w-0 flex-1">
+      <div class="flex items-center gap-2">
+        <h1 class="min-w-0 text-base font-semibold tracking-tight">
+          <button type="button" class="chat-switch" popovertarget="chat-switcher" aria-haspopup="menu" aria-label="Switch chat. Now: {{#if thread.isMain}}{{bot.name}}{{else}}{{thread.title}}{{/if}}">
+            {{#if project}}{{> projects/tile icon=project.icon hue=project.hue size="sm"}}{{/if}}
+            <span class="truncate" dir="auto">{{#if thread.isMain}}{{bot.name}}{{else}}{{thread.title}}{{/if}}</span>
+            {{icon "chevrons-up-down" class="size-3.5 shrink-0 text-ink-3"}}
+          </button>
+        </h1>
+        {{#if project}}<span class="badge badge-accent proj-badge hidden sm:inline-flex" style="--hue: {{project.hue}}">{{#if (eq project.status 'active')}}Project{{else}}{{project.status}}{{/if}}</span>
+        {{else}}{{#unless thread.isMain}}<span class="badge badge-neutral hidden shrink-0 sm:inline-flex" data-sidechat-badge {{#if thread.offRecord}}hidden{{/if}}>Side chat</span>
+          <span class="offrecord-chip hidden sm:inline-flex" data-offrecord-chip {{#unless thread.offRecord}}hidden{{/unless}} data-tooltip="Nothing from this chat becomes a memory">{{icon "message-circle-off" class="size-3.5"}} Off the record</span>{{/unless}}{{/if}}
+        {{#if now}}<span class="chat-head-greeting hidden shrink-[100] truncate sm:inline" title="{{now.line}}">{{now.text}}</span>{{/if}}
+      </div>
+      <div class="mt-1 flex min-w-0 items-center gap-2">
+        {{#unless thread.isMain}}<span class="offrecord-chip sm:hidden" data-offrecord-chip {{#unless thread.offRecord}}hidden{{/unless}}>{{icon "message-circle-off" class="size-3.5"}} Off the record</span>{{/unless}}
+        {{> chat/status-strip agent=agent}}
+      </div>
+    </div>
+    {{#if now.next}}<a href="{{now.next.href}}" class="chat-head-chip hidden lg:inline-flex" aria-label="Next up: {{now.next.label}}, {{now.next.whenLabel}}">{{icon now.next.iconName class="size-4"}}<span class="max-w-36 truncate">{{now.next.label}}</span><span class="opacity-75">{{now.next.whenLabel}}</span></a>{{/if}}
+    {{#if now.weather}}<a href="/me/places" class="chat-head-chip" data-now-weather title="{{now.weather.label}} · {{now.weather.place}}">{{icon now.weather.iconName class="size-4"}}<span class="tabular font-semibold">{{now.weather.temp}}</span><span class="hidden sm:inline">{{now.weather.place}}</span></a>{{/if}}
+    {{#unless thread.isMain}}{{#unless project}}{{#unless readOnly}}
+      <button type="button" class="btn btn-ghost btn-icon offrecord-toggle hidden sm:inline-flex" data-offrecord-toggle aria-label="Off the record" aria-pressed="{{#if thread.offRecord}}true{{else}}false{{/if}}"
+        data-tooltip="{{#if thread.offRecord}}Off the record: nothing here becomes a memory. Press to remember again{{else}}Go off the record: nothing said here becomes a memory{{/if}}">{{icon "message-circle-off" class="size-5"}}</button>
+    {{/unless}}{{/unless}}{{/unless}}
+    {{#if project}}<button type="button" class="btn btn-ghost btn-sm lg:hidden" data-modal-open="project-sheet" aria-label="Brief and files">{{icon "list-checks" class="size-4"}}<span class="hidden sm:inline">Brief & files</span></button>{{/if}}
+    <button type="button" class="btn btn-ghost btn-icon" popovertarget="thread-menu" aria-haspopup="menu" aria-label="Chat options">
+      {{icon "ellipsis" class="size-5"}}
+    </button>
+    <div id="thread-menu" popover class="menu w-56" role="menu" data-placement="bottom-end">
+      <a href="/chat/new" class="menu-item" role="menuitem">{{icon "message-square-plus" class="size-4"}} New side chat</a>
+      {{#if project}}
+        <button type="button" class="menu-item" role="menuitem" data-project-edit="{{project.id}}">{{icon "pencil" class="size-4"}} Edit project</button>
+        <a href="/projects" class="menu-item" role="menuitem">{{icon "folders" class="size-4"}} All projects</a>
+        <div class="menu-sep"></div>
+        <button type="button" class="menu-item is-danger" role="menuitem" data-project-delete="{{project.id}}" data-name="{{project.name}}">{{icon "trash-2" class="size-4"}} Delete project</button>
+      {{else}}{{#unless thread.isMain}}
+        <button type="button" class="menu-item" role="menuitemcheckbox" aria-checked="{{#if thread.offRecord}}true{{else}}false{{/if}}" data-offrecord-toggle>{{icon "message-circle-off" class="size-4"}} <span class="flex-1">Off the record</span>{{icon "check" class="menu-check size-4 text-accent"}}</button>
+        <button type="button" class="menu-item" role="menuitem" data-thread-rename>{{icon "pencil" class="size-4"}} Rename</button>
+        <button type="button" class="menu-item" role="menuitem" data-make-project>{{icon "folder-plus" class="size-4"}} Make this a project</button>
+        <div class="menu-sep"></div>
+        <button type="button" class="menu-item is-danger" role="menuitem" data-thread-delete>{{icon "trash-2" class="size-4"}} Delete side chat</button>
+      {{/unless}}{{/if}}
+      <a href="/activity" class="menu-item" role="menuitem">{{icon "history" class="size-4"}} Full activity</a>
+      {{#if context.used}}
+        <div class="menu-sep"></div>
+        <div class="px-2.5 py-1.5 text-xs text-ink-3">
+          <p class="flex justify-between"><span>Context</span><span class="tabular">{{context.usedLabel}} / {{context.hardLabel}}{{#if context.cachePct}} · {{context.cachePct}}% cached{{/if}}</span></p>
+          <div class="mt-1.5 h-1 overflow-hidden rounded-full bg-surface-3"><div class="h-full rounded-full bg-accent" style="width: {{context.pct}}%"></div></div>
+        </div>
+        <button type="button" class="menu-item" role="menuitem" data-thread-compact>{{icon "fold-vertical" class="size-4"}} Compact now</button>
+      {{/if}}
+    </div>
+    <button type="button" class="btn btn-ghost btn-icon hidden xl:inline-flex" data-panel-toggle data-tooltip="Toggle panel" data-tooltip-kbd="Ctrl ." aria-label="Toggle activity panel">
+      {{icon "panel-right" class="size-5"}}
+    </button>
+  </header>
+
+  <div class="min-h-0 flex-1 overflow-y-auto" data-message-scroller>
+    <div class="mx-auto flex max-w-3xl flex-col gap-6 px-4 pt-6 pb-8 sm:px-6" data-message-list>
+      {{#if background}}{{> chat/background-brief background=background}}{{/if}}
+      {{#each days}}
+        <div class="divider-label" role="separator">{{label}}</div>
+        {{#each messages}}{{> chat/message this}}{{/each}}
+      {{else}}
+        <section class="flex flex-col items-center pt-[8vh] text-center" aria-labelledby="welcome-title">
+          {{> avatar size="2xl" state="idle"}}
+          <h2 id="welcome-title" class="mt-6 text-2xl font-semibold tracking-tight text-balance">
+            {{#if user.name}}Hi {{user.firstName}}, I'm {{bot.name}}.{{else}}Hi, I'm {{bot.name}}.{{/if}}
+          </h2>
+          <p class="mt-2 max-w-md text-ink-2 text-pretty">I have my own browser and I keep working when you close the app. Ask me anything, or hand me something to get done.</p>
+          {{#if suggestions}}
+            <ul class="starter-list" role="list" aria-label="Things to ask">
+              {{#each suggestions}}
+                <li><button type="button" class="starter" data-suggest="{{text}}">
+                  {{icon iconName class="size-[18px] text-ink-3"}}
+                  <span class="flex-1">{{label}}</span>
+                  {{icon "arrow-up-right" class="starter-go size-4"}}
+                </button></li>
+              {{/each}}
+            </ul>
+          {{/if}}
+        </section>
+      {{/each}}
+    </div>
+  </div>
+
+  <div class="shrink-0 px-3 pb-3 sm:px-6">
+    <div class="mx-auto flex max-w-3xl flex-col gap-2" data-dock-area>
+      {{#if readOnly}}
+        <div class="flex items-center gap-3 rounded-2xl border border-warn/40 bg-warn-soft px-4 py-3 text-sm" role="status">
+          {{icon "eye" class="size-4 text-warn-text"}}
+          <span class="flex-1">Viewing <strong>{{viewingAs.name}}</strong>'s chat as admin · read-only. This view is logged.</span>
+          <a href="/admin/people/{{viewingAs.id}}" class="btn btn-secondary btn-sm">Back</a>
+        </div>
+      {{else}}
+        {{#if pendingQuestion}}{{> chat/ask-dock pendingQuestion}}{{else if whatsNew.length}}{{> chat/whats-new whatsNew=whatsNew}}{{/if}}
+        {{> chat/composer threadId=thread.id sendUrl=sendUrl running=running}}
+        {{#if memberNotice}}<p class="-mt-1 text-center text-[11px] text-ink-3">{{icon "eye" class="size-3"}} The owner of this {{bot.name}} can read your chats.</p>{{/if}}
+      {{/if}}
+    </div>
+  </div>
+</div>
+{{#if project}}
+  <aside class="proj-aside hidden w-[340px] shrink-0 border-l border-line bg-surface/60 lg:flex" aria-label="Project brief and files" data-project-panel-slot>
+    {{> projects/panel panel=panel prefix="aside" tab=panelTab}}
+  </aside>
+{{/if}}
+</div>
+
+{{#if project}}
+  <dialog id="project-sheet" class="sheet" aria-label="Project brief and files">
+    <div class="h-full" data-project-panel-slot>{{> projects/panel panel=panel prefix="sheet" inSheet=true}}</div>
+  </dialog>
+{{/if}}
+
+{{!-- Switch chats: Main · projects · side chats (the rail does this on wide screens; this works everywhere). --}}
+<div id="chat-switcher" popover class="menu chat-switcher w-72" role="menu" data-placement="bottom-start">
+  <a href="/chat" class="menu-item" role="menuitem" {{#if thread.isMain}}aria-current="page"{{/if}}>{{> avatar size="xs"}} <span class="flex-1">{{bot.name}}</span><span class="text-[11px] text-ink-3">Main</span></a>
+  <div class="menu-sep"></div>
+  <p class="menu-label">Projects</p>
+  {{#each shell.projects}}
+    <a href="{{href}}" class="menu-item" role="menuitem" {{#if active}}aria-current="page"{{/if}}>{{> projects/tile icon=this.icon hue=hue size="sm"}} <span class="flex-1 truncate" dir="auto">{{name}}</span>{{#if waiting}}{{icon "message-circle-question" class="size-3.5 text-warn-text"}}{{else if running}}<span class="dot dot-run"></span>{{/if}}</a>
+  {{/each}}
+  <button type="button" class="menu-item text-accent-text" role="menuitem" data-project-new>{{icon "folder-plus" class="size-4"}} New project</button>
+  {{#if shell.sideChats}}
+    <div class="menu-sep"></div>
+    <p class="menu-label">Side chats</p>
+    {{#each shell.sideChats}}
+      <a href="/chat/{{id}}" class="menu-item" role="menuitem" {{#if active}}aria-current="page"{{/if}}>{{#if (eq background 'delegate')}}{{icon "rocket" class="size-4"}}{{else if (eq background 'prep')}}{{icon "moon" class="size-4"}}{{else}}{{icon "message-square" class="size-4"}}{{/if}} <span class="flex-1 truncate">{{title}}</span>{{#if running}}<span class="dot dot-run"></span>{{/if}}</a>
+    {{/each}}
+  {{/if}}
+  <a href="/chat/new" class="menu-item" role="menuitem">{{icon "message-square-plus" class="size-4"}} New side chat</a>
+</div>
+
+{{> projects/edit-dialog}}
+{{#if project}}{{> projects/soul-dialog}}{{/if}}
+
+{{!-- A thumbs-down asks "What was off?" (#211): public/js/run.js puts this under the reply. The thumbs-down is saved at once;
+     Send (with their words) or Skip starts the lesson, and its "Noted: …" chip takes this form's place. --}}
+{{#unless readOnly}}
+<template data-fb-note-template>
+  <form class="fb-note" data-fb-note data-state="asking" novalidate>
+    <div data-when="asking">
+      <p class="fb-note-h">{{icon "thumbs-down" class="size-3.5"}} What was off?</p>
+      <p class="fb-note-sub">A few words help me get it right next time. You can skip this.</p>
+      <textarea name="note" rows="2" maxlength="500" class="textarea mt-2 text-sm" dir="auto" data-fb-note-text aria-label="What was off?"
+        placeholder="Too long, wrong tone, not what I asked for…"></textarea>
+      <p class="field-error" data-fb-note-error hidden></p>
+      <div class="mt-2 flex flex-wrap items-center gap-2">
+        <button type="submit" class="btn btn-primary btn-sm" data-fb-note-send>{{icon "send" class="size-3.5"}} Tell {{bot.name}}</button>
+        <button type="button" class="btn btn-ghost btn-sm" data-fb-note-skip>Skip</button>
+        <span class="fb-note-keys ms-auto"><kbd class="kbd">Ctrl</kbd> <kbd class="kbd">Enter</kbd> sends · <kbd class="kbd">Esc</kbd> skips</span>
+      </div>
+    </div>
+    <div data-when="thinking">{{> loader label="Working out what to do differently next time…" motion="thinking" iconName="sparkles" noLines=true}}</div>
+    <p class="fb-note-done" data-when="thanks">{{icon "check" class="size-3.5"}} Thanks. Your thumbs-down is saved; nothing general for me to change from this one.</p>
+  </form>
+</template>
+{{/unless}}

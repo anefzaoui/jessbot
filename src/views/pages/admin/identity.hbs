@@ -1,0 +1,12 @@
+{{> page-header title="Identity" subtitle=(concat "Who " bot.name " is: name, look, tone") width="max-w-5xl"}}
+<div class="mx-auto max-w-5xl px-4 py-6 sm:px-6">
+  {{> admin/nav active="identity"}}
+  <div class="max-w-xl">
+    <form method="post" action="/admin/identity" class="space-y-6" data-ajax data-stay data-success="Identity updated. SOUL.md rewritten." data-busy="Saving…" data-identity-form>
+      {{> setup/identity-fields}}
+      <button class="btn btn-primary">Save identity</button>
+    </form>
+    <p class="mt-6 text-xs text-ink-3">Saving updates the identity block in <code class="font-mono">data/workspace/SOUL.md</code>. The rest of the file (personality, boundaries) is kept as you edited it.</p>
+  </div>
+</div>
+<script type="module" src="/js/setup.js"></script>

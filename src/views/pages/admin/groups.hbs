@@ -1,0 +1,31 @@
+{{> page-header title="Groups" subtitle="Shared instructions for families, teams and circles" width="max-w-5xl"}}
+<div class="mx-auto max-w-5xl px-4 py-6 sm:px-6">
+  {{> admin/nav active="groups"}}
+
+  <form method="post" action="/admin/groups" class="card mb-8 flex flex-wrap items-end gap-3 p-4" data-ajax data-busy="Adding…">
+    <div class="min-w-48 flex-1">{{> field name="name" label="New group" placeholder="e.g. Family, Company" autocomplete="off"}}</div>
+    <button class="btn btn-primary">{{icon "plus" class="size-4"}} Add group</button>
+  </form>
+
+  <div class="space-y-6">
+    {{#each groups}}
+      <section class="card p-5" aria-labelledby="g-{{id}}">
+        <div class="flex items-center gap-3">
+          <span class="grid size-9 place-items-center rounded-xl bg-accent-soft text-accent-text">{{icon "users-round" class="size-[18px]"}}</span>
+          <div class="min-w-0 flex-1">
+            <h2 id="g-{{id}}" class="text-sm font-semibold">{{name}}</h2>
+            <p class="text-xs text-ink-3">{{plural members "member"}} · how {{@root.bot.name}} treats everyone in {{name}}</p>
+          </div>
+        </div>
+        {{> admin/instructions-form action=(concat '/admin/groups/' id '/instructions') current=instructions max=@root.instructionsMax
+          placeholder="e.g. Family: warm and casual; coordinate the shared calendar; never discuss work topics here."}}
+        <details class="mt-4 border-t border-line pt-4">
+          <summary class="cursor-pointer text-xs font-medium text-ink-3 hover:text-ink-2">Permissions for {{name}}</summary>
+          <div class="mt-4">{{> admin/policy-form policy}}</div>
+        </details>
+      </section>
+    {{else}}
+      {{> empty-state iconName="users-round" title="No groups yet" text="Groups let you give shared instructions to a family or a team, and later a shared memory only they can see." compact=true}}
+    {{/each}}
+  </div>
+</div>

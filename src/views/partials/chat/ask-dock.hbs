@@ -1,0 +1,94 @@
+{{!--
+  Question dock — docked above the composer (never full-screen). Server-rendered while a question is pending,
+  so refresh keeps it. ask.js adds stepping, keys (1-9, Enter, Esc), validation and submit.
+  Contract: question-card contract; options: [{ value, label, description?, recommended?, preview? }]; image? (a /shots/ path
+  the SERVER attached — what Jess was looking at, ask_user show_screen)
+  kind: single | multi | yesno | text | longtext; round? (a goal's second intake round: the title says "A couple more", #196)
+--}}
+<section class="ask-dock" id="ask-{{id}}" data-ask-dock="{{id}}" data-answer-url="{{default answerUrl (concat '/api/v1/questions/' id '/answer')}}"
+  aria-labelledby="ask-title-{{id}}">
+  <header class="flex items-center gap-2 border-b border-line px-4 py-2.5">
+    {{> avatar size="xs" state="waiting"}}
+    <h2 id="ask-title-{{id}}" class="text-[13px] font-semibold">{{#if (gt round 1)}}A couple more{{#unless (eq questions.length 1)}} questions{{else}} question{{/unless}}{{else}}{{@root.bot.name}} needs {{#if (eq questions.length 1)}}an answer{{else}}a few answers{{/if}}{{/if}}</h2>
+    {{#unless (eq questions.length 1)}}
+      <ol class="ml-2 hidden min-w-0 items-center gap-1 sm:flex" role="list" aria-label="Questions">
+        {{#each questions}}
+          <li><button type="button" class="ask-chip" data-ask-goto="{{@index}}" {{#if @first}}aria-current="step"{{/if}}>
+            <span class="ask-chip-check">{{icon "check" class="size-3"}}</span>{{header}}
+          </button></li>
+        {{/each}}
+      </ol>
+    {{/unless}}
+    <span class="tabular ml-auto text-[11px] text-ink-3 sm:hidden" data-ask-progress>1 / {{questions.length}}</span>
+    <button type="button" class="btn btn-ghost btn-icon btn-sm size-7 sm:ml-auto" data-ask-minimize data-tooltip="Minimize" data-tooltip-kbd="Esc" aria-label="Minimize questions">
+      {{icon "chevron-down" class="size-4"}}
+    </button>
+  </header>
+
+  <form class="flex max-h-[min(60dvh,560px)] flex-col" data-ask-form novalidate>
+    <div class="min-h-0 flex-1 overflow-y-auto px-4 pt-3 pb-2">
+      {{#each questions}}
+        <fieldset class="ask-step" data-step="{{@index}}" data-kind="{{kind}}" data-qid="{{id}}" data-header="{{header}}" {{#unless @first}}hidden{{/unless}}>
+          {{#if image}}<button type="button" class="ask-shot" data-lightbox="{{image}}" aria-label="View the screenshot larger"><img src="{{image}}" alt="What {{@root.bot.name}} is looking at" loading="lazy"></button>
+            <button type="button" class="btn btn-soft btn-sm mb-3" data-handover>{{icon "hand" class="size-3.5"}} Take over the browser</button>{{/if}}
+          <legend class="mb-3 text-[15px] leading-snug font-semibold text-balance">{{question}}</legend>
+
+          {{#if (or (eq kind 'single') (eq kind 'multi') (eq kind 'yesno'))}}
+            <div class="{{#if (hasPreview options)}}grid gap-3 md:grid-cols-[1fr_1fr]{{/if}}">
+              <div class="ask-options {{#if (eq kind 'yesno')}}grid grid-cols-2 gap-2{{else}}space-y-1.5{{/if}}"
+                role="{{#if (eq kind 'multi')}}group{{else}}radiogroup{{/if}}" aria-label="{{question}}">
+                {{#each options}}
+                  <label class="ask-option" {{#if preview}}data-preview="{{preview}}"{{/if}}>
+                    <input type="{{#if (eq ../kind 'multi')}}checkbox{{else}}radio{{/if}}" name="{{../id}}" value="{{value}}" class="ask-input">
+                    <span class="ask-key tabular">{{inc @index}}</span>
+                    <span class="min-w-0 flex-1">
+                      <span class="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-sm font-medium text-ink">{{label}}
+                        {{#if recommended}}<span class="badge badge-accent">Recommended</span>{{/if}}</span>
+                      {{#if description}}<span class="mt-0.5 block text-xs leading-snug text-ink-3">{{description}}</span>{{/if}}
+                    </span>
+                    <span class="ask-mark" aria-hidden="true">{{icon "check" class="size-3"}}</span>
+                  </label>
+                {{/each}}
+                {{#if allowOther}}
+                  <label class="ask-option ask-other">
+                    <input type="{{#if (eq kind 'multi')}}checkbox{{else}}radio{{/if}}" name="{{id}}" value="__other__" class="ask-input">
+                    <span class="ask-key tabular">{{inc options.length}}</span>
+                    <input type="text" class="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-ink-3" name="{{id}}__other"
+                      placeholder="Other: type your own answer" aria-label="Other answer" data-ask-other>
+                    <span class="ask-mark" aria-hidden="true">{{icon "check" class="size-3"}}</span>
+                  </label>
+                {{/if}}
+              </div>
+              {{#if (hasPreview options)}}
+                <pre class="ask-preview hidden min-h-32 overflow-auto rounded-xl border border-line bg-surface-2 p-3 font-mono text-xs leading-relaxed whitespace-pre-wrap text-ink-2 md:block" data-ask-preview aria-live="polite">Hover an option to preview it.</pre>
+              {{/if}}
+            </div>
+          {{else if (eq kind 'text')}}
+            <input type="text" class="input" name="{{id}}" placeholder="{{default placeholder 'Type your answer'}}" autocomplete="off">
+          {{else}}
+            <textarea class="textarea" name="{{id}}" rows="3" placeholder="{{default placeholder 'Type your answer'}}"></textarea>
+          {{/if}}
+          <p class="field-error" data-ask-error hidden></p>
+        </fieldset>
+      {{/each}}
+    </div>
+
+    <footer class="flex items-center gap-2 border-t border-line px-4 py-2.5">
+      <p class="hidden items-center gap-1.5 text-[11px] text-ink-3 md:flex">
+        <span class="kbd">1</span>-<span class="kbd">9</span> pick <span class="kbd ml-1">↵</span> next <span class="kbd ml-1">Esc</span> minimize
+      </p>
+      <span class="flex-1" aria-hidden="true"></span>
+      <button type="button" class="btn btn-ghost btn-sm" data-ask-back hidden>{{icon "arrow-left" class="size-3.5"}} Back</button>
+      <button type="submit" class="btn btn-primary btn-sm" data-ask-next>
+        <span data-ask-next-label>{{#if (eq questions.length 1)}}Send answer{{else}}Next{{/if}}</span>{{icon "arrow-right" class="size-3.5"}}
+      </button>
+    </footer>
+  </form>
+</section>
+
+{{!-- Minimized state --}}
+<button type="button" class="ask-pill" data-ask-pill="{{id}}" hidden>
+  {{> avatar size="xs" state="waiting"}}
+  <span class="font-medium">{{@root.bot.name}} is waiting on {{#if (eq questions.length 1)}}your answer{{else}}{{questions.length}} answers{{/if}}</span>
+  <span class="ml-auto font-semibold text-accent-text">Answer</span>{{icon "chevron-up" class="size-4 text-accent-text"}}
+</button>

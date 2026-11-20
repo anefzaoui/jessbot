@@ -1,0 +1,125 @@
+{{!-- Admin → Skills (decisions #84, #195). Data: skills [{ name, description, toolsets, origin: built-in|yours, status: active|review|off|broken,
+  problems[], approvedAt, files, lines, html, lint: { bad, warn, info }, checks: { bad, warn, optional, info }, usage: { count, lastUsedAt },
+  proposed, category, categoryLabel, recommended }], review, broken (counts), statusCounts, origins, categories: [{ key, label, count }],
+  recommended: { total, on, waiting: [skill] }, toolsetOptions. One skill's review: /admin/skills/:name. Client: public/js/admin-skills.js --}}
+{{> page-header title="Skills" subtitle=(concat "Know-how " bot.name " follows for kinds of tasks") width="max-w-5xl"}}
+<div class="mx-auto max-w-5xl px-4 py-6 sm:px-6" data-admin-skills>
+  {{> admin/nav active="skills"}}
+
+  <div class="mb-4 flex flex-wrap items-center gap-3">
+    <p class="min-w-0 flex-1 text-sm text-ink-2">A skill is a page of instructions for one kind of task. {{bot.name}} sees each skill’s description and opens the
+      instructions when a request matches. Nothing runs until you approve it, and a skill whose file changes (an update, an edit) waits for your review again.</p>
+    <button type="button" class="btn btn-primary btn-sm" data-modal-open="skill-editor" data-skill-new>{{icon "plus" class="size-3.5"}} New skill</button>
+  </div>
+  {{#if review}}<p class="mb-4 flex items-center gap-2 rounded-xl border border-warn/40 bg-warn-soft px-4 py-3 text-sm">{{icon "shield-alert" class="size-4 text-warn-text"}}
+    <span>{{plural review "skill needs" "skills need"}} your review before {{bot.name}} can use {{#if (eq review 1)}}it{{else}}them{{/if}}.</span></p>{{/if}}
+
+  {{!-- The recommended core set: one action that runs the normal approval for each (review-gated, checksum-pinned) --}}
+  {{#if recommended.waiting.length}}
+    <section class="card sk-rec mb-6" aria-labelledby="h-rec" data-skill-rec>
+      <div class="flex flex-wrap items-start gap-3 p-4 sm:p-5">
+        <span class="grid size-10 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent-text">{{icon "star" class="size-5"}}</span>
+        <div class="min-w-0 flex-1 basis-60">
+          <h2 id="h-rec" class="text-sm font-semibold">Recommended to switch on</h2>
+          <p class="mt-0.5 max-w-[65ch] text-[13px] text-ink-2">The everyday set most households use: research, mail, trips, bills, meals, school, writing. {{recommended.on}} of {{recommended.total}} are on.
+            Each is approved on its own, exactly as it is now, and one with a serious finding is left for you to read first.</p>
+        </div>
+        <button type="button" class="btn btn-primary btn-sm shrink-0" data-skill-rec-approve>{{icon "check" class="size-4"}} Approve these {{recommended.waiting.length}}</button>
+      </div>
+      <ul class="sk-rec-list" role="list" data-skill-rec-list>
+        {{#each recommended.waiting}}
+          <li class="sk-rec-item" data-rec="{{name}}" data-status="{{status}}" data-bad="{{checks.bad}}">
+            <a href="/admin/skills/{{name}}" class="min-w-0 truncate font-mono text-[12px] hover:underline">{{name}}</a>
+            <span class="sk-rec-state" data-rec-state>{{#if checks.bad}}{{icon "shield-alert" class="size-3.5"}} Read first{{else if (eq status 'broken')}}Broken{{else if (eq status 'review')}}Needs review{{else}}Off{{/if}}</span>
+          </li>
+        {{/each}}
+      </ul>
+    </section>
+  {{/if}}
+
+  {{!-- Find one: words, status, origin, category (in the page; nothing is fetched) --}}
+  <div class="sk-tools" data-skill-filters>
+    <label class="sk-search">{{icon "search" class="size-4 text-ink-3"}}<span class="sr-only">Find a skill</span>
+      <input type="search" class="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-ink-3" placeholder="Find a skill: trips, bills, school…" data-skill-q autocomplete="off"></label>
+    <div class="flex flex-wrap gap-1.5" role="group" aria-label="Status">
+      <button type="button" class="chip" aria-pressed="true" data-skill-status="all">All <span class="tabular text-ink-3">{{statusCounts.all}}</span></button>
+      <button type="button" class="chip" aria-pressed="false" data-skill-status="active">Active <span class="tabular text-ink-3">{{statusCounts.active}}</span></button>
+      {{#if statusCounts.review}}<button type="button" class="chip" aria-pressed="false" data-skill-status="review">Needs review <span class="tabular text-ink-3">{{statusCounts.review}}</span></button>{{/if}}
+      {{#if statusCounts.off}}<button type="button" class="chip" aria-pressed="false" data-skill-status="off">Off <span class="tabular text-ink-3">{{statusCounts.off}}</span></button>{{/if}}
+      {{#if statusCounts.broken}}<button type="button" class="chip" aria-pressed="false" data-skill-status="broken">Broken <span class="tabular text-ink-3">{{statusCounts.broken}}</span></button>{{/if}}
+    </div>
+    <div class="flex flex-wrap gap-2">
+      <label class="sr-only" for="sk-origin">Origin</label>
+      <select id="sk-origin" class="select h-8 w-auto text-[13px]" data-skill-origin>
+        <option value="">Built-in and yours</option><option value="built-in">Built-in ({{origins.builtIn}})</option>{{#if origins.yours}}<option value="yours">Yours ({{origins.yours}})</option>{{/if}}
+      </select>
+      <label class="sr-only" for="sk-cat">Category</label>
+      <select id="sk-cat" class="select h-8 w-auto text-[13px]" data-skill-category>
+        <option value="">Every category</option>{{#each categories}}<option value="{{key}}">{{label}} ({{count}})</option>{{/each}}
+      </select>
+    </div>
+  </div>
+  <p class="mb-3 text-xs text-ink-3" data-skill-count aria-live="polite">{{plural skills.length "skill"}}</p>
+
+  <ul class="space-y-3" role="list" data-skill-list>
+    {{#each skills}}
+      <li class="card overflow-hidden p-0" id="{{name}}" data-skill="{{name}}" data-status="{{status}}" data-origin="{{origin}}" data-category="{{category}}"
+        data-description="{{description}}" data-toolsets="{{#each toolsets}}{{this}} {{/each}}" data-bad="{{checks.bad}}">
+        {{#if raw}}<template data-skill-raw>{{raw}}</template>{{/if}}
+        <div class="flex flex-wrap items-start gap-3 p-4">
+          <span class="skill-tile" data-status="{{status}}">{{icon "book-marked" class="size-[18px]"}}</span>
+          <div class="min-w-0 flex-1 basis-60">
+            <p class="flex flex-wrap items-center gap-2 text-sm font-semibold"><a href="/admin/skills/{{name}}" class="font-mono hover:underline">{{name}}</a>
+              {{#if (eq status 'active')}}<span class="badge badge-ok">Active</span>{{else if (eq status 'review')}}<span class="badge badge-warn">Needs review</span>{{else if (eq status 'broken')}}<span class="badge badge-bad">Broken</span>{{else}}<span class="badge badge-neutral">Off</span>{{/if}}
+              {{#if (eq origin 'yours')}}<span class="badge badge-neutral">Yours</span>{{/if}}
+              {{#if recommended}}<span class="badge badge-accent">{{icon "star" class="size-3"}} Recommended</span>{{/if}}
+              {{#if proposed}}<span class="badge badge-accent">{{icon "notebook-pen" class="size-3"}} Drafted by {{@root.bot.name}}</span>{{/if}}</p>
+            <p class="mt-0.5 text-sm text-ink-2">{{description}}</p>
+            {{#if problems}}<ul class="mt-1 space-y-0.5 text-xs text-bad" role="list">{{#each problems}}<li>{{this}}</li>{{/each}}</ul>{{/if}}
+            <p class="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-ink-3">
+              <span>{{categoryLabel}}</span>
+              {{#if toolsets}}<span>Uses {{#each toolsets}}<span class="font-mono">{{this}}</span>{{#unless @last}}, {{/unless}}{{/each}}</span>{{/if}}
+              {{#if usage.count}}<span class="tabular">Used {{plural usage.count "time"}} in 30 days</span>{{/if}}
+              {{#if checks.bad}}<span class="inline-flex items-center gap-1 font-medium text-bad">{{icon "octagon-alert" class="size-3.5"}} {{plural checks.bad "serious finding"}}</span>{{/if}}
+              {{#if checks.warn}}<span class="inline-flex items-center gap-1 text-warn-text">{{icon "triangle-alert" class="size-3.5"}} {{checks.warn}} worth a look</span>{{/if}}
+              {{#if checks.optional}}<span class="inline-flex items-center gap-1">{{icon "wrench" class="size-3.5"}} {{plural checks.optional "optional tool"}}</span>{{/if}}
+            </p>
+          </div>
+          <div class="flex shrink-0 gap-1.5">
+            <a href="/admin/skills/{{name}}" class="btn btn-ghost btn-sm">Review</a>
+            {{#if (eq status 'active')}}<button type="button" class="btn btn-secondary btn-sm" data-skill-action="disable">Turn off</button>
+            {{else if (eq status 'broken')}}
+            {{else if checks.bad}}<a href="/admin/skills/{{name}}" class="btn btn-secondary btn-sm text-warn-text">{{icon "shield-alert" class="size-4"}} Read first</a>
+            {{else}}<button type="button" class="btn btn-primary btn-sm" data-skill-action="approve">{{#if (eq status 'review')}}Approve{{else}}Turn on{{/if}}</button>{{/if}}
+            {{#if (eq origin 'yours')}}<button type="button" class="btn btn-ghost btn-icon btn-sm" data-skill-edit data-tooltip="Edit" aria-label="Edit {{name}}">{{icon "pencil" class="size-4"}}</button>
+              <button type="button" class="btn btn-ghost btn-icon btn-sm hover:text-bad" data-skill-delete data-tooltip="Delete" aria-label="Delete {{name}}">{{icon "trash-2" class="size-4"}}</button>{{/if}}
+          </div>
+        </div>
+        <details class="border-t border-line">
+          <summary class="cursor-pointer px-4 py-2.5 text-xs font-medium text-ink-3 select-none hover:text-ink-2">Read the instructions · {{lines}} lines</summary>
+          <div class="prose-jb max-h-[28rem] overflow-auto bg-surface-2/40 px-5 py-4 text-sm" data-skill-body>{{{html}}}</div>
+        </details>
+      </li>
+    {{else}}
+      <li class="card p-6 text-center text-sm text-ink-3">No skills yet.</li>
+    {{/each}}
+  </ul>
+  <div class="card mt-3 flex items-center gap-3 p-5 text-sm text-ink-2" data-skill-none hidden>{{icon "search" class="size-5 text-ink-3"}}
+    <p class="min-w-0 flex-1">No skill matches. Try fewer words, or <button type="button" class="font-medium text-accent-text hover:underline" data-skill-clear>show them all</button>.</p></div>
+</div>
+
+<dialog id="skill-editor" class="modal max-w-2xl" aria-labelledby="skill-editor-title">
+  <form data-skill-form novalidate>
+    <div class="modal-header"><h2 id="skill-editor-title" class="text-base font-semibold">A skill of your own</h2>
+      <button type="button" class="btn btn-ghost btn-icon btn-sm" data-modal-close aria-label="Close">{{icon "x" class="size-4"}}</button></div>
+    <div class="modal-body space-y-4">
+      <div data-field><label class="label" for="sk-name">Name</label><input id="sk-name" name="name" class="input font-mono text-[13px]" placeholder="e.g. school-run" dir="ltr" autocomplete="off"></div>
+      <div data-field><label class="label" for="sk-desc">When to use it</label><input id="sk-desc" name="description" class="input" placeholder="One or two sentences. This is all {{bot.name}} sees until it’s needed"></div>
+      <fieldset><legend class="label">Needs</legend><div class="flex flex-wrap gap-2">
+        {{#each toolsetOptions}}<label class="chip cursor-pointer"><input type="checkbox" name="toolsets" value="{{value}}" class="checkbox"> {{label}}</label>{{/each}}</div></fieldset>
+      <div data-field><label class="label" for="sk-body">Instructions (markdown)</label>
+        <textarea id="sk-body" name="body" rows="12" class="textarea font-mono text-[13px]" data-md-editor="Skill instructions" placeholder="1. First…&#10;2. Then…"></textarea></div>
+    </div>
+    <div class="modal-footer"><button type="button" class="btn btn-secondary" data-modal-close>Cancel</button><button class="btn btn-primary" data-skill-save>Save and turn on</button></div>
+  </form>
+</dialog>

@@ -1,0 +1,27 @@
+{{!--
+  Upcoming: what happens on its own, and when. Data: upcoming (upcoming-body contract) + checkins { value, options, lastRunAt? }
+--}}
+{{#> page-header title="Upcoming" subtitle="What I'll do on my own, and when" width="max-w-4xl"}}
+  <a href="/chat?draft={{urlencode 'Every weekday at 7am, '}}" class="btn btn-primary btn-sm">{{icon "plus" class="size-4"}} <span class="hidden sm:inline">Schedule something</span></a>
+{{/page-header}}
+
+<div class="mx-auto max-w-4xl px-4 py-6 sm:px-6" data-upcoming-page>
+  <div data-upcoming-body>{{> upcoming-body}}</div>
+
+  <section class="card mt-8 p-5" aria-labelledby="h-checkins" id="checkins">
+    <div class="flex flex-wrap items-start gap-4">
+      <span class="grid size-9 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent-text">{{icon "hand-heart" class="size-[18px]"}}</span>
+      <div class="min-w-0 flex-1">
+        <h2 id="h-checkins" class="text-sm font-semibold">Check-ins</h2>
+        <p class="max-w-prose text-xs text-ink-3">I look in on my own a few times a day and only message you when something is genuinely useful: a heads-up, a follow-up, a next step. Never during your quiet hours.</p>
+      </div>
+      <form method="put" action="/api/v1/me/checkins" data-ajax data-stay data-autosubmit data-success="Check-ins updated.">
+        <div class="segmented" role="radiogroup" aria-label="Check-ins">
+          {{#each upcoming.checkins.options}}
+            <label class="segment-choice" title="{{hint}}"><input type="radio" class="sr-only" name="checkins" value="{{value}}" {{#if (eq value ../upcoming.checkins.value)}}checked{{/if}}><span>{{label}}</span></label>
+          {{/each}}
+        </div>
+      </form>
+    </div>
+  </section>
+</div>

@@ -1,0 +1,33 @@
+{{!-- Edit the project soul (decision #93). Filled by public/js/project-soul.js from GET /api/v1/projects/:id/soul
+  (fields as text, lists one per line); saving makes a new version. Safety is not here: the app sets it by field. --}}
+<dialog id="soul-editor" class="modal max-w-2xl" aria-labelledby="soul-editor-title">
+  <form data-soul-form novalidate>
+    <div class="modal-header">
+      <div><h2 id="soul-editor-title" class="text-base font-semibold">How Jess works in this project</h2>
+        <p class="text-sm text-ink-3">Concrete beats clever: the standards to rely on, what to ask first, how to check the work.</p></div>
+      <button type="button" class="btn btn-ghost btn-icon btn-sm" data-modal-close aria-label="Close">{{icon "x" class="size-4"}}</button>
+    </div>
+    <div class="modal-body space-y-4">
+      <div data-field><label class="label" for="se-stance">Jess, bringing…</label>
+        <input id="se-stance" name="stance" class="input" maxlength="160" placeholder="a master furniture-maker’s eye. Patient, practical, precise about technique." dir="auto"></div>
+      <div data-field><label class="label" for="se-person">About you here</label>
+        <textarea id="se-person" name="person" rows="2" class="textarea text-sm" maxlength="500" placeholder="Your level, goal, tools or data, constraints" dir="auto"></textarea></div>
+      <div class="grid gap-4 sm:grid-cols-2">
+        <div data-field><label class="label" for="se-anchors">Relies on <span class="font-normal text-ink-3">· one per line</span></label>
+          <textarea id="se-anchors" name="anchors" rows="4" class="textarea text-[13px]" dir="auto"></textarea></div>
+        <div data-field><label class="label" for="se-askFirst">Asks first <span class="font-normal text-ink-3">· one per line</span></label>
+          <textarea id="se-askFirst" name="askFirst" rows="4" class="textarea text-[13px]" dir="auto"></textarea></div>
+        <div data-field><label class="label" for="se-checkWork">Checks its work <span class="font-normal text-ink-3">· one per line</span></label>
+          <textarea id="se-checkWork" name="checkWork" rows="4" class="textarea text-[13px]" dir="auto"></textarea></div>
+        <div data-field><label class="label" for="se-glossary">Terms <span class="font-normal text-ink-3">· one per line</span></label>
+          <textarea id="se-glossary" name="glossary" rows="4" class="textarea text-[13px]" dir="auto"></textarea></div>
+      </div>
+      <div data-field><label class="label" for="se-format">Units & format</label>
+        <input id="se-format" name="format" class="input text-sm" maxlength="240" placeholder="mm first, inches in brackets; numbered steps; cut lists as tables" dir="auto"></div>
+      <div data-field><label class="label" for="se-learned">Learned together <span class="font-normal text-ink-3">· one per line</span></label>
+        <textarea id="se-learned" name="learned" rows="3" class="textarea text-[13px]" dir="auto"></textarea></div>
+      <p class="flex gap-2 text-xs text-ink-3">{{icon "shield-check" class="size-3.5 shrink-0"}} Safety rules for this kind of project are set by the app and always apply.</p>
+    </div>
+    <div class="modal-footer"><button type="button" class="btn btn-secondary" data-modal-close>Cancel</button><button class="btn btn-primary" data-soul-save>Save as a new version</button></div>
+  </form>
+</dialog>

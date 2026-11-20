@@ -1,0 +1,41 @@
+{{!--
+  Library. Data: library { items: [library-item], counts: { all, html, doc, pdf, image, sheet, audio? }, filters: [{ key, types, label,
+    iconName, count, chosen, empty }] (services/library.js libraryData, ?type= picks one, #212), filter }
+  Filtering and the view mode are client-side (library.js); the filter follows ?type=, search asks GET /api/v1/library?query=.
+--}}
+{{#> page-header title="Library" subtitle="Everything I've made for you, and the files you've shared"}}
+  <div class="relative hidden sm:block">
+    <span class="pointer-events-none absolute top-1/2 left-2.5 -translate-y-1/2 text-ink-3">{{icon "search" class="size-4"}}</span>
+    <input type="search" class="input h-8 w-52 pl-8 text-[13px]" placeholder="Search library" aria-label="Search library" data-library-search>
+  </div>
+  <label class="btn btn-secondary btn-sm cursor-pointer" data-library-upload-label>{{icon "upload" class="size-3.5"}} <span class="hidden sm:inline">Add files</span>
+    <input type="file" multiple class="sr-only" accept="{{@root.uploadAccept}}" data-library-upload></label>
+  <div class="segmented" role="group" aria-label="View">
+    <button type="button" aria-pressed="true" aria-selected="true" data-library-view="grid" aria-label="Grid view">{{icon "layout-grid" class="size-4"}}</button>
+    <button type="button" aria-pressed="false" aria-selected="false" data-library-view="list" aria-label="List view">{{icon "list" class="size-4"}}</button>
+  </div>
+{{/page-header}}
+
+<div class="mx-auto max-w-5xl px-4 py-6 sm:px-6">
+  {{!-- The grid always exists (hidden while empty) so a first item can arrive live. --}}
+  <div data-library-has-items {{#unless library.items}}hidden{{/unless}}>
+    <div class="mb-5 flex flex-wrap gap-1.5" role="group" aria-label="Filter by type">
+      {{#each library.filters}}
+        <button type="button" class="chip" aria-pressed="{{chosen}}" data-library-filter="{{types}}" data-filter-key="{{key}}" {{#if empty}}hidden{{/if}}>{{#if iconName}}{{icon iconName class="size-3.5"}} {{/if}}{{label}} <span class="text-ink-3 tabular" data-filter-count>{{count}}</span></button>
+      {{/each}}
+    </div>
+    {{!-- Searching (#212): titles match at once; then the Library search reads inside the files too (the one the tools use). --}}
+    <p class="lib-search-state" data-library-search-state role="status" aria-live="polite" hidden></p>
+    <div class="library-grid grid gap-4 @xl/main:grid-cols-2 @4xl/main:grid-cols-3" data-library-grid>
+      {{#each library.items}}{{> library-card this}}{{/each}}
+    </div>
+    <p class="py-12 text-center text-sm text-ink-3" data-library-empty hidden>Nothing matches that.</p>
+  </div>
+  {{#unless library.items}}
+    <div data-library-none>
+    {{#> empty-state iconName="library" title="Nothing here yet" text="Documents, dashboards, sites and files I create land here, whether you asked or I thought you'd want them."}}
+      <a href="/chat?draft={{urlencode 'Research me and make a one-page site about who I am and what I do.'}}" class="btn btn-secondary">Try: “Research me”</a>
+    {{/empty-state}}
+    </div>
+  {{/unless}}
+</div>

@@ -1,0 +1,149 @@
+{{!-- DEV styleguide: every component, every state. Screens use real templates + fixtures. --}}
+{{> page-header title="Styleguide" subtitle="Every component in every state (dev only)" width="max-w-5xl"}}
+
+<div class="mx-auto max-w-5xl space-y-14 px-4 py-8 sm:px-6">
+
+  <section aria-labelledby="sg-screens">
+    <h2 id="sg-screens" class="mb-4 text-lg font-semibold">Screens</h2>
+    <div class="grid gap-2 sm:grid-cols-3 lg:grid-cols-4">
+      {{#each (array "chat" "chat-empty" "feed" "ideas" "goals" "goal" "goal-new" "library" "library-item" "activity" "approvals" "upcoming" "me")}}
+        <a href="/styleguide/screens/{{this}}" class="card card-hover flex items-center justify-between px-4 py-3 text-sm font-medium">{{this}} {{icon "arrow-up-right" class="size-4 text-ink-3"}}</a>
+      {{/each}}
+    </div>
+  </section>
+
+  <section aria-labelledby="sg-activity">
+    <h2 id="sg-activity" class="text-lg font-semibold">Agent activity</h2>
+    <p class="mt-1 mb-4 text-sm text-ink-2">Always visible: what Jessbot is doing right now. Click any activity, or play a full run: every avatar, the strip, the panel and the tab title update together.</p>
+    <div class="card space-y-5 p-5">
+      <div class="flex flex-wrap items-center gap-4">
+        {{> avatar size="2xl" activity="searching" label="Jessbot"}}
+        <div class="min-w-0 flex-1 space-y-3">
+          {{> chat/status-strip agent=(obj activity="searching" target="showtimes near Palo Alto" since=@root.shell.agent.since doneToday=5 upcomingCount=4)}}
+          <div class="flex flex-wrap gap-1.5">
+            {{#each fx.activities}}<button type="button" class="chip h-7 text-xs" data-sg-activity="{{this}}">{{icon (activityIcon this) class="size-3.5"}} {{this}}</button>{{/each}}
+          </div>
+          <button type="button" class="btn btn-primary btn-sm" data-sg-play>{{icon "play" class="size-3.5"}} Play a full run</button>
+        </div>
+      </div>
+      <div class="flex flex-wrap items-end gap-5 border-t border-line pt-5">
+        {{#each fx.activities}}
+          <div class="flex flex-col items-center gap-2">{{> avatar size="lg" activity=this}}<span class="text-[11px] text-ink-3">{{this}}</span></div>
+        {{/each}}
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="sg-controls">
+    <h2 id="sg-controls" class="mb-4 text-lg font-semibold">Controls</h2>
+    <div class="card space-y-6 p-5">
+      <div class="flex flex-wrap items-center gap-2">
+        <button class="btn btn-primary">{{icon "plus" class="size-4"}} Primary</button>
+        <button class="btn btn-secondary">Secondary</button>
+        <button class="btn btn-soft">Soft</button>
+        <button class="btn btn-ghost">Ghost</button>
+        <button class="btn btn-danger">Danger</button>
+        <button class="btn btn-primary" disabled>Disabled</button>
+        <button class="btn btn-secondary" data-sg-busy>Click → busy</button>
+        <button class="btn btn-secondary btn-icon" data-tooltip="Tooltip with a shortcut" data-tooltip-kbd="Ctrl K" aria-label="Demo">{{icon "command" class="size-4"}}</button>
+      </div>
+      <div class="grid gap-4 sm:grid-cols-3">
+        <div><label class="label" for="sg-in">Input</label><input id="sg-in" class="input" placeholder="Placeholder"></div>
+        <div><label class="label" for="sg-bad">Invalid</label><input id="sg-bad" class="input" aria-invalid="true" value="nope@"><p class="field-error">That doesn't look like an email.</p></div>
+        <div><label class="label" for="sg-sel">Select</label><select id="sg-sel" class="select"><option>Weekdays</option><option>Every day</option></select></div>
+      </div>
+      <div class="flex flex-wrap items-center gap-5">
+        <label class="flex items-center gap-2 text-sm"><input type="checkbox" role="switch" class="switch" checked> Switch</label>
+        <label class="flex items-center gap-2 text-sm"><input type="checkbox" class="check" checked> Checkbox</label>
+        <span class="badge badge-neutral">Neutral</span><span class="badge badge-accent">Accent</span><span class="badge badge-run">Running</span>
+        <span class="badge badge-ok">Done</span><span class="badge badge-warn">Needs you</span><span class="badge badge-bad">Failed</span>
+        <span class="count">3</span><span class="kbd">⌘K</span>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        <button class="chip" aria-pressed="true">Selected chip</button><button class="chip" aria-pressed="false">Chip</button>
+        <div class="segmented"><button aria-selected="true">Day</button><button>Week</button><button>Month</button></div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="sg-feedback">
+    <h2 id="sg-feedback" class="mb-4 text-lg font-semibold">Feedback &amp; overlays</h2>
+    <div class="card flex flex-wrap gap-2 p-5">
+      <button class="btn btn-secondary btn-sm" data-sg-toast="success">Success toast</button>
+      <button class="btn btn-secondary btn-sm" data-sg-toast="error">Error toast + Retry</button>
+      <button class="btn btn-secondary btn-sm" data-sg-toast="undo">Toast + Undo</button>
+      <button class="btn btn-secondary btn-sm" data-modal-open="sg-modal">Open modal</button>
+      <button class="btn btn-secondary btn-sm" data-sg-confirm>Confirm dialog</button>
+      <button class="btn btn-secondary btn-sm" popovertarget="sg-menu" aria-haspopup="menu">Menu {{icon "chevron-down" class="size-3.5"}}</button>
+      <div id="sg-menu" popover class="menu" role="menu">
+        <button class="menu-item" role="menuitem">{{icon "pencil" class="size-4"}} Rename</button>
+        <button class="menu-item" role="menuitem">{{icon "copy" class="size-4"}} Duplicate</button>
+        <div class="menu-sep"></div>
+        <button class="menu-item is-danger" role="menuitem">{{icon "trash-2" class="size-4"}} Delete</button>
+      </div>
+      <button class="btn btn-secondary btn-sm" data-panel-open="approvals">Open panel → approvals</button>
+      <button class="btn btn-secondary btn-sm" data-cmdk-open>Command palette</button>
+    </div>
+    <dialog id="sg-modal" class="modal" aria-labelledby="sg-modal-title">
+      <div class="modal-header"><h2 id="sg-modal-title" class="text-base font-semibold">A native dialog</h2>
+        <button class="btn btn-ghost btn-icon btn-sm" data-modal-close aria-label="Close">{{icon "x" class="size-4"}}</button></div>
+      <div class="modal-body text-sm text-ink-2">Focus is trapped, Esc closes, clicking the backdrop closes, focus returns to the button that opened it.</div>
+      <div class="modal-footer"><button class="btn btn-secondary" data-modal-close>Cancel</button><button class="btn btn-primary" data-modal-close>Got it</button></div>
+    </dialog>
+  </section>
+
+  <section aria-labelledby="sg-runs">
+    <h2 id="sg-runs" class="mb-4 text-lg font-semibold">Run states (survive refresh)</h2>
+    <div class="grid gap-4 md:grid-cols-2">
+      <div class="card p-4"><p class="eyebrow mb-2">Running</p>{{> chat/run-steps run=fx.runningRun}}</div>
+      <div class="card p-4"><p class="eyebrow mb-2">Queued</p>{{> chat/run-steps run=(obj id="rq" status="queued" startedAt=@root.shell.agent.since)}}</div>
+      <div class="card p-4"><p class="eyebrow mb-2">Waiting for you</p>{{> chat/run-steps run=fx.waitingRun}}</div>
+      <div class="card p-4"><p class="eyebrow mb-2">Done</p>{{> chat/run-steps run=fx.doneRun}}</div>
+      <div class="card p-4"><p class="eyebrow mb-2">Failed</p>{{> chat/run-steps run=fx.erroredRun}}</div>
+      <div class="card space-y-3 p-4"><p class="eyebrow mb-2">Loaders (where a result will land)</p>
+        {{> loader label="Reading it and writing my take…" motion="writing" iconName="pen-line"}}
+        {{> loader label="Working out a plan…" motion="planning" iconName="list-todo" noLines=true}}</div>
+      <div class="card p-4"><p class="eyebrow mb-2">Approval</p>{{> approval-card fx.approval}}</div>
+    </div>
+  </section>
+
+  <section aria-labelledby="sg-rtl" data-sg-rtl>
+    <h2 id="sg-rtl" class="mb-1 text-lg font-semibold">Right-to-left content</h2>
+    <p class="mb-4 text-sm text-ink-2">Each paragraph follows its own words: Arabic reads right-to-left, English words inside stay in order, code stays left-to-right.</p>
+    <div class="card space-y-4 p-4">
+      <div class="flex justify-end"><div class="max-w-[85%] msg-user-bubble rounded-2xl rounded-br-md bg-accent px-4 py-2.5 text-[15px] leading-relaxed whitespace-pre-wrap text-accent-ink shadow-sm">{{fx.rtl.user}}</div></div>
+      <div class="prose-jb">{{{fx.rtl.html}}}</div>
+      <h3 class="text-lg font-semibold">{{fx.rtl.title}}</h3>
+      <p class="truncate text-sm text-ink-2">{{fx.rtl.title}}, Bloomberg Asharq</p>
+      <textarea class="input w-full" rows="2">اكتب هنا بالعربية with English words</textarea>
+    </div>
+  </section>
+
+  <section aria-labelledby="sg-ask">
+    <h2 id="sg-ask" class="mb-1 text-lg font-semibold">Question dock</h2>
+    <p class="mb-4 text-sm text-ink-2">Try it: number keys pick, Enter advances, Esc minimizes. Refresh mid-way and your picks are still there.</p>
+    {{> chat/ask-dock fx.question}}
+  </section>
+
+  <section aria-labelledby="sg-cards">
+    <h2 id="sg-cards" class="mb-4 text-lg font-semibold">Cards</h2>
+    <div class="grid gap-4 md:grid-cols-2">
+      {{> idea-card fx.idea}}
+      {{> goal-card fx.goal}}
+      {{> library-card fx.libraryItem}}
+      <div class="min-w-0 space-y-3">{{> job-card fx.job}}
+        <ol class="card relative ml-2 border-l border-line p-4 pl-2">{{#each fx.activityItems}}{{> activity-item this}}{{/each}}</ol></div>
+    </div>
+    <div class="mt-4 max-w-2xl" data-feed>{{> feed/card fx.post}}</div>
+  </section>
+
+  <section aria-labelledby="sg-empty">
+    <h2 id="sg-empty" class="mb-4 text-lg font-semibold">Empty &amp; loading</h2>
+    <div class="grid gap-4 md:grid-cols-2">
+      <div class="card">{{> empty-state iconName="lightbulb" title="Ideas show up as we talk" text="The more we chat, the better I get at spotting things I can take off your plate." compact=true}}</div>
+      <div class="card space-y-3 p-5" aria-hidden="true"><div class="skeleton h-4 w-1/3"></div><div class="skeleton h-3"></div><div class="skeleton h-3 w-5/6"></div><div class="skeleton h-24"></div></div>
+    </div>
+  </section>
+</div>
+
+<script type="module" src="/js/styleguide.js"></script>

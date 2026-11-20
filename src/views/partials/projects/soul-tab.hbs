@@ -1,0 +1,70 @@
+{{!-- "Jess here" — the project soul in the project panel (decision #93). Data: soul (services/project-soul.js soulView),
+  projectId, prefix. Client: public/js/project-soul.js. --}}
+{{#if soul.proposal}}<div class="mb-4">{{> projects/soul-proposal proposal=soul.proposal}}</div>{{/if}}
+{{#if soul.has}}
+  <div class="soul-card">
+    <p class="proj-card-eyebrow">{{icon "sparkles" class="size-3.5"}} Jess here</p>
+    <p class="soul-stance" dir="auto">Jess, bringing {{soul.stance}}</p>
+    <p class="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] text-ink-3">
+      <span class="badge badge-neutral">v{{soul.version}}</span>
+      <span>changed by {{soul.by}} · <time datetime="{{iso soul.updatedAt}}" data-relative>{{timeAgo soul.updatedAt}}</time></span>
+      <span title="How much of each message this takes">· ~{{soul.tokens}} tokens</span>
+    </p>
+  </div>
+  {{#each soul.sections}}
+    <section class="brief-sec">
+      <h3 class="brief-sec-title">{{label}}</h3>
+      {{#if list}}
+        <ul role="list" class="brief-list">
+          {{#each items}}
+            <li class="brief-row" data-kind="{{../key}}"><span class="brief-dot" aria-hidden="true"></span><span class="min-w-0 flex-1" dir="auto">{{this}}</span>
+              {{#if (eq ../key 'learned')}}<span class="brief-actions"><button type="button" class="btn btn-ghost btn-icon size-6 hover:text-bad" data-soul-forget="{{this}}" aria-label="Forget this note">{{icon "x" class="size-3"}}</button></span>{{/if}}
+            </li>
+          {{/each}}
+        </ul>
+      {{else}}<p class="px-1.5 text-[13px] text-ink-2" dir="auto">{{text}}</p>{{/if}}
+    </section>
+  {{/each}}
+  <section class="brief-sec">
+    <h3 class="brief-sec-title flex items-center gap-1.5">{{icon "shield-check" class="size-3.5"}} Safety <span class="font-normal normal-case tracking-normal">· set by the app for this field</span></h3>
+    <p class="soul-safety" dir="auto">{{soul.safety}}</p>
+  </section>
+
+  <div class="mt-4 flex flex-wrap gap-2">
+    <button type="button" class="btn btn-secondary btn-sm" data-soul-edit>{{icon "pencil" class="size-3.5"}} Edit</button>
+    <button type="button" class="btn btn-secondary btn-sm" data-soul-improve>{{icon "wand-sparkles" class="size-3.5"}} Improve with AI</button>
+    <button type="button" class="btn btn-ghost btn-sm" data-soul-try-open>{{icon "flask-conical" class="size-3.5"}} Try it</button>
+  </div>
+  <form class="soul-try" data-soul-try hidden>
+    <label class="sr-only" for="{{prefix}}-soul-try">A question to try</label>
+    <div class="flex gap-2">
+      <input id="{{prefix}}-soul-try" name="question" class="input h-9 min-w-0 flex-1 text-sm" placeholder="Ask something you’d ask here…" maxlength="500" dir="auto" autocomplete="off">
+      <button class="btn btn-secondary btn-sm h-9">Ask</button>
+    </div>
+    <div data-soul-try-out></div>
+  </form>
+
+  <details class="brief-sec">
+    <summary class="brief-sec-title cursor-pointer select-none">History · {{soul.versions.length}} version{{#unless (eq soul.versions.length 1)}}s{{/unless}}{{#if soul.drift}} · {{soul.drift}} change{{#unless (eq soul.drift 1)}}s{{/unless}} since the first{{/if}}</summary>
+    <ol role="list" class="mt-2 space-y-1">
+      {{#each soul.versions}}
+        <li class="soul-version" {{#if current}}aria-current="true"{{/if}}>
+          <span class="badge {{#if current}}badge-accent{{else}}badge-neutral{{/if}}">v{{version}}</span>
+          <span class="min-w-0 flex-1"><span class="block truncate text-[12px] text-ink-2" dir="auto">{{#if note}}{{note}}{{else}}by {{by}}{{/if}}</span>
+            <span class="text-[11px] text-ink-3">{{by}} · <time datetime="{{iso at}}" data-relative>{{timeAgo at}}</time></span></span>
+          {{#unless current}}<button type="button" class="btn btn-ghost btn-sm h-7 px-2 text-xs" data-soul-restore="{{version}}">Restore</button>{{/unless}}
+        </li>
+      {{/each}}
+    </ol>
+  </details>
+{{else}}
+  <div class="proj-empty">
+    <span class="proj-empty-icon">{{icon "sparkles" class="size-5"}}</span>
+    <p class="font-medium">No expertise set for this project yet</p>
+    <p class="text-xs text-ink-3">What I rely on here, what I ask first, how I check my work, your units. I can draft it from what we’ve said.</p>
+    <div class="mt-3 flex flex-wrap justify-center gap-2">
+      <button type="button" class="btn btn-primary btn-sm" data-soul-improve>{{icon "wand-sparkles" class="size-3.5"}} Draft it with AI</button>
+      <button type="button" class="btn btn-secondary btn-sm" data-soul-edit>Write it myself</button>
+    </div>
+  </div>
+{{/if}}

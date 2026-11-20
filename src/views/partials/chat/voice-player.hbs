@@ -1,0 +1,25 @@
+{{!--
+  A voice note: theirs (direction "in", inside their accent bubble) or hers (direction "out"). Client: voice.js
+  (one plays at a time; the waveform fills as it plays and seeks on click/arrow keys; starts at `rate`, then 1.5× → 2× → 1×).
+  Contract (services/voice.js clipView): { id, src, direction: in|out, durationMs, duration: "m:ss", peaks: [8–100],
+                                          transcript, voice, rate } — or { pending: true } while she records it.
+--}}
+{{#if pending}}
+  <div class="vp vp-pending" data-voice-pending role="status" aria-live="polite">
+    <span class="vp-play vp-rec" aria-hidden="true">{{icon "audio-lines" class="size-4"}}</span>
+    <span class="vp-wave" aria-hidden="true">{{#each (array 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27)}}<span style="--i:{{this}}"></span>{{/each}}</span>
+    <span class="vp-time">Recording…</span>
+    <span class="sr-only">{{@root.bot.name}} is recording a voice note of this reply.</span>
+  </div>
+{{else}}
+  <div class="vp {{#if (eq direction 'in')}}vp-in{{/if}}" data-voice-player="{{id}}" data-src="{{src}}" data-duration-ms="{{durationMs}}" data-rate="{{default rate 1}}" data-state="idle">
+    <button type="button" class="vp-play" data-vp-toggle aria-label="{{#if (eq direction 'in')}}Play your voice note{{else}}Play {{@root.bot.name}}’s voice note{{/if}} ({{duration}})">
+      <span class="vp-i-play">{{icon "play" class="size-4"}}</span><span class="vp-i-pause">{{icon "pause" class="size-4"}}</span>
+    </button>
+    <span class="vp-wave" data-vp-wave role="slider" tabindex="0" aria-label="Position in the voice note" aria-valuemin="0" aria-valuemax="{{durationMs}}" aria-valuenow="0" aria-valuetext="0:00 of {{duration}}">
+      {{#each peaks}}<span style="--h:{{this}}%"></span>{{/each}}
+    </span>
+    <span class="vp-time tabular" data-vp-time>{{duration}}</span>
+    <button type="button" class="vp-speed" data-vp-speed aria-label="Playback speed: {{default rate 1}} times">{{default rate 1}}×</button>
+  </div>
+{{/if}}

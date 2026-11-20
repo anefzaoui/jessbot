@@ -1,0 +1,57 @@
+{{!--
+  Ideas — proactive suggestions from conversations (+ starters for new users).
+  Data: ideas { categories: [string], items: [idea], starters: [idea], dismissReasons: [{ value, label }],
+    ready: [idea with prepared.readyAt] (overnight prep's drafts, shown first as "Ready for you", #212), prep: off|ideas }
+--}}
+{{#> page-header title="Ideas" subtitle="Ways I think I can help, based on what we've talked about"}}
+  <button type="button" class="btn btn-secondary btn-sm" data-ideas-refresh>{{icon "refresh-cw" class="size-3.5"}} <span class="hidden sm:inline">Think of more</span></button>
+{{/page-header}}
+
+<div class="mx-auto max-w-5xl px-4 py-6 sm:px-6" data-ideas-page>
+  {{#if ideas.ready.length}}
+    <section class="mb-8" aria-labelledby="h-ready">
+      <div class="mb-3 flex items-baseline gap-2"><h2 id="h-ready" class="text-sm font-semibold">Ready for you</h2>
+        <p class="text-xs text-ink-3">{{plural ideas.ready.length "draft" "drafts"}} I prepared while you slept</p></div>
+      <div class="grid gap-4 {{#if (gt ideas.ready.length 1)}}@3xl/main:grid-cols-2{{/if}}">{{#each ideas.ready}}{{> idea-ready this}}{{/each}}</div>
+    </section>
+  {{/if}}
+  {{#if ideas.items}}
+    {{!-- Overnight prep (#199): say it exists, and whether it's on. --}}
+    <p class="prep-hint" data-prep-hint="{{ideas.prep}}">{{icon "moon" class="size-3.5 shrink-0"}}
+      {{#if (eq ideas.prep 'ideas')}}<span>Overnight prep is on: in your quiet hours I may prepare one of these as a first draft. <a href="/me/notifications#h-prep">Change</a></span>
+      {{else}}<span>I can prepare one of these overnight, as a first draft for the morning. <a href="/me/notifications#h-prep">Turn on overnight prep</a></span>{{/if}}</p>
+    <div class="mb-5 flex flex-wrap gap-1.5" role="group" aria-label="Filter ideas">
+      <button type="button" class="chip" aria-pressed="true" data-idea-filter="all">All</button>
+      {{#each ideas.categories}}<button type="button" class="chip" aria-pressed="false" data-idea-filter="{{this}}">{{this}}</button>{{/each}}
+    </div>
+    <div class="grid gap-4 @xl/main:grid-cols-2 @4xl/main:grid-cols-3" data-idea-grid>
+      {{#each ideas.items}}{{#unless prepared.readyAt}}{{> idea-card this}}{{/unless}}{{/each}}
+    </div>
+  {{else}}
+    {{#> empty-state iconName="lightbulb" title="Ideas show up as we talk" text="The more we chat, the better I get at spotting things I can take off your plate. Here are a few to start."}}{{/empty-state}}
+  {{/if}}
+
+  {{#if ideas.starters}}
+    <h2 class="mt-10 mb-4 text-sm font-semibold">Popular ways people use {{bot.name}}</h2>
+    <div class="grid gap-4 @xl/main:grid-cols-2 @4xl/main:grid-cols-3">
+      {{#each ideas.starters}}{{> idea-card this}}{{/each}}
+    </div>
+  {{/if}}
+</div>
+
+{{!-- Why not (#196): public/js/ideas.js puts this in a card when its ✕ is pressed. "Not now" brings the idea back later. --}}
+<template data-idea-why-template>
+  <div class="idea-why" data-idea-why>
+    <p class="text-xs font-medium text-ink-2">What’s not right about it?</p>
+    <div class="mt-2 flex flex-wrap gap-1.5">
+      {{#each ideas.dismissReasons}}<button type="button" class="chip h-7 text-xs" data-idea-reason="{{value}}">{{#if (eq value 'not_now')}}{{icon "clock" class="size-3.5"}}{{else if (eq value 'already_doing')}}{{icon "check" class="size-3.5"}}{{else}}{{icon "x" class="size-3.5"}}{{/if}} {{label}}</button>{{/each}}
+    </div>
+    <label class="sr-only" for="idea-why-note">Anything to add</label>
+    <input id="idea-why-note" class="input mt-2 h-8 text-xs" maxlength="300" placeholder="Anything to add? (optional)" data-idea-note>
+    <p class="field-error" data-idea-why-error hidden></p>
+    <div class="mt-2 flex items-center gap-2">
+      <button type="button" class="btn btn-ghost btn-sm h-7 px-2 text-xs" data-idea-reason="">Just dismiss it</button>
+      <button type="button" class="btn btn-ghost btn-sm ms-auto h-7 px-2 text-xs" data-idea-why-cancel>Keep it</button>
+    </div>
+  </div>
+</template>

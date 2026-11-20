@@ -1,0 +1,20 @@
+{{!--
+  What's new in Jess (decision #210; the card is Phase 25 #213): published release notes this person hasn't seen, shown once in
+  the main chat above the composer. Contract: whatsNew = services/whats-new.js unseenFor() [{ id, lines: [string], publishedAt }]
+  (newest first, at most 3). "Got it" marks every entry shown as seen (POST /api/v1/whats-new/:id/seen) and folds the card
+  away; a failure keeps it and says so (public/js/whats-new.js). More than 4 lines fold behind "Show all".
+--}}
+<section class="wn-card" data-whats-new="{{#each whatsNew}}{{id}}{{#unless @last}},{{/unless}}{{/each}}" aria-labelledby="wn-h">
+  <div class="wn-head">
+    <span class="wn-face" aria-hidden="true">{{> avatar size="sm"}}</span>
+    <div class="min-w-0 flex-1">
+      <h2 id="wn-h" class="wn-title">New in {{bot.name}}</h2>
+      <p class="wn-meta">{{#with (lookup whatsNew 0)}}Since <time datetime="{{iso publishedAt}}">{{date publishedAt}}</time>{{/with}}{{#if (gt whatsNew.length 1)}} · {{whatsNew.length}} updates{{/if}}</p>
+    </div>
+    <button type="button" class="btn btn-secondary btn-sm wn-seen" data-whats-new-seen>{{icon "check" class="size-3.5"}} Got it</button>
+  </div>
+  <ul class="wn-lines" role="list" data-wn-lines>
+    {{#each whatsNew}}{{#each lines}}<li dir="auto">{{this}}</li>{{/each}}{{/each}}
+  </ul>
+  <button type="button" class="wn-more" data-wn-more hidden>{{icon "chevron-down" class="size-3.5"}} <span>Show all</span></button>
+</section>

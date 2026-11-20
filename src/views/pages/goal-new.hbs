@@ -1,0 +1,35 @@
+{{!-- New goal. Data: categories [{ value, label, hue }], examples [string] --}}
+{{> page-header title="New goal" subtitle="Tell me what you want, and I'll take it from there" width="max-w-2xl"}}
+
+<div class="mx-auto max-w-2xl px-4 py-8 sm:px-6">
+  <form class="card p-5 sm:p-6" data-ajax method="post" action="/api/v1/goals" data-busy="Setting it up…">
+    <label for="goal-text" class="text-lg font-semibold tracking-tight">What do you want to achieve?</label>
+    <p class="mt-1 text-sm text-ink-3">A sentence is plenty. I'll ask a few quick questions next, then show you everything I can do about it.</p>
+    <textarea id="goal-text" name="title" class="textarea mt-4 min-h-28 text-[15px]" required autofocus
+      placeholder="e.g. Grow my creator business on LinkedIn"></textarea>
+
+    <fieldset class="mt-5">
+      <legend class="label">Area of life</legend>
+      <div class="flex flex-wrap gap-1.5">
+        {{#each categories}}
+          <label class="chip cursor-pointer has-[:checked]:border-accent/40 has-[:checked]:bg-accent-soft has-[:checked]:text-accent-text">
+            <input type="radio" name="category" value="{{value}}" class="sr-only" {{#if @first}}checked{{/if}}>
+            <span class="size-2 rounded-full" style="background: oklch(0.65 0.14 {{hue}})"></span>{{label}}
+          </label>
+        {{/each}}
+      </div>
+    </fieldset>
+
+    <div class="mt-6 flex items-center justify-end gap-2">
+      <a href="/goals" class="btn btn-ghost">Cancel</a>
+      <button type="submit" class="btn btn-primary">{{icon "arrow-right" class="size-4"}} Continue</button>
+    </div>
+  </form>
+
+  {{#if examples}}
+    <h2 class="mt-8 mb-3 text-sm font-semibold text-ink-2">Need inspiration?</h2>
+    <div class="flex flex-wrap gap-2">
+      {{#each examples}}<button type="button" class="chip" data-fill-target="goal-text" data-fill="{{this}}">{{this}}</button>{{/each}}
+    </div>
+  {{/if}}
+</div>

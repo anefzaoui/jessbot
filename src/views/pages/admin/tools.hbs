@@ -1,0 +1,35 @@
+{{> page-header title="Permissions" subtitle=(concat "What " bot.name " may do: defaults for everyone") width="max-w-5xl"}}
+<div class="mx-auto max-w-5xl px-4 py-6 sm:px-6">
+  {{> admin/nav active="tools"}}
+
+  <section class="card p-5" aria-labelledby="h-defaults">
+    <h2 id="h-defaults" class="text-sm font-semibold">Defaults for everyone</h2>
+    <p class="mb-4 text-xs text-ink-3">Groups and individual people can override these (Admin → Groups / People). The most specific setting wins.</p>
+    {{> admin/policy-form policy}}
+  </section>
+
+  <section class="mt-8" aria-labelledby="h-tools">
+    <h2 id="h-tools" class="mb-3 text-sm font-semibold">Everything {{bot.name}} can do right now</h2>
+    <div class="card overflow-hidden">
+      <table class="w-full text-sm">
+        <thead class="bg-surface-2/60 text-start text-xs text-ink-3">
+          <tr><th class="px-4 py-2 font-medium">Action</th><th class="px-4 py-2 font-medium">Group</th><th class="px-4 py-2 font-medium">Risk</th><th class="hidden px-4 py-2 font-medium md:table-cell">What it does</th></tr>
+        </thead>
+        <tbody class="divide-y divide-line">
+          {{#each tools}}
+            <tr>
+              <td class="px-4 py-2.5 font-mono text-xs">{{name}}</td>
+              <td class="px-4 py-2.5 text-ink-2">{{toolset}}</td>
+              <td class="px-4 py-2.5">
+                {{#if (eq risk 'read')}}<span class="badge badge-neutral">Reads</span>{{else if (eq risk 'write')}}<span class="badge badge-run">Changes</span>
+                {{else if (eq risk 'spend')}}<span class="badge badge-warn">Spends</span>{{else if (eq risk 'external')}}<span class="badge badge-accent">Sends out</span>
+                {{else}}<span class="badge badge-neutral">Depends</span>{{/if}}
+              </td>
+              <td class="hidden px-4 py-2.5 text-xs text-ink-3 md:table-cell">{{description}}</td>
+            </tr>
+          {{/each}}
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>

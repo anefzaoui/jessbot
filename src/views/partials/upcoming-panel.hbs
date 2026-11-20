@@ -1,0 +1,6 @@
+{{!-- Right panel → Upcoming. Data: upcoming { alarms: [alarm-card], jobs: [job-card] }. Refreshed live (GET /upcoming/fragments). --}}
+{{#each upcoming.alarms}}{{> alarm-card this compact=true}}{{/each}}
+{{#each upcoming.jobs}}{{> job-card this compact=true}}{{/each}}
+{{#unless upcoming.alarms}}{{#unless upcoming.jobs}}
+  {{> empty-state iconName="calendar-clock" title="Nothing coming up" text="Ask me for an alarm, a reminder, a timer, or to do something regularly, like “every weekday at 7, brief me”." compact=true}}
+{{/unless}}{{/unless}}

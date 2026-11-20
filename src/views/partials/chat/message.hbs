@@ -1,0 +1,80 @@
+{{!--
+  One chat message.
+  Contract: { id, messageId?, runId?, role: user|assistant|system, html (server-rendered markdown) | text, createdAt: ISO, feedback?,
+              author?: { name, hue }, delivery?: sending|sent|failed, attachments? (user: chat/attachments contract),
+              run?: (run-steps contract), approval?: (approval-card contract), question?: (question-card contract),
+              proposal?: (projects/proposal-card contract), followUps?: [question] (her reply's closing questions as chips),
+              simplerText? (the "Simpler" turn, #196), noted? (chat/noted-chip: what a thumbs-down taught, #211), voice?: (chat/voice-player contract — user: their voice note;
+              assistant: her voice note of the reply, or { pending }) }
+  Headings/landmarks for screen readers: each message is an <article> with an sr-only heading.
+--}}
+{{#if (eq role 'user')}}
+  <article class="msg msg-user group flex flex-col items-end" data-message-id="{{id}}" {{#if messageId}}data-db-id="{{messageId}}"{{/if}} data-delivery="{{default delivery 'sent'}}" aria-labelledby="h-{{id}}">
+    <h3 id="h-{{id}}" class="sr-only">You said, {{time createdAt}}</h3>
+    {{#if attachments}}{{> chat/attachments attachments=attachments}}{{/if}}
+    {{#if voice}}
+      {{!-- A voice note: the player, then what they said (the transcript is also what Jess read). --}}
+      <div class="msg-voice msg-user-bubble max-w-[92%] rounded-2xl rounded-br-md bg-accent p-2 text-accent-ink shadow-sm sm:max-w-[26rem]">
+        {{> chat/voice-player voice}}
+        {{#if voice.transcript}}<p class="msg-voice-text" dir="auto">{{voice.transcript}}</p>{{/if}}
+      </div>
+    {{else if html}}<div class="msg-user-rich max-w-[92%] msg-user-bubble rounded-2xl rounded-br-md bg-accent px-4 py-2.5 text-[15px] leading-relaxed text-accent-ink shadow-sm sm:max-w-[80%]">{{{html}}}</div>
+    {{else if text}}<div class="max-w-[85%] msg-user-bubble rounded-2xl rounded-br-md bg-accent px-4 py-2.5 text-[15px] leading-relaxed whitespace-pre-wrap text-accent-ink shadow-sm sm:max-w-[75%]">{{text}}</div>{{/if}}
+    <div class="mt-1 flex h-5 items-center gap-2 px-1 text-[11px] text-ink-3">
+      <span class="msg-delivery" data-delivery-label>
+        {{#if (eq delivery 'sending')}}<span class="spinner size-2.5"></span> Sending…
+        {{else if (eq delivery 'failed')}}<span class="font-medium text-bad">Not sent</span> ·
+          <button type="button" class="font-medium text-accent-text hover:underline" data-message-resend>Retry</button>
+        {{else}}<time datetime="{{iso createdAt}}" class="opacity-0 transition group-hover:opacity-100 group-focus-within:opacity-100">{{time createdAt}}</time>{{/if}}
+      </span>
+      {{#if messageId}}{{#unless @root.readOnly}}<button type="button" class="btn btn-ghost btn-icon btn-sm size-6 opacity-0 transition group-hover:opacity-100 group-focus-within:opacity-100 hover:text-bad" data-message-delete data-tooltip="Delete" aria-label="Delete this message">{{icon "trash-2" class="size-3.5"}}</button>{{/unless}}{{/if}}
+    </div>
+  </article>
+
+{{else if (eq role 'system')}}
+  <div class="flex justify-center" data-message-id="{{id}}"><p class="rounded-full bg-surface-2 px-3 py-1 text-xs text-ink-3">{{text}}</p></div>
+
+{{else}}
+  <article class="msg msg-assistant group flex gap-3" data-message-id="{{id}}" {{#if runId}}id="run-{{runId}}" data-run-owner="{{runId}}"{{/if}}
+    {{#if messageId}}data-db-id="{{messageId}}"{{/if}} aria-labelledby="h-{{id}}">
+    <div class="shrink-0 pt-0.5">{{> avatar size="sm"}}</div>
+    <div class="min-w-0 flex-1">
+      <h3 id="h-{{id}}" class="mb-1 flex items-baseline gap-2 text-[13px] font-semibold">
+        {{@root.bot.name}}
+        <time class="text-[11px] font-normal text-ink-3" datetime="{{iso createdAt}}">{{time createdAt}}</time>
+        {{#if run.originLabel}}<span class="badge badge-accent self-center">{{#if (eq run.origin 'checkin')}}{{icon "hand-heart" class="size-3"}}{{else if (eq run.origin 'delegate')}}{{icon "rocket" class="size-3"}}{{else if (eq run.origin 'delegate_report')}}{{icon "corner-down-left" class="size-3"}}{{else if (eq run.origin 'prep')}}{{icon "moon" class="size-3"}}{{else if (eq run.origin 'reminder')}}{{icon "bell" class="size-3"}}{{else if (eq run.origin 'project')}}{{icon "folder-plus" class="size-3"}}{{else if (eq run.origin 'draw')}}{{icon "gift" class="size-3"}}{{else}}{{icon "calendar-clock" class="size-3"}}{{/if}} {{run.originLabel}}</span>{{/if}}
+      </h3>
+      {{!-- In the order it happened: what she said first, the steps she took, her question/OK, then her answer. --}}
+      <div class="prose-jb mb-3" data-message-lead {{#unless leadHtml}}hidden{{/unless}}>{{{leadHtml}}}</div>
+      {{#if run}}<div class="mb-2" data-run-slot>{{> chat/run-steps run=run}}</div>{{/if}}
+      {{!-- In the order it happened: her question or request for your OK (and what you said), then her reply. --}}
+      {{#if question}}<div class="mb-3 max-w-lg" data-question-slot>{{> chat/question-card question}}</div>{{/if}}
+      {{#if approval}}<div class="mb-3 max-w-lg">{{> approval-card approval}}</div>{{/if}}
+      <div class="mb-2.5" data-voice-slot {{#unless voice}}hidden{{/unless}}>{{#if voice}}{{> chat/voice-player voice}}{{/if}}</div>
+      <div class="prose-jb" data-message-body {{#unless html}}hidden{{/unless}} {{#if raw}}data-raw="{{raw}}"{{/if}}>{{{html}}}</div>
+      {{#if (and run.sources (eq run.status 'done'))}}{{> chat/trust-chip sources=run.sources}}{{/if}}
+      {{#if followUps.length}}{{#unless @root.readOnly}}
+        <div class="follow-ups" data-follow-ups>
+          <p class="follow-ups-h">{{icon "corner-down-right" class="size-3.5"}} A few things worth a second look</p>
+          <div class="flex flex-wrap gap-1.5">{{#each followUps}}<button type="button" class="follow-up" data-follow-up="{{this}}" dir="auto">{{this}}</button>{{/each}}</div>
+        </div>
+      {{/unless}}{{/if}}
+      {{#if reminder}}<div class="mt-2.5 max-w-lg" data-reminder-slot>{{> chat/reminder-card reminder=reminder}}</div>{{/if}}
+      {{#if proposal}}<div class="mt-3 max-w-xl" data-proposal-slot>{{> projects/proposal-card proposal=proposal}}</div>{{/if}}
+      {{#if soulProposal}}<div class="mt-3 max-w-xl">{{> projects/soul-proposal proposal=soulProposal}}</div>{{/if}}
+      {{#if messageId}}
+        <div class="msg-actions mt-1.5 -ml-1.5 flex items-center gap-0.5 opacity-0 transition group-hover:opacity-100 group-focus-within:opacity-100">
+          {{#unless @root.readOnly}}<button type="button" class="btn btn-ghost btn-icon btn-sm size-7" data-listen="{{messageId}}" data-tooltip="Listen" aria-label="Listen to this reply">{{icon "volume-2" class="size-3.5"}}</button>{{/unless}}
+          <button type="button" class="btn btn-ghost btn-icon btn-sm size-7" data-copy-message data-tooltip="Copy" aria-label="Copy message">{{icon "copy" class="size-3.5"}}</button>
+          {{#if simplerText}}{{#unless @root.readOnly}}<button type="button" class="btn btn-ghost btn-sm h-7 gap-1 px-2 text-xs" data-message-simpler="{{simplerText}}" data-tooltip="Explain it again more simply">{{icon "feather" class="size-3.5"}} Simpler</button>{{/unless}}{{/if}}
+          <button type="button" class="btn btn-ghost btn-icon btn-sm size-7" data-message-feedback="up" aria-pressed="{{eq feedback 'up'}}" data-tooltip="Good reply" aria-label="Good reply">{{icon "thumbs-up" class="size-3.5"}}</button>
+          <button type="button" class="btn btn-ghost btn-icon btn-sm size-7" data-message-feedback="down" aria-pressed="{{eq feedback 'down'}}" data-tooltip="Bad reply" aria-label="Bad reply">{{icon "thumbs-down" class="size-3.5"}}</button>
+          {{#if @root.project}}{{#unless @root.readOnly}}<button type="button" class="btn btn-ghost btn-icon btn-sm size-7" data-save-to-project="{{messageId}}" data-tooltip="Save to project files" aria-label="Save this reply to the project’s files">{{icon "file-plus" class="size-3.5"}}</button>{{/unless}}{{/if}}
+          {{#unless @root.readOnly}}<button type="button" class="btn btn-ghost btn-icon btn-sm size-7 hover:text-bad" data-message-delete data-tooltip="Delete" aria-label="Delete this reply">{{icon "trash-2" class="size-3.5"}}</button>{{/unless}}
+        </div>
+        {{!-- A thumbs-down's "What was off?" and then its "Noted: …" chip (#211, public/js/run.js). --}}
+        <div class="noted-slot" data-noted-slot {{#unless noted}}hidden{{/unless}}>{{#if noted}}{{> chat/noted-chip noted=noted}}{{/if}}</div>
+      {{/if}}
+    </div>
+  </article>
+{{/if}}

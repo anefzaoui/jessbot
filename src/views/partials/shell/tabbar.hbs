@@ -1,0 +1,12 @@
+{{!-- Bottom tab bar on phones (< md). Same destinations as the rail. --}}
+<nav class="safe-bottom flex shrink-0 border-t border-line bg-surface/90 backdrop-blur-md md:hidden" aria-label="Primary">
+  {{#each shell.navItems}}
+    <a href="{{href}}" class="tabbar-link" {{#if (eq key ../nav)}}aria-current="page"{{/if}}>
+      <span class="relative">
+        {{icon iconName class="size-[22px]"}}
+        {{#if count}}<span class="count absolute -top-1.5 -right-2.5" data-live-count="{{key}}">{{count}}</span>{{/if}}
+      </span>
+      {{label}}
+    </a>
+  {{/each}}
+</nav>

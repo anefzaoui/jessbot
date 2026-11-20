@@ -1,0 +1,41 @@
+{{!--
+  The top of a side chat where background work happens (Phase 25 #212): what it was asked and where it came from.
+  Contract: background = agent/tools/delegate.js backgroundOf()
+    delegate → { kind: 'delegate', title, brief, skill, startedAt, status, from: { href, label } | null }
+    prep     → { kind: 'prep', title, startedAt, status, idea: { title, why } | null, item: { title, href } | null }
+  The brief is folded (it can be long); the status line follows the run's status as it was when the page rendered.
+--}}
+<section class="bg-brief" data-bg-brief="{{background.kind}}" aria-labelledby="bg-brief-h">
+  <div class="bg-brief-head">
+    <span class="bg-brief-icon" aria-hidden="true">{{#if (eq background.kind 'prep')}}{{icon "moon" class="size-[18px]"}}{{else}}{{icon "rocket" class="size-[18px]"}}{{/if}}</span>
+    <div class="min-w-0 flex-1">
+      {{#if (eq background.kind 'prep')}}
+        <h2 id="bg-brief-h" class="bg-brief-title">Prepared overnight</h2>
+        <p class="bg-brief-meta">While you slept, on <time datetime="{{background.startedAt}}">{{date background.startedAt}}</time>. I could only search, read and save one draft: nothing was sent, booked or bought.</p>
+      {{else}}
+        <h2 id="bg-brief-h" class="bg-brief-title">Background task{{#if background.title}}: <span dir="auto">{{background.title}}</span>{{/if}}</h2>
+        <p class="bg-brief-meta">Started <time datetime="{{background.startedAt}}" data-relative>{{timeAgo background.startedAt}}</time>{{#if background.from}} from <a href="{{background.from.href}}" class="bg-brief-link">{{background.from.label}}</a>{{/if}}.
+          {{#if (eq background.status 'done')}}Done: the result was posted back {{#if background.from}}there{{else}}to your main chat{{/if}}.
+          {{else if (eq background.status 'error')}}It ran into a problem: Retry below, and the result still goes back {{#if background.from}}there{{else}}to your main chat{{/if}}.
+          {{else if (eq background.status 'cancelled')}}Stopped.
+          {{else if (eq background.status 'waiting')}}It’s waiting for you below.
+          {{else}}Working on it now; the result goes back {{#if background.from}}there{{else}}to your main chat{{/if}} when it’s done.{{/if}}</p>
+      {{/if}}
+    </div>
+    {{#if background.item}}<a href="{{background.item.href}}" class="btn btn-secondary btn-sm shrink-0">{{icon "file-text" class="size-3.5"}} <span class="max-w-40 truncate" dir="auto">{{background.item.title}}</span></a>{{/if}}
+  </div>
+  {{#if (eq background.kind 'prep')}}
+    {{#if background.idea}}
+      <div class="bg-brief-idea">
+        <p class="text-xs text-ink-3">Your idea</p>
+        <p class="text-sm font-medium text-ink" dir="auto">{{background.idea.title}}</p>
+        {{#if background.idea.why}}<p class="mt-0.5 text-xs leading-relaxed text-ink-2" dir="auto">{{background.idea.why}}</p>{{/if}}
+      </div>
+    {{/if}}
+  {{else if background.brief}}
+    <details class="bg-brief-fold">
+      <summary>{{icon "chevron-right" class="bg-brief-chevron size-3.5"}} What I was asked{{#if background.skill}}<span class="bg-brief-skill">{{icon "graduation-cap" class="size-3"}} {{background.skill}}</span>{{/if}}</summary>
+      <div class="bg-brief-text" dir="auto">{{background.brief}}</div>
+    </details>
+  {{/if}}
+</section>

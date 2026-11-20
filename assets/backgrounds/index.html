@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jessbot Scenes</title>
+<style>
+  :root { --bg: #0f1114; --panel: #181b20; --text: #e7e9ec; --muted: #8b929c; --line: #2a2f37; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  header { position: sticky; top: 0; z-index: 2; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; padding: 14px 20px; background: var(--bg); border-bottom: 1px solid var(--line); }
+  h1 { margin: 0; font-size: 18px; font-weight: 600; }
+  .controls { display: flex; gap: 8px; flex-wrap: wrap; }
+  button, select { font: inherit; padding: 6px 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); color: var(--text); cursor: pointer; }
+  button[aria-pressed="true"] { outline: 2px solid #5b8def; outline-offset: -2px; }
+  main { padding: 16px 20px 40px; overflow-x: auto; }
+  table { border-collapse: separate; border-spacing: 10px; }
+  th { color: var(--muted); font-weight: 500; font-size: 12px; text-transform: capitalize; }
+  th.rowhead { text-align: right; padding-right: 4px; }
+  td { vertical-align: top; }
+  .scene { position: relative; width: 190px; aspect-ratio: 1; border-radius: 10px; overflow: hidden; background: var(--panel); border: 1px solid var(--line); }
+  .scene > img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .scene.missing > img { visibility: hidden; }
+  .scene.missing::after { content: "not generated"; position: absolute; inset: 0; display: grid; place-items: center; color: var(--muted); font-size: 12px; }
+  .overlay { display: none; position: absolute; inset: 0; }
+  html.portrait .scene:not(.missing) .overlay { display: block; }
+  .overlay img { width: 100%; height: 100%; display: block; }
+  html.circle .scene { border-radius: 50%; border: 0; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Jessbot sky backgrounds (square, circle-crop)</h1>
+  <div class="controls">
+    <button id="portrait" aria-pressed="false">Show portrait</button>
+    <button id="circle" aria-pressed="false">Circle crop</button>
+    <select id="variant" aria-label="Portrait variant"><option>female</option><option>male</option><option>neutral</option></select>
+  </div>
+</header>
+<main><table id="grid"></table></main>
+<script>
+  const TIMES = ['dawn', 'day', 'dusk', 'night'];
+  const WEATHERS = ['clear', 'cloudy', 'rain', 'storm', 'snow', 'fog'];
+  const grid = document.getElementById('grid');
+  const head = grid.insertRow();
+  head.append(document.createElement('th'));
+  for (const w of WEATHERS) { const th = document.createElement('th'); th.textContent = w; head.append(th); }
+  const overlays = [];
+  for (const t of TIMES) {
+    const row = grid.insertRow();
+    const th = document.createElement('th');
+    th.className = 'rowhead';
+    th.textContent = t;
+    row.append(th);
+    for (const w of WEATHERS) {
+      const cell = row.insertCell();
+      const scene = document.createElement('div');
+      scene.className = 'scene';
+      scene.title = `${t}-${w}`;
+      const img = new Image();
+      img.alt = `${t} ${w}`;
+      img.src = `${t}-${w}.png`;
+      img.onerror = () => scene.classList.add('missing');
+      const ov = document.createElement('div');
+      ov.className = 'overlay';
+      const face = new Image();
+      face.alt = '';
+      ov.append(face);
+      overlays.push({ ov, face, src: img.src });
+      scene.append(img, ov);
+      cell.append(scene);
+    }
+  }
+  const variant = document.getElementById('variant');
+  const setVariant = () => overlays.forEach(({ face }) => { face.src = `../avatars/${variant.value}/neutral.png`; });
+  variant.onchange = setVariant;
+  setVariant();
+  const root = document.documentElement;
+  const toggle = (id, cls) => {
+    const btn = document.getElementById(id);
+    btn.onclick = () => btn.setAttribute('aria-pressed', root.classList.toggle(cls));
+  };
+  toggle('portrait', 'portrait');
+  toggle('circle', 'circle');
+</script>
+</body>
+</html>

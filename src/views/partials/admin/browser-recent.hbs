@@ -1,0 +1,24 @@
+{{!-- Recent browsing since the server started (Admin → Browser). recent: [{ at, kind: search|read|screenshot, url?, query?, engine?, title?, ms, ok, count?, error? }] --}}
+{{#if recent}}
+  <ul class="divide-y divide-line" role="list">
+    {{#each recent}}
+      <li class="flex items-start gap-3 px-4 py-2.5 text-[13px]">
+        <span class="mt-0.5 {{#if ok}}text-ink-3{{else}}text-bad{{/if}}">
+          {{#if (eq kind 'search')}}{{icon "search" class="size-4"}}{{else if (eq kind 'screenshot')}}{{icon "camera" class="size-4"}}{{else if (eq kind 'api')}}{{icon "braces" class="size-4"}}{{else}}{{icon "book-open" class="size-4"}}{{/if}}
+        </span>
+        <div class="min-w-0 flex-1">
+          {{#if (eq kind 'search')}}
+            <p class="truncate text-ink">“{{query}}” <span class="text-ink-3">· {{engine}}{{#if ok}} · {{count}} results{{/if}}</span></p>
+          {{else}}
+            <p class="truncate text-ink">{{default title url}}</p>
+            <p class="truncate text-xs text-ink-3">{{url}}</p>
+          {{/if}}
+          {{#if error}}<p class="text-xs text-bad">{{error}}</p>{{/if}}
+        </div>
+        <span class="tabular shrink-0 text-xs text-ink-3">{{ms}} ms · <time datetime="{{at}}" data-relative>{{timeAgo at}}</time></span>
+      </li>
+    {{/each}}
+  </ul>
+{{else}}
+  <p class="px-4 py-6 text-center text-[13px] text-ink-3">Nothing yet. Searches and pages {{@root.bot.name}} opens show up here (since the server started).</p>
+{{/if}}

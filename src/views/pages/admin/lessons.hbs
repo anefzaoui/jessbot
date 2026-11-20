@@ -1,0 +1,78 @@
+{{!--
+  Admin → Personality → Lessons (decisions #186, #188; the screen is Phase 25 #203): household lessons, the short rules
+  Jess learns from tasks that had to be pushed before they were done, for everyone. New ones wait here until approved.
+  Data: files, lessonsActive, lessonsWaiting (partials/admin/personality-nav.hbs), lessons = admin-lessons.js lessonsPage():
+  { lessons: [lesson-card], filter, counts: { proposed, active, retired, promoted, rejected }, total, retireSuggested,
+  promotable }. Client: admin-lessons.js. People's own lessons are theirs (You → Memory) and never listed here.
+--}}
+{{> page-header title="Personality" subtitle=(concat "Who " bot.name " is, and how " bot.name " works") width="max-w-5xl"}}
+<div class="mx-auto max-w-5xl px-4 py-6 sm:px-6" data-lessons-page data-filter="{{lessons.filter}}">
+  {{> admin/nav active="personality"}}
+  {{> admin/personality-nav}}
+
+  <div class="mb-4 flex flex-wrap items-end gap-3">
+    <div class="min-w-0 flex-1 basis-80">
+      <h2 class="text-lg font-semibold tracking-tight">Household lessons</h2>
+      <p class="max-w-2xl text-sm text-ink-3 text-pretty">Short rules {{bot.name}} learned from tasks someone had to push before they were done. They apply to everyone, so each one waits for you before she uses it. One that keeps coming back can move into her operating rules.</p>
+    </div>
+    <button type="button" class="btn btn-secondary btn-sm" data-lesson-new-open aria-expanded="false" aria-controls="lesson-new">{{icon "plus" class="size-3.5"}} Write a lesson</button>
+  </div>
+
+  <div class="lesson-stats" data-lesson-stats>
+    <div data-tone="{{#if lessons.counts.proposed}}warn{{/if}}"><p class="lesson-stat tabular" data-count="proposed">{{lessons.counts.proposed}}</p><p class="lesson-stat-label">waiting for you</p></div>
+    <div><p class="lesson-stat tabular" data-count="active">{{lessons.counts.active}}</p><p class="lesson-stat-label">in use</p></div>
+    <div><p class="lesson-stat tabular" data-count="promoted">{{lessons.counts.promoted}}</p><p class="lesson-stat-label">in AGENTS.md</p></div>
+    <div><p class="lesson-stat tabular" data-count="retired">{{lessons.counts.retired}}</p><p class="lesson-stat-label">retired</p></div>
+  </div>
+
+  <form id="lesson-new" class="card lesson-new" data-lesson-new hidden novalidate>
+    <div class="flex items-start gap-3">
+      <span class="lesson-icon" aria-hidden="true">{{icon "graduation-cap" class="size-[18px]"}}</span>
+      <div class="min-w-0 flex-1">
+        <h3 class="text-[15px] font-semibold">Write a lesson</h3>
+        <p class="text-xs text-ink-3">It’s in use as soon as you save it. Write it as a rule: when this happens, do that.</p>
+      </div>
+    </div>
+    <div class="mt-4 space-y-3">
+      <div data-field>
+        <label class="label" for="ln-rule">The rule</label>
+        <textarea id="ln-rule" name="rule" rows="2" maxlength="220" class="textarea text-sm" dir="auto" placeholder="When booking a table, confirm the time zone of the restaurant, not ours." data-lesson-rule-input></textarea>
+        <p class="hint tabular" data-lesson-rule-count>0 / 220</p>
+      </div>
+      <div class="grid gap-3 sm:grid-cols-[minmax(0,1fr)_12rem]">
+        <div data-field>
+          <label class="label" for="ln-why">Why <span class="font-normal text-ink-3">(optional)</span></label>
+          <input id="ln-why" name="why" maxlength="160" class="input text-sm" dir="auto" placeholder="A booking for 8 pm came through as 7 pm last month.">
+        </div>
+        <div data-field>
+          <label class="label" for="ln-site">Only on <span class="font-normal text-ink-3">(a site)</span></label>
+          <input id="ln-site" name="domain" class="input font-mono text-[13px]" placeholder="Everywhere" autocomplete="off" spellcheck="false">
+        </div>
+      </div>
+      <p class="text-xs text-ink-3">A household lesson reaches everyone, so it can’t hold anyone’s personal details.</p>
+    </div>
+    <div class="mt-4 flex justify-end gap-2">
+      <button type="button" class="btn btn-ghost btn-sm" data-lesson-new-cancel>Cancel</button>
+      <button type="submit" class="btn btn-primary btn-sm">{{icon "check" class="size-3.5"}} Save lesson</button>
+    </div>
+  </form>
+
+  <div class="mb-3 flex flex-wrap gap-1.5" role="group" aria-label="Show" data-lesson-filters {{#unless lessons.total}}hidden{{/unless}}>
+    <button type="button" class="chip" data-lesson-filter="all" aria-pressed="{{eq lessons.filter 'all'}}">All <span class="tabular text-ink-3" data-filter-count="all">{{lessons.total}}</span></button>
+    <button type="button" class="chip" data-lesson-filter="proposed" aria-pressed="{{eq lessons.filter 'proposed'}}">Waiting <span class="tabular text-ink-3" data-filter-count="proposed">{{lessons.counts.proposed}}</span></button>
+    <button type="button" class="chip" data-lesson-filter="active" aria-pressed="{{eq lessons.filter 'active'}}">In use <span class="tabular text-ink-3" data-filter-count="active">{{lessons.counts.active}}</span></button>
+    <button type="button" class="chip" data-lesson-filter="promoted" aria-pressed="{{eq lessons.filter 'promoted'}}">In AGENTS.md <span class="tabular text-ink-3" data-filter-count="promoted">{{lessons.counts.promoted}}</span></button>
+    <button type="button" class="chip" data-lesson-filter="retired" aria-pressed="{{eq lessons.filter 'retired'}}">Retired <span class="tabular text-ink-3" data-filter-count="retired">{{lessons.counts.retired}}</span></button>
+    <button type="button" class="chip" data-lesson-filter="rejected" aria-pressed="{{eq lessons.filter 'rejected'}}">Turned down <span class="tabular text-ink-3" data-filter-count="rejected">{{lessons.counts.rejected}}</span></button>
+  </div>
+
+  <div class="space-y-3" data-lesson-list>
+    {{#each lessons.lessons}}{{> admin/lesson-card lesson=this}}{{/each}}
+  </div>
+  <p class="card px-5 py-6 text-center text-sm text-ink-3" data-lesson-none hidden>None here. Pick another filter above.</p>
+  <div class="card" data-lesson-empty {{#if lessons.total}}hidden{{/if}}>
+    {{#> empty-state iconName="graduation-cap" title="No household lessons yet" text="When a task needs pushing before it’s done, I work out a short rule so it doesn’t happen again, and it waits here for you. You can also write one."}}
+      <button type="button" class="btn btn-primary" data-lesson-new-open>{{icon "plus" class="size-4"}} Write a lesson</button>
+    {{/empty-state}}
+  </div>
+</div>

@@ -1,0 +1,17 @@
+{{!--
+  What a finished reply rests on (decision #180; the screen is Phase 25 #212): "Checked 4 sources · 3 sites · newest 2 days old",
+  and behind it every page the task read (and the search results it only saw). Contract: sources = services/sources.js trustChip()
+  { checked, found, sites, newestDays, label, items: [{ url, host, title, date, kind: read|found }] }. Only-search-results says so.
+--}}
+<details class="trust" data-trust data-checked="{{sources.checked}}">
+  <summary class="trust-sum">{{#if sources.checked}}{{icon "shield-check" class="size-3.5"}}{{else}}{{icon "search" class="size-3.5"}}{{/if}} <span>{{sources.label}}</span>{{icon "chevron-down" class="trust-chevron size-3"}}</summary>
+  <ul class="trust-list" role="list">
+    {{#each sources.items}}
+      <li class="trust-item" data-kind="{{kind}}">
+        <span class="trust-kind" aria-hidden="true">{{#if (eq kind 'read')}}{{icon "file-text" class="size-3.5"}}{{else}}{{icon "search" class="size-3.5"}}{{/if}}</span>
+        <a href="{{url}}" target="_blank" rel="noopener noreferrer" class="min-w-0 flex-1 truncate" dir="auto">{{default title host}}</a>
+        <span class="trust-meta">{{host}}{{#if this.date}} · {{this.date}}{{/if}}{{#if (eq kind 'found')}} · search result{{/if}}</span>
+      </li>
+    {{/each}}
+  </ul>
+</details>

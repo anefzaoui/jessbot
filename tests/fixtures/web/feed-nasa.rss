@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:media="http://search.yahoo.com/mrss/" >
+
+<channel>
+	<title>NASA</title>
+	<atom:link href="https://www.nasa.gov/feed/" rel="self" type="application/rss+xml" />
+	<link>https://www.nasa.gov</link>
+	<description>Official National Aeronautics and Space Administration Website</description>
+	<lastBuildDate>Fri, 25 Sep 2026 22:06:52 +0000</lastBuildDate>
+	<language>en-US</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=7.0.6</generator>
+	<item>
+		<title>NASA, Boeing to Provide Update on Starliner Development</title>
+		<link>https://www.nasa.gov/news-release/nasa-boeing-to-provide-update-on-starliner-development/</link>
+		
+		<dc:creator><![CDATA[Lauren E. Low]]></dc:creator>
+		<pubDate>Fri, 25 Sep 2026 22:06:50 +0000</pubDate>
+				<category><![CDATA[International Space Station (ISS)]]></category>
+		<category><![CDATA[Commercial Space]]></category>
+		<category><![CDATA[Low Earth Orbit Economy]]></category>
+		<guid isPermaLink="false">https://www.nasa.gov/?post_type=press-release&#038;p=1050672</guid>
+
+					<description><![CDATA[During a news conference at 3 p.m. EDT on Monday, Sept. 28, NASA and Boeing leadership will discuss Starliner’s development and plans for regular crew flights to and from the International Space Station. Learn where to watch online: https://www.nasa.gov/live The briefing participants include: Media already credentialed for Crew-13 may participate in person at NASA’s Kennedy [&#8230;]]]></description>
+										<content:encoded><![CDATA[<p>(trimmed for the test fixture)</p>]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>NASA Welcomes San Marino Signing the Artemis Accords  </title>
+		<link>https://www.nasa.gov/organizations/oiir/nasa-welcomes-san-marino-signing-the-artemis-accords/</link>
+		
+		<dc:creator><![CDATA[Elizabeth Shaw]]></dc:creator>
+		<pubDate>Fri, 25 Sep 2026 19:53:03 +0000</pubDate>
+				<category><![CDATA[Office of International and Interagency Relations (OIIR)]]></category>
+		<category><![CDATA[Artemis Accords]]></category>
+		<guid isPermaLink="false">https://www.nasa.gov/?p=1050600</guid>
+
+					<description><![CDATA[The Republic of San Marino became the 76th signatory to the Artemis Accords during a ceremony in the city of Rimini on Friday with NASA and U.S. Department of State officials present.   “San Marino joins a growing coalition of like-minded nations committed to the peaceful, transparent, and responsible exploration of space,” said NASA Deputy Administrator [&#8230;]]]></description>
+										<content:encoded><![CDATA[<p>(trimmed for the test fixture)</p>]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>NASA Tests Dual Mode Propulsion CubeSat Ahead of Launch</title>
+		<link>https://www.nasa.gov/directorates/rtmd/nasa-tests-dual-mode-propulsion-cubesat-ahead-of-launch/</link>
+		
+		<dc:creator><![CDATA[Lee Mohon]]></dc:creator>
+		<pubDate>Fri, 25 Sep 2026 19:36:10 +0000</pubDate>
+				<category><![CDATA[Research and Technology Mission Directorate]]></category>
+		<category><![CDATA[CubeSats]]></category>
+		<category><![CDATA[Marshall Space Flight Center]]></category>
+		<guid isPermaLink="false">https://www.nasa.gov/?p=1050570</guid>
+
+					<description><![CDATA[Spacecraft propulsion traditionally relies on volatile fuels and separate, bulky systems for different types of maneuvering in space. NASA is working to change that paradigm. Engineers at NASA’s Marshall Space Flight Center in Huntsville, Alabama, recently completed a rigorous series of environmental and physical tests on a new small satellite designed to make spaceflight safer [&#8230;]]]></description>
+										<content:encoded><![CDATA[<p>(trimmed for the test fixture)</p>]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>2026-2027 DWU: Middle School Design Challenge</title>
+		<link>https://www.nasa.gov/aeronautics/aeronautics-stem/2026-2027-dwu-middle-school-design-challenge/</link>
+		
+		<dc:creator><![CDATA[Lillian Gipson]]></dc:creator>
+		<pubDate>Fri, 25 Sep 2026 17:20:51 +0000</pubDate>
+				<category><![CDATA[Aeronautics STEM]]></category>
+		<guid isPermaLink="false">https://www.nasa.gov/?p=1045213</guid>
+
+					<description><![CDATA[2026-2027 DWU: Middle School Design Challenge Overview The 2026-2027 challenge theme is, “Fueling Flight Design Challenge: New Energy Systems.”&#160; As more and more aircraft are a part of the US’ National Airspace System (NAS), NASA and partners at the FAA, at universities, and in the aviation industry are searching for ways to increase safety, make [&#8230;]]]></description>
+										<content:encoded><![CDATA[<p>(trimmed for the test fixture)</p>]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

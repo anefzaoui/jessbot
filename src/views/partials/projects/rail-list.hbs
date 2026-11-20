@@ -1,0 +1,17 @@
+{{!-- The rail's Projects list (also re-rendered live on projects.changed — GET /projects/rail).
+  Data: projects [{ id, name, icon, hue, href, active, running, waiting }] (services/projects.js projectView). --}}
+<ul class="px-3 pb-1" role="list" data-rail-projects>
+  {{#each projects}}
+    <li>
+      <a href="{{href}}" class="rail-link rail-project h-8 text-[13px]" {{#if active}}aria-current="page"{{/if}}
+        data-cmd="{{name}}" data-cmd-group="Projects" data-cmd-icon="{{this.icon}}">
+        {{> projects/tile icon=this.icon hue=hue size="sm"}}
+        <span class="flex-1 truncate" dir="auto">{{name}}</span>
+        {{#if waiting}}<span class="rail-project-flag" title="Waiting for your answer">{{icon "message-circle-question" class="size-3.5"}}</span>
+        {{else if running}}<span class="dot dot-run" aria-label="Working"></span>{{/if}}
+      </a>
+    </li>
+  {{else}}
+    <li class="px-2.5 py-2 text-xs leading-relaxed text-ink-3">Long-running work with its own files and memory. Say “let’s start a project”.</li>
+  {{/each}}
+</ul>

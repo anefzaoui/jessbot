@@ -1,0 +1,51 @@
+{{!-- The New project card on the reply that proposed it (docs/PROJECTS.md). Survives refresh; Create / Edit first / Not now.
+  Data: proposal { id, name, icon, hue, about, fieldLabel, field, state: draft|created|dismissed|deleted, href,
+                   intake: [{ question, answer }], rows: [{ kind, kindLabel, text }] } (services/projects.js proposalOfRun).
+  Client: public/js/projects.js. --}}
+<section class="proj-card" data-proposal="{{proposal.id}}" data-state="{{proposal.state}}" style="--hue: {{proposal.hue}}"
+  data-name="{{proposal.name}}" data-about="{{proposal.about}}" data-icon="{{proposal.icon}}" data-hue="{{proposal.hue}}" data-field="{{proposal.field}}"
+  aria-label="New project: {{proposal.name}}">
+  <div class="proj-card-glow" aria-hidden="true"></div>
+  <header class="relative flex items-start gap-3.5 p-4 pb-3">
+    {{> projects/tile icon=proposal.icon hue=proposal.hue size="lg"}}
+    <div class="min-w-0 flex-1">
+      <p class="proj-card-eyebrow">{{#if (eq proposal.state 'created')}}{{icon "circle-check" class="size-3.5"}} Project{{else}}{{icon "sparkles" class="size-3.5"}} New project{{/if}} · {{proposal.fieldLabel}}</p>
+      <h4 class="mt-0.5 text-[17px] leading-snug font-semibold tracking-tight" dir="auto">{{proposal.name}}</h4>
+      {{#if proposal.about}}<p class="mt-1 text-sm text-ink-2 text-pretty" dir="auto">{{proposal.about}}</p>{{/if}}
+    </div>
+  </header>
+
+  {{#if (eq proposal.state 'draft')}}
+    {{#if proposal.intake}}
+      <dl class="proj-card-facts">
+        {{#each proposal.intake}}<div><dt dir="auto">{{question}}</dt><dd dir="auto">{{answer}}</dd></div>{{/each}}
+      </dl>
+    {{/if}}
+    {{#if proposal.soul}}
+      <div class="proj-card-soul">
+        <p class="text-[13px]" dir="auto">{{icon "sparkles" class="size-3.5 inline -mt-0.5 text-accent-text"}} <span class="text-ink-3">In this project I bring</span> {{proposal.soul.stance}}</p>
+        {{#if proposal.soul.anchors}}<ul role="list" class="mt-1.5 space-y-0.5 text-xs text-ink-2">{{#each proposal.soul.anchors}}<li dir="auto">· {{this}}</li>{{/each}}</ul>{{/if}}
+        {{#if proposal.soul.assumptions}}<p class="mt-2 text-xs text-warn-text" dir="auto">{{icon "circle-help" class="size-3.5 inline -mt-0.5"}} I assumed: {{#each proposal.soul.assumptions}}{{this}}{{#unless @last}} · {{/unless}}{{/each}}. Tell me if not.</p>{{/if}}
+      </div>
+    {{/if}}
+    {{#if proposal.rows}}
+      <ul class="proj-card-rows" role="list">
+        {{#each proposal.rows}}<li><span class="proj-kind" data-kind="{{kind}}">{{kindLabel}}</span><span dir="auto">{{text}}</span></li>{{/each}}
+      </ul>
+    {{/if}}
+    <p class="proj-card-promise">{{icon "archive" class="size-3.5 shrink-0"}}
+      <span>Its own chat where I go deep. Files, references and long pastes you add there are kept as files, never summarized away.</span></p>
+    <footer class="proj-card-actions">
+      <button type="button" class="btn btn-primary" data-proposal-create>{{icon "folder-plus" class="size-4"}} Create project</button>
+      <button type="button" class="btn btn-secondary" data-proposal-edit>{{icon "pencil" class="size-4"}} Edit first</button>
+      <button type="button" class="btn btn-ghost ml-auto" data-proposal-dismiss>Not now</button>
+    </footer>
+  {{else if (eq proposal.state 'created')}}
+    <footer class="proj-card-actions">
+      <a href="{{proposal.href}}" class="btn btn-primary">{{icon "arrow-right" class="size-4"}} Open project</a>
+      <span class="text-xs text-ink-3">It’s in your sidebar under Projects.</span>
+    </footer>
+  {{else}}
+    <p class="relative px-4 pb-4 text-sm text-ink-3">{{#if (eq proposal.state 'deleted')}}This project was deleted.{{else}}Not created. Just say the word if you change your mind.{{/if}}</p>
+  {{/if}}
+</section>

@@ -1,0 +1,183 @@
+{{!--
+  Library item viewer. Data: item (library-card contract) + { rawUrl, downloadUrl, html? (rendered md/doc; audio: its script),
+  audio? (audio items: the voice-player contract, services/library.js audioView), description?, sourceHref?, version?,
+  origin?, sourceLabel?, madeFrom? { title, href }, ext?, viewerDraws? (a PDF whose form answers the viewer app must draw,
+  services/pdf-viewer.js), textSource? ('ocr': its text was read by OCR), pagePictures?, madeWith? { model, prompt, style, size,
+  costLabel } (a picture Jess made), ocrOffer? (scan | picture), ocrReading? { startedAt, pages }, listenable, listen? (read-aloud.js
+  listenJob) } (#196), versions?: [{ v, current, at, sizeLabel }], readOnly? (admin viewing someone else's item).
+  HTML artifacts render in a sandboxed iframe WITHOUT allow-same-origin (and the file itself is served with a sandbox CSP).
+  Client: public/js/library.js (details: title + description, delete with Undo, restore a version, live updates).
+--}}
+<div class="flex h-full min-h-0 flex-col" data-library-item="{{item.id}}" data-version="{{item.version}}">
+  <header class="flex shrink-0 items-center gap-2 border-b border-line bg-canvas/85 px-3 py-2.5 backdrop-blur-md sm:px-5">
+    <a href="/library" class="btn btn-ghost btn-icon btn-sm" aria-label="Back to library" data-tooltip="Library">{{icon "arrow-left" class="size-[18px]"}}</a>
+    <div class="min-w-0 flex-1">
+      <h1 class="truncate text-[15px] font-semibold" dir="auto" data-library-title>{{item.title}}</h1>
+      <p class="truncate text-xs text-ink-3"><span>{{#if (eq item.ext 'ics')}}Calendar file{{else}}{{default item.kindLabel item.type}}{{/if}}</span>{{#if item.sizeLabel}}, {{item.sizeLabel}}{{/if}}, <time datetime="{{iso item.createdAt}}" data-relative>{{timeAgo item.createdAt}}</time>
+        {{#if item.version}}{{#unless (eq item.version 1)}}, <span data-library-version>v{{item.version}}</span>{{/unless}}{{/if}}
+        {{#if item.proactive}}, <span class="text-accent-text">made without being asked</span>{{/if}}</p>
+    </div>
+    {{#if (eq item.ext 'ics')}}<a href="{{item.downloadUrl}}" class="btn btn-primary btn-sm hidden sm:inline-flex">{{icon "calendar-plus" class="size-3.5"}} Add to calendar</a>{{/if}}
+    {{#if item.listenable}}{{#unless readOnly}}<button type="button" class="btn btn-secondary btn-sm" data-library-listen>{{icon "headphones" class="size-3.5"}} <span class="hidden sm:inline">Listen</span></button>{{/unless}}{{/if}}
+    {{#unless readOnly}}<a href="/chat?draft={{urlencode (concat 'About “' item.title '” in my library: ')}}" class="btn btn-secondary btn-sm">{{icon "message-circle" class="size-3.5"}} <span class="hidden sm:inline">Discuss in chat</span></a>{{/unless}}
+    <a href="{{item.rawUrl}}" target="_blank" rel="noopener" class="btn btn-ghost btn-icon btn-sm" data-tooltip="Open full screen" aria-label="Open full screen">{{icon "maximize-2" class="size-4"}}</a>
+    <a href="{{item.downloadUrl}}" download class="btn btn-ghost btn-icon btn-sm" data-tooltip="Download" aria-label="Download">{{icon "download" class="size-4"}}</a>
+    <button type="button" class="btn btn-ghost btn-icon btn-sm" popovertarget="item-menu" aria-haspopup="menu" aria-label="More">{{icon "ellipsis" class="size-4"}}</button>
+    <div id="item-menu" popover class="menu w-64" role="menu" data-placement="bottom-end">
+      {{#unless readOnly}}<button type="button" class="menu-item" role="menuitem" data-library-details-open>{{icon "pencil" class="size-4"}} Edit title and description</button>{{/unless}}
+      {{#if item.ocrOffer}}{{#unless readOnly}}<button type="button" class="menu-item" role="menuitem" data-library-ocr>{{icon "scan-text" class="size-4"}} {{#if (eq item.ocrOffer 'picture')}}Read the text in this picture{{else}}Read this scan{{/if}}</button>{{/unless}}{{/if}}
+      {{#if item.sourceHref}}<a href="{{item.sourceHref}}" class="menu-item" role="menuitem">{{icon "message-circle" class="size-4"}} Where this came from</a>{{/if}}
+      {{#if versions.[1]}}
+        <div class="menu-sep"></div>
+        <p class="menu-label">Versions</p>
+        {{#each versions}}
+          <div class="flex items-center gap-1 px-1">
+            <a href="{{../item.rawUrl}}?v={{v}}" target="_blank" rel="noopener" class="menu-item min-w-0 flex-1" role="menuitem">
+              {{icon "history" class="size-4"}} <span class="flex-1">v{{v}}{{#if current}}, current{{/if}}</span>
+              <time class="text-xs text-ink-3" datetime="{{at}}" data-relative>{{timeAgo at}}</time></a>
+            {{#unless current}}{{#unless @root.readOnly}}<button type="button" class="btn btn-ghost btn-sm" data-library-restore-version="{{v}}" aria-label="Restore version {{v}}">Restore</button>{{/unless}}{{/unless}}
+          </div>
+        {{/each}}
+      {{/if}}
+      {{#unless readOnly}}
+        <div class="menu-sep"></div>
+        <button type="button" class="menu-item is-danger" role="menuitem" data-library-delete="{{item.id}}">{{icon "trash-2" class="size-4"}} Delete</button>
+      {{/unless}}
+    </div>
+  </header>
+
+  {{!-- Where it came from, what it is (its description), and anything the viewer should know before trusting what they see. --}}
+  <div class="lib-about" data-library-about {{#unless (or item.description item.madeFrom (eq item.origin 'downloaded') (eq item.origin 'email') item.viewerDraws item.textSource item.madeWith)}}hidden{{/unless}}>
+    <div class="lib-about-inner">
+      <div class="min-w-0 flex-1 space-y-1" data-library-about-view>
+        {{#if (or item.madeFrom (eq item.origin 'downloaded') (eq item.origin 'email') item.textSource item.madeWith)}}
+          <p class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-ink-3">
+            {{#if (eq item.textSource 'ocr')}}<span class="lib-ocr-chip" data-library-ocr-mark>{{icon "scan-text" class="size-3.5"}} Text from OCR (may contain errors)</span>{{/if}}
+            {{#if item.madeWith}}<span class="inline-flex min-w-0 items-center gap-1" data-library-made-with>{{icon "palette" class="size-3.5"}} <span class="truncate">Made with {{item.madeWith.model}}{{#if item.madeWith.size}} · {{item.madeWith.size}}{{/if}}{{#if item.madeWith.style}} · {{item.madeWith.style}}{{/if}}{{#if item.madeWith.costLabel}} · cost {{item.madeWith.costLabel}}{{/if}}</span></span>{{/if}}
+            {{#if (eq item.origin 'downloaded')}}<span class="inline-flex min-w-0 items-center gap-1">{{icon "download" class="size-3.5"}} <span class="truncate">{{item.sourceLabel}}</span></span>{{/if}}
+            {{#if (eq item.origin 'email')}}<span class="inline-flex min-w-0 items-center gap-1">{{icon "mail" class="size-3.5"}} <span class="truncate">{{item.sourceLabel}}</span></span>{{/if}}
+            {{#if item.madeFrom}}<a href="{{item.madeFrom.href}}" class="inline-flex min-w-0 items-center gap-1 hover:text-ink-2 hover:underline">{{icon "file-text" class="size-3.5"}} <span class="truncate">Made from “{{item.madeFrom.title}}”</span></a>{{/if}}
+          </p>
+        {{/if}}
+        <p class="text-sm text-ink-2" dir="auto" data-library-description {{#unless item.description}}hidden{{/unless}}>{{item.description}}</p>
+      </div>
+      {{#unless readOnly}}<button type="button" class="btn btn-ghost btn-sm shrink-0" data-library-details-open>{{icon "pencil" class="size-3.5"}} <span class="hidden sm:inline">Edit</span></button>{{/unless}}
+    </div>
+    {{#if item.viewerDraws}}
+      <div class="lib-notice" role="note">
+        {{icon "triangle-alert" class="size-4 shrink-0 text-warn-text"}}
+        <p class="min-w-0 text-[13px] text-ink-2">Some answers in this form are drawn by the app that opens it, so they’re shaped right in Arabic. If a box looks empty on your phone, a flattened copy writes every answer onto the page.</p>
+        {{#unless readOnly}}<a href="/chat?draft={{urlencode (concat 'Make a flattened copy of “' item.title '” so every answer shows on any phone.')}}" class="btn btn-secondary btn-sm shrink-0">Ask for a flattened copy</a>{{/unless}}
+      </div>
+    {{/if}}
+  </div>
+  {{#unless readOnly}}
+    {{!-- Read this scan (#196): offer → the estimate → reading (survives a refresh: the server remembers it) → the page reloads with
+      the text. States follow data-state; public/js/library.js fills the numbers. --}}
+    <section class="lib-task" data-library-ocr-box data-state="{{#if item.ocrReading}}reading{{else}}offer{{/if}}" {{#if item.ocrReading}}data-started="{{item.ocrReading.startedAt}}"{{/if}}
+      {{#unless (or item.ocrReading (eq item.ocrOffer 'scan'))}}hidden{{/unless}} aria-live="polite">
+      <div class="lib-task-inner">
+        <span class="lib-task-icon lib-scan-icon">{{icon "scan-text" class="size-5"}}<span class="lib-scanline" aria-hidden="true"></span></span>
+        <div class="min-w-0 flex-1">
+          <p data-when="offer"><span class="font-medium text-ink">{{#if (eq item.ocrOffer 'picture')}}I can read the text in this picture.{{else}}This PDF is a scan: there’s no text in it for me to read or search.{{/if}}</span>
+            <span class="text-ink-3">Reading it uses the chat model and costs a little; you see how much first.</span></p>
+          <p data-when="checking" class="lib-task-working"><span class="approval-dots" aria-hidden="true"><i></i><i></i><i></i></span> Counting the pages and the cost…</p>
+          <p data-when="estimate"><span class="font-medium text-ink" data-ocr-pages></span> <span class="text-ink-3" data-ocr-cost></span></p>
+          <div data-when="reading">
+            <p class="font-medium text-ink">Reading <span data-ocr-reading-pages>{{#if item.ocrReading}}{{plural item.ocrReading.pages "page"}}{{/if}}</span><span class="font-normal text-ink-3">, a few seconds each · <span class="tabular" data-ocr-elapsed>0:00</span></span></p>
+            <p class="text-xs text-ink-3">You can leave this page: the text appears here when it’s read.</p>
+          </div>
+          <p data-when="error" class="text-bad" data-ocr-error></p>
+        </div>
+        <div class="flex shrink-0 gap-2">
+          <button type="button" class="btn btn-primary btn-sm" data-when="offer" data-library-ocr>Read this scan</button>
+          <button type="button" class="btn btn-ghost btn-sm" data-when="estimate" data-library-ocr-cancel>Not now</button>
+          <button type="button" class="btn btn-primary btn-sm" data-when="estimate" data-library-ocr-confirm>Read it</button>
+          <button type="button" class="btn btn-secondary btn-sm" data-when="error" data-library-ocr>{{icon "rotate-ccw" class="size-3.5"}} Try again</button>
+        </div>
+      </div>
+    </section>
+    {{!-- Listen (#196): how long it is → recording, part by part (survives a refresh) → the new audio, ready to play. --}}
+    {{#if item.listenable}}
+      <section class="lib-task" data-library-listen-box data-state="{{#if item.listen}}{{item.listen.status}}{{else}}idle{{/if}}" {{#unless item.listen}}hidden{{/unless}}
+        {{#if item.listen}}data-part="{{item.listen.part}}" data-parts="{{item.listen.parts}}"{{/if}} aria-live="polite">
+        <div class="lib-task-inner">
+          <span class="lib-task-icon lib-listen-icon">{{icon "headphones" class="size-5"}}<span class="lib-listen-bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span></span>
+          <div class="min-w-0 flex-1">
+            <p data-when="checking" class="lib-task-working"><span class="approval-dots" aria-hidden="true"><i></i><i></i><i></i></span> Working out how long it is…</p>
+            <p data-when="estimate"><span class="font-medium text-ink" data-listen-length></span> <span class="text-ink-3">in my voice, saved to your Library. It uses this week’s voice budget.</span></p>
+            <p data-when="refused" class="text-ink-2" data-listen-refused></p>
+            <div data-when="recording">
+              <p class="font-medium text-ink">Recording part <span class="tabular" data-listen-part>{{#if item.listen}}{{item.listen.part}}{{/if}}</span> of <span class="tabular" data-listen-parts>{{#if item.listen}}{{item.listen.parts}}{{/if}}</span></p>
+              <span class="progress mt-2 max-w-sm" role="progressbar" aria-label="Recording progress"><span data-listen-bar style="width: 4%"></span></span>
+              <p class="mt-1 text-xs text-ink-3">You can leave this page: it keeps going, and the audio lands in your Library.</p>
+            </div>
+            <p data-when="done"><span class="font-medium text-ink">Ready to play:</span> <a class="text-accent-text underline-offset-2 hover:underline" data-listen-link href="{{#if item.listen.audio}}{{item.listen.audio.href}}{{/if}}">{{#if item.listen.audio}}{{item.listen.audio.title}}, {{item.listen.audio.length}}{{/if}}</a>
+              <span class="text-ink-3" data-listen-partial {{#unless item.listen.partial}}hidden{{/unless}}>Only the first parts were recorded: the budget or the voice model stopped it.</span></p>
+            <p data-when="failed" class="text-bad" data-listen-error>{{#if item.listen.error}}Not recorded: {{item.listen.error}}{{/if}}</p>
+          </div>
+          <div class="flex shrink-0 gap-2">
+            <button type="button" class="btn btn-ghost btn-sm" data-when="estimate refused done failed" data-library-listen-close>Close</button>
+            <button type="button" class="btn btn-primary btn-sm" data-when="estimate" data-library-listen-confirm>{{icon "headphones" class="size-3.5"}} Record it</button>
+            <a class="btn btn-primary btn-sm" data-when="done" data-listen-play href="{{#if item.listen.audio}}{{item.listen.audio.href}}{{/if}}">{{icon "play" class="size-3.5"}} Play it</a>
+          </div>
+        </div>
+      </section>
+    {{/if}}
+    <template data-library-details-template>
+      <form class="lib-details" data-library-details novalidate>
+        <div data-field><label class="label" for="lib-title">Title</label><input id="lib-title" class="input" name="title" maxlength="120" required></div>
+        <div class="mt-3" data-field><label class="label" for="lib-desc">Description</label>
+          <textarea id="lib-desc" class="textarea min-h-16 text-sm" name="description" maxlength="300" placeholder="What it is, for whom, anything worth knowing"></textarea>
+          <p class="hint">Helps you and me find it later.</p></div>
+        <div class="mt-3 flex justify-end gap-2">
+          <button type="button" class="btn btn-ghost btn-sm" data-library-details-cancel>Cancel</button>
+          <button class="btn btn-primary btn-sm">Save</button>
+        </div>
+      </form>
+    </template>
+  {{/unless}}
+
+  <div class="min-h-0 flex-1 overflow-auto bg-surface-2/50">
+    {{#if (eq item.type 'html')}}
+      <iframe src="{{item.rawUrl}}" title="{{item.title}}" class="size-full bg-white" sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox allow-forms allow-modals allow-downloads" referrerpolicy="no-referrer" data-library-frame></iframe>
+    {{else if (eq item.type 'pdf')}}
+      <iframe src="{{item.rawUrl}}" title="{{item.title}}" class="size-full"></iframe>
+    {{else if (eq item.type 'image')}}
+      <div class="grid min-h-full place-items-center p-6"><img src="{{item.rawUrl}}" alt="{{item.title}}" class="max-h-[80dvh] rounded-xl border border-line shadow-lg"></div>
+    {{else if (eq item.type 'audio')}}
+      <div class="mx-auto my-6 flex max-w-3xl flex-col gap-4 px-4">
+        <section class="lib-audio" aria-label="Listen" data-library-audio>
+          <div class="flex items-start gap-3">
+            <span class="grid size-11 shrink-0 place-items-center rounded-2xl bg-accent-soft text-accent-text">{{icon "headphones" class="size-5"}}</span>
+            <div class="min-w-0 flex-1">
+              <p class="text-[15px] font-semibold" dir="auto">{{item.title}}</p>
+              <p class="text-xs text-ink-3">{{#if item.audio.voice}}Read aloud by {{@root.bot.name}}, voice {{item.audio.voice}}{{else}}Read aloud by {{@root.bot.name}}{{/if}}{{#if item.audio.duration}}, {{item.audio.duration}}{{/if}}</p>
+            </div>
+          </div>
+          <div class="mt-4">{{> chat/voice-player item.audio}}</div>
+          <p class="mt-3 text-xs text-ink-3">Tap the waveform to jump; the speed button cycles 1.5×, 2× and back. Download it to listen offline.</p>
+        </section>
+        {{#if item.html}}
+          <article class="rounded-2xl border border-line bg-surface px-6 py-8 sm:px-10">
+            <h2 class="mb-4 text-sm font-semibold text-ink-2">What’s read out</h2>
+            <div class="prose-jb">{{{item.html}}}</div>
+          </article>
+        {{/if}}
+      </div>
+    {{else if (or (eq item.type 'sheet') (eq item.type 'slides'))}}
+      <div class="mx-auto max-w-6xl p-4 sm:p-6">{{{item.html}}}</div>
+    {{else}}
+      {{#if (eq item.ext 'ics')}}
+        <div class="mx-auto mt-6 max-w-3xl px-4">
+          <div class="lib-ics">
+            <span class="grid size-10 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent-text">{{icon "calendar-plus" class="size-5"}}</span>
+            <p class="min-w-0 text-sm text-ink-2">Add these to your phone or calendar app in one tap. Nothing is added until you do.</p>
+            <a href="{{item.downloadUrl}}" class="btn btn-primary btn-sm shrink-0">Add to calendar</a>
+          </div>
+        </div>
+      {{/if}}
+      <article class="mx-3 my-6 max-w-3xl rounded-2xl border border-line bg-surface px-6 py-8 sm:mx-auto sm:px-10"><div class="prose-jb">{{{item.html}}}</div></article>
+    {{/if}}
+  </div>
+</div>

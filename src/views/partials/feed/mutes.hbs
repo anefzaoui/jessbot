@@ -1,0 +1,35 @@
+{{!--
+  Muted words on /feed/sources (decision #193; the card is Phase 25 #204), with the topics and sources muted from cards.
+  Contract: mutes = services/feed.js mutesList(): { topics, sources, words: [{ value, at }], limits: { words } }. The page
+  renders it; POST / DELETE /api/v1/feed/mutes?fragment=1 re-render it. Client: public/js/feed-tools.js. Any script works:
+  a word matches whole words in titles and summaries (dir="auto" for Arabic).
+--}}
+<div class="mutes" data-mutes data-count="{{mutes.words.length}}" data-max="{{mutes.limits.words}}">
+  <form class="mutes-add" data-mute-form novalidate>
+    <div class="min-w-0 flex-1" data-field>
+      <label class="sr-only" for="mute-word">A word or phrase to mute</label>
+      <input id="mute-word" name="value" class="input" maxlength="60" dir="auto" autocomplete="off" placeholder="A word or short phrase, in any language" data-mute-input>
+    </div>
+    <button type="submit" class="btn btn-secondary shrink-0" data-mute-add>{{icon "eye-off" class="size-4"}} Mute</button>
+  </form>
+  <p class="mt-2 flex items-center justify-between gap-3 text-xs text-ink-3"><span>Stories with it in the title or summary stay out of your Feed.</span>
+    <span class="tabular shrink-0" data-mute-count>{{mutes.words.length}} of {{mutes.limits.words}}</span></p>
+  <ul class="mute-chips" role="list" data-mute-words>
+    {{#each mutes.words}}
+      <li class="mute-chip" data-mute="{{value}}" data-kind="word"><span dir="auto">{{value}}</span>
+        <button type="button" class="mute-x" data-unmute aria-label="Unmute “{{value}}”" data-tooltip="Unmute">{{icon "x" class="size-3.5"}}</button></li>
+    {{/each}}
+  </ul>
+  {{#unless mutes.words.length}}<p class="mt-3 text-sm text-ink-3" data-mute-empty>No muted words yet. Try a team you don’t follow, or a show you haven’t watched.</p>{{/unless}}
+  {{#if (or mutes.topics.length mutes.sources.length)}}
+    <div class="mt-4 border-t border-line pt-3">
+      <p class="text-xs font-medium text-ink-2">Muted from story cards</p>
+      <ul class="mute-chips" role="list">
+        {{#each mutes.topics}}<li class="mute-chip is-quiet" data-mute="{{value}}" data-kind="topic">{{icon "tag" class="size-3 text-ink-3"}}<span dir="auto">{{value}}</span>
+          <button type="button" class="mute-x" data-unmute aria-label="Unmute the topic {{value}}" data-tooltip="Unmute">{{icon "x" class="size-3.5"}}</button></li>{{/each}}
+        {{#each mutes.sources}}<li class="mute-chip is-quiet" data-mute="{{value}}" data-kind="source">{{icon "globe" class="size-3 text-ink-3"}}<span dir="auto">{{value}}</span>
+          <button type="button" class="mute-x" data-unmute aria-label="Unmute the source {{value}}" data-tooltip="Unmute">{{icon "x" class="size-3.5"}}</button></li>{{/each}}
+      </ul>
+    </div>
+  {{/if}}
+</div>

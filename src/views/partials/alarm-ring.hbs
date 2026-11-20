@@ -1,0 +1,14 @@
+{{!-- A ringing alarm or finished timer, docked at the top of every page (server-rendered + live via alarm.ring).
+      Contract: alarmView { id, kind, iconName, label, rangAt }. Stop / Snooze sync to every device. --}}
+<section class="alarm-ring" role="alertdialog" aria-labelledby="ring-{{id}}" aria-describedby="ring-{{id}}-d" data-alarm-ring="{{id}}" data-alarm-id="{{id}}">
+  <span class="alarm-ring-icon alarm-wiggle">{{icon iconName class="size-6"}}</span>
+  <div class="min-w-0 flex-1">
+    <p id="ring-{{id}}-d" class="text-xs font-medium text-warn-text">{{#if (eq kind 'timer')}}Timer done{{else}}Alarm{{/if}}{{#if rangAt}} · <time datetime="{{rangAt}}">{{time rangAt}}</time>{{/if}}</p>
+    <h2 id="ring-{{id}}" class="truncate text-lg leading-tight font-semibold">{{label}}</h2>
+    <button type="button" class="mt-0.5 text-xs font-medium text-accent-text hover:underline" data-alarm-unmute hidden>{{icon "volume-2" class="size-3.5"}} Tap to hear it</button>
+  </div>
+  <div class="flex shrink-0 flex-col gap-1.5 sm:flex-row">
+    <button type="button" class="btn btn-secondary" data-alarm-action="snooze">{{icon "alarm-clock-plus" class="size-4"}} 9 min</button>
+    <button type="button" class="btn btn-primary" data-alarm-action="dismiss">{{icon "alarm-clock-off" class="size-4"}} Stop</button>
+  </div>
+</section>

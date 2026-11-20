@@ -1,0 +1,36 @@
+{{!--
+  "Your reading diet" on the Feed's home (decision #193; the card is Phase 25 #204): what they actually read over the last
+  30 days, how varied it was, and one suggestion. Once a month: the card carries its month and stays hidden until
+  feed-tools.js checks it wasn't dismissed this month (no flash). Contract: diet = app.js dietCard(): services/feed-rank.js
+  readingDiet() + month, topics ≤ 5, sources ≤ 4: { stories, minutes, liked, saved, topics: [{ label, count, share }],
+  sources: [{ name, count, share }], variety: { topics, sources, score, label: varied|balanced|narrow }, suggestion: { kind,
+  text, topic?, source? } }.
+--}}
+<section class="card diet" data-diet data-month="{{diet.month}}" aria-labelledby="diet-h" hidden>
+  <div class="flex items-start gap-3">
+    <div class="min-w-0 flex-1">
+      <h2 id="diet-h" class="text-[15px] font-semibold">Your reading diet</h2>
+      <p class="text-xs text-ink-3">The last {{diet.days}} days · {{plural diet.stories "story" "stories"}}{{#if diet.minutes}} · {{diet.minutes}} min reading{{/if}}{{#if diet.saved}} · {{diet.saved}} saved{{/if}}</p>
+    </div>
+    <span class="diet-variety" data-variety="{{diet.variety.label}}">{{#if (eq diet.variety.label 'varied')}}Varied{{else if (eq diet.variety.label 'balanced')}}Balanced{{else}}Narrow{{/if}}</span>
+    <button type="button" class="btn btn-ghost btn-icon btn-sm -me-1.5 -mt-1 shrink-0" data-diet-dismiss aria-label="Hide until next month" data-tooltip="Hide until next month">{{icon "x" class="size-4"}}</button>
+  </div>
+  <div class="diet-bar" role="img" aria-label="What you read, by topic: {{#each diet.topics}}{{label}} {{share}}%{{#unless @last}}, {{/unless}}{{/each}}">
+    {{#each diet.topics}}<span style="--w: {{share}}%" data-i="{{@index}}"></span>{{/each}}
+  </div>
+  <ul class="diet-legend" role="list">
+    {{#each diet.topics}}<li data-i="{{@index}}"><i aria-hidden="true"></i><span dir="auto">{{label}}</span> <span class="tabular text-ink-3">{{share}}%</span></li>{{/each}}
+  </ul>
+  {{#if diet.sources.length}}
+    <p class="mt-3 text-xs text-ink-3">Most read from {{#each diet.sources}}<span class="font-medium text-ink-2" dir="auto">{{name}}</span> {{share}}%{{#unless @last}}, {{/unless}}{{/each}}</p>
+  {{/if}}
+  {{#if diet.suggestion}}
+    <div class="diet-tip">
+      <span class="text-accent-text">{{icon "lightbulb" class="size-4"}}</span>
+      <p class="min-w-0 flex-1 text-sm text-ink-2">{{diet.suggestion.text}}</p>
+      {{#if (eq diet.suggestion.kind 'unread_topic')}}<a href="/feed/sources" class="btn btn-secondary btn-sm shrink-0">Review topics</a>
+      {{else if (eq diet.suggestion.kind 'one_source')}}<a href="/feed/sources" class="btn btn-secondary btn-sm shrink-0">Add a source</a>
+      {{else if (or (eq diet.suggestion.kind 'one_topic') (eq diet.suggestion.kind 'explore'))}}<button type="button" class="btn btn-secondary btn-sm shrink-0" data-modal-open="tune-feed">Add a topic</button>{{/if}}
+    </div>
+  {{/if}}
+</section>

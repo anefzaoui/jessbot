@@ -1,0 +1,54 @@
+{{!--
+  One self-review proposal (admin/self-review.hbs; contract there). Every state's words are in the markup; data-status picks
+  one (pending → approved | rejected). Reject asks for a reason first (optional, it helps next week's review). The result and
+  the reason are filled in from the server's answer (public/js/admin-review.js).
+--}}
+<li class="rv-prop" data-rv-prop="{{id}}" data-status="{{status}}">
+  <div class="rv-prop-main">
+    <p class="rv-prop-flags"><span class="badge badge-neutral">{{kindLabel}}</span>
+      <span class="rv-stamp" data-when="approved">{{icon "check" class="size-3"}} Approved</span>
+      <span class="rv-stamp" data-when="rejected">{{icon "x" class="size-3"}} Rejected</span></p>
+    <h3 class="rv-prop-title" dir="auto">{{title}}</h3>
+    {{#if why}}<p class="rv-prop-why" dir="auto">{{why}}</p>{{/if}}
+
+    <div class="rv-change">
+      <p class="rv-change-where">{{icon "pencil" class="size-3.5"}} {{preview.where}}</p>
+      {{#if preview.lines.length}}
+        <div class="skr-diff rv-diff" dir="auto">{{#each preview.lines}}<div class="skr-line" data-mark="{{mark}}">{{#if (eq mark 'add')}}+ {{else if (eq mark 'del')}}− {{else}}  {{/if}}{{text}}</div>{{/each}}</div>
+      {{/if}}
+      {{#if preview.skill}}
+        <div class="rv-skill">
+          <p class="text-[13px] text-ink-2" dir="auto">{{preview.skill.description}}</p>
+          {{#if preview.skill.tests.length}}<p class="mt-1.5 text-xs text-ink-3">It should start for:</p>
+            <ul class="mt-1 flex flex-wrap gap-1.5" role="list">{{#each preview.skill.tests}}<li class="skr-say" dir="auto">{{this}}</li>{{/each}}</ul>{{/if}}
+        </div>
+      {{/if}}
+      {{#if preview.note}}<p class="mt-1.5 text-xs text-ink-3">{{preview.note}}</p>{{/if}}
+    </div>
+
+    {{#if evidence.length}}
+      <div class="rv-evidence">
+        <p class="text-xs text-ink-3">What showed it</p>
+        <ul class="mt-1 flex flex-wrap gap-1.5" role="list">
+          {{#each evidence}}<li>{{#if href}}<a href="{{href}}" class="rv-ev" target="_blank" rel="noopener">{{icon "message-square" class="size-3"}} <span class="truncate" dir="auto">{{label}}</span>{{#if person}} <span class="text-ink-3">· {{person}}</span>{{/if}}{{#if at}} <span class="text-ink-3">· <time datetime="{{iso at}}">{{timeAgo at}}</time></span>{{/if}}{{icon "arrow-up-right" class="size-3 text-ink-3"}}</a>{{else}}<span class="rv-ev is-gone">{{label}}</span>{{/if}}</li>{{/each}}
+        </ul>
+      </div>
+    {{/if}}
+
+    <p class="rv-outcome" data-when="approved">{{icon "circle-check" class="size-4 shrink-0 text-ok"}} <span data-rv-result>{{result}}</span></p>
+    <p class="rv-outcome" data-when="rejected">{{icon "x" class="size-4 shrink-0 text-ink-3"}} <span data-rv-reason>{{#if reason}}Why: {{reason}}{{else}}Rejected without a reason.{{/if}}</span></p>
+  </div>
+
+  <div class="rv-actions" data-when="pending">
+    <button type="button" class="btn btn-primary btn-sm" data-rv-approve>{{icon "check" class="size-3.5"}} Approve</button>
+    <button type="button" class="btn btn-ghost btn-sm" data-rv-reject-open>Reject</button>
+  </div>
+  <form class="rv-reject" data-rv-reject hidden novalidate>
+    <label class="label" for="rv-reason-{{id}}">Why not? <span class="font-normal text-ink-3">(optional, next week’s review reads it)</span></label>
+    <input id="rv-reason-{{id}}" name="reason" maxlength="300" class="input text-sm" dir="auto" placeholder="Already covered, too strict, not a real pattern…">
+    <div class="mt-2 flex items-center gap-2">
+      <button type="submit" class="btn btn-danger btn-sm">Reject it</button>
+      <button type="button" class="btn btn-ghost btn-sm" data-rv-reject-cancel>Cancel</button>
+    </div>
+  </form>
+</li>

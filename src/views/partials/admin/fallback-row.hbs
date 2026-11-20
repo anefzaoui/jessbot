@@ -1,0 +1,23 @@
+{{!--
+  One fallback model in Admin → Models (Phase 25, decision #203). Contract: { model, state: saved | testing | ok | failed }.
+  public/js/admin-models.js clones this from its <template> for a new row, sets data-state, and fills [data-fb-ms] /
+  [data-fb-error] with the test's numbers or reason. Every state's words are here; CSS shows the one that matches.
+--}}
+<li class="mdl-fb-row" data-fb-row data-model="{{model}}" data-state="{{default state 'saved'}}">
+  <span class="mdl-fb-n tabular" aria-hidden="true"></span>
+  <div class="mdl-fb-main min-w-0">
+    <p class="truncate font-mono text-[13px] text-ink" data-fb-model title="{{model}}">{{model}}</p>
+    <p class="mdl-state" role="status">
+      <span data-when="saved">{{icon "check" class="size-3.5"}} Saved, tested when added</span>
+      <span data-when="testing"><span class="spinner size-3" aria-hidden="true"></span> Asking it a tiny question…</span>
+      <span data-when="ok">{{icon "circle-check" class="size-3.5"}} Answered in <span class="tabular" data-fb-ms></span>. Press Save to keep it.</span>
+      <span data-when="failed">{{icon "circle-x" class="size-3.5"}} <span data-fb-error>Didn’t answer.</span></span>
+    </p>
+  </div>
+  <div class="mdl-fb-tools">
+    <button type="button" class="btn btn-ghost btn-icon btn-sm" data-fb-move="up" data-tooltip="Earlier in the order" aria-label="Move {{model}} earlier">{{icon "arrow-up" class="size-3.5"}}</button>
+    <button type="button" class="btn btn-ghost btn-icon btn-sm" data-fb-move="down" data-tooltip="Later in the order" aria-label="Move {{model}} later">{{icon "arrow-down" class="size-3.5"}}</button>
+    <button type="button" class="btn btn-ghost btn-icon btn-sm" data-fb-test data-tooltip="Test it again" aria-label="Test {{model}} again">{{icon "refresh-cw" class="size-3.5"}}</button>
+    <button type="button" class="btn btn-ghost btn-icon btn-sm hover:text-bad" data-fb-remove data-tooltip="Remove" aria-label="Remove {{model}}">{{icon "x" class="size-4"}}</button>
+  </div>
+</li>

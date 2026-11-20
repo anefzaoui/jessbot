@@ -1,0 +1,6 @@
+{{!-- Day-grouped stories (pages/feed.hbs and GET /api/v1/feed/page). sections: [{ label?, day?, posts: [feed/card] }]
+      A day header repeated across pages is dropped client-side (data-feed-day). --}}
+{{#each sections}}
+  {{#if label}}<h2 class="divider-label pt-2" data-feed-day="{{day}}">{{label}}</h2>{{/if}}
+  {{#each posts}}{{> feed/card this}}{{/each}}
+{{/each}}

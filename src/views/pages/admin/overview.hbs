@@ -1,0 +1,43 @@
+{{> page-header title="Admin" subtitle=(concat "Run " bot.name " for everyone") width="max-w-5xl"}}
+<div class="mx-auto max-w-5xl px-4 py-6 sm:px-6">
+  {{> admin/nav active="overview"}}
+
+  <a href="/admin/system" class="card card-hover mb-3 flex items-center gap-3 p-4" data-overview-health>
+    <span class="health-dot" data-status="{{health.status}}"></span>
+    <p class="min-w-0 flex-1 text-sm"><span class="font-semibold">{{health.summary}}</span>
+      {{#each health.checks}}{{#unless (eq status 'ok')}}<span class="text-ink-3"> · {{label}}: {{detail}}</span>{{/unless}}{{/each}}</p>
+    {{icon "chevron-right" class="size-4 text-ink-3"}}
+  </a>
+  <div class="mb-3 grid gap-3 sm:grid-cols-3">
+    <a href="/admin/usage" class="card card-hover p-4"><p class="text-xs text-ink-3">Spent this week</p><p class="tabular mt-1 text-2xl font-semibold">{{ops.week}}</p><p class="text-xs text-ink-3">everyone · resets Monday</p></a>
+    <div class="card p-4"><p class="text-xs text-ink-3">Working now</p><p class="tabular mt-1 text-2xl font-semibold">{{ops.running}}</p><p class="text-xs text-ink-3">tasks queued or running</p></div>
+    <div class="card p-4"><p class="text-xs text-ink-3">Waiting for approval</p><p class="tabular mt-1 text-2xl font-semibold">{{ops.waiting}}</p><p class="text-xs text-ink-3">across everyone</p></div>
+  </div>
+  <div class="grid gap-3 sm:grid-cols-4">
+    <a href="/admin/people" class="card card-hover p-4"><p class="text-xs text-ink-3">People</p><p class="tabular mt-1 text-2xl font-semibold">{{stats.people}}</p><p class="text-xs text-ink-3">{{stats.active}} active</p></a>
+    <a href="/admin/people#invites" class="card card-hover p-4"><p class="text-xs text-ink-3">Pending invites</p><p class="tabular mt-1 text-2xl font-semibold">{{stats.invites}}</p><p class="text-xs text-ink-3">expire after 7 days</p></a>
+    <a href="/admin/groups" class="card card-hover p-4"><p class="text-xs text-ink-3">Groups</p><p class="tabular mt-1 text-2xl font-semibold">{{stats.groups}}</p><p class="text-xs text-ink-3">shared instructions</p></a>
+    <a href="/admin/model" class="card card-hover p-4"><p class="text-xs text-ink-3">Brain</p>
+      <p class="mt-1 truncate font-mono text-sm font-semibold">{{llm.model}}</p>
+      <p class="flex items-center gap-1.5 text-xs {{#if llm.hasKey}}text-ok{{else}}text-bad{{/if}}"><span class="dot {{#if llm.hasKey}}dot-ok{{else}}dot-bad{{/if}}"></span>{{#if llm.hasKey}}Key {{llm.maskedKey}}{{else}}No API key{{/if}}</p></a>
+  </div>
+
+  {{> admin/security security=security}}
+
+  <section class="mt-8" aria-labelledby="h-audit">
+    <h2 id="h-audit" class="mb-3 text-sm font-semibold">Recent activity</h2>
+    <ul class="card divide-y divide-line" role="list">
+      {{#each audit}}
+        <li class="flex items-center gap-3 px-4 py-2.5 text-sm" data-audit-action="{{action}}">
+          {{#if (eq action 'injection_suspected')}}<span class="badge badge-warn">{{icon "shield-alert" class="size-3"}} Hidden instructions</span>
+          {{else if (eq action 'secret_blocked')}}<span class="badge badge-warn">{{icon "key-round" class="size-3"}} Secret stopped</span>
+          {{else}}<span class="font-mono text-xs text-ink-3">{{action}}</span>{{/if}}
+          <span class="min-w-0 flex-1 truncate text-ink-2">{{default actor_name "System"}}{{#if detail.name}} · {{detail.name}}{{else if detail.from}} · {{detail.from}}{{/if}}</span>
+          <time class="shrink-0 text-xs text-ink-3" datetime="{{iso at}}" data-relative>{{timeAgo at}}</time>
+        </li>
+      {{else}}
+        <li class="px-4 py-6 text-center text-sm text-ink-3">Nothing yet.</li>
+      {{/each}}
+    </ul>
+  </section>
+</div>

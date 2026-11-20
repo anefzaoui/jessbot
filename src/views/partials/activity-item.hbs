@@ -1,0 +1,17 @@
+{{!--
+  One activity entry on a timeline rail.
+  Contract: { id, at: ISO, iconName, title, detail?, status: ok|run|warn|bad|idle, href?, kind?: task|search|file|schedule|message }
+--}}
+<li class="relative pb-3.5 pl-6 last:pb-0" data-activity-id="{{id}}" data-kind="{{kind}}">
+  <span class="absolute top-0.5 -left-[11.5px] grid size-[22px] place-items-center rounded-full border border-line bg-surface
+    {{#if (eq status 'run')}}text-run{{else if (eq status 'warn')}}text-warn-text{{else if (eq status 'bad')}}text-bad{{else if (eq status 'ok')}}text-ok{{else}}text-ink-3{{/if}}">
+    {{#if (eq status 'run')}}<span class="spinner size-3 border-[1.5px]"></span>{{else}}{{icon (default iconName "circle") class="size-[13px]"}}{{/if}}
+  </span>
+  {{#if href}}<a href="{{href}}" class="group -mx-1.5 block rounded-lg px-1.5 py-0.5 hover:bg-surface-2">{{else}}<div class="-mx-1.5 px-1.5 py-0.5">{{/if}}
+    <div class="flex items-baseline gap-2">
+      <p class="min-w-0 flex-1 text-[13px] leading-snug font-medium text-ink">{{title}}</p>
+      <time class="tabular shrink-0 text-[11px] text-ink-3" datetime="{{iso at}}">{{when at}}</time>
+    </div>
+    {{#if detail}}<p class="mt-0.5 line-clamp-2 text-xs leading-snug text-ink-3">{{detail}}</p>{{/if}}
+  {{#if href}}</a>{{else}}</div>{{/if}}
+</li>

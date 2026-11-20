@@ -1,0 +1,321 @@
+{
+  "model": "openai/gpt-image-2.5-sunburst",
+  "endpoint": "https://openrouter.ai/api/v1/images",
+  "created": "2026-09-24T15:38:17.915Z",
+  "updated": "2026-09-24T15:42:50.611Z",
+  "totalCost": 0.381195,
+  "images": [
+    {
+      "variant": "female",
+      "state": "neutral",
+      "file": "female/neutral.png",
+      "prompt": "Photorealistic head-and-shoulders studio portrait of a humanoid android: clearly a robot, but skinned with realistic, natural human-like skin. Subtle, elegant android tells: thin vertical seam / panel lines on the forehead and temples, fine seam lines along the jawline and running down the sides of the neck, a few tiny inset sensor points near the temples, and a very faint seam where the neck meets the shoulders. The seams are physical, not drawn: very fine recessed hairline grooves in the skin, like precision-fitted panel joins on a premium device, catching a soft shadow on one edge and a faint highlight on the other. Not ink lines, not tattoos, not makeup. Friendly, warm, calm, intelligent and trustworthy; premium consumer-product design. Not creepy, not uncanny, not horror, no exposed wires or machinery, no chrome or metallic skin. Composition: square image, subject centered and facing the camera directly, head and shoulders filling about 70% of the frame, eyes on the upper third line, medium close-up. Soft, even, flattering studio lighting (large soft key light and gentle fill). Background: a plain seamless studio backdrop in soft light warm grey (#EDEBE8), evenly lit, no gradient, no vignette, no props, no text, no logos. The android is woman-presenting, appearing around 30 years old, with warm deep-brown skin, dark brown eyes, and dark natural hair pulled back into a neat low bun, soft and friendly features. She wears a simple modern soft heather-grey knit crew-neck sweater, with a hint of a synthetic collar seam at the base of the neck. Facial expression: a calm, relaxed resting expression with a subtle pleasant warmth, mouth closed, eyes looking directly into the camera.",
+      "referenceUsed": null,
+      "cost": 0.05453,
+      "generationId": "gen-img-1790264529-jHlnOS5qRyxpooGpv4Hp",
+      "model": "openai/gpt-image-2.5-sunburst",
+      "quality": "high",
+      "usage": {
+        "prompt_tokens": 370,
+        "completion_tokens": 1756,
+        "total_tokens": 2126,
+        "cost": 0.05453,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.05453,
+          "upstream_inference_prompt_cost": 0.00185,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "createdAt": "2026-09-24T15:42:50.603Z"
+    },
+    {
+      "variant": "male",
+      "state": "neutral",
+      "file": "male/neutral.png",
+      "prompt": "Photorealistic head-and-shoulders studio portrait of a humanoid android: clearly a robot, but skinned with realistic, natural human-like skin. Subtle, elegant android tells: thin vertical seam / panel lines on the forehead and temples, fine seam lines along the jawline and running down the sides of the neck, a few tiny inset sensor points near the temples, and a very faint seam where the neck meets the shoulders. The seams are physical, not drawn: very fine recessed hairline grooves in the skin, like precision-fitted panel joins on a premium device, catching a soft shadow on one edge and a faint highlight on the other. Not ink lines, not tattoos, not makeup. Friendly, warm, calm, intelligent and trustworthy; premium consumer-product design. Not creepy, not uncanny, not horror, no exposed wires or machinery, no chrome or metallic skin. Composition: square image, subject centered and facing the camera directly, head and shoulders filling about 70% of the frame, eyes on the upper third line, medium close-up. Soft, even, flattering studio lighting (large soft key light and gentle fill). Background: a plain seamless studio backdrop in soft light warm grey (#EDEBE8), evenly lit, no gradient, no vignette, no props, no text, no logos. The android is man-presenting, appearing in his mid-30s, with East Asian features, light warm skin tone, dark brown eyes, short neat black hair with a subtle side part, clean-shaven, a gentle but defined jawline. He wears a simple modern charcoal-grey knit crew-neck sweater, with a hint of a synthetic collar seam at the base of the neck. Facial expression: a calm, relaxed resting expression with a subtle pleasant warmth, mouth closed, eyes looking directly into the camera.",
+      "referenceUsed": null,
+      "cost": 0.05456,
+      "generationId": "gen-img-1790264452-gu5fg7cHclIuCZojcZIy",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "usage": {
+        "prompt_tokens": 376,
+        "completion_tokens": 1756,
+        "total_tokens": 2132,
+        "cost": 0.05456,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.05456,
+          "upstream_inference_prompt_cost": 0.00188,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "createdAt": "2026-09-24T15:41:17.996Z"
+    },
+    {
+      "variant": "neutral",
+      "state": "neutral",
+      "file": "neutral/neutral.png",
+      "prompt": "Photorealistic head-and-shoulders studio portrait of a humanoid android: clearly a robot, but skinned with realistic, natural human-like skin. Subtle, elegant android tells: thin vertical seam / panel lines on the forehead and temples, fine seam lines along the jawline and running down the sides of the neck, a few tiny inset sensor points near the temples, and a very faint seam where the neck meets the shoulders. The seams are physical, not drawn: very fine recessed hairline grooves in the skin, like precision-fitted panel joins on a premium device, catching a soft shadow on one edge and a faint highlight on the other. Not ink lines, not tattoos, not makeup. Friendly, warm, calm, intelligent and trustworthy; premium consumer-product design. Not creepy, not uncanny, not horror, no exposed wires or machinery, no chrome or metallic skin. Composition: square image, subject centered and facing the camera directly, head and shoulders filling about 70% of the frame, eyes on the upper third line, medium close-up. Soft, even, flattering studio lighting (large soft key light and gentle fill). Background: a plain seamless studio backdrop in soft light warm grey (#EDEBE8), evenly lit, no gradient, no vignette, no props, no text, no logos. The android is gender-neutral and truly androgynous, appearing in their late 20s, with light olive skin and a few faint freckles, grey-green eyes, straight natural brows, and short, softly tousled ash-brown hair in a cropped cut; a balanced face with a moderately defined jaw and no makeup, which reads as neither clearly male nor female. They wear a simple modern deep slate-grey knit crew-neck sweater, with a hint of a synthetic collar seam at the base of the neck. Facial expression: a calm, relaxed resting expression with a subtle pleasant warmth, mouth closed, eyes looking directly into the camera.",
+      "referenceUsed": null,
+      "cost": 0.054685,
+      "generationId": "gen-img-1790264479-bQjg48SEqDsbvBGuSeI6",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "usage": {
+        "prompt_tokens": 401,
+        "completion_tokens": 1756,
+        "total_tokens": 2157,
+        "cost": 0.054685,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.054685,
+          "upstream_inference_prompt_cost": 0.002005,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "createdAt": "2026-09-24T15:41:54.250Z"
+    }
+  ],
+  "history": [
+    {
+      "variant": "female",
+      "state": "neutral",
+      "file": "female/neutral.png",
+      "prompt": "Photorealistic head-and-shoulders studio portrait of a humanoid android: clearly a robot, but skinned with realistic, natural human-like skin. Subtle, elegant android tells: thin vertical seam / panel lines on the forehead and temples, fine seam lines along the jawline and running down the sides of the neck, a few tiny inset sensor points near the temples, and a very faint seam where the neck meets the shoulders. Friendly, warm, calm, intelligent and trustworthy; premium consumer-product design. Not creepy, not uncanny, not horror, no exposed wires or machinery, no chrome or metallic skin. Composition: square image, subject centered and facing the camera directly, head and shoulders filling about 70% of the frame, eyes on the upper third line, medium close-up. Soft, even, flattering studio lighting (large soft key light and gentle fill). Background: a plain seamless studio backdrop in soft light warm grey (#EDEBE8), evenly lit, no gradient, no vignette, no props, no text, no logos. The android is woman-presenting, appearing around 30 years old, with warm deep-brown skin, dark brown eyes, and dark natural hair pulled back into a neat low bun, soft and friendly features. She wears a simple modern soft heather-grey knit crew-neck sweater, with a hint of a synthetic collar seam at the base of the neck. Facial expression: a calm, relaxed resting expression with a subtle pleasant warmth, mouth closed, eyes looking directly into the camera.",
+      "referenceUsed": null,
+      "cost": 0.05426,
+      "generationId": "gen-img-1790264298-YqObRHkTR0UJHw2edx7K",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "usage": {
+        "prompt_tokens": 316,
+        "completion_tokens": 1756,
+        "total_tokens": 2072,
+        "cost": 0.05426,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.05426,
+          "upstream_inference_prompt_cost": 0.00158,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "createdAt": "2026-09-24T15:38:40.910Z"
+    },
+    {
+      "variant": "male",
+      "state": "neutral",
+      "file": "male/neutral.png",
+      "prompt": "Photorealistic head-and-shoulders studio portrait of a humanoid android: clearly a robot, but skinned with realistic, natural human-like skin. Subtle, elegant android tells: thin vertical seam / panel lines on the forehead and temples, fine seam lines along the jawline and running down the sides of the neck, a few tiny inset sensor points near the temples, and a very faint seam where the neck meets the shoulders. Friendly, warm, calm, intelligent and trustworthy; premium consumer-product design. Not creepy, not uncanny, not horror, no exposed wires or machinery, no chrome or metallic skin. Composition: square image, subject centered and facing the camera directly, head and shoulders filling about 70% of the frame, eyes on the upper third line, medium close-up. Soft, even, flattering studio lighting (large soft key light and gentle fill). Background: a plain seamless studio backdrop in soft light warm grey (#EDEBE8), evenly lit, no gradient, no vignette, no props, no text, no logos. The android is man-presenting, appearing in his mid-30s, with East Asian features, light warm skin tone, dark brown eyes, short neat black hair with a subtle side part, clean-shaven, a gentle but defined jawline. He wears a simple modern charcoal-grey knit crew-neck sweater, with a hint of a synthetic collar seam at the base of the neck. Facial expression: a calm, relaxed resting expression with a subtle pleasant warmth, mouth closed, eyes looking directly into the camera.",
+      "referenceUsed": null,
+      "cost": 0.05429,
+      "generationId": "gen-img-1790264329-pWOBhMDTIACfUVErXp3K",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "usage": {
+        "prompt_tokens": 322,
+        "completion_tokens": 1756,
+        "total_tokens": 2078,
+        "cost": 0.05429,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.05429,
+          "upstream_inference_prompt_cost": 0.00161,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "createdAt": "2026-09-24T15:39:11.590Z"
+    },
+    {
+      "variant": "neutral",
+      "state": "neutral",
+      "file": "neutral/neutral.png",
+      "prompt": "Photorealistic head-and-shoulders studio portrait of a humanoid android: clearly a robot, but skinned with realistic, natural human-like skin. Subtle, elegant android tells: thin vertical seam / panel lines on the forehead and temples, fine seam lines along the jawline and running down the sides of the neck, a few tiny inset sensor points near the temples, and a very faint seam where the neck meets the shoulders. Friendly, warm, calm, intelligent and trustworthy; premium consumer-product design. Not creepy, not uncanny, not horror, no exposed wires or machinery, no chrome or metallic skin. Composition: square image, subject centered and facing the camera directly, head and shoulders filling about 70% of the frame, eyes on the upper third line, medium close-up. Soft, even, flattering studio lighting (large soft key light and gentle fill). Background: a plain seamless studio backdrop in soft light warm grey (#EDEBE8), evenly lit, no gradient, no vignette, no props, no text, no logos. The android is gender-neutral and androgynous, appearing in their late 20s, with light olive skin and a few faint freckles, grey-green eyes, and short, softly tousled ash-brown hair in a cropped cut; balanced features that read as neither clearly male nor female. They wear a simple modern deep slate-grey knit crew-neck sweater, with a hint of a synthetic collar seam at the base of the neck. Facial expression: a calm, relaxed resting expression with a subtle pleasant warmth, mouth closed, eyes looking directly into the camera.",
+      "referenceUsed": null,
+      "cost": 0.05434,
+      "generationId": "gen-img-1790264351-Mopuh7Ma1WKzVDXhxa3N",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "usage": {
+        "prompt_tokens": 332,
+        "completion_tokens": 1756,
+        "total_tokens": 2088,
+        "cost": 0.05434,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.05434,
+          "upstream_inference_prompt_cost": 0.00166,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "createdAt": "2026-09-24T15:39:35.800Z"
+    },
+    {
+      "variant": "female",
+      "state": "neutral",
+      "file": "female/neutral.png",
+      "prompt": "Photorealistic head-and-shoulders studio portrait of a humanoid android: clearly a robot, but skinned with realistic, natural human-like skin. Subtle, elegant android tells: thin vertical seam / panel lines on the forehead and temples, fine seam lines along the jawline and running down the sides of the neck, a few tiny inset sensor points near the temples, and a very faint seam where the neck meets the shoulders. The seams are physical, not drawn: very fine recessed hairline grooves in the skin, like precision-fitted panel joins on a premium device, catching a soft shadow on one edge and a faint highlight on the other. Not ink lines, not tattoos, not makeup. Friendly, warm, calm, intelligent and trustworthy; premium consumer-product design. Not creepy, not uncanny, not horror, no exposed wires or machinery, no chrome or metallic skin. Composition: square image, subject centered and facing the camera directly, head and shoulders filling about 70% of the frame, eyes on the upper third line, medium close-up. Soft, even, flattering studio lighting (large soft key light and gentle fill). Background: a plain seamless studio backdrop in soft light warm grey (#EDEBE8), evenly lit, no gradient, no vignette, no props, no text, no logos. The android is woman-presenting, appearing around 30 years old, with warm deep-brown skin, dark brown eyes, and dark natural hair pulled back into a neat low bun, soft and friendly features. She wears a simple modern soft heather-grey knit crew-neck sweater, with a hint of a synthetic collar seam at the base of the neck. Facial expression: a calm, relaxed resting expression with a subtle pleasant warmth, mouth closed, eyes looking directly into the camera.",
+      "referenceUsed": null,
+      "cost": 0.05453,
+      "generationId": "gen-img-1790264401-NeuoXb822zzQBKbTwjiI",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "usage": {
+        "prompt_tokens": 370,
+        "completion_tokens": 1756,
+        "total_tokens": 2126,
+        "cost": 0.05453,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.05453,
+          "upstream_inference_prompt_cost": 0.00185,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "createdAt": "2026-09-24T15:40:51.330Z"
+    },
+    {
+      "variant": "male",
+      "state": "neutral",
+      "file": "male/neutral.png",
+      "prompt": "Photorealistic head-and-shoulders studio portrait of a humanoid android: clearly a robot, but skinned with realistic, natural human-like skin. Subtle, elegant android tells: thin vertical seam / panel lines on the forehead and temples, fine seam lines along the jawline and running down the sides of the neck, a few tiny inset sensor points near the temples, and a very faint seam where the neck meets the shoulders. The seams are physical, not drawn: very fine recessed hairline grooves in the skin, like precision-fitted panel joins on a premium device, catching a soft shadow on one edge and a faint highlight on the other. Not ink lines, not tattoos, not makeup. Friendly, warm, calm, intelligent and trustworthy; premium consumer-product design. Not creepy, not uncanny, not horror, no exposed wires or machinery, no chrome or metallic skin. Composition: square image, subject centered and facing the camera directly, head and shoulders filling about 70% of the frame, eyes on the upper third line, medium close-up. Soft, even, flattering studio lighting (large soft key light and gentle fill). Background: a plain seamless studio backdrop in soft light warm grey (#EDEBE8), evenly lit, no gradient, no vignette, no props, no text, no logos. The android is man-presenting, appearing in his mid-30s, with East Asian features, light warm skin tone, dark brown eyes, short neat black hair with a subtle side part, clean-shaven, a gentle but defined jawline. He wears a simple modern charcoal-grey knit crew-neck sweater, with a hint of a synthetic collar seam at the base of the neck. Facial expression: a calm, relaxed resting expression with a subtle pleasant warmth, mouth closed, eyes looking directly into the camera.",
+      "referenceUsed": null,
+      "cost": 0.05456,
+      "generationId": "gen-img-1790264452-gu5fg7cHclIuCZojcZIy",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "usage": {
+        "prompt_tokens": 376,
+        "completion_tokens": 1756,
+        "total_tokens": 2132,
+        "cost": 0.05456,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.05456,
+          "upstream_inference_prompt_cost": 0.00188,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "createdAt": "2026-09-24T15:41:17.996Z"
+    },
+    {
+      "variant": "neutral",
+      "state": "neutral",
+      "file": "neutral/neutral.png",
+      "prompt": "Photorealistic head-and-shoulders studio portrait of a humanoid android: clearly a robot, but skinned with realistic, natural human-like skin. Subtle, elegant android tells: thin vertical seam / panel lines on the forehead and temples, fine seam lines along the jawline and running down the sides of the neck, a few tiny inset sensor points near the temples, and a very faint seam where the neck meets the shoulders. The seams are physical, not drawn: very fine recessed hairline grooves in the skin, like precision-fitted panel joins on a premium device, catching a soft shadow on one edge and a faint highlight on the other. Not ink lines, not tattoos, not makeup. Friendly, warm, calm, intelligent and trustworthy; premium consumer-product design. Not creepy, not uncanny, not horror, no exposed wires or machinery, no chrome or metallic skin. Composition: square image, subject centered and facing the camera directly, head and shoulders filling about 70% of the frame, eyes on the upper third line, medium close-up. Soft, even, flattering studio lighting (large soft key light and gentle fill). Background: a plain seamless studio backdrop in soft light warm grey (#EDEBE8), evenly lit, no gradient, no vignette, no props, no text, no logos. The android is gender-neutral and truly androgynous, appearing in their late 20s, with light olive skin and a few faint freckles, grey-green eyes, straight natural brows, and short, softly tousled ash-brown hair in a cropped cut; a balanced face with a moderately defined jaw and no makeup, which reads as neither clearly male nor female. They wear a simple modern deep slate-grey knit crew-neck sweater, with a hint of a synthetic collar seam at the base of the neck. Facial expression: a calm, relaxed resting expression with a subtle pleasant warmth, mouth closed, eyes looking directly into the camera.",
+      "referenceUsed": null,
+      "cost": 0.054685,
+      "generationId": "gen-img-1790264479-bQjg48SEqDsbvBGuSeI6",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "usage": {
+        "prompt_tokens": 401,
+        "completion_tokens": 1756,
+        "total_tokens": 2157,
+        "cost": 0.054685,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.054685,
+          "upstream_inference_prompt_cost": 0.002005,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "createdAt": "2026-09-24T15:41:54.250Z"
+    },
+    {
+      "variant": "female",
+      "state": "neutral",
+      "file": "female/neutral.png",
+      "prompt": "Photorealistic head-and-shoulders studio portrait of a humanoid android: clearly a robot, but skinned with realistic, natural human-like skin. Subtle, elegant android tells: thin vertical seam / panel lines on the forehead and temples, fine seam lines along the jawline and running down the sides of the neck, a few tiny inset sensor points near the temples, and a very faint seam where the neck meets the shoulders. The seams are physical, not drawn: very fine recessed hairline grooves in the skin, like precision-fitted panel joins on a premium device, catching a soft shadow on one edge and a faint highlight on the other. Not ink lines, not tattoos, not makeup. Friendly, warm, calm, intelligent and trustworthy; premium consumer-product design. Not creepy, not uncanny, not horror, no exposed wires or machinery, no chrome or metallic skin. Composition: square image, subject centered and facing the camera directly, head and shoulders filling about 70% of the frame, eyes on the upper third line, medium close-up. Soft, even, flattering studio lighting (large soft key light and gentle fill). Background: a plain seamless studio backdrop in soft light warm grey (#EDEBE8), evenly lit, no gradient, no vignette, no props, no text, no logos. The android is woman-presenting, appearing around 30 years old, with warm deep-brown skin, dark brown eyes, and dark natural hair pulled back into a neat low bun, soft and friendly features. She wears a simple modern soft heather-grey knit crew-neck sweater, with a hint of a synthetic collar seam at the base of the neck. Facial expression: a calm, relaxed resting expression with a subtle pleasant warmth, mouth closed, eyes looking directly into the camera.",
+      "referenceUsed": null,
+      "cost": 0.05453,
+      "generationId": "gen-img-1790264529-jHlnOS5qRyxpooGpv4Hp",
+      "model": "openai/gpt-image-2.5-sunburst",
+      "quality": "high",
+      "usage": {
+        "prompt_tokens": 370,
+        "completion_tokens": 1756,
+        "total_tokens": 2126,
+        "cost": 0.05453,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.05453,
+          "upstream_inference_prompt_cost": 0.00185,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "createdAt": "2026-09-24T15:42:50.603Z"
+    }
+  ]
+}

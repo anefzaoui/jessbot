@@ -1,0 +1,82 @@
+{{#> page-header title="People" subtitle=(concat "Who talks to " bot.name ", and how it treats them") width="max-w-5xl"}}
+  <button type="button" class="btn btn-primary btn-sm" data-modal-open="invite-dialog" data-cmd="Invite someone" data-cmd-group="Admin" data-cmd-icon="user-plus">
+    {{icon "user-plus" class="size-4"}} <span class="hidden sm:inline">Invite</span>
+  </button>
+{{/page-header}}
+<div class="mx-auto max-w-5xl px-4 py-6 sm:px-6">
+  {{> admin/nav active="people"}}
+
+  {{#if newLink}}<div class="mb-6">{{> setup/invite-link name=newLinkName link=newLink}}</div>{{/if}}
+
+  <section class="card mb-8 p-5" aria-labelledby="h-everyone">
+    <div class="flex items-start gap-3">
+      <span class="grid size-9 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent-text">{{icon "globe" class="size-[18px]"}}</span>
+      <div class="min-w-0 flex-1">
+        <h2 id="h-everyone" class="text-sm font-semibold">How {{bot.name}} treats everyone</h2>
+        <p class="text-xs text-ink-3">Applies to every person. Group and personal instructions add to it (and win when they conflict).</p>
+      </div>
+    </div>
+    {{> admin/instructions-form action="/admin/everyone/instructions" current=everyone max=instructionsMax
+      placeholder="e.g. Always answer in the language the person writes in. Never share one person's private details with another. Keep work and family topics separate."}}
+  </section>
+
+  <section aria-labelledby="h-people">
+    <h2 id="h-people" class="mb-3 text-sm font-semibold">Everyone with an account</h2>
+    <ul class="card divide-y divide-line" role="list">
+      {{#each users}}
+        <li>
+          <a href="/admin/people/{{id}}" class="flex items-center gap-3 px-4 py-3 transition hover:bg-surface-2/60">
+            {{> person name=name hue=hue size="size-9 text-xs"}}
+            <div class="min-w-0 flex-1">
+              <p class="flex items-center gap-2 text-sm font-semibold">{{name}}
+                {{#if (eq role 'admin')}}<span class="badge badge-accent">Admin</span>{{/if}}
+                {{#if (eq status 'disabled')}}<span class="badge badge-bad">Disabled</span>{{/if}}</p>
+              <p class="truncate text-xs text-ink-3">{{email}}{{#each groups}} · {{name}}{{/each}}</p>
+            </div>
+            <span class="hidden text-xs text-ink-3 sm:block">{{#if lastSeenAt}}Active <time datetime="{{iso lastSeenAt}}" data-relative>{{timeAgo lastSeenAt}}</time>{{else}}Never signed in{{/if}}</span>
+            {{icon "chevron-right" class="size-4 text-ink-3"}}
+          </a>
+        </li>
+      {{/each}}
+    </ul>
+  </section>
+
+  <section id="invites" class="mt-8 scroll-mt-24" aria-labelledby="h-invites">
+    <h2 id="h-invites" class="mb-3 text-sm font-semibold">Pending invites</h2>
+    <ul class="card divide-y divide-line" role="list" data-pending-invites>
+      {{#each invites}}
+        <li class="flex items-center gap-3 px-4 py-3 text-sm" data-invite-id="{{id}}">
+          {{icon "clock" class="size-4 text-ink-3"}}
+          <span class="min-w-0 flex-1 truncate"><span class="font-medium">{{name}}</span> <span class="text-ink-3">· {{role}}{{#if group_name}} · {{group_name}}{{/if}}{{#if email}} · {{email}}{{/if}}</span></span>
+          <span class="hidden text-xs text-ink-3 sm:block">expires <time datetime="{{iso expires_at}}" data-relative>{{timeAgo expires_at}}</time></span>
+          <form method="post" action="/admin/invites/{{id}}/revoke" data-ajax data-stay data-remove-closest="li" data-success="Invite revoked."><button class="btn btn-ghost btn-sm">Revoke</button></form>
+        </li>
+      {{else}}
+        <li class="px-4 py-5 text-center text-sm text-ink-3">No pending invites.</li>
+      {{/each}}
+    </ul>
+  </section>
+</div>
+
+<dialog id="invite-dialog" class="modal" aria-labelledby="invite-title">
+  <form method="post" action="/admin/people/invite" data-ajax data-stay data-busy="Creating link…" data-invite-form>
+    <div class="modal-header">
+      <div><h2 id="invite-title" class="text-base font-semibold">Invite someone</h2>
+        <p class="text-sm text-ink-3">They'll pick their own password.</p></div>
+      <button type="button" class="btn btn-ghost btn-icon btn-sm" data-modal-close aria-label="Close">{{icon "x" class="size-4"}}</button>
+    </div>
+    <div class="modal-body space-y-3">
+      <div class="grid gap-3 sm:grid-cols-2">
+        {{> field name="name" label="Name" required=true autocomplete="off"}}
+        {{> field name="email" label="Email (optional)" type="email" autocomplete="off"}}
+      </div>
+      <div class="grid gap-3 sm:grid-cols-2">
+        <div><label class="label" for="f-role">Role</label><select id="f-role" name="role" class="select"><option value="member">Member</option><option value="admin">Admin</option></select></div>
+        <div><label class="label" for="f-groupId">Group</label><select id="f-groupId" name="groupId" class="select"><option value="">None</option>{{#each groups}}<option value="{{id}}">{{name}}</option>{{/each}}</select></div>
+      </div>
+      <div data-invite-links class="space-y-2"></div>
+    </div>
+    <div class="modal-footer"><button type="button" class="btn btn-secondary" data-modal-close>Done</button><button class="btn btn-primary">{{icon "link" class="size-4"}} Create link</button></div>
+  </form>
+</dialog>
+<script type="module" src="/js/setup.js"></script>

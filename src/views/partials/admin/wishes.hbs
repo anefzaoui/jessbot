@@ -1,0 +1,30 @@
+{{!--
+  "Asked for, can't do yet" on Admin → System (the wish log, decision #181; the screen is Phase 25 #203): what people asked
+  for that no tool or skill covers, the most asked first. Contract: wishes { list: [{ id, text, count, person, firstSeen,
+  lastSeen }] (services/wishes.js wishesView), wishes, asks }. Client: admin-wishes.js (Remove → DELETE /api/v1/admin/wishes/:id).
+  Their words are shown as they were cleaned when saved (one line); dir="auto" for Arabic.
+--}}
+<section id="wishes" class="mt-6 scroll-mt-20" aria-labelledby="h-wishes" data-wishes data-total="{{wishes.wishes}}" data-asks="{{wishes.asks}}">
+  <div class="mb-3 flex flex-wrap items-end gap-x-3 gap-y-1">
+    <div class="min-w-0 flex-1 basis-72">
+      <h2 id="h-wishes" class="text-sm font-semibold">Asked for, can’t do yet</h2>
+      <p class="text-xs text-ink-3">What people asked {{bot.name}} for that no tool or skill covers yet, the most asked first. Good ideas for the next skill.</p>
+    </div>
+    <p class="text-xs text-ink-3 tabular" data-wish-summary {{#unless wishes.wishes}}hidden{{/unless}}>{{plural wishes.wishes "wish" "wishes"}} · asked {{plural wishes.asks "time" "times"}}</p>
+  </div>
+  <ul class="card wish-list" role="list" data-wish-list {{#unless wishes.list}}hidden{{/unless}}>
+    {{#each wishes.list}}
+      <li class="wish-row" data-wish="{{id}}" data-count="{{count}}">
+        <span class="wish-count tabular" data-hot="{{#if (gt count 2)}}true{{else}}false{{/if}}" aria-label="Asked {{plural count 'time' 'times'}}">{{count}}×</span>
+        <div class="min-w-0 flex-1">
+          <p class="text-sm leading-snug text-ink" dir="auto">{{text}}</p>
+          <p class="mt-0.5 text-xs text-ink-3">{{#if person}}{{person}} · {{/if}}{{#if (eq count 1)}}asked <time datetime="{{iso lastSeen}}" data-relative>{{timeAgo lastSeen}}</time>{{else}}first <time datetime="{{iso firstSeen}}">{{timeAgo firstSeen}}</time> · last <time datetime="{{iso lastSeen}}" data-relative>{{timeAgo lastSeen}}</time>{{/if}}</p>
+        </div>
+        <button type="button" class="btn btn-ghost btn-icon btn-sm wish-remove" data-wish-remove data-tooltip="Remove from the list" aria-label="Remove “{{text}}” from the list">{{icon "x" class="size-4"}}</button>
+      </li>
+    {{/each}}
+  </ul>
+  <div class="card" data-wish-empty {{#if wishes.list}}hidden{{/if}}>
+    {{> empty-state compact=true iconName="lightbulb" title="Nothing asked for yet" text="When someone asks for something no tool covers (book a taxi, turn on the lights), it’s noted here once, and counted when it comes up again."}}
+  </div>
+</section>

@@ -1,0 +1,58 @@
+{{!--
+  The card under a reminder's note in the chat (decisions #190–#191; the card is Phase 25 #205). Contract: reminder =
+  services/alarms.js reminderCard():
+   - { kind: 'reminder', alarm: alarmView (followUp: { awaiting, sent, max, line, closed: { how, label, done, at,
+       canMarkDone } | null, escalateTo: { name, consent } | null, escalated, lastPostId }), level, messageId, latest }
+     The newest post of a reminder offers Done; its older nudges fold to one line. data-state: waiting | closed | idle.
+   - { kind: 'consent', consent: { id, status: pending|granted|declined, fromName, answeredAt } } → Yes / No.
+  Every state's words are here; public/js/reminder-card.js sets data-state / data-status from the server's answers and the
+  alarm.updated / reminder.consent frames, and fills in the few live values (the nudge line, the time it closed).
+--}}
+{{#if (eq reminder.kind 'reminder')}}
+  {{#with reminder.alarm}}
+  <div class="rem-card" data-reminder-card data-alarm-id="{{id}}" data-post="{{../reminder.messageId}}" data-latest="{{#if ../reminder.latest}}true{{else}}false{{/if}}"
+    data-state="{{#if followUp.awaiting}}waiting{{else if followUp.closed}}closed{{else}}idle{{/if}}" data-done="{{#if followUp.closed.done}}true{{else}}false{{/if}}">
+    {{!-- An older nudge of the same reminder: one quiet line. --}}
+    <p class="rem-earlier">{{icon "bell" class="size-3.5"}} {{#if ../reminder.level}}Nudge {{../reminder.level}} of {{followUp.max}}{{else}}First reminder{{/if}}</p>
+    <div class="rem-main">
+      <span class="rem-icon" aria-hidden="true">{{icon "bell" class="size-[18px]"}}</span>
+      <div class="min-w-0 flex-1">
+        <p class="rem-line" data-rem-when="waiting"><span data-rem-line>{{followUp.line}}</span></p>
+        <p class="rem-line" data-rem-when="closed">
+          <span class="rem-closed-done">{{icon "circle-check" class="size-3.5"}}<span>Done<span data-rem-closed-at>{{#if followUp.closed.at}} at {{time followUp.closed.at}}{{/if}}</span>. I’ve stopped reminding you.</span></span>
+          <span class="rem-closed-stop" {{#unless (eq followUp.closed.how 'stop')}}hidden{{/unless}}>{{icon "bell-off" class="size-3.5"}} Stopped. No more nudges this time.</span>
+          <span class="rem-closed-missed" {{#unless (eq followUp.closed.how 'unconfirmed')}}hidden{{/unless}}>{{icon "circle-alert" class="size-3.5"}} Not confirmed after {{plural followUp.max "nudge" "nudges"}}.{{#if followUp.escalated}} I told {{followUp.escalateTo.name}}.{{/if}}</span>
+        </p>
+        <p class="rem-line" data-rem-when="idle">{{icon "calendar-clock" class="size-3.5"}} Next time: {{whenLabel}}</p>
+        {{#if followUp.escalateTo}}
+          <p class="rem-note" data-rem-when="waiting">{{#if (eq followUp.escalateTo.consent 'granted')}}If it’s still open after the last nudge, I’ll tell {{followUp.escalateTo.name}}.{{else if (eq followUp.escalateTo.consent 'pending')}}{{followUp.escalateTo.name}} hasn’t said yes to being told yet, so I won’t.{{else if (eq followUp.escalateTo.consent 'declined')}}{{followUp.escalateTo.name}} said no to being told, so this stays between us.{{/if}}</p>
+        {{/if}}
+        <p class="field-error" data-rem-error hidden></p>
+      </div>
+      <button type="button" class="btn btn-primary btn-sm rem-done" data-reminder-done data-rem-when="waiting">{{icon "check" class="size-3.5"}} Done</button>
+      <button type="button" class="btn btn-secondary btn-sm rem-done" data-reminder-done data-rem-mark data-rem-when="closed" {{#unless followUp.closed.canMarkDone}}hidden{{/unless}}>{{icon "check" class="size-3.5"}} Mark done</button>
+    </div>
+  </div>
+  {{/with}}
+{{else if (eq reminder.kind 'consent')}}
+  {{#with reminder.consent}}
+  <div class="rem-card rem-consent" data-consent-card data-consent-id="{{id}}" data-status="{{status}}">
+    <div class="rem-main">
+      <span class="rem-icon" aria-hidden="true">{{icon "user-check" class="size-[18px]"}}</span>
+      <div class="min-w-0 flex-1">
+        <p class="rem-line" data-rem-when="pending">May I tell you here when {{fromName}} doesn’t confirm a reminder?</p>
+        <p class="rem-line" data-rem-when="granted">{{icon "circle-check" class="size-3.5"}} You said yes. I’ll tell you here when {{fromName}} misses a reminder, nothing more.</p>
+        <p class="rem-line" data-rem-when="declined">{{icon "circle-x" class="size-3.5"}} You said no. I won’t tell you about {{fromName}}’s reminders.</p>
+        <p class="rem-note">You can change your mind any time.</p>
+        <p class="field-error" data-rem-error hidden></p>
+      </div>
+      <div class="rem-choices" data-rem-when="pending">
+        <button type="button" class="btn btn-primary btn-sm" data-consent-answer="yes">Yes, tell me</button>
+        <button type="button" class="btn btn-secondary btn-sm" data-consent-answer="no">No</button>
+      </div>
+      <button type="button" class="btn btn-ghost btn-sm" data-consent-answer="no" data-rem-when="granted">Change to no</button>
+      <button type="button" class="btn btn-ghost btn-sm" data-consent-answer="yes" data-rem-when="declined">Change to yes</button>
+    </div>
+  </div>
+  {{/with}}
+{{/if}}

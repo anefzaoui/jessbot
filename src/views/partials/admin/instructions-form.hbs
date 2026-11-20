@@ -1,0 +1,15 @@
+{{!--
+  Versioned instructions editor. action, current ({ body, created_at, author_name }|null), max, placeholder, history?
+  Saves in place (data-stay) with a character counter.
+--}}
+<form method="post" action="{{action}}" class="mt-4" data-ajax data-stay data-success="Instructions saved. They apply from the next message." data-busy="Saving…">
+  <label class="sr-only" for="f-body-{{action}}">Instructions</label>
+  <textarea id="f-body-{{action}}" name="body" class="textarea min-h-32 text-sm" maxlength="{{max}}" placeholder="{{placeholder}}" data-counter data-md-editor="Instructions">{{current.body}}</textarea>
+  <div class="mt-2 flex items-center gap-3">
+    <p class="text-xs text-ink-3">
+      {{#if current}}Last changed <time datetime="{{iso current.created_at}}" data-relative>{{timeAgo current.created_at}}</time>{{#if current.author_name}} by {{current.author_name}}{{/if}}{{else}}Not set yet{{/if}}
+      · <span class="tabular" data-counter-out>0</span>/{{max}}
+    </p>
+    <button class="btn btn-primary btn-sm ml-auto">Save</button>
+  </div>
+</form>

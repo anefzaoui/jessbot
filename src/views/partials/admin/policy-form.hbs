@@ -1,0 +1,58 @@
+{{!--
+  Policy editor (decision #13). action, rows: [{ key, label, description, value, inherited?, available }],
+  showInherit, approver, inheritedApprover, budget, inheritedBudget, taskBudget, inheritedTaskBudget?, defaultTaskBudget,
+  quietStart, quietEnd
+--}}
+<form method="post" action="{{action}}" class="@container space-y-5" data-ajax data-stay data-success="Permissions saved. They apply from the next message." data-busy="Saving…">
+  <ul class="divide-y divide-line rounded-xl border border-line" role="list">
+    {{#each rows}}
+      <li class="flex flex-col gap-2 px-4 py-3 @lg:flex-row @lg:items-center">
+        <div class="min-w-0 flex-1">
+          <p class="flex items-center gap-2 text-sm font-medium">{{label}}{{#unless available}}<span class="badge badge-neutral">Coming soon</span>{{/unless}}</p>
+          <p class="text-xs text-ink-3">{{description}}</p>
+        </div>
+        <div class="segmented shrink-0" role="radiogroup" aria-label="{{label}}">
+          {{#if ../showInherit}}
+            <label class="segment-choice"><input type="radio" class="sr-only" name="toolsets[{{key}}]" value="" {{#unless value}}checked{{/unless}}>
+              <span>Inherit{{#if inherited}} <span class="text-ink-3">({{inherited}})</span>{{/if}}</span></label>
+          {{/if}}
+          <label class="segment-choice"><input type="radio" class="sr-only" name="toolsets[{{key}}]" value="off" {{#if (eq value 'off')}}checked{{/if}}><span>Off</span></label>
+          <label class="segment-choice"><input type="radio" class="sr-only" name="toolsets[{{key}}]" value="ask" {{#if (eq value 'ask')}}checked{{/if}}><span>Ask first</span></label>
+          <label class="segment-choice"><input type="radio" class="sr-only" name="toolsets[{{key}}]" value="allow" {{#if (eq value 'allow')}}checked{{/if}}><span>Allowed</span></label>
+        </div>
+      </li>
+    {{/each}}
+  </ul>
+  <p class="text-xs text-ink-3">Spending money or sending anything outside <strong>always</strong> asks first, even when “Allowed”, unless the person chose “Always allow” for that action.</p>
+
+  <div class="grid gap-4 @lg:grid-cols-2 @4xl:grid-cols-4">
+    <div data-field>
+      <label class="label" for="pol-approver-{{action}}">Who approves</label>
+      <select id="pol-approver-{{action}}" name="approver" class="select">
+        {{#if showInherit}}<option value="" {{#unless approver}}selected{{/unless}}>Inherit{{#if inheritedApprover}} ({{inheritedApprover}}){{/if}}</option>{{/if}}
+        <option value="self" {{#if (eq approver 'self')}}selected{{/if}}>The person themself</option>
+        <option value="admin" {{#if (eq approver 'admin')}}selected{{/if}}>The admin</option>
+      </select>
+    </div>
+    <div data-field>
+      <label class="label" for="pol-budget-{{action}}">Weekly budget (USD)</label>
+      <input id="pol-budget-{{action}}" name="weeklyBudget" type="number" min="0" step="0.5" class="input" value="{{budget}}" placeholder="{{#if inheritedBudget}}Inherit ({{inheritedBudget}}){{/if}}">
+    </div>
+    {{!-- #178 (field: Phase 25 #203): one task stops and asks before it spends past this. Empty = inherit or the default. --}}
+    <div data-field>
+      <label class="label" for="pol-task-{{action}}">One task, at most (USD)</label>
+      <input id="pol-task-{{action}}" name="taskBudget" type="number" min="0" max="100" step="0.05" class="input" value="{{taskBudget}}"
+        placeholder="{{#if inheritedTaskBudget}}Inherit ({{inheritedTaskBudget}}){{else}}Default (up to {{defaultTaskBudget}}){{/if}}" aria-describedby="pol-task-hint-{{action}}">
+      <p class="hint" id="pol-task-hint-{{action}}">A task that would spend more stops and asks first. 0 means no cap per task.</p>
+    </div>
+    <div data-field>
+      <span class="label">Quiet hours</span>
+      <div class="flex items-center gap-2">
+        <input name="quietStart" type="time" class="input" value="{{quietStart}}" aria-label="Quiet from">
+        <span class="text-ink-3">to</span>
+        <input name="quietEnd" type="time" class="input" value="{{quietEnd}}" aria-label="Quiet until">
+      </div>
+    </div>
+  </div>
+  <div class="flex justify-end"><button class="btn btn-primary btn-sm">Save permissions</button></div>
+</form>

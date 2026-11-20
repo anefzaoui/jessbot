@@ -1,0 +1,76 @@
+{{!--
+  One list (/lists/:id). Data: detail = services/lists.js detailOf() (see partials/lists/items.hbs), members for the pickers.
+  Client: public/js/lists.js (add with an optimistic row, tick with reconcile, change / remove items, rename, archive,
+  live refresh on list.updated so two people shopping see each other's ticks).
+--}}
+<div data-list-page="{{detail.list.id}}" data-kind="{{detail.list.kind}}" data-title="{{detail.list.title}}" data-shared="{{#if detail.list.shared}}true{{else}}false{{/if}}">
+  <header class="sticky top-0 z-20 border-b border-line bg-canvas/85 backdrop-blur-md">
+    <div class="mx-auto flex max-w-2xl items-center gap-2 px-3 py-2.5 sm:px-6">
+      <a href="/lists" class="btn btn-ghost btn-icon btn-sm -ms-1" aria-label="All lists" data-tooltip="All lists">{{icon "arrow-left" class="size-[18px]"}}</a>
+      <span class="list-kind shrink-0" data-kind="{{detail.list.kind}}">{{icon detail.list.iconName class="size-[18px]"}}</span>
+      <div class="min-w-0 flex-1">
+        <h1 class="truncate text-[17px] font-semibold tracking-tight" dir="auto" data-list-title>{{detail.list.title}}</h1>
+        <p class="truncate text-xs text-ink-3">
+          {{#if (eq detail.list.kind 'wish')}}{{#if detail.isWisher}}Your wishes. You won’t see what’s been bought{{else}}{{detail.list.wisher}}’s wishes. {{detail.list.wisher}} won’t see what’s been bought{{/if}}
+          {{else if detail.list.shared}}Shared with {{detail.list.scope}}{{#if detail.members.[1]}}: {{#each detail.members}}{{name}}{{#unless @last}}, {{/unless}}{{/each}}{{/if}}
+          {{else}}{{detail.list.kindLabel}}, just for you{{/if}}
+        </p>
+      </div>
+      {{#if detail.list.canManage}}
+        <button type="button" class="btn btn-ghost btn-icon btn-sm" popovertarget="list-menu" aria-haspopup="menu" aria-label="List options">{{icon "ellipsis" class="size-5"}}</button>
+        <div id="list-menu" popover class="menu w-52" role="menu" data-placement="bottom-end">
+          <button type="button" class="menu-item" role="menuitem" data-list-rename>{{icon "pencil" class="size-4"}} Rename</button>
+          <div class="menu-sep"></div>
+          <button type="button" class="menu-item" role="menuitem" data-list-archive>{{icon "archive" class="size-4"}} Archive list</button>
+        </div>
+      {{/if}}
+      <button type="button" class="shrink-0 rounded-full xl:hidden" data-panel-open="activity" aria-label="Open {{@root.bot.name}}'s activity">
+        {{> avatar size="md" activity=@root.shell.agent.activity}}
+      </button>
+    </div>
+  </header>
+
+  <div class="mx-auto max-w-2xl px-3 pt-4 pb-10 sm:px-6">
+    <form class="li-add" data-list-add autocomplete="off">
+      <label class="sr-only" for="list-add-input">{{detail.meta.add}}</label>
+      <span class="li-add-icon" aria-hidden="true">{{icon "plus" class="size-[18px]"}}</span>
+      <input id="list-add-input" class="li-add-input" name="text" maxlength="200" placeholder="{{detail.meta.add}}" enterkeyhint="done" data-list-add-input>
+      <button class="btn btn-primary btn-sm" data-list-add-button>Add</button>
+    </form>
+    {{#if (eq detail.list.kind 'shopping')}}<p class="mt-1.5 px-1 text-xs text-ink-3">Quantities are read for you, and items land in their aisle.</p>{{/if}}
+
+    <div class="mt-5" data-list-body aria-live="polite">{{> lists/items detail=detail}}</div>
+    <div class="li-gone" data-list-gone hidden role="alert">
+      {{icon "archive" class="size-5 shrink-0 text-ink-3"}}
+      <p class="min-w-0 flex-1 text-sm">This list was archived or removed.</p>
+      <a href="/lists" class="btn btn-secondary btn-sm">All lists</a>
+    </div>
+  </div>
+
+  {{!-- The change form, cloned under a row by lists.js (one source of markup: the pickers come from the server). --}}
+  <template data-list-editor>
+    <form class="li-editor" data-list-editor-form>
+      <div class="grid gap-3 sm:grid-cols-2">
+        <div class="sm:col-span-2" data-field><label class="label">What</label><input class="input" name="text" maxlength="200" required></div>
+        {{#unless (eq detail.list.kind 'todo')}}
+          <div data-field><label class="label">Quantity</label><input class="input" name="qty" maxlength="30" placeholder="e.g. 2 kg"></div>
+        {{/unless}}
+        {{#if (eq detail.list.kind 'shopping')}}
+          <div data-field><label class="label">Aisle</label><select class="select" name="category"><option value="">Other</option>{{#each detail.aisles}}<option>{{this}}</option>{{/each}}</select></div>
+        {{/if}}
+        {{#if detail.members.[1]}}
+          <div data-field><label class="label">Who’s on it</label><select class="select" name="assigneeId"><option value="">Anyone</option>{{#each detail.members}}<option value="{{id}}">{{name}}</option>{{/each}}</select></div>
+        {{/if}}
+        {{#unless (eq detail.list.kind 'shopping')}}{{#unless (eq detail.list.kind 'wish')}}
+          <div data-field><label class="label">Due</label><input class="input" type="datetime-local" name="due"></div>
+        {{/unless}}{{/unless}}
+      </div>
+      <div class="mt-3 flex items-center gap-2">
+        <button type="button" class="btn btn-danger-ghost btn-sm" data-list-delete>{{icon "trash-2" class="size-3.5"}} Remove</button>
+        <span class="flex-1"></span>
+        <button type="button" class="btn btn-ghost btn-sm" data-list-edit-cancel>Cancel</button>
+        <button class="btn btn-primary btn-sm">Save</button>
+      </div>
+    </form>
+  </template>
+</div>

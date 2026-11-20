@@ -1,0 +1,51 @@
+{{!--
+  Scheduled task (Upcoming page and panel; services/schedules.js jobView).
+  Contract: { id, title, iconName?, kind, scheduleLabel, nextRunAt: ISO|null, paused, lastStatus?: ok|bad|silent|skipped|running|retrying|null,
+              lastRunAt?, endsAt?, endsLabel?, retryAt?, retryLabel?, threadHref, watch?: { condition, lastNote, checkedAt, checkedLabel,
+              lastCheck, failStreak, line } }  (Phase 19; the screen #196). compact=true → the panel's short card.
+  public/js/alarms.js runs / pauses / deletes it and shows "Running now" at once while the server confirms.
+--}}
+<article class="card job {{#if compact}}p-3{{else}}p-4{{/if}}" data-job-id="{{id}}" data-status="{{default lastStatus 'none'}}" {{#if paused}}data-paused{{/if}}
+  {{#if watch}}data-watch{{/if}}>
+  <span class="job-tile">{{#if watch}}{{icon "eye" class="size-[18px]"}}{{else}}{{icon (default iconName "calendar-clock") class="size-[18px]"}}{{/if}}</span>
+  <div class="min-w-0 flex-1">
+    <h3 class="truncate text-[13px] font-semibold" dir="auto">{{title}}</h3>
+    <p class="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-ink-3">
+      <span class="inline-flex items-center gap-1">{{icon "repeat" class="size-3"}} {{scheduleLabel}}</span>
+      {{#if endsLabel}}<span>Ends {{endsLabel}}</span>{{/if}}
+    </p>
+    {{#if watch}}{{#unless compact}}
+      <div class="job-watch">
+        <p class="flex flex-wrap items-center gap-x-2 gap-y-1"><span class="job-watching">{{icon "eye" class="size-3"}} Watching</span>
+          {{#if watch.condition}}<span class="text-ink-2" dir="auto">Tells you when: {{watch.condition}}</span>{{/if}}</p>
+        <p class="mt-1 text-ink-3" dir="auto">{{#if watch.lastNote}}Last: {{watch.lastNote}}{{else}}No check yet{{/if}}{{#if watch.checkedLabel}} · checked {{watch.checkedLabel}}{{/if}}</p>
+        {{#if (gt watch.failStreak 1)}}<p class="mt-1 flex items-center gap-1 font-medium text-warn-text">{{icon "triangle-alert" class="size-3.5"}} Couldn’t check the last {{watch.failStreak}} times</p>{{/if}}
+      </div>
+    {{/unless}}{{/if}}
+    <p class="mt-1 text-xs {{#if paused}}text-ink-3{{else}}text-ink-2{{/if}}" data-job-next>
+      {{#if pausedByFailures}}<span class="inline-flex items-center gap-1 font-medium text-warn-text">{{icon "triangle-alert" class="size-3.5"}} Paused after {{failStreak}} failures in a row: resume it when it should run again</span>
+      {{else if paused}}Paused{{else if nextRunAt}}Next <time datetime="{{iso nextRunAt}}" data-relative class="font-medium">{{timeAgo nextRunAt}}</time>{{/if}}
+    </p>
+    {{!-- How the last run went. "running" also shows at once when Run it now is pressed (alarms.js). --}}
+    <div class="job-state" data-job-state>
+      <span class="job-state-line" data-when="running"><span class="approval-dots" aria-hidden="true"><i></i><i></i><i></i></span> Running now{{#unless compact}} · <a href="{{threadHref}}" class="underline decoration-ink-3/40 underline-offset-2 hover:text-ink">see it in chat</a>{{/unless}}</span>
+      <span class="job-state-line" data-when="retrying">{{icon "rotate-ccw" class="size-3.5"}} Didn’t finish. Trying again{{#if retryLabel}} at {{retryLabel}}{{/if}}</span>
+      <span class="job-state-line" data-when="bad">{{icon "circle-x" class="size-3.5"}} The last run failed</span>
+      <span class="job-state-line" data-when="skipped">{{icon "circle-slash" class="size-3.5"}} Skipped last time (offline, quiet hours or no budget left)</span>
+      {{#unless compact}}
+        <span class="job-state-line" data-when="silent">{{icon "check" class="size-3.5"}} Nothing worth telling you last time{{#if lastRunAt}}, <time datetime="{{iso lastRunAt}}" data-relative>{{timeAgo lastRunAt}}</time>{{/if}}</span>
+        <span class="job-state-line" data-when="ok">{{icon "circle-check" class="size-3.5"}} Last run went fine{{#if lastRunAt}}, <time datetime="{{iso lastRunAt}}" data-relative>{{timeAgo lastRunAt}}</time>{{/if}}</span>
+        {{#if (or (eq lastStatus 'bad') (eq lastStatus 'skipped'))}}<button type="button" class="btn btn-secondary btn-sm job-run-now" data-job-action="run">{{icon "play" class="size-3.5"}} Run it now</button>{{/if}}
+      {{/unless}}
+    </div>
+  </div>
+  {{#unless compact}}
+    <div class="flex gap-1">
+      {{!-- One Run control per card: the labelled "Run it now" replaces this icon when the last run failed or was skipped. --}}
+      {{#unless (or (eq lastStatus 'bad') (eq lastStatus 'skipped'))}}<button type="button" class="btn btn-ghost btn-icon btn-sm" data-job-action="run" data-tooltip="Run now" aria-label="Run {{title}} now">{{icon "play" class="size-4"}}</button>{{/unless}}
+      <button type="button" class="btn btn-ghost btn-icon btn-sm" data-job-action="{{#if paused}}resume{{else}}pause{{/if}}"
+        data-tooltip="{{#if paused}}Resume{{else}}Pause{{/if}}" aria-label="{{#if paused}}Resume{{else}}Pause{{/if}}">{{#if paused}}{{icon "play" class="size-4"}}{{else}}{{icon "pause" class="size-4"}}{{/if}}</button>
+      {{#unless (eq kind 'checkin')}}<button type="button" class="btn btn-ghost btn-icon btn-sm hover:text-bad" data-job-action="delete" data-title="{{title}}" data-tooltip="Delete" aria-label="Delete {{title}}">{{icon "trash-2" class="size-4"}}</button>{{/unless}}
+    </div>
+  {{/unless}}
+</article>

@@ -1,0 +1,107 @@
+{{!--
+  Approval request. Same card in chat, the panel and /approvals; every copy kept in sync by approvals.js / live.js, which
+  only set data-status (pending | deciding | approved | denied | expired) and the result line: everything else follows in CSS.
+  Contract: { id, title, tool, toolLabel (people-facing name), risk: read|write|spend|external, preview?, previewChars,
+              previewLong (fold it), previewFoldsCompact (fold it in the compact card), requestedAt: ISO, requester?: { name }, status: pending|approved|denied|expired, scope?,
+              threadHref?, provenance?, provenanceLevel?: low|high, askReason?, flags?: [{ kind, label, masked }],
+              facts?: [{ key, label, value?, items?: [{ title, meta?, href? }] }], undo?: { possible, note }, reach?, reachShown,
+              taskScope (false: "Allow for this task" isn't offered), closedReason?: timeout|moved_on|run_closed,
+              resultLabel? (the decided line) }  (decisions #124–#127, Phase 19, the design #194)
+  compact=true → panel / history variant (tighter; the preview folds to four lines).
+--}}
+<article class="approval card" data-approval-id="{{id}}" data-status="{{status}}" data-risk="{{risk}}" data-tool-label="{{default toolLabel tool}}"
+  {{#if compact}}data-compact{{/if}} aria-label="Approval request: {{title}}">
+  <header class="approval-head">
+    <span class="approval-risk" aria-hidden="true">
+      {{#if (eq risk 'spend')}}{{icon "credit-card" class="size-[18px]"}}{{else if (eq risk 'external')}}{{icon "send" class="size-[18px]"}}{{else if (eq risk 'write')}}{{icon "pencil" class="size-[18px]"}}{{else}}{{icon "eye" class="size-[18px]"}}{{/if}}
+    </span>
+    <div class="min-w-0 flex-1">
+      <h3 class="approval-title">{{title}}</h3>
+      <p class="approval-meta">
+        <span class="approval-risk-label">{{#if (eq risk 'spend')}}Spends money{{else if (eq risk 'external')}}Sends outside this app{{else if (eq risk 'write')}}Changes your data{{else}}Reads private data{{/if}}</span>
+        <span aria-hidden="true">·</span> <span>{{default toolLabel tool}}</span>
+        {{#if requester}}<span aria-hidden="true">·</span> <span>For {{requester.name}}</span>{{/if}}
+        <span aria-hidden="true">·</span> <time datetime="{{iso requestedAt}}" data-relative>{{timeAgo requestedAt}}</time>
+      </p>
+    </div>
+    {{!-- The decided state, readable at a glance; which one shows follows data-status (CSS). --}}
+    <span class="approval-stamp" data-stamp="pending">Needs your OK</span>
+    <span class="approval-stamp" data-stamp="approved">{{icon "circle-check" class="size-3.5"}} Approved</span>
+    <span class="approval-stamp" data-stamp="denied">{{icon "circle-x" class="size-3.5"}} Denied</span>
+    <span class="approval-stamp" data-stamp="expired">{{icon "clock" class="size-3.5"}} Not done</span>
+  </header>
+
+  <div class="approval-body">
+    {{#if (or facts.length reachShown undo)}}
+      <dl class="approval-facts" data-approval-facts>
+        {{#each facts}}
+          <div class="approval-fact" data-fact="{{key}}"><dt>{{label}}</dt>
+            <dd>{{#if value}}<span class="approval-fact-value" dir="auto">{{value}}</span>{{/if}}
+              {{#if items.length}}<ul class="approval-files" role="list">{{#each items}}<li>
+                {{#if href}}<a href="{{href}}" class="approval-file" target="_blank" rel="noopener">{{icon "file-text" class="size-3.5"}}<span class="truncate" dir="auto">{{title}}</span>{{#if meta}}<span class="approval-file-meta">{{meta}}</span>{{/if}}</a>
+                {{else}}<span class="approval-file is-missing">{{icon "file-x" class="size-3.5"}}<span class="truncate">{{title}}</span>{{#if meta}}<span class="approval-file-meta">{{meta}}</span>{{/if}}</span>{{/if}}
+              </li>{{/each}}</ul>{{/if}}</dd></div>
+        {{/each}}
+        {{#if reachShown}}<div class="approval-fact" data-fact="reach"><dt>Reaches</dt><dd><span class="approval-fact-value" dir="auto">{{reach}}</span></dd></div>{{/if}}
+        {{#if undo}}
+          <div class="approval-fact" data-fact="undo" data-approval-undo><dt>Undo</dt>
+            <dd class="approval-undo {{#if undo.possible}}is-possible{{/if}}">{{#if undo.possible}}{{icon "rotate-ccw" class="size-3.5"}} Can be undone{{else}}{{icon "lock" class="size-3.5"}} Can’t be undone{{/if}}{{#if undo.note}}<span class="approval-undo-note">: {{undo.note}}</span>{{/if}}</dd></div>
+        {{/if}}
+      </dl>
+    {{/if}}
+
+    {{#if (or askReason provenance)}}
+      <div class="approval-why" data-level="{{default provenanceLevel 'none'}}" data-approval-why>
+        <span class="approval-why-icon">{{#if (eq provenanceLevel 'high')}}{{icon "shield-alert" class="size-4"}}{{else}}{{icon "shield-check" class="size-4"}}{{/if}}</span>
+        <div class="min-w-0 flex-1">
+          <p class="approval-why-h">{{#if (eq provenanceLevel 'high')}}Something I read was written to steer AI assistants{{else}}Why I’m asking{{/if}}</p>
+          {{#if (eq provenanceLevel 'high')}}<p>Check this is what you asked for. If it isn’t, deny it and I’ll leave it.</p>{{/if}}
+          {{#if askReason}}<p>{{askReason}}</p>{{/if}}
+          {{#if provenance}}<p class="approval-why-src" data-approval-provenance>{{provenance}}</p>{{/if}}
+        </div>
+      </div>
+    {{/if}}
+
+    {{#if flags.length}}
+      <ul class="approval-flags" role="list" data-approval-flags>
+        {{#each flags}}<li class="approval-flag">{{icon "key-round" class="size-3.5"}} Contains {{label}} <span class="font-mono">{{masked}}</span></li>{{/each}}
+      </ul>
+    {{/if}}
+
+    {{#if preview}}
+      <section class="approval-preview" {{#if (or previewLong (and compact previewFoldsCompact))}}data-folded{{/if}} data-approval-preview-box aria-label="The full request">
+        <p class="approval-preview-h"><span>{{#if (eq risk 'external')}}What will be sent{{else if (eq risk 'spend')}}What you’re paying for{{else if (eq risk 'write')}}What will change{{else}}What I’ll look at{{/if}}</span>
+          {{#if previewChars}}<span class="tabular" data-approval-chars>{{num previewChars}} characters</span>{{/if}}</p>
+        <div class="approval-preview-text" dir="auto" data-approval-preview>{{preview}}</div>
+        {{#if (or previewLong (and compact previewFoldsCompact))}}
+          <button type="button" class="approval-expand" data-approval-expand aria-expanded="false">
+            <span data-when="folded">Show all{{#if previewChars}} {{num previewChars}} characters{{/if}}</span><span data-when="open">Show less</span>
+            {{icon "chevron-down" class="size-3.5"}}</button>
+        {{/if}}
+      </section>
+    {{/if}}
+  </div>
+
+  <footer class="approval-actions" {{#unless (eq status 'pending')}}hidden{{/unless}}>
+    <div class="flex">
+      <button type="button" class="btn btn-primary btn-sm rounded-e-none" data-approval-action="approve" data-scope="once">
+        {{icon "check" class="size-4"}} Approve
+      </button>
+      <button type="button" class="btn btn-primary btn-sm rounded-s-none border-s border-white/20 px-1.5" popovertarget="appr-scope-{{id}}{{#if compact}}-c{{/if}}"
+        aria-haspopup="menu" aria-label="More approval options">{{icon "chevron-down" class="size-4"}}</button>
+      <div id="appr-scope-{{id}}{{#if compact}}-c{{/if}}" popover class="menu w-64" role="menu" data-placement="bottom-start">
+        <button type="button" class="menu-item" role="menuitem" data-approval-action="approve" data-scope="once">{{icon "check" class="size-4"}} Allow once</button>
+        {{#if taskScope}}<button type="button" class="menu-item" role="menuitem" data-approval-action="approve" data-scope="task">{{icon "list-checks" class="size-4"}} Allow for this task</button>{{/if}}
+        <button type="button" class="menu-item" role="menuitem" data-approval-action="approve" data-scope="always">{{icon "infinity" class="size-4"}} Always allow {{default toolLabel tool}}</button>
+      </div>
+    </div>
+    <button type="button" class="btn btn-secondary btn-sm" data-approval-action="deny">Deny</button>
+    {{#if threadHref}}<a href="{{threadHref}}" class="btn btn-ghost btn-sm ms-auto">Context</a>{{/if}}
+  </footer>
+
+  <footer class="approval-result" role="status" {{#if (eq status 'pending')}}hidden{{/if}}>
+    {{#if (eq status 'approved')}}<span class="text-ok">{{icon "circle-check" class="size-4"}}</span> {{#if resultLabel}}{{resultLabel}}{{else}}Approved{{/if}}{{#if (eq scope 'always')}} · always allowed{{else if (eq scope 'task')}} · for that task{{/if}}
+    {{else if (eq status 'denied')}}<span class="text-bad">{{icon "circle-x" class="size-4"}}</span> {{#if resultLabel}}{{resultLabel}}{{else}}Denied{{/if}}
+    {{else if (eq status 'expired')}}<span class="text-ink-3">{{icon "clock" class="size-4"}}</span> {{#if resultLabel}}{{resultLabel}}{{else}}Expired, not done{{/if}}{{/if}}
+  </footer>
+</article>

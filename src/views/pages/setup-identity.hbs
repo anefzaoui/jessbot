@@ -1,0 +1,7 @@
+{{#> setup/frame heading="Who is your agent?" lead="Every Jessbot starts as Jess. Give yours its own name and personality. It will always know where it came from."}}
+  <form method="post" action="{{default action '/setup/identity'}}" class="space-y-6" data-ajax data-busy="Bringing it to life…" data-identity-form>
+    {{> setup/identity-fields}}
+    <button class="btn btn-primary btn-lg btn-block">That's who they are {{icon "arrow-right" class="size-4"}}</button>
+  </form>
+{{/setup/frame}}
+<script type="module" src="/js/setup.js"></script>

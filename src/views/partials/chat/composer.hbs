@@ -1,0 +1,41 @@
+{{!--
+  Message composer. composer.js: auto-grow, Enter to send / Shift+Enter newline, per-thread draft kept in
+  localStorage (survives refresh), optimistic "Sending…" bubble, Stop while a run is active. attach.js: files (tray).
+  voice.js: the mic records a voice note (live waveform, timer, discard/send; stops itself at 5:00).
+  Params: threadId, sendUrl, running (bool)
+--}}
+<form class="composer" data-composer data-thread-id="{{threadId}}" data-send-url="{{sendUrl}}" {{#if running}}data-running{{/if}}>
+  <div class="composer-box rounded-2xl border border-line bg-surface transition focus-within:border-accent/60"
+    style="box-shadow: var(--jb-shadow-lg)">
+    <div class="composer-tray" data-composer-tray aria-label="Attached files"></div>
+    <div class="rec-bar" data-rec role="group" aria-label="Recording a voice note">
+      <button type="button" class="btn btn-ghost btn-icon btn-sm" data-rec-cancel data-tooltip="Discard" aria-label="Discard the recording">{{icon "trash-2" class="size-[18px]"}}</button>
+      <span class="rec-dot" aria-hidden="true"></span>
+      <span class="rec-time tabular" data-rec-time aria-live="off">0:00</span>
+      <span class="rec-wave" data-rec-wave aria-hidden="true"></span>
+      <span class="rec-hint">Up to 5:00 · <span class="kbd">Esc</span> discards</span>
+      <button type="button" class="btn btn-primary btn-icon btn-sm ml-1 rounded-full" data-rec-send data-tooltip="Send voice note" aria-label="Send the voice note">{{icon "arrow-up" class="size-[18px]"}}</button>
+    </div>
+    <label for="composer-{{threadId}}" class="sr-only">Message {{@root.bot.name}}</label>
+    <textarea id="composer-{{threadId}}" name="text" rows="1" data-composer-input
+      class="block max-h-[40dvh] min-h-[52px] w-full resize-none bg-transparent px-4 pt-3.5 pb-1 text-[15px] leading-relaxed outline-none placeholder:text-ink-3"
+      style="field-sizing: content" placeholder="Message {{@root.bot.name}}…" autocomplete="off" enterkeyhint="send"></textarea>
+    <div class="flex items-center gap-1 px-2 pb-2" data-composer-row>
+      <button type="button" class="btn btn-ghost btn-icon btn-sm" data-composer-attach data-tooltip="Attach files (or drop or paste them)" aria-label="Attach files">
+        {{icon "paperclip" class="size-[18px]"}}
+      </button>
+      <input type="file" multiple hidden accept="{{@root.uploadAccept}}" data-composer-file>
+      <button type="button" class="btn btn-ghost btn-icon btn-sm" data-composer-mic aria-pressed="false" data-tooltip="Record a voice note" aria-label="Record a voice note">
+        {{icon "mic" class="size-[18px]"}}
+      </button>
+      <span class="flex-1" aria-hidden="true"></span>
+      <span class="hidden text-[11px] text-ink-3 sm:inline" data-composer-hint><span class="kbd">↵</span> send · <span class="kbd">⇧↵</span> new line</span>
+      <button type="button" class="btn btn-secondary btn-icon btn-sm ml-2 rounded-full" data-composer-stop hidden data-tooltip="Stop" aria-label="Stop the current task">
+        {{icon "square" class="size-3.5"}}
+      </button>
+      <button type="submit" class="btn btn-primary btn-icon btn-sm ml-2 rounded-full" data-composer-send disabled data-tooltip="Send" aria-label="Send message">
+        {{icon "arrow-up" class="size-[18px]"}}
+      </button>
+    </div>
+  </div>
+</form>

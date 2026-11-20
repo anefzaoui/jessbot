@@ -1,0 +1,24 @@
+{{!--
+  The OpenRouter balance on Admin → Usage (decision #179; the card is Phase 25 #203). Contract: balance = admin-ops.js
+  balanceCard(spend-watch balanceView()) → null (never read: not OpenRouter, or no key yet), { amount: null } (read, but no
+  balance given) or { amount, days, daysLine, perDayLabel, warn, gap, at }. "Read it now" re-renders this card from
+  GET /admin/usage/balance?refresh=1 (admin-usage.js).
+--}}
+<div class="card bal-card p-4" data-balance data-warn="{{#if balance.warn}}true{{else}}false{{/if}}">
+  <div class="flex items-start justify-between gap-2">
+    <p class="text-xs text-ink-3">OpenRouter balance</p>
+    <button type="button" class="btn btn-ghost btn-icon btn-sm -me-1.5 -mt-1.5 size-7" data-balance-refresh data-tooltip="Read it now" aria-label="Read the balance now">{{icon "refresh-cw" class="size-3.5"}}</button>
+  </div>
+  {{#if balance.amount}}
+    <p class="tabular mt-1 text-2xl font-semibold">{{balance.amount}}</p>
+    <p class="text-xs {{#if balance.warn}}font-medium text-warn-text{{else}}text-ink-3{{/if}}">{{balance.daysLine}}</p>
+    {{#if balance.warn}}<p class="mt-2"><span class="badge badge-warn">{{icon "circle-alert" class="size-3"}} Under a week left</span></p>{{/if}}
+    <p class="mt-1 text-[11px] text-ink-3">{{balance.perDayLabel}}{{#if balance.at}} · read <time datetime="{{iso balance.at}}" data-relative>{{timeAgo balance.at}}</time>{{/if}}</p>
+  {{else if balance}}
+    <p class="mt-1 text-sm font-medium text-ink-2">Not shared</p>
+    <p class="text-xs text-ink-3">OpenRouter answered but gave no balance for this key (it has no limit, and the account total needs a management key).</p>
+  {{else}}
+    <p class="mt-1 text-sm font-medium text-ink-2">Not read yet</p>
+    <p class="text-xs text-ink-3">Read every few hours when this install uses an OpenRouter key. Press the arrow to read it now.</p>
+  {{/if}}
+</div>

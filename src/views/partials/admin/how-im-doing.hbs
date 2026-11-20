@@ -1,0 +1,62 @@
+{{!--
+  Admin → System, "How I'm doing" (decision #208; the screen is Phase 25 #212): plain numbers over the last 7 or 30 days, counted
+  in code (no model). Contract: summary = agent/self-review.js summaryFor() { days, runs: { total, done, errored, stopped }, thumbs:
+  { up, down }, pushes: { total, runs, deliveredAfter }, deadEndChecks, repeatsRefused, checkins: { sent, silent, skipped },
+  spendLabel, failedSteps, declinedApprovals, wishes: { n, asks }, proposedLessons: [{ id, rule, recurrences }] }.
+  GET /admin/system/summary?days= re-renders it (public/js/admin-review.js).
+--}}
+<section class="mt-6" aria-labelledby="h-doing" data-doing data-days="{{summary.days}}">
+  <div class="mb-3 flex flex-wrap items-center gap-3">
+    <div class="min-w-0 flex-1">
+      <h2 id="h-doing" class="text-sm font-semibold">How I’m doing</h2>
+      <p class="text-xs text-ink-3">Counted from what happened, not judged by a model. The last {{summary.days}} days.</p>
+    </div>
+    <div class="segmented" role="group" aria-label="Period">
+      <button type="button" data-doing-days="7" aria-pressed="{{eq summary.days 7}}">7 days</button>
+      <button type="button" data-doing-days="30" aria-pressed="{{eq summary.days 30}}">30 days</button>
+    </div>
+  </div>
+  <div class="doing-tiles" data-doing-tiles>
+    <div class="card doing-tile">
+      <p class="doing-label">Tasks finished</p>
+      <p class="doing-value">{{summary.runs.done}} <span class="doing-of">of {{summary.runs.total}}</span></p>
+      <p class="doing-ctx">{{#if summary.runs.errored}}<span class="text-bad">{{icon "circle-alert" class="size-3"}} {{summary.runs.errored}} failed</span>{{else}}None failed{{/if}}{{#if summary.runs.stopped}} · {{summary.runs.stopped}} stopped{{/if}}</p>
+    </div>
+    <div class="card doing-tile">
+      <p class="doing-label">Replies rated</p>
+      <p class="doing-value"><span class="doing-thumb">{{icon "thumbs-up" class="size-4"}} {{summary.thumbs.up}}</span> <span class="doing-thumb">{{icon "thumbs-down" class="size-4"}} {{summary.thumbs.down}}</span></p>
+      <p class="doing-ctx">{{#if summary.thumbs.down}}Each thumbs-down is read in the weekly review{{else}}No thumbs-down{{/if}}</p>
+    </div>
+    <div class="card doing-tile">
+      <p class="doing-label">Sent back by my checks</p>
+      <p class="doing-value">{{summary.pushes.runs}} <span class="doing-of">{{#if (eq summary.pushes.runs 1)}}task{{else}}tasks{{/if}}</span></p>
+      <p class="doing-ctx">{{summary.pushes.deliveredAfter}} delivered after · {{plural summary.deadEndChecks "dead-end check"}}</p>
+    </div>
+    <div class="card doing-tile">
+      <p class="doing-label">Check-ins</p>
+      <p class="doing-value">{{summary.checkins.sent}} <span class="doing-of">sent</span></p>
+      <p class="doing-ctx">{{summary.checkins.silent}} with nothing to say · {{summary.checkins.skipped}} skipped</p>
+    </div>
+    <a href="#wishes" class="card card-hover doing-tile">
+      <p class="doing-label">Asked for, can’t do yet</p>
+      <p class="doing-value">{{summary.wishes.n}} <span class="doing-of">{{#if (eq summary.wishes.n 1)}}wish{{else}}wishes{{/if}}</span></p>
+      <p class="doing-ctx">{{#if summary.wishes.asks}}Asked {{plural summary.wishes.asks "time"}}{{else}}Nothing new{{/if}}</p>
+    </a>
+    <div class="card doing-tile">
+      <p class="doing-label">Spent</p>
+      <p class="doing-value">{{summary.spendLabel}}</p>
+      <p class="doing-ctx"><a href="/admin/usage" class="hover:underline">Usage</a> has the detail</p>
+    </div>
+  </div>
+  <ul class="doing-more" role="list">
+    <li>{{icon "wrench" class="size-3.5"}} {{plural summary.failedSteps "failed step"}}</li>
+    <li>{{icon "hand" class="size-3.5"}} {{plural summary.declinedApprovals "approval"}} declined</li>
+    <li>{{icon "rotate-ccw" class="size-3.5"}} {{plural summary.repeatsRefused "repeated change"}} refused</li>
+  </ul>
+  {{#if summary.proposedLessons.length}}
+    <div class="doing-lessons">
+      <p class="text-xs font-medium text-ink-2">Household lessons waiting for you <a href="/admin/lessons" class="ms-1 font-normal text-accent-text hover:underline">Review</a></p>
+      <ul class="mt-1.5 space-y-1" role="list">{{#each summary.proposedLessons}}<li class="flex items-baseline gap-2 text-[13px] text-ink-2"><span class="count count-quiet tabular shrink-0">{{recurrences}}×</span><span class="min-w-0" dir="auto">{{rule}}</span></li>{{/each}}</ul>
+    </div>
+  {{/if}}
+</section>

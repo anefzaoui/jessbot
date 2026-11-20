@@ -1,0 +1,66 @@
+{{!--
+  Full activity history. Data: activity { today: { done, minutesSaved?, highlights: [string] },
+    days: [{ label, count, items: [activity (+ kind: task|search|file|schedule|message)] }],
+    draws: [{ id, mode, label, iconName, headline, detail?, from?, count, at, private }] (services/draws.js drawHistory, #196) }
+--}}
+{{> page-header title="Activity" subtitle="Everything I've done for you, day by day" width="max-w-3xl"}}
+
+<div class="mx-auto max-w-3xl px-4 py-6 sm:px-6">
+  {{#if activity.today}}
+    <section class="card overflow-hidden" aria-labelledby="today-summary">
+      <div class="flex items-center gap-4 p-5" style="background: radial-gradient(100% 140% at 0% 0%, var(--jb-accent-soft), transparent 60%)">
+        <div class="tabular text-4xl font-semibold tracking-tight text-accent-text">{{activity.today.done}}</div>
+        <div>
+          <h2 id="today-summary" class="font-semibold">things done today</h2>
+          <p class="text-sm text-ink-2">{{#if activity.today.minutesSaved}}About {{activity.today.minutesSaved}} minutes of your time saved.{{else}}Nice and steady.{{/if}}</p>
+        </div>
+      </div>
+      {{#if activity.today.highlights}}
+        <ul class="space-y-1.5 border-t border-line px-5 py-4 text-sm" role="list">
+          {{#each activity.today.highlights}}<li class="flex gap-2"><span class="text-ok">{{icon "check" class="size-4"}}</span>{{this}}</li>{{/each}}
+        </ul>
+      {{/if}}
+    </section>
+  {{/if}}
+
+  {{!-- Fair draws (#196): each one on the record (who got what, from which names, when), so "was it fair?" has an answer. --}}
+  {{#if activity.draws.length}}
+    <details class="card draws mt-6" data-draws>
+      <summary class="draws-h"><span class="draw-icon">{{icon "dice-5" class="size-4"}}</span><span class="flex-1"><span class="text-sm font-semibold">Fair draws</span>
+        <span class="block text-xs text-ink-3">{{plural activity.draws.length "recent draw"}}, decided by chance, never by me</span></span>{{icon "chevron-down" class="draws-chevron size-4 text-ink-3"}}</summary>
+      <ul class="divide-y divide-line border-t border-line" role="list">
+        {{#each activity.draws}}
+          <li class="draw-row" data-draw="{{id}}">
+            <span class="draw-icon">{{icon iconName class="size-4"}}</span>
+            <div class="min-w-0 flex-1">
+              <p class="text-[13px] font-medium text-ink" dir="auto">{{headline}}</p>
+              {{#if detail}}<p class="mt-0.5 text-xs text-ink-2 {{#if private}}italic{{/if}}" dir="auto">{{detail}}</p>{{/if}}
+              <p class="mt-0.5 text-[11px] text-ink-3">{{#if from}}From {{from}} · {{/if}}<time datetime="{{at}}" data-relative>{{timeAgo at}}</time> · <span class="font-mono">{{id}}</span></p>
+            </div>
+          </li>
+        {{/each}}
+      </ul>
+    </details>
+  {{/if}}
+
+  <div class="mt-6 mb-2 flex flex-wrap gap-1.5" role="group" aria-label="Filter activity">
+    <button type="button" class="chip" aria-pressed="true" data-activity-filter="all">All</button>
+    <button type="button" class="chip" aria-pressed="false" data-activity-filter="task">{{icon "list-checks" class="size-3.5"}} Tasks</button>
+    <button type="button" class="chip" aria-pressed="false" data-activity-filter="search">{{icon "search" class="size-3.5"}} Web</button>
+    <button type="button" class="chip" aria-pressed="false" data-activity-filter="file">{{icon "file-text" class="size-3.5"}} Files</button>
+    <button type="button" class="chip" aria-pressed="false" data-activity-filter="schedule">{{icon "calendar-clock" class="size-3.5"}} Scheduled</button>
+  </div>
+
+  {{#each activity.days}}
+    <section class="mt-6" aria-labelledby="day-{{@index}}">
+      <h2 id="day-{{@index}}" class="sticky top-[65px] z-10 -mx-2 mb-2 flex items-baseline gap-2 bg-canvas/90 px-2 py-2 backdrop-blur-sm">
+        <span class="text-sm font-semibold">{{label}}</span><span class="text-xs text-ink-3">{{plural count "thing"}}</span>
+      </h2>
+      <ol class="relative ml-2 border-l border-line" role="list" data-activity-list>
+        {{#each items}}{{> activity-item this}}{{/each}}
+      </ol>
+    </section>
+  {{else}}
+    {{> empty-state iconName="history" title="No activity yet" text="Once I start working for you, every search, file, message and scheduled run is logged here with the time it happened."}}
+  {{/each}}
+</div>

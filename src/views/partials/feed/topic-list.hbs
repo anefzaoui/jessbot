@@ -1,0 +1,3 @@
+{{!-- The topic cards on /feed/sources (one per topic, partials/feed/topic-sources.hbs). Contract: topics (sourcesPage().topics).
+      GET /api/v1/feed/sources?fragment=1 re-renders it (after an OPML import, Phase 25 #204). --}}
+{{#each topics}}{{> feed/topic-sources topic=this}}{{/each}}

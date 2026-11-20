@@ -1,0 +1,49 @@
+{{!--
+  Library item.
+  Contract (services/library.js itemView): { id, title, type: html|doc|md|pdf|image|sheet|slides|audio, kindLabel?, uploaded?,
+              origin?: made|uploaded|downloaded|email, sourceLabel?, ext?, sizeLabel?, createdAt: ISO, thumbUrl?, proactive?,
+              madeFrom?: { id, title, href }, downloadUrl?, rawUrl?, textSource? ('ocr') }  (audio plays on the card, #196)
+  The whole card opens the item (the title's link stretches over it); a calendar file also offers Add to calendar.
+--}}
+<article class="library-card card card-hover group relative flex flex-col overflow-hidden" data-library-id="{{id}}" data-type="{{type}}"
+  data-title="{{title}}" data-origin="{{default origin 'made'}}">
+  <div class="library-thumb relative aspect-[16/10] overflow-hidden border-b border-line bg-surface-2">
+    {{#if thumbUrl}}
+      <img src="{{thumbUrl}}" alt="" loading="lazy" class="size-full object-cover object-top transition duration-500 group-hover:scale-[1.03]">
+    {{else if (eq type 'audio')}}
+      <div class="library-placeholder library-audio-thumb" style="--h: 95">
+        {{!-- Plays right here (public/js/library.js); the rest of the card still opens the item. --}}
+        <button type="button" class="library-audio-play library-card-action" data-audio-play="{{default rawUrl (concat '/library/' id '/raw')}}" aria-label="Play {{title}}">
+          <span class="library-audio-icon" data-when="idle">{{icon "play" class="size-5"}}</span><span class="library-audio-icon" data-when="playing">{{icon "pause" class="size-5"}}</span></button>
+        <span class="pb-1"><span data-audio-time>{{icon "audio-lines" class="size-4"}} Read aloud</span></span>
+        <span class="library-audio-bar" aria-hidden="true"><span data-audio-bar></span></span>
+      </div>
+    {{else}}
+      <div class="library-placeholder" style="--h: {{#if (eq ext 'ics')}}205{{else}}{{typeHue type}}{{/if}}">
+        {{#if (eq ext 'ics')}}{{icon "calendar-days" class="size-10"}}{{else if (eq type 'html')}}{{icon "app-window" class="size-10"}}{{else if (eq type 'pdf')}}{{icon "file-text" class="size-10"}}{{else if (eq type 'image')}}{{icon "image" class="size-10"}}{{else if (eq type 'sheet')}}{{icon "sheet" class="size-10"}}{{else if (eq type 'slides')}}{{icon "presentation" class="size-10"}}{{else if (eq type 'md')}}{{icon "file-code" class="size-10"}}{{else if (eq type 'doc')}}{{icon "file-type" class="size-10"}}{{else}}{{icon "file" class="size-10"}}{{/if}}
+        <span class="pb-1">{{#if (eq ext 'ics')}}Calendar file{{else}}{{default kindLabel type}}{{/if}}</span>
+      </div>
+    {{/if}}
+  </div>
+  <div class="flex flex-1 flex-col p-3.5">
+    <h3 class="line-clamp-2 text-sm leading-snug font-semibold"><a href="/library/{{id}}" class="library-card-link">{{title}}</a></h3>
+    {{#if madeFrom}}<p class="mt-1 truncate text-xs text-ink-3">Made from “{{madeFrom.title}}”</p>{{/if}}
+    {{#if (eq textSource 'ocr')}}<p class="mt-1 inline-flex items-center gap-1 text-xs text-ink-3">{{icon "scan-text" class="size-3.5"}} Text from OCR (may contain errors)</p>{{/if}}
+    {{#if (eq ext 'ics')}}
+      <a href="{{default downloadUrl (concat '/library/' id '/download')}}" class="btn btn-secondary btn-sm library-card-action mt-2.5 self-start">{{icon "calendar-plus" class="size-3.5"}} Add to calendar</a>
+    {{/if}}
+    <div class="mt-auto flex min-w-0 items-center gap-2 pt-2 text-xs text-ink-3">
+      {{#if (eq type 'html')}}<span class="inline-flex shrink-0 items-center gap-1 font-medium text-accent-text">{{icon "mouse-pointer-click" class="size-3.5"}} Interactive</span>
+      {{else if (eq origin 'downloaded')}}<span class="inline-flex min-w-0 items-center gap-1 font-medium" title="{{sourceLabel}}">{{icon "download" class="size-3.5"}}<span class="truncate">{{sourceLabel}}</span></span>
+      {{else if (eq origin 'email')}}<span class="inline-flex min-w-0 items-center gap-1 font-medium" title="{{sourceLabel}}">{{icon "mail" class="size-3.5"}}<span class="truncate">{{sourceLabel}}</span></span>
+      {{else if uploaded}}<span class="inline-flex shrink-0 items-center gap-1 font-medium">{{icon "upload" class="size-3.5"}} Uploaded</span>
+      {{else if (eq type 'audio')}}<span class="inline-flex shrink-0 items-center gap-1 font-medium">{{icon "headphones" class="size-3.5"}} Audio</span>
+      {{else}}<span class="shrink-0 font-medium">{{#if (eq ext 'ics')}}Calendar file{{else}}{{default kindLabel type}}{{/if}}</span>{{/if}}
+      {{#if sizeLabel}}<span class="shrink-0">{{sizeLabel}}</span>{{/if}}
+      <time class="ms-auto shrink-0" datetime="{{iso createdAt}}" data-relative>{{timeAgo createdAt}}</time>
+    </div>
+    {{#if proactive}}
+      <p class="mt-2 text-xs text-ink-3">Made without being asked{{#if sourceLabel}}, {{sourceLabel}}{{/if}}</p>
+    {{/if}}
+  </div>
+</article>

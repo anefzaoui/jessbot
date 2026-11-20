@@ -1,0 +1,67 @@
+[
+  {
+    "kind": "Listing",
+    "data": {
+      "after": null, "dist": 1, "modhash": "", "geo_filter": "", "before": null,
+      "children": [
+        {
+          "kind": "t3",
+          "data": {
+            "subreddit": "AskCulinary", "subreddit_name_prefixed": "r/AskCulinary", "title": "Why does my bread dough never rise in winter?",
+            "author": "flour_power_22", "score": 412, "upvote_ratio": 0.97, "num_comments": 5, "created_utc": 1788220800.0,
+            "selftext": "Same recipe all year: 500 g flour, 350 g water, 7 g instant yeast. Summer loaves double in an hour; in winter nothing happens after three.\n\nKitchen is about 16 °C. Is the yeast dying?",
+            "is_self": true, "url": "https://www.reddit.com/r/AskCulinary/comments/1abcde/why_does_my_bread_dough_never_rise_in_winter/",
+            "permalink": "/r/AskCulinary/comments/1abcde/why_does_my_bread_dough_never_rise_in_winter/", "over_18": false,
+            "link_flair_text": "Baking", "edited": false, "stickied": false, "id": "1abcde", "name": "t3_1abcde"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "kind": "Listing",
+    "data": {
+      "after": null, "dist": null, "modhash": "", "geo_filter": "", "before": null,
+      "children": [
+        {
+          "kind": "t1",
+          "data": {
+            "author": "AutoModerator", "body": "Please remember to include your recipe.", "score": 1, "stickied": true, "created_utc": 1788220900.0,
+            "is_submitter": false, "replies": "", "depth": 0, "id": "m0"
+          }
+        },
+        {
+          "kind": "t1",
+          "data": {
+            "author": "proofing_box", "body": "Your yeast is fine, it's just slow. Yeast activity roughly halves for every 8-10 °C drop. At 16 °C expect 3-4x the time. Use water around 35 °C and proof in the oven with only the light on.",
+            "score": 980, "stickied": false, "created_utc": 1788221400.0, "is_submitter": false, "depth": 0, "id": "m1",
+            "replies": {
+              "kind": "Listing",
+              "data": {
+                "children": [
+                  { "kind": "t1", "data": { "author": "flour_power_22", "body": "Oven light trick worked, doubled in 90 minutes. Thank you!", "score": 310, "is_submitter": true, "depth": 1, "id": "m1a", "replies": "" } },
+                  { "kind": "t1", "data": { "author": "crumbshot", "body": "A bowl of hot water on the rack below helps too.", "score": 45, "is_submitter": false, "depth": 1, "id": "m1b", "replies": "" } },
+                  { "kind": "t1", "data": { "author": "late_reply", "body": "Same here.", "score": 2, "is_submitter": false, "depth": 1, "id": "m1c", "replies": "" } }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "kind": "t1",
+          "data": {
+            "author": "cold_ferment_fan", "body": "Or lean into it: a slow cold rise makes better flavour. Mix at night, shape in the morning.", "score": 1200,
+            "stickied": false, "created_utc": 1788222000.0, "is_submitter": false, "depth": 0, "id": "m2", "replies": ""
+          }
+        },
+        {
+          "kind": "t1",
+          "data": {
+            "author": "[deleted]", "body": "[removed]", "score": 3, "stickied": false, "created_utc": 1788223000.0, "is_submitter": false, "depth": 0, "id": "m3", "replies": ""
+          }
+        },
+        { "kind": "more", "data": { "count": 1, "name": "t1_m4", "id": "m4", "parent_id": "t3_1abcde", "depth": 0, "children": ["m4"] } }
+      ]
+    }
+  }
+]

@@ -1,0 +1,84 @@
+{{!--
+  One household lesson on Admin → Personality → Lessons (decisions #186, #188; Phase 25 #203). Contract: lesson =
+  admin-lessons.js lessonCard(): { id, rule, why, domain, status: proposed|active|retired|promoted|rejected, source,
+  sourceLabel, fromName, uses, lastUsedAt, createdAt, retireSuggested, retireDays, recent: { hits, tasks }, promotable,
+  promoteNeeds, open, run: { id, at, label, href } | null }. Client: admin-lessons.js (every action re-renders this card
+  from the server's answer; Edit opens the form under it).
+--}}
+<article class="card lesson" data-lesson="{{lesson.id}}" data-status="{{lesson.status}}" aria-labelledby="lesson-{{lesson.id}}-rule">
+  <div class="lesson-main">
+    <span class="lesson-icon" aria-hidden="true">{{#if (eq lesson.status 'promoted')}}{{icon "file-text" class="size-[18px]"}}{{else}}{{icon "graduation-cap" class="size-[18px]"}}{{/if}}</span>
+    <div class="min-w-0 flex-1">
+      <p class="lesson-flags">
+        {{#if (eq lesson.status 'proposed')}}<span class="badge badge-warn">Waiting for you</span>
+        {{else if (eq lesson.status 'active')}}<span class="badge badge-ok">In use</span>
+        {{else if (eq lesson.status 'retired')}}<span class="badge badge-neutral">Retired</span>
+        {{else if (eq lesson.status 'promoted')}}<span class="badge badge-accent">In AGENTS.md</span>
+        {{else}}<span class="badge badge-neutral">Turned down</span>{{/if}}
+        {{#if lesson.domain}}<span class="lesson-chip">{{icon "globe" class="size-3"}} {{lesson.domain}}</span>{{/if}}
+        {{#if lesson.retireSuggested}}<span class="lesson-chip is-stale" data-tooltip="Not used in {{lesson.retireDays}} days: retire it if it no longer applies">{{icon "clock" class="size-3"}} Not used lately</span>{{/if}}
+      </p>
+      <p id="lesson-{{lesson.id}}-rule" class="lesson-rule" dir="auto">{{lesson.rule}}</p>
+      {{#if lesson.why}}<p class="lesson-why" dir="auto">{{lesson.why}}</p>{{/if}}
+      <p class="lesson-meta">
+        <span>{{default lesson.sourceLabel "Learned"}}{{#if lesson.fromName}} ({{lesson.fromName}}’s task){{/if}}</span>
+        {{#if lesson.run.href}}<a href="{{lesson.run.href}}" class="font-medium text-accent-text hover:underline">Open that chat</a>
+        {{else if lesson.run}}<span>{{date lesson.run.at}}</span>{{/if}}
+        <span>{{#if lesson.uses}}Used {{plural lesson.uses "time" "times"}}{{#if lesson.lastUsedAt}}, last <time datetime="{{iso lesson.lastUsedAt}}" data-relative>{{timeAgo lesson.lastUsedAt}}</time>{{/if}}{{else}}Not used yet{{/if}}</span>
+      </p>
+      {{#if lesson.open}}
+        <div class="lesson-evidence" data-ready="{{#if lesson.promotable}}true{{else}}false{{/if}}">
+          <span class="text-xs {{#if lesson.promotable}}font-medium text-accent-text{{else}}text-ink-3{{/if}}">{{#if lesson.promotable}}{{icon "check" class="size-3"}} Keeps coming back: ready for AGENTS.md{{else}}Came up {{plural lesson.recent.hits "time" "times"}} in {{plural lesson.recent.tasks "task" "tasks"}} this month{{/if}}</span>
+        </div>
+      {{/if}}
+    </div>
+  </div>
+  <div class="lesson-actions">
+    {{#if (eq lesson.status 'proposed')}}
+      <button type="button" class="btn btn-primary btn-sm" data-lesson-action="approve">{{icon "check" class="size-3.5"}} Approve</button>
+      <button type="button" class="btn btn-secondary btn-sm" data-lesson-edit-open>{{icon "pencil" class="size-3.5"}} Edit</button>
+      <button type="button" class="btn btn-ghost btn-sm" data-lesson-action="reject">Turn down</button>
+    {{else if (eq lesson.status 'active')}}
+      <button type="button" class="btn btn-secondary btn-sm" data-lesson-edit-open>{{icon "pencil" class="size-3.5"}} Edit</button>
+      <button type="button" class="btn btn-ghost btn-sm" data-lesson-action="retire">{{icon "archive" class="size-3.5"}} Retire</button>
+    {{else if (eq lesson.status 'retired')}}
+      <button type="button" class="btn btn-secondary btn-sm" data-lesson-action="approve">{{icon "rotate-ccw" class="size-3.5"}} Use again</button>
+    {{else if (eq lesson.status 'rejected')}}
+      <button type="button" class="btn btn-ghost btn-sm" data-lesson-action="approve">Approve after all</button>
+    {{else}}
+      <a href="/admin/personality/rules" class="btn btn-ghost btn-sm">{{icon "file-text" class="size-3.5"}} See AGENTS.md</a>
+    {{/if}}
+    {{#if lesson.open}}
+      <span class="flex-1"></span>
+      {{#if lesson.promotable}}
+        <button type="button" class="btn btn-soft btn-sm" data-lesson-action="promote">{{icon "arrow-up-right" class="size-3.5"}} Promote to AGENTS.md</button>
+      {{else}}
+        <button type="button" class="btn btn-ghost btn-sm" disabled data-tooltip="Once it has come up {{lesson.promoteNeeds}}" aria-label="Promote to AGENTS.md (not yet: once it has come up {{lesson.promoteNeeds}})">{{icon "arrow-up-right" class="size-3.5"}} Promote</button>
+      {{/if}}
+    {{/if}}
+  </div>
+  {{#if lesson.open}}
+    <form class="lesson-edit" data-lesson-edit hidden novalidate>
+      <div data-field>
+        <label class="label" for="le-rule-{{lesson.id}}">The rule</label>
+        <textarea id="le-rule-{{lesson.id}}" name="rule" rows="2" maxlength="220" class="textarea text-sm" dir="auto" required>{{lesson.rule}}</textarea>
+      </div>
+      <div class="grid gap-3 sm:grid-cols-[minmax(0,1fr)_12rem]">
+        <div data-field>
+          <label class="label" for="le-why-{{lesson.id}}">Why <span class="font-normal text-ink-3">(optional)</span></label>
+          <input id="le-why-{{lesson.id}}" name="why" maxlength="160" class="input text-sm" dir="auto" value="{{lesson.why}}">
+        </div>
+        <div data-field>
+          <label class="label" for="le-site-{{lesson.id}}">Only on <span class="font-normal text-ink-3">(a site)</span></label>
+          <input id="le-site-{{lesson.id}}" name="domain" class="input font-mono text-[13px]" value="{{lesson.domain}}" placeholder="Everywhere" autocomplete="off" spellcheck="false">
+        </div>
+      </div>
+      <div class="flex flex-wrap justify-end gap-2">
+        <button type="button" class="btn btn-ghost btn-sm" data-lesson-edit-cancel>Cancel</button>
+        {{#if (eq lesson.status 'proposed')}}<button type="submit" class="btn btn-secondary btn-sm" value="save">Save</button>
+        <button type="submit" class="btn btn-primary btn-sm" value="approve">{{icon "check" class="size-3.5"}} Save and approve</button>
+        {{else}}<button type="submit" class="btn btn-primary btn-sm" value="save">Save</button>{{/if}}
+      </div>
+    </form>
+  {{/if}}
+</article>

@@ -1,0 +1,30 @@
+{{!--
+  What an OPML import did (Phase 25, decision #204), on /feed/sources. Contract: result = routes/api/v1/feed.js opmlResult():
+  { message, added: [{ title, url, topic }], topics: [{ key, label, created, added }], groups: [{ reason, label, items:
+  [{ title, url, reason }] }] }. Feed titles and addresses come from the file: shown as text, never as links.
+--}}
+<div class="opml-result" data-opml-result role="status" data-added="{{result.added.length}}">
+  <div class="flex items-start gap-3">
+    <span class="grid size-9 shrink-0 place-items-center rounded-xl {{#if result.added.length}}bg-ok-soft text-ok{{else}}bg-surface-2 text-ink-2{{/if}}">{{#if result.added.length}}{{icon "circle-check" class="size-[18px]"}}{{else}}{{icon "info" class="size-[18px]"}}{{/if}}</span>
+    <div class="min-w-0 flex-1">
+      <p class="text-sm font-semibold">{{result.message}}</p>
+      {{#if result.topics.length}}
+        <p class="mt-2 flex flex-wrap gap-1.5">
+          {{#each result.topics}}{{#if added}}<span class="opml-topic">{{label}} <span class="tabular text-ink-3">+{{added}}</span>{{#if created}}<span class="badge badge-accent ms-1">New topic</span>{{/if}}</span>{{/if}}{{/each}}
+        </p>
+      {{/if}}
+    </div>
+  </div>
+  {{#if result.added.length}}
+    <details class="opml-more">
+      <summary>{{icon "chevron-right" class="size-3.5 li-archived-chevron"}} {{plural result.added.length "feed" "feeds"}} added</summary>
+      <ul class="opml-list" role="list">{{#each result.added}}<li><span class="min-w-0 flex-1 truncate" dir="auto">{{title}}</span><span class="shrink-0 text-ink-3">{{topic}}</span></li>{{/each}}</ul>
+    </details>
+  {{/if}}
+  {{#each result.groups}}
+    <details class="opml-more" data-skip="{{reason}}">
+      <summary>{{icon "chevron-right" class="size-3.5 li-archived-chevron"}} Skipped {{items.length}}: {{label}}</summary>
+      <ul class="opml-list" role="list">{{#each items}}<li><span class="min-w-0 flex-1 truncate" dir="auto" title="{{url}}">{{#if title}}{{title}}{{else}}{{url}}{{/if}}</span></li>{{/each}}</ul>
+    </details>
+  {{/each}}
+</div>

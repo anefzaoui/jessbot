@@ -1,0 +1,105 @@
+{{!-- /feed/sources — where the Feed's stories come from, per topic (decision #89); OPML import and export and muted words
+  (Phase 25 #204).
+  Data: sources { topics: [feed/topic-sources topic], counts: { topics, sources, failing, mine }, prompt, limits: { topics, sourcesPerTopic } },
+        mutes (partials/feed/mutes.hbs).
+  Clients: public/js/feed-sources.js (topics and sources), feed-tools.js (OPML, muted words). --}}
+{{#> page-header title="Your sources" subtitle="Where your Feed’s stories come from" width="max-w-3xl"}}
+  <a href="/feed" class="btn btn-ghost btn-sm" aria-label="Back to the Feed">{{icon "arrow-left" class="size-4"}}<span class="hidden sm:inline">Feed</span></a>
+  <button type="button" class="btn btn-primary btn-sm" data-topic-new aria-label="New topic" {{#if (eq sources.counts.topics sources.limits.topics)}}disabled{{/if}}>{{icon "plus" class="size-3.5"}}<span class="hidden sm:inline">New topic</span></button>
+{{/page-header}}
+<div class="mx-auto max-w-3xl px-4 py-6 sm:px-6" data-feed-sources data-max-sources="{{sources.limits.sourcesPerTopic}}">
+  {{#if sources.topics}}
+    {{!-- Kept current by feed-sources.js (recount) as topics and sources change on the page. --}}
+    <div class="src-summary" data-src-summary>
+      <div><p class="src-stat tabular" data-count="topics">{{sources.counts.topics}}</p><p class="src-stat-label">topics</p></div>
+      <div><p class="src-stat tabular" data-count="sources">{{sources.counts.sources}}</p><p class="src-stat-label">sources</p></div>
+      <div><p class="src-stat tabular" data-count="mine">{{sources.counts.mine}}</p><p class="src-stat-label">added by you</p></div>
+      <div data-bad="{{#if sources.counts.failing}}true{{else}}false{{/if}}"><p class="src-stat tabular" data-count="failing">{{sources.counts.failing}}</p><p class="src-stat-label">not answering</p></div>
+    </div>
+
+    <p class="mt-4 mb-5 flex gap-2.5 rounded-xl bg-surface-2/60 px-4 py-3 text-sm text-ink-2">
+      {{icon "info" class="mt-0.5 size-4 shrink-0 text-ink-3"}}
+      <span>{{bot.name}} picked these when you tuned your feed{{#if sources.prompt}} (“<span dir="auto">{{sources.prompt}}</span>”){{/if}}: a Google News search for each
+        topic, plus the sites you named. Add your own, remove any, pause a topic: <strong class="font-medium text-ink">your changes stay when you re-tune.</strong></span>
+    </p>
+
+    <div class="space-y-4" data-topic-list>{{> feed/topic-list topics=sources.topics}}</div>
+  {{else}}
+    <div data-sources-empty>
+    {{#> empty-state iconName="rss" title="No sources yet" text="Tell me what you care about on the Feed and I’ll find sources for each topic, or bring your feeds from another reader below."}}
+      <a href="/feed" class="btn btn-primary">{{icon "sliders-horizontal" class="size-4"}} Tune my feed</a>
+      <button type="button" class="btn btn-secondary" data-topic-new>{{icon "plus" class="size-4"}} Start with a topic</button>
+    {{/empty-state}}
+    </div>
+    <div class="space-y-4" data-topic-list></div>
+  {{/if}}
+
+  {{!-- Bring feeds from another reader, take yours with you (OPML, #192). Client: feed-tools.js --}}
+  <section class="card src-extra mt-8" aria-labelledby="h-opml" data-opml>
+    <div class="flex items-start gap-3">
+      <span class="src-extra-icon">{{icon "file-up" class="size-[18px]"}}</span>
+      <div class="min-w-0 flex-1">
+        <h2 id="h-opml" class="text-[15px] font-semibold">Bring your feeds</h2>
+        <p class="text-sm text-ink-3 text-pretty">From Feedly, Inoreader, NetNewsWire or any feed reader: export its list as OPML and bring it here. Each folder becomes a topic, and nothing is fetched until the next check.</p>
+      </div>
+      <a href="/api/v1/feed/opml" class="btn btn-ghost btn-sm shrink-0" download data-tooltip="Your topics and feeds as an OPML file">{{icon "download" class="size-3.5"}}<span class="hidden sm:inline">Export mine</span></a>
+    </div>
+    <form class="mt-4 space-y-3" data-opml-form novalidate>
+      <div class="flex flex-wrap items-center gap-2" data-field>
+        <label class="btn btn-secondary btn-sm cursor-pointer">{{icon "file-up" class="size-3.5"}} Choose an .opml file
+          <input type="file" name="file" accept=".opml,.xml,text/x-opml,application/xml,text/xml" class="sr-only" data-opml-file></label>
+        <span class="opml-file" data-opml-filename hidden></span>
+        <button type="button" class="btn btn-ghost btn-sm" data-opml-paste-open aria-expanded="false">{{icon "clipboard-paste" class="size-3.5"}} Paste it instead</button>
+      </div>
+      <div data-field data-opml-paste hidden>
+        <label class="label" for="opml-text">The OPML list</label>
+        <textarea id="opml-text" name="opml" rows="4" class="textarea font-mono text-[12px]" spellcheck="false" placeholder="&lt;opml version=&quot;2.0&quot;&gt;…" data-opml-text></textarea>
+      </div>
+      <div class="flex flex-wrap items-end gap-3">
+        <div class="min-w-0 flex-1 basis-56" data-field>
+          <label class="label" for="opml-topic">Put them all in one topic <span class="font-normal text-ink-3">(optional)</span></label>
+          <input id="opml-topic" name="topic" class="input" maxlength="30" dir="auto" autocomplete="off" placeholder="Keep the folders as topics">
+        </div>
+        <button type="submit" class="btn btn-primary" data-opml-import disabled>{{icon "file-up" class="size-4"}} Import</button>
+      </div>
+    </form>
+    <div class="mt-4 empty:hidden" data-opml-result-slot aria-live="polite"></div>
+  </section>
+
+  {{!-- Muted words (#193): stories that mention them stay out of the Feed. Client: feed-tools.js --}}
+  <section class="card src-extra mt-4" aria-labelledby="h-mutes">
+    <div class="mb-3 flex items-start gap-3">
+      <span class="src-extra-icon">{{icon "eye-off" class="size-[18px]"}}</span>
+      <div class="min-w-0 flex-1">
+        <h2 id="h-mutes" class="text-[15px] font-semibold">Muted words</h2>
+        <p class="text-sm text-ink-3">Spoilers, a team you can’t stand, a topic you need a break from.</p>
+      </div>
+    </div>
+    <div data-mutes-slot>{{> feed/mutes mutes=mutes}}</div>
+  </section>
+</div>
+
+<dialog id="topic-editor" class="modal" aria-labelledby="topic-editor-title">
+  <form data-topic-form novalidate>
+    <div class="modal-header">
+      <div><h2 id="topic-editor-title" class="text-base font-semibold" data-topic-form-title>New topic</h2>
+        <p class="text-sm text-ink-3">{{bot.name}} searches Google News for it; add sites once it’s made.</p></div>
+      <button type="button" class="btn btn-ghost btn-icon btn-sm" data-modal-close aria-label="Close">{{icon "x" class="size-4"}}</button>
+    </div>
+    <div class="modal-body space-y-4">
+      <div data-field><label class="label" for="tp-label">Name</label>
+        <input id="tp-label" name="label" class="input" maxlength="30" placeholder="e.g. Brazilian Football" autocomplete="off"></div>
+      <div data-field><label class="label" for="tp-query">Search words</label>
+        <input id="tp-query" name="query" class="input font-mono text-[13px]" maxlength="200" placeholder="e.g. &quot;Flamengo&quot; OR &quot;Palmeiras&quot;" autocomplete="off" dir="auto">
+        <p class="hint">What Google News should look for. Use OR between alternatives and “quotes” for exact names. Empty = the name.</p></div>
+      <fieldset><legend class="label">When</legend>
+        <div class="flex flex-wrap gap-2">
+          {{#each (array "any" "morning" "midday" "evening")}}
+            <label class="chip cursor-pointer has-[:checked]:bg-accent-soft has-[:checked]:text-accent-text"><input type="radio" name="when" value="{{this}}" class="sr-only" {{#if (eq this "any")}}checked{{/if}}>
+              {{#if (eq this "any")}}Any time{{else if (eq this "morning")}}Morning{{else if (eq this "midday")}}Midday{{else}}Evening{{/if}}</label>
+          {{/each}}
+        </div></fieldset>
+    </div>
+    <div class="modal-footer"><button type="button" class="btn btn-secondary" data-modal-close>Cancel</button><button class="btn btn-primary" data-topic-save>Save topic</button></div>
+  </form>
+</dialog>

@@ -1,0 +1,42 @@
+{{!--
+  History card for an ask_user request. Pending → "Answer" re-opens the dock. Answered → read-only answers.
+  Contract: { id, status: pending|answered|expired, askedAt: ISO,
+              questions: [{ id, header, question, kind, options, allowOther, placeholder? }],
+              answers?: [{ header, question, display }] }
+--}}
+<div class="question-card card overflow-hidden {{#if (eq status 'pending')}}ring-1 ring-accent/40{{/if}}" data-question-card="{{id}}" data-status="{{status}}">
+  <div class="flex items-center gap-3 px-4 py-3">
+    <span class="grid size-8 shrink-0 place-items-center rounded-full {{#if (eq status 'answered')}}bg-ok-soft text-ok{{else if (eq status 'expired')}}bg-surface-2 text-ink-3{{else}}bg-accent-soft text-accent-text{{/if}}">
+      {{#if (eq status 'answered')}}{{icon "check" class="size-4"}}{{else if (eq status 'expired')}}{{icon "message-circle-off" class="size-4"}}{{else}}{{icon "message-circle-question" class="size-4"}}{{/if}}
+    </span>
+    <div class="min-w-0 flex-1">
+      <p class="text-[13px] font-semibold">
+        {{#if (eq status 'answered')}}You answered {{plural questions.length "question"}}
+        {{else if (eq status 'expired')}}Question closed <span class="font-normal text-ink-3">because you moved on</span>
+        {{else}}{{@root.bot.name}} asked {{plural questions.length "question"}}{{/if}}
+      </p>
+      <p class="truncate text-xs text-ink-3">{{#each questions}}{{header}}{{#unless @last}} · {{/unless}}{{/each}}</p>
+    </div>
+    {{#if (eq status 'pending')}}
+      <button type="button" class="btn btn-primary btn-sm" data-ask-open="{{id}}">{{icon "pencil-line" class="size-3.5"}} Answer</button>
+    {{/if}}
+  </div>
+  {{!-- What Jess was looking at when she asked (browser screenshot) --}}
+  {{#each questions}}{{#if image}}<div class="border-t border-line px-4 py-3"><button type="button" class="step-shot" data-lightbox="{{image}}" aria-label="View the screenshot larger"><img src="{{image}}" alt="What {{@root.bot.name}} was looking at" loading="lazy" width="320" height="200"></button>
+    {{#if (eq ../status 'pending')}}<button type="button" class="btn btn-soft btn-sm mt-2" data-handover>{{icon "hand" class="size-3.5"}} Take over the browser</button>{{/if}}</div>{{/if}}{{/each}}
+  {{!-- The conversation, in order: what was asked, then what you said. --}}
+  {{#if answers}}
+    <dl class="space-y-3 border-t border-line bg-surface-2/50 px-4 py-3 text-[13px]">
+      {{#each answers}}
+        <div>
+          <dt class="text-ink-2">{{question}}</dt>
+          <dd class="mt-1.5 flex justify-end"><span class="max-w-[85%] msg-user-bubble rounded-2xl rounded-br-md bg-accent px-3 py-1.5 font-medium text-accent-ink">{{display}}</span></dd>
+        </div>
+      {{/each}}
+    </dl>
+  {{else if (eq status 'expired')}}
+    <ul class="question-closed" role="list">
+      {{#each questions}}{{#if question}}<li dir="auto">{{question}}</li>{{/if}}{{/each}}
+    </ul>
+  {{/if}}
+</div>

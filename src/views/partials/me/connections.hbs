@@ -1,0 +1,71 @@
+{{!-- You → Connections (decisions #78/#79). Data: connections { email: [conn], calendar: [conn] }, presets.
+  conn = services/connections.js connectionView (never the password). Client: public/js/connections.js --}}
+<div class="space-y-6" data-connections>
+  {{#each (array (obj kind="email" title="Email" icon="mail" empty="Connect your mailbox and I can check, find and draft email for you. Sending always asks you first." list=connections.email)
+                 (obj kind="calendar" title="Calendar" icon="calendar-days" empty="Connect your calendar and I’ll know what’s coming up, spot clashes and add events (with your OK)." list=connections.calendar))}}
+    <section aria-labelledby="h-conn-{{kind}}">
+      <div class="mb-3 flex items-center gap-2">
+        <h2 id="h-conn-{{kind}}" class="flex-1 text-sm font-semibold">{{title}}</h2>
+        <button type="button" class="btn btn-secondary btn-sm" data-connection-add="{{kind}}">{{icon "plus" class="size-3.5"}} Add {{#if (eq kind 'email')}}a mailbox{{else}}a calendar{{/if}}</button>
+      </div>
+      <div class="card divide-y divide-line">
+        {{#each list}}
+          <div class="flex items-center gap-3 p-4" data-connection-id="{{id}}">
+            <span class="relative grid size-9 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent-text">
+              {{#if (eq kind 'email')}}{{icon "mail" class="size-[18px]"}}{{else}}{{icon "calendar-days" class="size-[18px]"}}{{/if}}
+              <span class="health-dot absolute -end-0.5 -bottom-0.5 mt-0 size-2.5 ring-2 ring-surface" data-status="{{#if (eq status 'ok')}}ok{{else}}bad{{/if}}"></span>
+            </span>
+            <div class="min-w-0 flex-1">
+              <p class="truncate text-sm font-medium">{{label}} <span class="font-normal text-ink-3">· {{providerLabel}}</span></p>
+              <p class="truncate text-xs text-ink-3">{{#if address}}{{address}}{{else}}{{username}}{{/if}}{{#if calendars}} · {{plural calendars.length "calendar"}}{{/if}}</p>
+              {{#if (eq status 'error')}}<p class="mt-0.5 text-xs text-bad">{{error}}</p>{{/if}}
+            </div>
+            <button type="button" class="btn btn-ghost btn-sm" data-connection-test="{{id}}">{{icon "plug-zap" class="size-3.5"}} Test</button>
+            <button type="button" class="btn btn-ghost btn-icon btn-sm hover:text-bad" data-connection-remove="{{id}}" data-label="{{label}}" data-tooltip="Remove" aria-label="Remove {{label}}">{{icon "trash-2" class="size-4"}}</button>
+          </div>
+        {{else}}
+          <p class="p-5 text-sm text-ink-3">{{empty}}</p>
+        {{/each}}
+      </div>
+    </section>
+  {{/each}}
+  <p class="text-xs text-ink-3">Passwords are stored encrypted on this computer and are never shown again. Use an <strong>app password</strong> where your provider offers one. Only you can use your accounts, not even the admin.</p>
+</div>
+
+<dialog id="connection-dialog" class="modal" aria-labelledby="conn-title">
+  <form data-connection-form novalidate>
+    <input type="hidden" name="kind" value="email">
+    <div class="modal-header"><h2 id="conn-title" class="text-base font-semibold" data-conn-title>Add a mailbox</h2>
+      <button type="button" class="btn btn-ghost btn-icon btn-sm" data-modal-close aria-label="Close">{{icon "x" class="size-4"}}</button></div>
+    <div class="modal-body space-y-4">
+      <div data-field>
+        <label class="label" for="conn-provider">Provider</label>
+        <select id="conn-provider" name="provider" class="select" data-conn-provider>
+          {{#each presets}}<option value="{{@key}}" data-email="{{email}}" data-calendar="{{calendar}}" data-help="{{help}}" data-url="{{url}}">{{label}}</option>{{/each}}
+        </select>
+        <p class="hint" data-conn-help></p>
+      </div>
+      <div class="grid gap-3 sm:grid-cols-2">
+        <div data-field><label class="label" for="conn-username">Username</label><input id="conn-username" name="username" class="input" autocomplete="off" dir="ltr" spellcheck="false" placeholder="you@example.com"></div>
+        <div data-field><label class="label" for="conn-password">App password</label><input id="conn-password" name="password" type="password" class="input" autocomplete="new-password" dir="ltr"></div>
+      </div>
+      <div data-conn-only="email" data-field><label class="label" for="conn-address">Send as</label><input id="conn-address" name="address" class="input" dir="ltr" placeholder="Same as the username"></div>
+      <div data-conn-only="calendar" data-field><label class="label" for="conn-url">CalDAV address</label><input id="conn-url" name="url" class="input font-mono text-[13px]" dir="ltr" placeholder="https://…"></div>
+      <details data-conn-servers>
+        <summary class="cursor-pointer text-xs font-medium text-ink-3 hover:text-ink-2">Servers</summary>
+        <div class="mt-3 grid gap-3 sm:grid-cols-[1fr_6rem]" data-conn-only="email">
+          <div data-field><label class="label" for="conn-imap">Incoming (IMAP)</label><input id="conn-imap" name="imapHost" class="input font-mono text-[13px]" dir="ltr"></div>
+          <div data-field><label class="label" for="conn-imap-port">Port</label><input id="conn-imap-port" name="imapPort" class="input" inputmode="numeric" dir="ltr"></div>
+          <div data-field><label class="label" for="conn-smtp">Outgoing (SMTP)</label><input id="conn-smtp" name="smtpHost" class="input font-mono text-[13px]" dir="ltr"></div>
+          <div data-field><label class="label" for="conn-smtp-port">Port</label><input id="conn-smtp-port" name="smtpPort" class="input" inputmode="numeric" dir="ltr"></div>
+        </div>
+        <label class="mt-3 flex items-center gap-2 text-xs text-ink-2"><input type="checkbox" name="allowSelfSigned" class="checkbox"> Trust a self-signed certificate (your own server)</label>
+      </details>
+      <div data-field><label class="label" for="conn-label">Name it</label><input id="conn-label" name="label" class="input" placeholder="e.g. Work mail"></div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" data-modal-close>Cancel</button>
+      <button type="submit" class="btn btn-primary" data-conn-submit>{{icon "plug-zap" class="size-4"}} Check and connect</button>
+    </div>
+  </form>
+</dialog>

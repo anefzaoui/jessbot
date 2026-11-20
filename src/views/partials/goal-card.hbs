@@ -1,0 +1,28 @@
+{{!--
+  Goal card.
+  Contract: { id, title, category, hue, progress, statusLine?, nextStep?, lastCheckIn?: ISO,
+              state: active|needs_input|suggested|done, activity?: (activities.js key, when Jessbot is on it now),
+              streak?: "6-day streak" (≥ 2 in a row, services/goals.js streakOf; Phase 25 #212) }
+--}}
+<article class="goal-card card card-hover" data-goal-id="{{id}}" aria-labelledby="goal-{{id}}">
+  <a href="/goals/{{id}}" class="flex h-full flex-col p-4">
+    <div class="flex items-start gap-3">
+      <h3 id="goal-{{id}}" class="min-w-0 flex-1 leading-snug font-semibold text-balance">{{title}}</h3>
+      <span class="tabular shrink-0 pt-px text-sm font-semibold text-ink-2">{{default progress 0}}%</span>
+    </div>
+    <div class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-ink-3">
+      <span>{{category}}</span>
+      {{#if streak}}<span class="goal-streak">{{icon "flame" class="size-3"}} {{streak}}</span>{{/if}}
+      {{#if (eq state 'needs_input')}}<span class="badge badge-warn">{{icon "message-circle-question" class="size-3"}} Needs your input</span>{{/if}}
+      {{#if activity}}<span class="badge badge-run"><span class="spinner size-2.5 border-[1.5px]"></span> {{describeActivity activity}}</span>{{/if}}
+    </div>
+    {{#if statusLine}}<p class="mt-3 text-[13px] leading-relaxed text-ink-2">{{statusLine}}</p>{{/if}}
+    <div class="mt-auto pt-4">
+      {{> progress-bar value=progress label=title}}
+      <div class="mt-2.5 flex items-center gap-3 text-xs text-ink-3">
+        {{#if nextStep}}<span class="flex min-w-0 items-center gap-1">{{icon "arrow-right" class="size-3"}}<span class="truncate">Next: {{nextStep}}</span></span>{{/if}}
+        {{#if lastCheckIn}}<time class="ml-auto shrink-0" datetime="{{iso lastCheckIn}}" data-relative>{{timeAgo lastCheckIn}}</time>{{/if}}
+      </div>
+    </div>
+  </a>
+</article>

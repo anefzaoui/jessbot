@@ -1,0 +1,14 @@
+{{!-- One step of a run, as a timeline row (mirrored by stepLi in public/js/run.js).
+  Contract: { id, iconName, label, detail?, image?, href?, handover?, favicon?, status: run|ok|bad|wait, durationLabel? } --}}
+<li class="tl-step" data-step-id="{{id}}" data-step-status="{{status}}">
+  <span class="tl-node" aria-hidden="true">
+    {{#if favicon}}<img src="{{favicon}}" alt="" class="step-favicon" loading="lazy" width="14" height="14">{{else}}{{icon (default iconName "circle-check") class="size-3"}}{{/if}}
+  </span>
+  <span class="tl-body">
+    <span class="tl-label">{{label}}</span>
+    {{#if detail}}{{#if href}}<a href="{{href}}" class="tl-detail tl-link">{{detail}}</a>{{else}}<span class="tl-detail">{{detail}}</span>{{/if}}{{/if}}
+    {{#if (and image (not hideImage))}}{{> chat/step-image}}{{/if}}
+    {{#if handover}}<button type="button" class="btn btn-soft btn-sm mt-1.5" data-handover>{{icon "hand" class="size-3.5"}} Take over the browser</button>{{/if}}
+  </span>
+  {{#if durationLabel}}<span class="tl-dur tabular">{{durationLabel}}</span>{{/if}}
+</li>

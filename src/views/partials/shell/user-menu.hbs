@@ -1,0 +1,42 @@
+{{!-- User menu (rail footer). Theme options are radio items kept in sync by theme.js. --}}
+<button type="button" popovertarget="user-menu" aria-haspopup="menu" aria-expanded="false"
+  class="flex w-full items-center gap-2.5 rounded-lg p-1.5 text-start transition hover:bg-surface-2"
+  data-tooltip="{{default user.name 'Account'}}" data-tooltip-rail>
+  {{> person name=(default user.name "Guest") hue=user.hue size="size-7 text-[11px]"}}
+  <span class="rail-label min-w-0 flex-1">
+    <span class="block truncate text-[13px] font-semibold">{{default user.name "Guest"}}</span>
+    <span class="block truncate text-[11px] text-ink-3">{{#if (eq user.role "admin")}}Owner · Admin{{else if user}}Member{{else}}Not signed in{{/if}}</span>
+  </span>
+  <span class="rail-label text-ink-3">{{icon "chevrons-up-down" class="size-4"}}</span>
+</button>
+
+<div id="user-menu" popover class="menu w-60" role="menu" data-placement="top-start" aria-label="Account">
+  {{#if user}}
+    <a href="/me" class="menu-item" role="menuitem" data-cmd="Profile & memory" data-cmd-group="Go to" data-cmd-icon="user-round">
+      {{icon "user-round" class="size-4"}} Profile &amp; memory
+    </a>
+    <a href="/upcoming" class="menu-item" role="menuitem">{{icon "calendar-clock" class="size-4"}} Upcoming</a>
+    <a href="/activity" class="menu-item" role="menuitem">{{icon "history" class="size-4"}} Activity</a>
+    <a href="/me/devices" class="menu-item" role="menuitem">{{icon "smartphone" class="size-4"}} Devices &amp; app tokens</a>
+    <div class="menu-sep" role="separator"></div>
+  {{/if}}
+  <p class="menu-label">Theme</p>
+  <button type="button" class="menu-item" role="menuitemradio" data-theme-set="light" aria-checked="false" data-keep-open
+    data-cmd="Light theme" data-cmd-group="Appearance" data-cmd-icon="sun">
+    {{icon "sun" class="size-4"}} <span class="flex-1">Light</span>{{icon "check" class="menu-check size-4 text-accent"}}
+  </button>
+  <button type="button" class="menu-item" role="menuitemradio" data-theme-set="dark" aria-checked="false" data-keep-open
+    data-cmd="Dark theme" data-cmd-group="Appearance" data-cmd-icon="moon">
+    {{icon "moon" class="size-4"}} <span class="flex-1">Dark</span>{{icon "check" class="menu-check size-4 text-accent"}}
+  </button>
+  <button type="button" class="menu-item" role="menuitemradio" data-theme-set="system" aria-checked="false" data-keep-open
+    data-cmd="System theme" data-cmd-group="Appearance" data-cmd-icon="monitor">
+    {{icon "monitor" class="size-4"}} <span class="flex-1">System</span>{{icon "check" class="menu-check size-4 text-accent"}}
+  </button>
+  {{#if user}}
+    <div class="menu-sep" role="separator"></div>
+    <form method="post" action="/logout">
+      <button class="menu-item is-danger" role="menuitem">{{icon "log-out" class="size-4"}} Sign out</button>
+    </form>
+  {{/if}}
+</div>

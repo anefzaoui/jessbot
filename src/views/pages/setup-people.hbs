@@ -1,0 +1,47 @@
+{{#> setup/frame heading="Who else will talk to it?" lead="Invite family and colleagues now or later. Each person gets their own private chat, and you decide how your agent treats each of them."}}
+  <section aria-labelledby="h-groups">
+    <h2 id="h-groups" class="label">Groups</h2>
+    <div class="flex flex-wrap items-center gap-1.5" data-group-list>
+      {{#each groups}}<span class="chip cursor-default">{{icon "users" class="size-3.5"}} {{name}}</span>{{/each}}
+    </div>
+    <form method="post" action="/setup/people/group" class="mt-2 flex gap-2" data-ajax data-reset data-stay data-group-form>
+      <label class="sr-only" for="f-group">New group name</label>
+      <input id="f-group" name="name" class="input h-9 flex-1" placeholder="e.g. Family, Company" list="group-suggestions" autocomplete="off">
+      <datalist id="group-suggestions"><option value="Family"><option value="Company"><option value="Friends"></datalist>
+      <button class="btn btn-secondary">{{icon "plus" class="size-4"}} Add</button>
+    </form>
+  </section>
+
+  <section aria-labelledby="h-invite" class="mt-8">
+    <h2 id="h-invite" class="label">Invite someone</h2>
+    <form method="post" action="/setup/people/invite" class="card space-y-3 p-4" data-ajax data-stay data-busy="Creating link…" data-invite-form>
+      <div class="grid gap-3 sm:grid-cols-2">
+        {{> field name="name" label="Name" required=true autocomplete="off"}}
+        {{> field name="email" label="Email (optional)" type="email" autocomplete="off"}}
+      </div>
+      <div class="grid gap-3 sm:grid-cols-2">
+        <div><label class="label" for="f-role">Role</label>
+          <select id="f-role" name="role" class="select"><option value="member">Member</option><option value="admin">Admin</option></select></div>
+        <div><label class="label" for="f-groupId">Group</label>
+          <select id="f-groupId" name="groupId" class="select" data-group-select><option value="">None</option>{{#each groups}}<option value="{{id}}">{{name}}</option>{{/each}}</select></div>
+      </div>
+      <button class="btn btn-secondary btn-block">{{icon "link" class="size-4"}} Create invite link</button>
+    </form>
+
+    <div data-invite-links class="mt-3 space-y-2">
+      {{#if newLink}}{{> setup/invite-link name=newLinkName link=newLink}}{{/if}}
+    </div>
+
+    {{#if invites}}
+      <ul class="mt-4 space-y-1 text-sm text-ink-2" role="list">
+        {{#each invites}}<li class="flex items-center gap-2">{{icon "clock" class="size-3.5 text-ink-3"}} {{name}} <span class="text-ink-3">· {{role}}{{#if group_name}} · {{group_name}}{{/if}} · pending</span></li>{{/each}}
+      </ul>
+    {{/if}}
+  </section>
+
+  <form method="post" action="/setup/finish" class="mt-10">
+    <button class="btn btn-primary btn-lg btn-block">Finish and meet your agent</button>
+    <p class="mt-2 text-center text-xs text-ink-3">You can invite people any time from Admin → People.</p>
+  </form>
+{{/setup/frame}}
+<script type="module" src="/js/setup.js"></script>

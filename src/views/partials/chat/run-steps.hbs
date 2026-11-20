@@ -1,0 +1,106 @@
+{{!--
+  What the agent did (or is doing) for one reply. Server-rendered from run_events → survives refresh;
+  run.js re-attaches to the live stream using data-run-id + data-last-seq (and mirrors this markup — keep them in step).
+  Contract: run = { id, status: queued|running|waiting|done|error|cancelled, startedAt: ISO, elapsedLabel?, lastSeq,
+                    steps: [{ id, iconName, label, detail?, status: run|ok|bad|wait, activity?, favicon?, durationLabel? }],
+                    current?: step (running / waiting), sites: [{ favicon, host }], error?, expanded? (styleguide: start open),
+                    scheduleId?, errorKind?, retryAt? (a scheduled task's note: Run it now / "Trying again at", #196) }
+--}}
+<div class="run" data-run-id="{{run.id}}" data-run-status="{{run.status}}" data-last-seq="{{default run.lastSeq 0}}">
+  {{#if (or (eq run.status 'queued') (eq run.status 'running') (eq run.status 'waiting'))}}
+    {{!-- Live: an animated glyph for what she's doing, the current step as a headline, the live tab, the timeline --}}
+    <div class="run-live" data-state="{{run.status}}" aria-live="polite">
+      <div class="run-live-head">
+        {{#if (eq run.status 'queued')}}
+          <span class="run-glyph" data-motion="queued" aria-hidden="true"><span class="run-dots"><i></i><i></i><i></i></span></span>
+        {{else if (eq run.status 'waiting')}}
+          <span class="run-glyph" data-motion="waiting" aria-hidden="true">{{icon "hand" class="size-[18px]"}}</span>
+        {{else}}
+          <span class="run-glyph" data-motion="{{default run.current.activity 'thinking'}}" data-run-glyph aria-hidden="true">{{icon (default run.current.iconName "sparkles") class="size-[18px]"}}</span>
+        {{/if}}
+        <div class="min-w-0 flex-1">
+          <p class="run-now" data-run-current>
+            {{#if (eq run.status 'queued')}}Getting ready…{{else if (eq run.status 'waiting')}}Waiting for you{{else}}{{default run.current.label "Thinking…"}}{{/if}}
+          </p>
+          <p class="run-meta">
+            <span data-run-count>{{#if run.steps}}Step {{run.steps.length}}{{else}}{{#if (eq run.status 'queued')}}Queued{{else}}Starting{{/if}}{{/if}}</span>
+            <span aria-hidden="true">·</span>
+            <span class="tabular" data-elapsed-since="{{iso run.startedAt}}"></span>
+            <span class="fav-stack" data-run-sites {{#unless run.sites}}hidden{{/unless}}>
+              {{#each run.sites}}<img src="{{favicon}}" alt="" title="{{host}}" width="16" height="16">{{/each}}
+            </span>
+          </p>
+        </div>
+        <button type="button" class="btn btn-ghost btn-sm -my-1 -mr-1.5 h-7 shrink-0 px-2 text-xs" data-run-cancel data-tooltip="Stop" aria-label="Stop this task">
+          {{icon "square" class="size-3"}} Stop
+        </button>
+      </div>
+      {{!-- Her browser tab, live (run.js shows it while she's on a website) --}}
+      <button type="button" class="run-screen" data-run-screen data-handover hidden aria-label="Watch or take over Jess's browser">
+        <img alt="" data-run-screen-img>
+        <span class="run-screen-bar"><span class="live-dot"></span><span class="truncate" data-run-screen-url></span><span class="run-screen-cta">{{icon "maximize-2" class="size-3"}} Watch · take over</span></span>
+      </button>
+      <ol class="run-tl" role="list" data-run-steps {{#unless run.steps}}hidden{{/unless}}>
+        {{#each run.steps}}{{> chat/run-step this}}{{/each}}
+      </ol>
+    </div>
+  {{else if run.steps}}
+    {{!-- Finished: a summary chip (time, steps, the sites she used), expandable timeline --}}
+    <details class="run-done group" {{#if run.expanded}}open{{/if}}>
+      <summary class="run-done-chip">
+        {{#if (eq run.status 'error')}}<span class="text-bad">{{icon "circle-x" class="size-3.5"}}</span>
+        {{else if (eq run.status 'cancelled')}}{{icon "circle-slash" class="size-3.5"}}
+        {{else}}<span class="text-run">{{icon "sparkles" class="size-3.5"}}</span>{{/if}}
+        <span>Worked {{run.elapsedLabel}} · {{run.steps.length}} step{{#unless (eq run.steps.length 1)}}s{{/unless}}</span>
+        {{#if run.sites}}<span class="fav-stack">{{#each run.sites}}<img src="{{favicon}}" alt="" title="{{host}}" width="16" height="16">{{/each}}</span>{{/if}}
+        <span class="run-done-chevron">{{icon "chevron-right" class="size-3.5"}}</span>
+      </summary>
+      <ol class="run-tl" role="list">
+        {{#each run.steps}}{{> chat/run-step this hideImage=true}}{{/each}}
+      </ol>
+    </details>
+    {{!-- Screenshots stay visible when the steps are collapsed; so does a background task it started (#212). --}}
+    {{#each run.steps}}{{#if image}}{{> chat/step-image}}{{/if}}{{/each}}
+    {{#each run.steps}}{{#if (and (eq tool 'delegate') href (eq status 'ok'))}}
+      <a href="{{href}}" class="run-bg-link">{{icon "rocket" class="size-4 shrink-0"}}<span class="min-w-0 flex-1"><span class="block text-[13px] font-medium text-ink">Handed to a background task <span class="font-normal text-ink-3">· the result comes back here</span></span>
+        <span class="block truncate text-xs text-ink-3" dir="auto">{{detail}}</span></span>{{icon "arrow-up-right" class="size-4 shrink-0 text-ink-3"}}</a>
+    {{/if}}{{/each}}
+  {{/if}}
+
+  {{#if (eq run.status 'error')}}
+    <div class="run-failed" role="alert">
+      <span class="mt-0.5 text-bad">{{icon "triangle-alert" class="size-4"}}</span>
+      <p class="min-w-0 flex-1 text-ink">{{default run.error "Something went wrong while working on this."}}
+        {{#if run.retryAt}}<span class="mt-0.5 flex items-center gap-1 text-xs text-ink-3" data-run-retry-at>{{icon "clock" class="size-3"}} Trying again by itself at <time datetime="{{iso run.retryAt}}">{{time run.retryAt}}</time></span>{{/if}}</p>
+      {{#if run.scheduleId}}<button type="button" class="btn btn-secondary btn-sm -my-0.5 shrink-0" data-schedule-run="{{run.scheduleId}}">{{icon "play" class="size-3.5"}} Run it now</button>
+      {{else}}<button type="button" class="btn btn-secondary btn-sm -my-0.5 shrink-0" data-run-retry>{{icon "rotate-ccw" class="size-3.5"}} Retry</button>{{/if}}
+    </div>
+  {{/if}}
+  {{!-- A scheduled task that didn't run at its time (the computer was off, quiet hours): run it now from its note (#196). --}}
+  {{#if (and run.scheduleId (eq run.errorKind 'missed') (neq run.status 'error'))}}
+    <div class="run-missed" role="status">
+      <span class="run-stopped-icon">{{icon "calendar-clock" class="size-4"}}</span>
+      <p class="min-w-0 flex-1"><span class="font-medium text-ink-2">It didn’t run at its time.</span> <span class="text-ink-3">It runs again at the next one, or now.</span></p>
+      <button type="button" class="btn btn-secondary btn-sm -my-0.5 shrink-0" data-schedule-run="{{run.scheduleId}}">{{icon "play" class="size-3.5"}} Run it now</button>
+    </div>
+  {{/if}}
+  {{!-- A task paused after failing 3 times in a row (#178): resume it from its note while it's still paused (#212). --}}
+  {{#if (and run.scheduleId (eq run.errorKind 'paused'))}}
+    <div class="run-missed" role="status" data-schedule-paused>
+      <span class="run-stopped-icon">{{icon "circle-pause" class="size-4"}}</span>
+      {{#if run.schedulePaused}}
+        <p class="min-w-0 flex-1"><span class="font-medium text-ink-2">Paused.</span> <span class="text-ink-3">It won’t run again until you resume it.</span></p>
+        <button type="button" class="btn btn-secondary btn-sm -my-0.5 shrink-0" data-schedule-resume="{{run.scheduleId}}">{{icon "play" class="size-3.5"}} Resume</button>
+      {{else}}
+        <p class="min-w-0 flex-1 text-ink-3">Running on its schedule again.</p>
+      {{/if}}
+    </div>
+  {{/if}}
+  {{#if (eq run.status 'cancelled')}}
+    <div class="run-stopped" role="status">
+      <span class="run-stopped-icon">{{icon "circle-slash" class="size-4"}}</span>
+      <p class="min-w-0 flex-1"><span class="font-medium text-ink-2">Stopped.</span> <span class="text-ink-3">I left this unfinished.</span></p>
+      <button type="button" class="btn btn-secondary btn-sm -my-0.5 shrink-0" data-run-retry>{{icon "rotate-ccw" class="size-3.5"}} Try again</button>
+    </div>
+  {{/if}}
+</div>

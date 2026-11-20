@@ -1,0 +1,82 @@
+{{!--
+  Right panel: Activity · Approvals · Upcoming · Identity.
+  Rendered twice (xl aside + small-screen sheet) → ids are prefixed. Live updates target [data-live-*].
+  Data: shell.panel = { activity: [{ label, items: [activity] }], approvals: [approval], upcoming: { alarms: [alarm], jobs: [job] } }
+--}}
+<div class="flex h-full min-h-0 flex-col">
+  <header class="flex items-center gap-3 border-b border-line px-4 py-3">
+    {{> avatar size="xl" activity=shell.agent.activity}}
+    <div class="min-w-0 flex-1">
+      <p class="truncate text-sm font-semibold">{{bot.name}}</p>
+      <p class="truncate text-xs text-ink-3" data-live-agent-label>{{describeActivity (default shell.agent.activity 'resting') shell.agent.target}}</p>
+    </div>
+    {{#if inSheet}}
+      <button type="button" class="btn btn-ghost btn-icon btn-sm" data-modal-close aria-label="Close panel">{{icon "x" class="size-[18px]"}}</button>
+    {{else}}
+      <button type="button" class="btn btn-ghost btn-icon btn-sm" data-panel-toggle data-tooltip="Hide panel" data-tooltip-kbd="Ctrl ." aria-label="Hide panel">
+        {{icon "panel-right-close" class="size-[18px]"}}
+      </button>
+    {{/if}}
+  </header>
+
+  <div class="px-3 pt-3">
+    <div role="tablist" class="segmented flex w-full" data-tabs="panel" aria-label="Panel sections">
+      <button role="tab" id="{{prefix}}-tab-activity" aria-controls="{{prefix}}-activity" aria-selected="true" class="flex-1 justify-center">Activity</button>
+      <button role="tab" id="{{prefix}}-tab-approvals" aria-controls="{{prefix}}-approvals" aria-selected="false" tabindex="-1" class="flex-1 justify-center">
+        Approvals
+        <span class="count count-warn" data-live-count="approvals" {{#unless shell.counts.approvals}}hidden{{/unless}}>{{shell.counts.approvals}}</span>
+      </button>
+      <button role="tab" id="{{prefix}}-tab-upcoming" aria-controls="{{prefix}}-upcoming" aria-selected="false" tabindex="-1" class="flex-1 justify-center">Upcoming</button>
+      <button role="tab" id="{{prefix}}-tab-identity" aria-controls="{{prefix}}-identity" aria-selected="false" tabindex="-1" class="flex-1 justify-center" aria-label="Identity">
+        {{icon "fingerprint" class="size-4"}}
+      </button>
+    </div>
+  </div>
+
+  {{!-- Activity: day by day, by time --}}
+  <section role="tabpanel" id="{{prefix}}-activity" aria-labelledby="{{prefix}}-tab-activity" class="min-h-0 flex-1 overflow-y-auto px-3 pt-2 pb-6" data-live-activity>
+    {{#each shell.panel.activity}}
+      <h3 class="sticky top-0 z-10 bg-chrome/95 px-1 pt-3 pb-2 text-xs font-medium text-ink-3 backdrop-blur-sm">{{label}}</h3>
+      <ol class="relative ml-2.5 border-l border-line" role="list">
+        {{#each items}}{{> activity-item this}}{{/each}}
+      </ol>
+    {{else}}
+      {{> empty-state iconName="history" title="Nothing yet today" text="Everything I do for you shows up here, hour by hour, so at the end of the day you can see how much got done." compact=true}}
+    {{/each}}
+    {{#if shell.panel.activity}}
+      <a href="/activity" class="btn btn-ghost btn-sm mt-3 w-full">See full history {{icon "arrow-right" class="size-3.5"}}</a>
+    {{/if}}
+  </section>
+
+  {{!-- Approvals --}}
+  <section role="tabpanel" id="{{prefix}}-approvals" aria-labelledby="{{prefix}}-tab-approvals" hidden class="min-h-0 flex-1 space-y-3 overflow-y-auto px-3 pt-3 pb-6" data-live-approvals>
+    {{#each shell.panel.approvals}}
+      {{> approval-card this compact=true}}
+    {{else}}
+      {{> empty-state iconName="shield-check" title="You're all clear" text="When I need your OK to buy something, send a message or visit an unfamiliar site, I'll ask here and in chat." compact=true}}
+    {{/each}}
+  </section>
+
+  {{!-- Upcoming: alarms, timers, reminders, scheduled tasks (refreshed live) --}}
+  <section role="tabpanel" id="{{prefix}}-upcoming" aria-labelledby="{{prefix}}-tab-upcoming" hidden class="min-h-0 flex-1 space-y-2 overflow-y-auto px-3 pt-3 pb-6">
+    <div class="space-y-2" data-upcoming-panel>{{> upcoming-panel upcoming=shell.panel.upcoming}}</div>
+    <a href="/upcoming" class="btn btn-ghost btn-sm w-full">Manage schedule {{icon "arrow-right" class="size-3.5"}}</a>
+  </section>
+
+  {{!-- Identity: tucked-away customisation for power users --}}
+  <section role="tabpanel" id="{{prefix}}-identity" aria-labelledby="{{prefix}}-tab-identity" hidden class="min-h-0 flex-1 overflow-y-auto px-3 pt-3 pb-6">
+    <div class="card p-4 text-center">
+      <div class="mx-auto w-fit">{{> avatar size="xl" activity=shell.agent.activity}}</div>
+      <p class="mt-3 font-semibold">{{bot.name}}</p>
+      <p class="mt-0.5 text-sm text-ink-3">{{default bot.vibe "Warm, capable, a little playful."}}</p>
+    </div>
+    <ul class="mt-3 space-y-1" role="list">
+      <li><a href="/me/memory" class="rail-link">{{icon "brain" class="size-[18px]"}}<span class="flex-1">What I remember about you</span>{{icon "chevron-right" class="size-4 text-ink-3"}}</a></li>
+      <li><a href="/me/profile" class="rail-link">{{icon "user-round" class="size-[18px]"}}<span class="flex-1">Your profile &amp; preferences</span>{{icon "chevron-right" class="size-4 text-ink-3"}}</a></li>
+      {{#if (eq user.role "admin")}}
+        <li><a href="/admin/soul" class="rail-link">{{icon "sparkles" class="size-[18px]"}}<span class="flex-1">Personality (SOUL.md)</span>{{icon "chevron-right" class="size-4 text-ink-3"}}</a></li>
+      {{/if}}
+    </ul>
+    <p class="mt-4 px-1 text-xs leading-relaxed text-ink-3">Tell me in chat to “forget” something any time.</p>
+  </section>
+</div>

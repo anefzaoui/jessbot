@@ -1,0 +1,587 @@
+{
+  "model": "openai/gpt-image-2.5-flare",
+  "endpoint": "https://openrouter.ai/api/v1/images",
+  "created": "2026-09-24T17:01:04.708Z",
+  "updated": "2026-09-24T17:04:35.057Z",
+  "totalCost": 0.37466,
+  "images": [
+    {
+      "name": "ai-gpu",
+      "file": "ai-gpu.png",
+      "prompt": "Editorial cover photograph for a news and stories feed: photographic, magazine quality, natural light, shallow depth of field, rich but natural colour, clean composition. Landscape 3:2 image. No text, no lettering, no logos, no brand marks, no real book covers, and no identifiable people. Subject: A sleek, modern graphics card and chip in a macro shot, precise heatsink fins and circuitry, cool blue-violet light, dark background.",
+      "referenceUsed": null,
+      "cost": 0.04165,
+      "generationId": "gen-img-1790269282-wEnlFulRZBgE8oGViZEE",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1536x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 98,
+        "completion_tokens": 1372,
+        "total_tokens": 1470,
+        "cost": 0.04165,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.04165,
+          "upstream_inference_prompt_cost": 0.00049,
+          "upstream_inference_completions_cost": 0.04116
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1372
+        }
+      },
+      "createdAt": "2026-09-24T17:01:41.429Z"
+    },
+    {
+      "name": "book-money",
+      "file": "book-money.png",
+      "prompt": "Editorial cover photograph for a news and stories feed: photographic, magazine quality, natural light, shallow depth of field, rich but natural colour, clean composition. Landscape 3:2 image. No text, no lettering, no logos, no brand marks, no real book covers, and no identifiable people. Subject: A plain notebook, a pen and a few coins arranged on natural linen, understated and minimal, soft daylight.",
+      "referenceUsed": null,
+      "cost": 0.041615,
+      "generationId": "gen-img-1790269416-CY1NRfkzfJzA4wJCnIjm",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1536x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 91,
+        "completion_tokens": 1372,
+        "total_tokens": 1463,
+        "cost": 0.041615,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.041615,
+          "upstream_inference_prompt_cost": 0.000455,
+          "upstream_inference_completions_cost": 0.04116
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1372
+        }
+      },
+      "createdAt": "2026-09-24T17:03:53.589Z"
+    },
+    {
+      "name": "book-range",
+      "file": "book-range.png",
+      "prompt": "Editorial cover photograph for a news and stories feed: photographic, magazine quality, natural light, shallow depth of field, rich but natural colour, clean composition. Landscape 3:2 image. No text, no lettering, no logos, no brand marks, no real book covers, and no identifiable people. Subject: A craftsman's wooden workbench with a varied set of hand tools neatly arranged, warm workshop light.",
+      "referenceUsed": null,
+      "cost": 0.041605,
+      "generationId": "gen-img-1790269456-n4RhIbBmgoSxmP15VOuR",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1536x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 89,
+        "completion_tokens": 1372,
+        "total_tokens": 1461,
+        "cost": 0.041605,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.041605,
+          "upstream_inference_prompt_cost": 0.000445,
+          "upstream_inference_completions_cost": 0.04116
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1372
+        }
+      },
+      "createdAt": "2026-09-24T17:04:35.057Z"
+    },
+    {
+      "name": "book-run",
+      "file": "book-run.png",
+      "prompt": "Editorial cover photograph for a news and stories feed: photographic, magazine quality, natural light, shallow depth of field, rich but natural colour, clean composition. Landscape 3:2 image. No text, no lettering, no logos, no brand marks, no real book covers, and no identifiable people. Subject: A pair of worn running sandals resting on red desert rock, warm late-afternoon sun, textured stone.",
+      "referenceUsed": null,
+      "cost": 0.04161,
+      "generationId": "gen-img-1790269435-ZB7UMrJOAWw0B669HeAc",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1536x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 90,
+        "completion_tokens": 1372,
+        "total_tokens": 1462,
+        "cost": 0.04161,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.04161,
+          "upstream_inference_prompt_cost": 0.00045,
+          "upstream_inference_completions_cost": 0.04116
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1372
+        }
+      },
+      "createdAt": "2026-09-24T17:04:15.319Z"
+    },
+    {
+      "name": "book-weeks",
+      "file": "book-weeks.png",
+      "prompt": "Editorial cover photograph for a news and stories feed: photographic, magazine quality, natural light, shallow depth of field, rich but natural colour, clean composition. Landscape 3:2 image. No text, no lettering, no logos, no brand marks, no real book covers, and no identifiable people. Subject: An hourglass beside an open book with blank-looking pages on a desk, warm evening lamp light, cosy and reflective.",
+      "referenceUsed": null,
+      "cost": 0.041625,
+      "generationId": "gen-img-1790269395-3HwoNIMmuFFHMDQpXtHS",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1536x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 93,
+        "completion_tokens": 1372,
+        "total_tokens": 1465,
+        "cost": 0.041625,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.041625,
+          "upstream_inference_prompt_cost": 0.000465,
+          "upstream_inference_completions_cost": 0.04116
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1372
+        }
+      },
+      "createdAt": "2026-09-24T17:03:35.096Z"
+    },
+    {
+      "name": "markets",
+      "file": "markets.png",
+      "prompt": "Editorial cover photograph for a news and stories feed: photographic, magazine quality, natural light, shallow depth of field, rich but natural colour, clean composition. Landscape 3:2 image. No text, no lettering, no logos, no brand marks, no real book covers, and no identifiable people. Subject: An elegant, abstract close-up of a softly glowing financial market line chart reflected on a pane of glass, calm green tones, bokeh highlights.",
+      "referenceUsed": null,
+      "cost": 0.04165,
+      "generationId": "gen-img-1790269264-hb2knUXXNV7usFMiUUPY",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1536x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 98,
+        "completion_tokens": 1372,
+        "total_tokens": 1470,
+        "cost": 0.04165,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.04165,
+          "upstream_inference_prompt_cost": 0.00049,
+          "upstream_inference_completions_cost": 0.04116
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1372
+        }
+      },
+      "createdAt": "2026-09-24T17:01:20.832Z"
+    },
+    {
+      "name": "running",
+      "file": "running.png",
+      "prompt": "Editorial cover photograph for a news and stories feed: photographic, magazine quality, natural light, shallow depth of field, rich but natural colour, clean composition. Landscape 3:2 image. No text, no lettering, no logos, no brand marks, no real book covers, and no identifiable people. Subject: A forest trail at dawn with a single runner seen from behind, small in the distance, soft mist between the trees, warm golden light.",
+      "referenceUsed": null,
+      "cost": 0.041645,
+      "generationId": "gen-img-1790269303-qDd792PNaJO6f6T6jonr",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1536x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 97,
+        "completion_tokens": 1372,
+        "total_tokens": 1469,
+        "cost": 0.041645,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.041645,
+          "upstream_inference_prompt_cost": 0.000485,
+          "upstream_inference_completions_cost": 0.04116
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1372
+        }
+      },
+      "createdAt": "2026-09-24T17:02:02.124Z"
+    },
+    {
+      "name": "savings",
+      "file": "savings.png",
+      "prompt": "Editorial cover photograph for a news and stories feed: photographic, magazine quality, natural light, shallow depth of field, rich but natural colour, clean composition. Landscape 3:2 image. No text, no lettering, no logos, no brand marks, no real book covers, and no identifiable people. Subject: A glass jar filled with coins on a wooden table, soft morning window light, gentle shadows, calm and hopeful.",
+      "referenceUsed": null,
+      "cost": 0.04162,
+      "generationId": "gen-img-1790269341-gW8uRde1AiEhYg0EpFux",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1536x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 92,
+        "completion_tokens": 1372,
+        "total_tokens": 1464,
+        "cost": 0.04162,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.04162,
+          "upstream_inference_prompt_cost": 0.00046,
+          "upstream_inference_completions_cost": 0.04116
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1372
+        }
+      },
+      "createdAt": "2026-09-24T17:03:14.171Z"
+    },
+    {
+      "name": "voice",
+      "file": "voice.png",
+      "prompt": "Editorial cover photograph for a news and stories feed: photographic, magazine quality, natural light, shallow depth of field, rich but natural colour, clean composition. Landscape 3:2 image. No text, no lettering, no logos, no brand marks, no real book covers, and no identifiable people. Subject: An abstract, soft sound-wave light sculpture: flowing luminous ribbons shaped like an audio waveform, violet and teal light in a dark space.",
+      "referenceUsed": null,
+      "cost": 0.04164,
+      "generationId": "gen-img-1790269323-9aeM89jrxcKgGHj0vzFB",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1536x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 96,
+        "completion_tokens": 1372,
+        "total_tokens": 1468,
+        "cost": 0.04164,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.04164,
+          "upstream_inference_prompt_cost": 0.00048,
+          "upstream_inference_completions_cost": 0.04116
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1372
+        }
+      },
+      "createdAt": "2026-09-24T17:02:20.270Z"
+    }
+  ],
+  "history": [
+    {
+      "name": "markets",
+      "file": "markets.png",
+      "prompt": "Editorial cover photograph for a news and stories feed: photographic, magazine quality, natural light, shallow depth of field, rich but natural colour, clean composition. Landscape 3:2 image. No text, no lettering, no logos, no brand marks, no real book covers, and no identifiable people. Subject: An elegant, abstract close-up of a softly glowing financial market line chart reflected on a pane of glass, calm green tones, bokeh highlights.",
+      "referenceUsed": null,
+      "cost": 0.04165,
+      "generationId": "gen-img-1790269264-hb2knUXXNV7usFMiUUPY",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1536x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 98,
+        "completion_tokens": 1372,
+        "total_tokens": 1470,
+        "cost": 0.04165,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.04165,
+          "upstream_inference_prompt_cost": 0.00049,
+          "upstream_inference_completions_cost": 0.04116
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1372
+        }
+      },
+      "createdAt": "2026-09-24T17:01:20.832Z"
+    },
+    {
+      "name": "ai-gpu",
+      "file": "ai-gpu.png",
+      "prompt": "Editorial cover photograph for a news and stories feed: photographic, magazine quality, natural light, shallow depth of field, rich but natural colour, clean composition. Landscape 3:2 image. No text, no lettering, no logos, no brand marks, no real book covers, and no identifiable people. Subject: A sleek, modern graphics card and chip in a macro shot, precise heatsink fins and circuitry, cool blue-violet light, dark background.",
+      "referenceUsed": null,
+      "cost": 0.04165,
+      "generationId": "gen-img-1790269282-wEnlFulRZBgE8oGViZEE",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1536x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 98,
+        "completion_tokens": 1372,
+        "total_tokens": 1470,
+        "cost": 0.04165,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.04165,
+          "upstream_inference_prompt_cost": 0.00049,
+          "upstream_inference_completions_cost": 0.04116
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1372
+        }
+      },
+      "createdAt": "2026-09-24T17:01:41.429Z"
+    },
+    {
+      "name": "running",
+      "file": "running.png",
+      "prompt": "Editorial cover photograph for a news and stories feed: photographic, magazine quality, natural light, shallow depth of field, rich but natural colour, clean composition. Landscape 3:2 image. No text, no lettering, no logos, no brand marks, no real book covers, and no identifiable people. Subject: A forest trail at dawn with a single runner seen from behind, small in the distance, soft mist between the trees, warm golden light.",
+      "referenceUsed": null,
+      "cost": 0.041645,
+      "generationId": "gen-img-1790269303-qDd792PNaJO6f6T6jonr",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1536x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 97,
+        "completion_tokens": 1372,
+        "total_tokens": 1469,
+        "cost": 0.041645,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.041645,
+          "upstream_inference_prompt_cost": 0.000485,
+          "upstream_inference_completions_cost": 0.04116
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1372
+        }
+      },
+      "createdAt": "2026-09-24T17:02:02.124Z"
+    },
+    {
+      "name": "voice",
+      "file": "voice.png",
+      "prompt": "Editorial cover photograph for a news and stories feed: photographic, magazine quality, natural light, shallow depth of field, rich but natural colour, clean composition. Landscape 3:2 image. No text, no lettering, no logos, no brand marks, no real book covers, and no identifiable people. Subject: An abstract, soft sound-wave light sculpture: flowing luminous ribbons shaped like an audio waveform, violet and teal light in a dark space.",
+      "referenceUsed": null,
+      "cost": 0.04164,
+      "generationId": "gen-img-1790269323-9aeM89jrxcKgGHj0vzFB",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1536x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 96,
+        "completion_tokens": 1372,
+        "total_tokens": 1468,
+        "cost": 0.04164,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.04164,
+          "upstream_inference_prompt_cost": 0.00048,
+          "upstream_inference_completions_cost": 0.04116
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1372
+        }
+      },
+      "createdAt": "2026-09-24T17:02:20.270Z"
+    },
+    {
+      "name": "savings",
+      "file": "savings.png",
+      "prompt": "Editorial cover photograph for a news and stories feed: photographic, magazine quality, natural light, shallow depth of field, rich but natural colour, clean composition. Landscape 3:2 image. No text, no lettering, no logos, no brand marks, no real book covers, and no identifiable people. Subject: A glass jar filled with coins on a wooden table, soft morning window light, gentle shadows, calm and hopeful.",
+      "referenceUsed": null,
+      "cost": 0.04162,
+      "generationId": "gen-img-1790269341-gW8uRde1AiEhYg0EpFux",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1536x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 92,
+        "completion_tokens": 1372,
+        "total_tokens": 1464,
+        "cost": 0.04162,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.04162,
+          "upstream_inference_prompt_cost": 0.00046,
+          "upstream_inference_completions_cost": 0.04116
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1372
+        }
+      },
+      "createdAt": "2026-09-24T17:03:14.171Z"
+    },
+    {
+      "name": "book-weeks",
+      "file": "book-weeks.png",
+      "prompt": "Editorial cover photograph for a news and stories feed: photographic, magazine quality, natural light, shallow depth of field, rich but natural colour, clean composition. Landscape 3:2 image. No text, no lettering, no logos, no brand marks, no real book covers, and no identifiable people. Subject: An hourglass beside an open book with blank-looking pages on a desk, warm evening lamp light, cosy and reflective.",
+      "referenceUsed": null,
+      "cost": 0.041625,
+      "generationId": "gen-img-1790269395-3HwoNIMmuFFHMDQpXtHS",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1536x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 93,
+        "completion_tokens": 1372,
+        "total_tokens": 1465,
+        "cost": 0.041625,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.041625,
+          "upstream_inference_prompt_cost": 0.000465,
+          "upstream_inference_completions_cost": 0.04116
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1372
+        }
+      },
+      "createdAt": "2026-09-24T17:03:35.096Z"
+    },
+    {
+      "name": "book-money",
+      "file": "book-money.png",
+      "prompt": "Editorial cover photograph for a news and stories feed: photographic, magazine quality, natural light, shallow depth of field, rich but natural colour, clean composition. Landscape 3:2 image. No text, no lettering, no logos, no brand marks, no real book covers, and no identifiable people. Subject: A plain notebook, a pen and a few coins arranged on natural linen, understated and minimal, soft daylight.",
+      "referenceUsed": null,
+      "cost": 0.041615,
+      "generationId": "gen-img-1790269416-CY1NRfkzfJzA4wJCnIjm",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1536x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 91,
+        "completion_tokens": 1372,
+        "total_tokens": 1463,
+        "cost": 0.041615,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.041615,
+          "upstream_inference_prompt_cost": 0.000455,
+          "upstream_inference_completions_cost": 0.04116
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1372
+        }
+      },
+      "createdAt": "2026-09-24T17:03:53.589Z"
+    },
+    {
+      "name": "book-run",
+      "file": "book-run.png",
+      "prompt": "Editorial cover photograph for a news and stories feed: photographic, magazine quality, natural light, shallow depth of field, rich but natural colour, clean composition. Landscape 3:2 image. No text, no lettering, no logos, no brand marks, no real book covers, and no identifiable people. Subject: A pair of worn running sandals resting on red desert rock, warm late-afternoon sun, textured stone.",
+      "referenceUsed": null,
+      "cost": 0.04161,
+      "generationId": "gen-img-1790269435-ZB7UMrJOAWw0B669HeAc",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1536x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 90,
+        "completion_tokens": 1372,
+        "total_tokens": 1462,
+        "cost": 0.04161,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.04161,
+          "upstream_inference_prompt_cost": 0.00045,
+          "upstream_inference_completions_cost": 0.04116
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1372
+        }
+      },
+      "createdAt": "2026-09-24T17:04:15.319Z"
+    },
+    {
+      "name": "book-range",
+      "file": "book-range.png",
+      "prompt": "Editorial cover photograph for a news and stories feed: photographic, magazine quality, natural light, shallow depth of field, rich but natural colour, clean composition. Landscape 3:2 image. No text, no lettering, no logos, no brand marks, no real book covers, and no identifiable people. Subject: A craftsman's wooden workbench with a varied set of hand tools neatly arranged, warm workshop light.",
+      "referenceUsed": null,
+      "cost": 0.041605,
+      "generationId": "gen-img-1790269456-n4RhIbBmgoSxmP15VOuR",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1536x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 89,
+        "completion_tokens": 1372,
+        "total_tokens": 1461,
+        "cost": 0.041605,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.041605,
+          "upstream_inference_prompt_cost": 0.000445,
+          "upstream_inference_completions_cost": 0.04116
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1372
+        }
+      },
+      "createdAt": "2026-09-24T17:04:35.057Z"
+    }
+  ]
+}

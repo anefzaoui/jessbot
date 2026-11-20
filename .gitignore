@@ -1,0 +1,29 @@
+# Secrets — never commit
+.env
+.env.*
+!.env.example
+
+# Runtime data (portable, per-install) — see docs/ARCHITECTURE.md
+/data/
+/tools/
+
+# Build output
+/public/css/app.css
+/public/fonts/
+/public/icons.svg
+
+# Dependencies & OS noise
+node_modules/
+npm-debug.log*
+.DS_Store
+Thumbs.db
+
+
+# Dev UI screenshots
+/ui-shots/
+
+# Raw generated image masters (large; optimized WebP in public/img is committed)
+/assets/**/*.png
+
+# JVM crash logs (a test mail server that ran out of memory writes these to the working folder)
+hs_err_pid*.log

@@ -1,0 +1,22 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<title>{{#if title}}{{title}} · {{/if}}{{bot.name}}</title>
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#faf9f7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111113" media="(prefers-color-scheme: dark)">
+{{#if presence.variant}}<link rel="icon" href="/img/avatars/{{presence.variant}}/neutral-256.webp" type="image/webp">{{else}}<link rel="icon" href="/img/favicon.svg" type="image/svg+xml">{{/if}}
+{{!-- Resolve theme + shell state before first paint so nothing flashes or jumps on refresh. --}}
+<script nonce="{{nonce}}">
+  (function () {
+    var d = document.documentElement, t = null, r = null, p = null;
+    try { t = localStorage.getItem('jb-theme'); r = localStorage.getItem('jb-rail'); p = localStorage.getItem('jb-panel'); } catch (e) {}
+    var dark = t ? t === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+    d.classList.toggle('dark', dark);
+    d.classList.add('no-transitions'); // boot: nothing animates into its first state (main.js lifts this)
+    if (r === '"collapsed"') d.dataset.rail = 'collapsed';
+    if (p === '"hidden"') d.dataset.panel = 'hidden';
+  })();
+</script>
+<link rel="preload" href="/fonts/geist-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/css/app.css?v={{assetV}}">
+{{block "head"}}

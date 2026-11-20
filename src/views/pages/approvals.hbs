@@ -1,0 +1,22 @@
+{{!-- Approvals. Data: approvals { pending: [approval], history: [approval] } --}}
+{{> page-header title="Approvals" subtitle="Things I won't do without your OK" width="max-w-3xl"}}
+
+<div class="mx-auto max-w-3xl px-4 py-6 sm:px-6">
+  <section aria-labelledby="pending-approvals">
+    <h2 id="pending-approvals" class="mb-3 flex items-center gap-2 text-sm font-semibold">
+      Waiting on you <span class="count count-warn" data-live-count="approvals" {{#unless approvals.pending}}hidden{{/unless}}>{{approvals.pending.length}}</span>
+    </h2>
+    <div class="space-y-3">
+      {{#each approvals.pending}}{{> approval-card this}}{{else}}
+        {{> empty-state iconName="shield-check" title="Nothing needs your OK" text="Buying, sending, deleting or visiting unfamiliar sites always stops here first. You can change what needs approval in your profile." compact=true}}
+      {{/each}}
+    </div>
+  </section>
+
+  {{#if approvals.history}}
+    <section aria-labelledby="past-approvals" class="mt-10">
+      <h2 id="past-approvals" class="mb-3 text-sm font-semibold">Recent decisions</h2>
+      <div class="space-y-3">{{#each approvals.history}}{{> approval-card this compact=true}}{{/each}}</div>
+    </section>
+  {{/if}}
+</div>

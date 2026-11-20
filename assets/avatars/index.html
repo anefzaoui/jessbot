@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en" data-bg="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jessbot Avatars</title>
+<style>
+  :root { --bg: #0f1114; --panel: #181b20; --tile: #1e2228; --text: #e7e9ec; --muted: #8b929c; --line: #2a2f37; }
+  html[data-bg="light"] { --bg: #f6f5f3; --panel: #ffffff; --tile: #ecebe8; --text: #1d1f23; --muted: #6b7079; --line: #e3e1dd; }
+  html[data-bg="checker"] { --tile: repeating-conic-gradient(#b9b9b9 0% 25%, #eeeeee 0% 50%) 50% / 20px 20px; }
+  html[data-bg="day"] { --tile: url("../backgrounds/day-clear.png") center / cover; }
+  html[data-bg="night"] { --tile: url("../backgrounds/night-rain.png") center / cover; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  header { position: sticky; top: 0; z-index: 1; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; padding: 14px 20px; background: var(--bg); border-bottom: 1px solid var(--line); }
+  h1 { margin: 0; font-size: 18px; font-weight: 600; }
+  .controls { display: flex; gap: 8px; flex-wrap: wrap; }
+  button { font: inherit; padding: 6px 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); color: var(--text); cursor: pointer; }
+  button[aria-pressed="true"] { outline: 2px solid #5b8def; outline-offset: -2px; }
+  main { padding: 16px 20px 40px; }
+  section { margin-bottom: 28px; }
+  h2 { margin: 0 0 10px; font-size: 15px; font-weight: 600; text-transform: capitalize; }
+  h3 { margin: 14px 0 8px; font-size: 12px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+  .row { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+  figure { margin: 0; padding: 8px; border-radius: 12px; background: var(--panel); border: 1px solid var(--line); text-align: center; }
+  .frame { aspect-ratio: 1; border-radius: 8px; background: var(--tile); overflow: hidden; }
+  html.circle .frame { border-radius: 50%; }
+  figure img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  figcaption { margin-top: 6px; color: var(--muted); font-size: 12px; }
+  figure.missing { display: none; }
+  .small .row { grid-template-columns: repeat(auto-fill, minmax(56px, 1fr)); gap: 8px; }
+  .small figure { padding: 4px; }
+  .small figcaption { font-size: 10px; }
+  #anim { display: none; }
+  #anim.on { display: block; }
+  #anim .frame { width: 220px; position: relative; }
+  #anim img { position: absolute; inset: 0; transition: opacity .18s ease; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Jessbot avatars</h1>
+  <div class="controls" id="bgs">
+    <button data-bg="dark" aria-pressed="true">Dark</button>
+    <button data-bg="light" aria-pressed="false">Light</button>
+    <button data-bg="checker" aria-pressed="false">Checker (alpha)</button>
+    <button data-bg="day" aria-pressed="false">Day scene</button>
+    <button data-bg="night" aria-pressed="false">Night rain scene</button>
+  </div>
+  <div class="controls">
+    <button id="circle" aria-pressed="false">Circle crop</button>
+    <button id="small" aria-pressed="false">Small size</button>
+  </div>
+</header>
+<main id="sheet">
+  <section id="anim">
+    <h2>Idle life preview (female, crossfading life frames)</h2>
+    <div class="frame" id="anim-frame"></div>
+  </section>
+</main>
+<script>
+  const VARIANTS = ['female', 'male', 'neutral'];
+  const STATES = ['neutral', 'happy', 'focused', 'thinking', 'curious', 'reading', 'confused', 'surprised', 'concerned', 'proud', 'apologetic', 'excited', 'sleepy'];
+  const LIFE = ['neutral', 'life-blink', 'life-glance-left', 'life-glance-right', 'life-listening'];
+  const sheet = document.getElementById('sheet');
+
+  function tile(src, label) {
+    const fig = document.createElement('figure');
+    const frame = document.createElement('div');
+    frame.className = 'frame';
+    const img = new Image();
+    img.loading = 'lazy';
+    img.alt = label;
+    img.src = src;
+    img.onerror = () => fig.classList.add('missing');
+    frame.append(img);
+    const cap = document.createElement('figcaption');
+    cap.textContent = label;
+    fig.append(frame, cap);
+    return fig;
+  }
+
+  for (const v of VARIANTS) {
+    const section = document.createElement('section');
+    section.innerHTML = `<h2>${v}</h2><h3>Expressions</h3><div class="row states"></div><h3>Life frames (same pose)</h3><div class="row life"></div>`;
+    for (const s of STATES) section.querySelector('.states').append(tile(`${v}/${s}.png`, s));
+    for (const s of LIFE.slice(1)) section.querySelector('.life').append(tile(`${v}/${s}.png`, s.replace('life-', '')));
+    sheet.append(section);
+  }
+
+  // Idle animation preview: neutral as the base, occasional blink / glance / listening crossfades.
+  const animFrame = document.getElementById('anim-frame');
+  const layers = {};
+  let loaded = 0;
+  for (const s of LIFE) {
+    const img = new Image();
+    img.src = `female/${s}.png`;
+    img.style.opacity = s === 'neutral' ? 1 : 0;
+    img.onload = () => { if (++loaded === LIFE.length) { document.getElementById('anim').classList.add('on'); loop(); } };
+    layers[s] = img;
+    animFrame.append(img);
+  }
+  const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+  async function show(s, ms) { layers[s].style.opacity = 1; await wait(ms); layers[s].style.opacity = 0; }
+  async function loop() {
+    for (;;) {
+      await wait(2200 + Math.random() * 2500);
+      const r = Math.random();
+      if (r < 0.5) await show('life-blink', 140);
+      else if (r < 0.7) await show('life-glance-left', 1400);
+      else if (r < 0.9) await show('life-glance-right', 1400);
+      else await show('life-listening', 2600);
+    }
+  }
+
+  const root = document.documentElement;
+  const bgButtons = document.querySelectorAll('#bgs button');
+  bgButtons.forEach((b) => b.onclick = () => {
+    root.dataset.bg = b.dataset.bg;
+    bgButtons.forEach((x) => x.setAttribute('aria-pressed', x === b));
+  });
+  const toggle = (id, target, cls) => {
+    const btn = document.getElementById(id);
+    btn.onclick = () => btn.setAttribute('aria-pressed', target.classList.toggle(cls));
+  };
+  toggle('circle', root, 'circle');
+  toggle('small', sheet, 'small');
+</script>
+</body>
+</html>

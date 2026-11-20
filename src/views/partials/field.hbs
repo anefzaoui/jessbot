@@ -1,0 +1,22 @@
+{{!--
+  Form field with label, hint and server-side error (no-JS path); forms.js renders the same errors client-side.
+  name, label, type (text|email|password|textarea), value (else @root.values[name]), placeholder, hint,
+  autocomplete, required, rows, maxlength, autofocus, inputClass
+--}}
+<div data-field>
+  <label class="label" for="f-{{name}}">{{label}}</label>
+  {{#if (eq type 'textarea')}}
+    <textarea id="f-{{name}}" name="{{name}}" class="textarea {{inputClass}}" rows="{{default rows 3}}"
+      {{#if placeholder}}placeholder="{{placeholder}}"{{/if}} {{#if maxlength}}maxlength="{{maxlength}}"{{/if}}
+      {{#if required}}required{{/if}} {{#if autofocus}}autofocus{{/if}}
+      {{#if (lookup @root.errors name)}}aria-invalid="true" aria-describedby="f-{{name}}-error"{{/if}}>{{default value (lookup @root.values name)}}</textarea>
+  {{else}}
+    <input id="f-{{name}}" name="{{name}}" type="{{default type 'text'}}" class="input {{inputClass}}"
+      value="{{#unless (eq type 'password')}}{{default value (lookup @root.values name)}}{{/unless}}"
+      {{#if placeholder}}placeholder="{{placeholder}}"{{/if}} {{#if autocomplete}}autocomplete="{{autocomplete}}"{{/if}}
+      {{#if maxlength}}maxlength="{{maxlength}}"{{/if}} {{#if required}}required{{/if}} {{#if autofocus}}autofocus{{/if}}
+      {{#if (lookup @root.errors name)}}aria-invalid="true" aria-describedby="f-{{name}}-error"{{/if}}>
+  {{/if}}
+  {{#if (lookup @root.errors name)}}<p class="field-error" id="f-{{name}}-error" data-field-error>{{lookup @root.errors name}}</p>
+  {{else if hint}}<p class="hint">{{hint}}</p>{{/if}}
+</div>

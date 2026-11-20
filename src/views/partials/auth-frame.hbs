@@ -1,0 +1,17 @@
+{{!-- Split frame for sign-in / invite pages: character stage + form. heading, lead --}}
+<div class="grid min-h-dvh lg:grid-cols-[minmax(360px,5fr)_7fr]">
+  <aside class="setup-hero relative hidden overflow-hidden lg:flex lg:flex-col lg:justify-center lg:p-10" aria-hidden="true">
+    <div class="w-fit">{{> avatar size="hero" activity="resting"}}</div>
+    <p class="mt-8 max-w-sm text-3xl leading-tight font-semibold tracking-tight text-balance text-white">{{@root.bot.name}} has been keeping things moving.</p>
+    <p class="mt-3 max-w-sm text-white/70">Sign in to see what got done while you were away.</p>
+  </aside>
+  <main id="main" class="flex items-center px-5 py-10 sm:px-10">
+    <div class="mx-auto w-full max-w-sm">
+      <div class="mb-8 lg:hidden">{{> avatar size="xl" activity="resting"}}</div>
+      <h1 class="text-2xl font-semibold tracking-tight text-balance">{{heading}}</h1>
+      {{#if lead}}<p class="mt-2 text-ink-2 text-pretty">{{lead}}</p>{{/if}}
+      {{#if @root.error}}<div class="mt-5 rounded-xl border border-bad/30 bg-bad-soft px-4 py-3 text-sm" role="alert">{{@root.error}}</div>{{/if}}
+      <div class="mt-8">{{> @partial-block}}</div>
+    </div>
+  </main>
+</div>

@@ -1,0 +1,72 @@
+{{!--
+  Upcoming page body (refreshed live via GET /upcoming/fragments).
+  Data: upcoming { week: [{ label, date, isToday, runs: [{ time, title, kind: alarm|timer|reminder|task|event }], more }],
+    calendar: { connected, events: [{ line, title, location?, recurring, account }] }, alarms: [alarm-card], jobs: [job-card],
+    dates: [{ id, text, ymd, day, month, time?, relLabel, soon, age?, yearly }] (remembered dates in the next two weeks, #196) }
+--}}
+<section aria-label="Next 7 days" class="-mx-4 mb-8 grid grid-cols-[repeat(7,minmax(5.75rem,1fr))] gap-1.5 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0">
+  {{#each upcoming.week}}
+    <div class="min-w-0 rounded-xl border p-2 {{#if isToday}}border-accent/40 bg-accent-soft/40{{else}}border-line bg-surface{{/if}}">
+      <p class="text-xs font-medium {{#if isToday}}text-accent-text{{else}}text-ink-3{{/if}}">{{label}}</p>
+      <p class="tabular text-lg font-semibold">{{this.date}}</p>{{!-- this.: helpers named date/time would shadow the fields --}}
+      <ul class="mt-1.5 space-y-1" role="list">
+        {{#each runs}}<li class="truncate rounded-md px-1.5 py-0.5 text-[11px] {{#if (eq kind 'task')}}bg-accent-soft/60 text-accent-text{{else if (eq kind 'event')}}bg-run-soft text-run{{else}}bg-surface-2 text-ink-2{{/if}}" title="{{this.time}} · {{title}}"><span class="tabular opacity-70">{{this.time}}</span> {{title}}</li>{{/each}}
+        {{#if more}}<li class="px-1.5 text-[11px] text-ink-3">+{{more}} more</li>{{/if}}
+      </ul>
+    </div>
+  {{/each}}
+</section>
+
+<section class="mb-8" aria-labelledby="h-calendar">
+  <div class="mb-3 flex items-center gap-2"><h2 id="h-calendar" class="flex-1 text-sm font-semibold">Your calendar</h2>
+    <a href="/me/connections" class="text-xs text-ink-3 hover:text-ink-2 hover:underline">{{#if upcoming.calendar.connected}}Calendars{{else}}Connect a calendar{{/if}}</a></div>
+  {{#if upcoming.calendar.events}}
+    <ul class="card divide-y divide-line" role="list">
+      {{#each upcoming.calendar.events}}
+        <li class="flex items-center gap-3 px-4 py-2.5 text-sm"><span class="text-run">{{icon "calendar-days" class="size-4"}}</span>
+          <span class="min-w-0 flex-1 truncate">{{line}}</span>{{#if recurring}}<span class="shrink-0 text-ink-3" data-tooltip="Repeats">{{icon "repeat" class="size-3.5"}}</span>{{/if}}</li>
+      {{/each}}
+    </ul>
+  {{else}}
+    <p class="rounded-xl border border-dashed border-line px-4 py-5 text-center text-[13px] text-ink-3">{{#if upcoming.calendar.connected}}Nothing on your calendar this week.{{else}}Connect your calendar (iCloud, Fastmail, Nextcloud…) and I’ll keep what’s coming up in mind.{{/if}}</p>
+  {{/if}}
+</section>
+
+<section class="mb-8" aria-labelledby="h-dates">
+  <div class="mb-3 flex items-center gap-2"><h2 id="h-dates" class="flex-1 text-sm font-semibold">Dates I remember</h2>
+    <a href="/me/memory" class="text-xs text-ink-3 hover:text-ink-2 hover:underline">Memories</a></div>
+  {{#if upcoming.dates.length}}
+    <ul class="card divide-y divide-line" role="list" data-upcoming-dates>
+      {{#each upcoming.dates}}
+        <li class="up-date {{#if soon}}is-soon{{/if}}">
+          <span class="up-date-day" aria-hidden="true"><span class="up-date-month">{{month}}</span><span class="tabular text-base leading-none font-semibold">{{day}}</span></span>
+          <span class="min-w-0 flex-1"><span class="block text-sm text-ink" dir="auto">{{text}}</span>
+            <span class="mt-0.5 flex flex-wrap items-center gap-x-2 text-xs text-ink-3"><span class="up-date-rel">{{relLabel}}{{#if this.time}}, {{this.time}}{{/if}}</span>
+              {{#if age}}<span>turns {{age}}</span>{{/if}}{{#if yearly}}<span class="inline-flex items-center gap-1">{{icon "repeat" class="size-3"}} every year</span>{{/if}}</span></span>
+        </li>
+      {{/each}}
+    </ul>
+  {{else}}
+    <p class="rounded-xl border border-dashed border-line px-4 py-5 text-center text-[13px] text-ink-3">Tell me birthdays, anniversaries and appointments (“Maya’s birthday is 14 March”) and they show here two weeks ahead.</p>
+  {{/if}}
+</section>
+
+<section class="mb-8" aria-labelledby="h-alarms">
+  <h2 id="h-alarms" class="mb-3 text-sm font-semibold">Alarms, reminders & timers</h2>
+  <div class="space-y-2">
+    {{#each upcoming.alarms}}{{> alarm-card this}}{{else}}
+      <p class="rounded-xl border border-dashed border-line px-4 py-5 text-center text-[13px] text-ink-3">None set. Try “wake me at 6:45 on weekdays”, “remind me to call Mum at 6”, or “a 12-minute pasta timer”.</p>
+    {{/each}}
+  </div>
+</section>
+
+<section aria-labelledby="h-jobs">
+  <h2 id="h-jobs" class="mb-3 text-sm font-semibold">Things I do on my own</h2>
+  <div class="space-y-2">
+    {{#each upcoming.jobs}}{{> job-card this}}{{else}}
+      {{#> empty-state iconName="calendar-clock" title="Nothing scheduled yet" text="Ask me to do things on a rhythm: a morning brief, a weekly budget check, a reminder before bills are due." compact=true}}
+        <a href="/chat?draft={{urlencode 'Every weekday at 7am, brief me on '}}" class="btn btn-secondary">{{icon "sunrise" class="size-4"}} Try a morning brief</a>
+      {{/empty-state}}
+    {{/each}}
+  </div>
+</section>

@@ -1,0 +1,22 @@
+{{!--
+  Alarm / reminder / timer row (panel + Upcoming).
+  Contract: { id, kind: alarm|reminder|timer, iconName, noun, label, status, whenLabel, repeatLabel?, fireAt, snoozeCount } + compact?
+--}}
+<article class="card {{#if compact}}p-3{{else}}p-4{{/if}} flex items-center gap-3 {{#if (eq status 'ringing')}}border-warn/50 bg-warn-soft/50{{/if}}" data-alarm-id="{{id}}" data-status="{{status}}" data-noun="{{noun}}" data-label="{{label}}">
+  <span class="grid size-9 shrink-0 place-items-center rounded-xl {{#if (eq status 'ringing')}}alarm-wiggle bg-warn-soft text-warn-text{{else if (eq kind 'timer')}}bg-run-soft text-run{{else}}bg-surface-2 text-ink-2{{/if}}">{{icon iconName class="size-[18px]"}}</span>
+  <div class="min-w-0 flex-1">
+    <h3 class="truncate text-[13px] font-semibold">{{label}}</h3>
+    <p class="mt-0.5 truncate text-xs text-ink-3">
+      {{#if (eq status 'ringing')}}<span class="font-medium text-warn-text">Ringing now</span>
+      {{else if (eq kind 'timer')}}<span class="tabular font-medium text-ink-2" data-countdown="{{fireAt}}">{{whenLabel}}</span> left
+      {{else}}{{noun}} · {{whenLabel}}{{#if (eq status 'snoozed')}} · snoozed{{/if}}{{/if}}
+      {{#if repeatLabel}} · {{repeatLabel}}{{/if}}
+    </p>
+  </div>
+  {{#if (eq status 'ringing')}}
+    <button type="button" class="btn btn-secondary btn-sm" data-alarm-action="snooze">Snooze</button>
+    <button type="button" class="btn btn-primary btn-sm" data-alarm-action="dismiss">Stop</button>
+  {{else}}
+    <button type="button" class="btn btn-ghost btn-icon btn-sm" data-alarm-action="cancel" data-tooltip="Cancel" aria-label="Cancel {{noun}} {{label}}">{{icon "x" class="size-4"}}</button>
+  {{/if}}
+</article>

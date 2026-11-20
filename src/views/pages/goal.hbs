@@ -1,0 +1,192 @@
+{{!--
+  Goal detail (services/goals.js goalDetail). Data: goal (goal-card contract) + {
+    summary?, state, horizon, categoryKey, stage: intake|planning|ready, error?, busyNote?, threadHref?,
+    pendingQuestion? (ask-dock contract + answerUrl, skipUrl),
+    plan: [{ id, title, description?, iconName?, enabled, status: todo|doing|done, failed?, waiting?, when?, href?,
+      doneWhen?, afterIds, after? (titles it still waits for), blocked, queued }],
+    measures: [goal-measure contract: { id, label, unit?, start?, target?, direction, perWeek?, latest?, latestAt?, progress?, thisWeek?, weekLabel?, line, points }],
+    streak? ("6-day streak"), streakDetail: { count, cadence: day|week, label? }, intakeRound (pendingQuestion.round),
+    timeline: [{ id, at: ISO, kind: checkin|action|reply|artifact|milestone|note, iconName, title, detail?, href? }] }
+  categories: [{ value, label, hue }] (edit dialog). Live: 'goal.updated' { id } → public/js/goals.js reloads the page.
+--}}
+{{#> page-header title=goal.title subtitle=goal.category width="max-w-4xl"}}
+  {{#if (eq goal.stage 'ready')}}
+    <button type="button" class="btn btn-secondary btn-sm" data-goal-checkin {{#unless (eq goal.state 'active')}}disabled{{/unless}}>{{icon "refresh-cw" class="size-3.5"}} <span class="hidden sm:inline">Check in now</span></button>
+  {{/if}}
+  <button type="button" class="btn btn-ghost btn-icon btn-sm" popovertarget="goal-menu" aria-haspopup="menu" aria-label="Goal options">{{icon "ellipsis" class="size-4"}}</button>
+  <div id="goal-menu" popover class="menu" role="menu" data-placement="bottom-end">
+    <button type="button" class="menu-item" role="menuitem" data-modal-open="goal-edit">{{icon "pencil" class="size-4"}} Edit goal</button>
+    {{#if goal.threadHref}}<a href="{{goal.threadHref}}" class="menu-item" role="menuitem">{{icon "message-circle" class="size-4"}} Open the goal’s chat</a>{{/if}}
+    {{#if (eq goal.state 'active')}}
+      <button type="button" class="menu-item" role="menuitem" data-goal-patch="state:paused">{{icon "pause" class="size-4"}} Pause</button>
+      <button type="button" class="menu-item" role="menuitem" data-goal-patch="state:done">{{icon "trophy" class="size-4"}} Mark as done</button>
+    {{else}}
+      <button type="button" class="menu-item" role="menuitem" data-goal-patch="state:active">{{icon "play" class="size-4"}} Resume</button>
+    {{/if}}
+    {{#if (eq goal.horizon 'long')}}
+      <button type="button" class="menu-item" role="menuitem" data-goal-patch="horizon:now">{{icon "calendar-range" class="size-4"}} Move back to active goals</button>
+    {{else}}
+      <button type="button" class="menu-item" role="menuitem" data-goal-patch="horizon:long">{{icon "calendar-range" class="size-4"}} Move to longer horizon</button>
+    {{/if}}
+    <div class="menu-sep"></div>
+    <button type="button" class="menu-item is-danger" role="menuitem" data-goal-patch="state:archived">{{icon "archive" class="size-4"}} Archive</button>
+  </div>
+{{/page-header}}
+
+<div class="mx-auto max-w-4xl space-y-6 px-4 py-6 sm:px-6" data-goal-page data-goal-id="{{goal.id}}">
+  {{#if goal.error}}
+    <div class="card flex items-center gap-3 border-bad/30 bg-bad-soft p-4" role="alert">
+      {{icon "triangle-alert" class="size-5 shrink-0 text-bad"}}
+      <p class="min-w-0 flex-1 text-sm">{{goal.error}}</p>
+      <button type="button" class="btn btn-secondary btn-sm" data-goal-retry>{{icon "rotate-ccw" class="size-3.5"}} Retry</button>
+    </div>
+  {{else if goal.busyNote}}
+    <div data-goal-busy>{{> loader label=goal.busyNote motion="planning" iconName="list-todo" noLines=true}}</div>
+  {{/if}}
+
+  {{#if goal.pendingQuestion}}
+    <section aria-label="Questions about this goal" class="space-y-2">
+      {{> chat/ask-dock goal.pendingQuestion}}
+      <p class="text-right"><button type="button" class="btn btn-ghost btn-sm" data-goal-skip>Skip the questions and show me the plan</button></p>
+    </section>
+  {{/if}}
+
+  {{!-- Layer 1: where things stand --}}
+  <section class="card p-5" aria-labelledby="goal-status">
+    <div class="flex items-baseline gap-3">
+      <h2 id="goal-status" class="text-sm font-semibold">Where things stand</h2>
+      {{#if goal.streak}}<span class="goal-streak" title="{{#if (eq goal.streakDetail.cadence 'week')}}Weeks in a row with something logged{{else}}Days in a row with something logged{{/if}}">{{icon "flame" class="size-3.5"}} {{goal.streak}}</span>{{/if}}
+      <p class="tabular ml-auto text-2xl leading-none font-semibold tracking-tight">{{default goal.progress 0}}<span class="text-sm font-medium text-ink-3">%</span></p>
+    </div>
+    {{> progress-bar value=goal.progress label="Goal progress" class="mt-3"}}
+    <p class="mt-4 max-w-[65ch] leading-relaxed text-pretty text-ink">{{default goal.summary goal.statusLine}}</p>
+    {{#if goal.nextStep}}<p class="mt-2 flex items-center gap-1.5 text-sm text-ink-2">{{icon "arrow-right" class="size-3.5 text-accent-text"}} Next: {{goal.nextStep}}</p>{{/if}}
+  </section>
+
+  {{#if (or goal.measures.length (eq goal.state 'active'))}}
+    <section aria-labelledby="goal-numbers">
+      <div class="mb-3 flex items-center gap-3">
+        <h2 id="goal-numbers" class="flex-1 text-sm font-semibold">The numbers</h2>
+        {{#if (eq goal.state 'active')}}<button type="button" class="btn btn-ghost btn-sm" data-measure-new-open aria-expanded="false">{{icon "plus" class="size-3.5"}} Track a number</button>{{/if}}
+      </div>
+      {{!-- A number to track (#212): a level to reach, a rhythm, or both. The new card joins the grid. Client: goals.js --}}
+      <form class="card measure-new" data-measure-new hidden novalidate>
+        <p class="text-sm font-medium">What should I count?</p>
+        <p class="mt-0.5 text-xs text-ink-3">A level to reach (weight 92 to 84 kg), how often (runs, 3 a week), or both.</p>
+        <div class="measure-new-grid">
+          <div data-field class="col-span-2 sm:col-span-1"><label class="label" for="mn-label">Name</label><input id="mn-label" name="label" maxlength="60" class="input" placeholder="Weight, Runs, Pages read" required></div>
+          <div data-field><label class="label" for="mn-unit">Unit <span class="font-normal text-ink-3">(optional)</span></label><input id="mn-unit" name="unit" maxlength="20" class="input" placeholder="kg, km, pages"></div>
+          <div data-field><label class="label" for="mn-start">Now</label><input id="mn-start" name="start" type="number" step="any" inputmode="decimal" class="input tabular" placeholder="92"></div>
+          <div data-field><label class="label" for="mn-target">Target</label><input id="mn-target" name="target" type="number" step="any" inputmode="decimal" class="input tabular" placeholder="84"></div>
+          <div data-field><label class="label" for="mn-week">Times a week</label><input id="mn-week" name="per_week" type="number" min="1" max="21" step="1" inputmode="numeric" class="input tabular" placeholder="3"></div>
+        </div>
+        <p class="field-error" data-measure-new-error hidden></p>
+        <div class="mt-3 flex items-center gap-2">
+          <button type="submit" class="btn btn-primary btn-sm">{{icon "plus" class="size-3.5"}} Start counting</button>
+          <button type="button" class="btn btn-ghost btn-sm" data-measure-new-cancel>Cancel</button>
+        </div>
+      </form>
+      <div class="grid gap-3 @2xl/main:grid-cols-2" data-goal-measures>
+        {{#each goal.measures}}{{> goal-measure this goalId=@root.goal.id disabled=(neq @root.goal.state 'active')}}{{/each}}
+      </div>
+      {{#unless goal.measures.length}}<p class="measure-none" data-measure-none>{{icon "chart-line" class="size-4 shrink-0 text-ink-3"}} <span>No numbers yet. When a goal has one (a weight, runs a week), I count it for you and progress comes from the real figures.</span></p>{{/unless}}
+    </section>
+  {{/if}}
+
+  <div class="grid gap-6 @4xl/main:grid-cols-[1fr_320px]">
+    {{!-- Layer 2: everything I can do --}}
+    <section aria-labelledby="goal-plan">
+      <h2 id="goal-plan" class="mb-3 text-sm font-semibold">Here's everything I can do</h2>
+      <ul class="card divide-y divide-line" role="list">
+        {{#each goal.plan}}
+          <li class="goal-step flex flex-wrap items-start gap-3 p-4" data-plan-id="{{id}}" data-plan-title="{{title}}" data-status="{{status}}" data-kind="{{#if when}}recurring{{else}}once{{/if}}" {{#if blocked}}data-blocked{{/if}}>
+            <span class="mt-0.5 grid size-8 shrink-0 place-items-center rounded-lg
+              {{#if (eq status 'done')}}bg-ok-soft text-ok{{else if waiting}}bg-warn-soft text-warn-text{{else if (eq status 'doing')}}bg-run-soft text-run{{else}}bg-surface-2 text-ink-3{{/if}}">
+              {{#if (eq status 'done')}}{{icon "check" class="size-4"}}{{else if waiting}}{{icon "hand" class="size-4"}}{{else if (eq status 'doing')}}<span class="spinner size-3.5"></span>{{else}}{{icon (default iconName "circle-dashed") class="size-4"}}{{/if}}
+            </span>
+            <div class="min-w-0 flex-1">
+              <p class="text-sm font-semibold {{#if (eq status 'done')}}text-ink-2 line-through decoration-ink-3/40{{/if}}">{{title}}</p>
+              {{#if description}}<p class="mt-0.5 text-[13px] leading-relaxed text-ink-3">{{description}}</p>{{/if}}
+              {{#if doneWhen}}<p class="goal-done-when">{{icon "flag" class="size-3.5"}} <span><span class="font-medium text-ink-2">Done when</span> {{doneWhen}}</span></p>{{/if}}
+              {{#if (or when failed href after (eq status 'doing'))}}
+                <p class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-ink-3">
+                  {{#if when}}<span class="flex items-center gap-1">{{icon "repeat" class="size-3"}} {{this.when}}</span>{{/if}}
+                  {{#if after}}<span class="goal-after {{#if queued}}is-queued{{/if}}">{{icon "hourglass" class="size-3"}} After: {{after}}{{#if queued}}, then it starts by itself{{/if}}</span>{{/if}}
+                  {{#if failed}}<span class="flex items-center gap-1 text-bad">{{icon "triangle-alert" class="size-3"}} Didn’t finish. Switch it on to try again</span>{{/if}}
+                  {{#if waiting}}<span class="font-medium text-warn-text">Waiting for you: answer in the chat</span>{{else if (eq status 'doing')}}{{#unless when}}<span>Working on it…</span>{{/unless}}{{/if}}
+                  {{#if href}}<a href="{{href}}" class="underline decoration-ink-3/40 underline-offset-2 hover:text-ink-2">See the chat</a>{{/if}}
+                </p>
+              {{/if}}
+            </div>
+            {{#unless (eq status 'done')}}
+              {{#if (gt @root.goal.plan.length 1)}}{{#if (eq @root.goal.state 'active')}}<button type="button" class="btn btn-ghost btn-icon btn-sm -my-1 shrink-0" data-step-order
+                data-after="{{#each afterIds}}{{this}} {{/each}}" data-tooltip="What it waits for" aria-label="Change what “{{title}}” waits for">{{icon "list-ordered" class="size-4"}}</button>{{/if}}{{/if}}
+              <label class="mt-1 flex items-center gap-2 text-xs text-ink-3">
+                <span class="sr-only">Let {{@root.bot.name}} do this</span>
+                <input type="checkbox" role="switch" class="switch" data-plan-toggle {{#if enabled}}checked{{/if}} {{#unless (eq @root.goal.state 'active')}}disabled{{/unless}}>
+              </label>
+            {{/unless}}
+          </li>
+        {{else}}
+          <li class="p-6 text-center text-sm text-ink-3">{{#if (eq @root.goal.stage 'planning')}}Laying out the plan…{{else}}Answer a few questions above and I'll lay out a plan.{{/if}}</li>
+        {{/each}}
+      </ul>
+    </section>
+
+    {{!-- Layer 3: full timeline --}}
+    <section aria-labelledby="goal-timeline">
+      <h2 id="goal-timeline" class="mb-3 text-sm font-semibold">Timeline</h2>
+      <ol class="relative ml-2 border-l border-line" role="list">
+        {{#each goal.timeline}}
+          {{> activity-item id=id at=at iconName=iconName title=title detail=detail href=href
+            status=(iff (eq kind 'milestone') 'ok' 'idle')}}
+        {{else}}
+          <li class="pl-5 text-sm text-ink-3">Nothing yet.</li>
+        {{/each}}
+      </ol>
+    </section>
+  </div>
+</div>
+
+{{!-- What a step waits for (public/js/goals.js clones this under the step, hides the step itself, ticks what it waits for). --}}
+<template data-order-template>
+  <form class="goal-order" data-step-order-form novalidate>
+    <p class="text-xs font-medium text-ink-2">It starts by itself once these are done</p>
+    <ul class="mt-2 space-y-1" role="list">
+      {{#each goal.plan}}<li data-order-for="{{id}}"><label class="goal-order-choice {{#if when}}is-off{{/if}}"><input type="checkbox" class="check" name="after" value="{{id}}" {{#if when}}disabled{{/if}}> <span class="min-w-0 truncate" dir="auto">{{title}}</span>{{#if when}}<span class="ms-auto shrink-0 text-[11px] text-ink-3">repeats, never finishes</span>{{else if (eq status 'done')}}<span class="badge badge-ok ms-auto">Done</span>{{/if}}</label></li>{{/each}}
+    </ul>
+    <p class="field-error" data-order-error hidden></p>
+    <div class="mt-3 flex justify-end gap-2">
+      <button type="button" class="btn btn-ghost btn-sm" data-order-cancel>Cancel</button>
+      <button class="btn btn-primary btn-sm">Save the order</button>
+    </div>
+  </form>
+</template>
+
+{{!-- Edit --}}
+<dialog id="goal-edit" class="modal" aria-labelledby="goal-edit-title">
+  <form data-goal-edit novalidate>
+    <div class="modal-header">
+      <h2 id="goal-edit-title" class="text-base font-semibold">Edit goal</h2>
+      <button type="button" class="btn btn-ghost btn-icon btn-sm" data-modal-close aria-label="Close">{{icon "x" class="size-4"}}</button>
+    </div>
+    <div class="modal-body space-y-4">
+      <div data-field>
+        <label for="goal-title" class="label">Goal</label>
+        <input id="goal-title" name="title" class="input" value="{{goal.title}}" maxlength="140" required>
+      </div>
+      <fieldset>
+        <legend class="label">Area of life</legend>
+        <div class="flex flex-wrap gap-1.5">
+          {{#each categories}}
+            <label class="chip cursor-pointer has-[:checked]:border-accent/40 has-[:checked]:bg-accent-soft has-[:checked]:text-accent-text">
+              <input type="radio" name="category" value="{{value}}" class="sr-only" {{#if (eq value @root.goal.categoryKey)}}checked{{/if}}>
+              <span class="size-2 rounded-full" style="background: oklch(0.65 0.14 {{hue}})"></span>{{label}}
+            </label>
+          {{/each}}
+        </div>
+      </fieldset>
+    </div>
+    <div class="modal-footer"><button type="button" class="btn btn-secondary" data-modal-close>Cancel</button><button class="btn btn-primary">Save</button></div>
+  </form>
+</dialog>

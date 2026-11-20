@@ -1,0 +1,53 @@
+{{!--
+  Admin → Personality: edit SOUL.md / AGENTS.md / MEMORY.md with history (decision #53).
+  Data: files [{ key, name, label, active }], lessonsActive, lessonsWaiting (the tabs: partials/admin/personality-nav.hbs),
+        fileKey, fileName, file { label, hint }, body, max,
+        versions [{ id, note, created_at, size, author }]
+--}}
+{{> page-header title="Personality" subtitle=(concat "Who " bot.name " is, and how " bot.name " works") width="max-w-5xl"}}
+<div class="mx-auto max-w-5xl px-4 py-6 sm:px-6">
+  {{> admin/nav active="personality"}}
+
+  {{> admin/personality-nav}}
+
+  <div class="grid gap-6 @4xl/main:grid-cols-[1fr_280px]">
+    <form method="post" action="/admin/personality/{{fileKey}}" class="card flex flex-col p-4" data-ajax data-stay data-busy="Saving…"
+      data-success="Saved. She uses it from the next message." data-personality-form>
+      <p class="mb-3 text-xs text-ink-3">{{file.hint}}{{#if (eq fileName 'SOUL.md')}} Edits inside the identity markers are replaced by the Identity settings.{{/if}}</p>
+      <div data-field>
+        <label class="sr-only" for="ws-body">{{fileName}}</label>
+        <textarea id="ws-body" name="body" class="textarea min-h-[60vh] font-mono text-[13px] leading-relaxed" spellcheck="false" maxlength="{{max}}" data-dirty-guard data-md-editor="{{fileName}}">{{body}}</textarea>
+      </div>
+      <div class="mt-3 flex items-center gap-3">
+        <span class="tabular text-xs text-ink-3" data-char-count data-max="{{max}}"></span>
+        <button class="btn btn-primary btn-sm ml-auto">Save</button>
+      </div>
+    </form>
+
+    <aside aria-labelledby="h-history">
+      <h2 id="h-history" class="mb-2 text-sm font-semibold">History</h2>
+      {{#if versions}}
+        <ol class="card divide-y divide-line overflow-hidden text-[13px]" role="list">
+          {{#each versions}}
+            <li class="flex items-center gap-2 px-3 py-2.5">
+              <div class="min-w-0 flex-1">
+                <p class="truncate font-medium">{{#if @first}}Current{{else}}{{#if (eq note 'original')}}Original{{else}}{{default author 'Someone'}}{{/if}}{{/if}}
+                  {{#unless (eq note 'saved')}}{{#unless (eq note 'original')}}<span class="font-normal text-ink-3">· {{note}}</span>{{/unless}}{{/unless}}</p>
+                <p class="text-xs text-ink-3"><time datetime="{{iso created_at}}" data-relative>{{timeAgo created_at}}</time> · {{size}} chars</p>
+              </div>
+              <a href="/admin/personality/{{@root.fileKey}}/versions/{{id}}" target="_blank" rel="noopener" class="btn btn-ghost btn-icon btn-sm" data-tooltip="View" aria-label="View this version">{{icon "eye" class="size-4"}}</a>
+              {{#unless @first}}
+                <form method="post" action="/admin/personality/{{@root.fileKey}}/restore/{{id}}" data-ajax data-confirm="Restore this version? The current text is kept in history.">
+                  <button class="btn btn-ghost btn-icon btn-sm" data-tooltip="Restore" aria-label="Restore this version">{{icon "rotate-ccw" class="size-4"}}</button>
+                </form>
+              {{/unless}}
+            </li>
+          {{/each}}
+        </ol>
+      {{else}}
+        <p class="rounded-xl border border-dashed border-line px-3 py-4 text-xs text-ink-3">No edits yet. Every save keeps the previous text here, so you can always go back.</p>
+      {{/if}}
+    </aside>
+  </div>
+</div>
+<script type="module" src="/js/personality.js"></script>

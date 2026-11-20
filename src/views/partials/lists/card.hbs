@@ -1,0 +1,28 @@
+{{!--
+  A list on the Lists index. Contract (services/lists.js cardOf): listView + { kindLabel, iconName, openWord, total, pct,
+  preview: [{ text, qty }], more }.
+--}}
+<a href="/lists/{{id}}" class="card card-hover list-card" data-list-id="{{id}}">
+  <div class="flex items-start gap-3 px-4 pt-4">
+    <span class="list-kind" data-kind="{{kind}}">{{icon iconName class="size-[18px]"}}</span>
+    <div class="min-w-0 flex-1">
+      <h3 class="truncate text-[15px] font-semibold" dir="auto">{{title}}</h3>
+      <p class="truncate text-xs text-ink-3">{{#if (eq kind 'wish')}}{{wisher}}’s wishes{{else}}{{kindLabel}}{{/if}}, {{#if shared}}shared with {{scope}}{{else}}just you{{/if}}</p>
+    </div>
+  </div>
+  {{#if preview}}
+    <ul class="list-card-preview" role="list">
+      {{#each preview}}<li><span class="list-card-box" aria-hidden="true"></span><span class="min-w-0 flex-1 truncate" dir="auto">{{text}}</span>{{#if qty}}<span class="tabular shrink-0 text-ink-3">{{qty}}</span>{{/if}}</li>{{/each}}
+      {{#if more}}<li class="text-ink-3"><span class="list-card-box is-more" aria-hidden="true"></span>{{more}} more</li>{{/if}}
+    </ul>
+  {{else if total}}
+    <p class="list-card-note">{{icon "check-check" class="size-4 text-ok"}} Everything’s ticked</p>
+  {{else}}
+    <p class="list-card-note text-ink-3">Nothing on it yet</p>
+  {{/if}}
+  <div class="mt-auto flex items-center gap-3 border-t border-line px-4 py-2.5 text-xs text-ink-3">
+    <span class="shrink-0"><span class="tabular font-medium text-ink-2">{{open}}</span> {{openWord}}</span>
+    {{#if total}}{{> progress-bar value=pct label=(concat title ": done so far") class="min-w-0 flex-1"}}{{else}}<span class="flex-1"></span>{{/if}}
+    <time class="shrink-0" datetime="{{iso updatedAt}}" data-relative>{{timeAgo updatedAt}}</time>
+  </div>
+</a>

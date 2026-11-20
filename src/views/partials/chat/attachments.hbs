@@ -1,0 +1,16 @@
+{{!-- Files attached to a message (mirrored by attachmentsHtml in public/js/composer.js).
+  Contract: attachments = [{ id, title, type, kindLabel, sizeLabel, href, rawUrl, ext, isImage, meta?, missing? }] --}}
+<div class="msg-files" data-attachments>
+  {{#each attachments}}
+    {{#if missing}}
+      <span class="file-chip is-missing">{{icon "file-x" class="size-4"}}<span class="truncate">{{title}}</span></span>
+    {{else if isImage}}
+      <a href="{{rawUrl}}" class="file-shot" data-lightbox="{{rawUrl}}" aria-label="View {{title}}"><img src="{{rawUrl}}" alt="{{title}}" loading="lazy"></a>
+    {{else}}
+      <a href="{{href}}" class="file-chip" data-file-type="{{type}}">
+        <span class="file-chip-icon">{{#if (eq type 'pdf')}}{{icon "file-text" class="size-4"}}{{else if (eq type 'doc')}}{{icon "file-type" class="size-4"}}{{else if (eq type 'sheet')}}{{icon "sheet" class="size-4"}}{{else}}{{icon "file" class="size-4"}}{{/if}}</span>
+        <span class="min-w-0"><span class="block truncate font-medium">{{title}}</span><span class="block truncate text-[11px] opacity-70">{{kindLabel}} · {{sizeLabel}}{{#if meta}} · {{meta}}{{/if}}</span></span>
+      </a>
+    {{/if}}
+  {{/each}}
+</div>

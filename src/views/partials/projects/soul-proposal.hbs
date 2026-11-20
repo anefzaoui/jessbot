@@ -1,0 +1,51 @@
+{{!-- A change to a project soul, waiting for the person (decision #93) — on Jess's reply in the chat and at the top of
+  "Jess here". Data: proposal { id, projectId, status: pending|accepted|rejected|stale, source: jess|ai, reason, quote?, first,
+  diff: [{ key, label, list, before?, after?, added?, removed? }] } (services/project-soul.js proposalView).
+  Client: public/js/project-soul.js (Accept / Keep as is / Try a question). --}}
+<section class="soul-prop" data-soul-proposal="{{proposal.id}}" data-project="{{proposal.projectId}}" data-status="{{proposal.status}}">
+  <header class="flex items-start gap-3 p-4 pb-2">
+    <span class="soul-prop-icon" aria-hidden="true">{{#if (eq proposal.source 'ai')}}{{icon "wand-sparkles" class="size-4"}}{{else}}{{icon "user-round-cog" class="size-4"}}{{/if}}</span>
+    <div class="min-w-0 flex-1">
+      <p class="text-xs font-medium text-ink-3">{{#if (eq proposal.source 'ai')}}{{#if proposal.first}}A first draft of how I work here{{else}}Improved with AI{{/if}}{{else}}I’d like to change how I work here{{/if}}</p>
+      <p class="mt-0.5 text-sm font-medium" dir="auto">{{proposal.reason}}</p>
+      {{#if proposal.quote}}<blockquote class="soul-prop-quote" dir="auto">“{{proposal.quote}}” <span class="text-ink-3">(you)</span></blockquote>{{/if}}
+    </div>
+  </header>
+  <div class="soul-diff">
+    {{#each proposal.diff}}
+      <div class="soul-diff-row">
+        <p class="soul-diff-label">{{label}}</p>
+        {{#if list}}
+          <ul role="list">
+            {{#each removed}}<li class="is-removed" dir="auto"><span aria-hidden="true">−</span><span class="sr-only">Removed:</span> {{this}}</li>{{/each}}
+            {{#each added}}<li class="is-added" dir="auto"><span aria-hidden="true">+</span><span class="sr-only">Added:</span> {{this}}</li>{{/each}}
+          </ul>
+        {{else}}
+          {{#if before}}<p class="is-removed" dir="auto"><span class="sr-only">Was:</span>{{before}}</p>{{/if}}
+          {{#if after}}<p class="is-added" dir="auto"><span class="sr-only">Now:</span>{{after}}</p>{{else}}<p class="text-xs text-ink-3">(removed)</p>{{/if}}
+        {{/if}}
+      </div>
+    {{/each}}
+  </div>
+  {{#if (eq proposal.status 'pending')}}
+    <footer class="proj-card-actions">
+      <button type="button" class="btn btn-primary btn-sm" data-soul-decide="accept">{{icon "check" class="size-4"}} Accept</button>
+      <button type="button" class="btn btn-secondary btn-sm" data-soul-decide="reject">Keep as is</button>
+      <button type="button" class="btn btn-ghost btn-sm ml-auto" data-soul-try-open>{{icon "flask-conical" class="size-4"}} Try it first</button>
+    </footer>
+    <form class="soul-try" data-soul-try data-proposal-id="{{proposal.id}}" hidden>
+      <label class="sr-only" for="try-{{proposal.id}}">A question to try</label>
+      <div class="flex gap-2">
+        <input id="try-{{proposal.id}}" name="question" class="input h-9 min-w-0 flex-1 text-sm" placeholder="Ask something you’d ask in this project…" maxlength="500" dir="auto" autocomplete="off">
+        <button class="btn btn-secondary btn-sm h-9">Ask</button>
+      </div>
+      <div data-soul-try-out></div>
+    </form>
+  {{else}}
+    <p class="soul-prop-status">
+      {{#if (eq proposal.status 'accepted')}}{{icon "circle-check" class="size-4 text-ok"}} Accepted. This is how I work here now.
+      {{else if (eq proposal.status 'rejected')}}{{icon "circle-x" class="size-4 text-ink-3"}} Kept as it was.
+      {{else}}{{icon "history" class="size-4 text-ink-3"}} Out of date: the soul changed since.{{/if}}
+    </p>
+  {{/if}}
+</section>

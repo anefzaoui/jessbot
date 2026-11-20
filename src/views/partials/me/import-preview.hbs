@@ -1,0 +1,37 @@
+{{!--
+  You → Memory → Import, step 2: what I found in the paste or file, to tick before anything is saved.
+  Rendered by POST /api/v1/me/memories/import/preview?fragment=1. Contract: preview = services/memory-import.js
+  previewImport() { format: vcard|json|text, candidates: [{ key, text, kind, date, recurs, dateLabel, source, problem, duplicateOf }],
+  truncated }. A candidate with a problem can't be ticked; one I already remember starts unticked.
+--}}
+<div data-import-preview data-format="{{preview.format}}">
+  {{#if preview.candidates}}
+    <div class="flex flex-wrap items-center gap-2">
+      <p class="flex-1 text-sm text-ink-2"><span class="tabular font-semibold text-ink" data-import-count>0</span> of {{plural preview.candidates.length "memory" "memories"}} chosen
+        {{#if (eq preview.format 'vcard')}}<span class="text-ink-3">from your contacts</span>{{/if}}</p>
+      <button type="button" class="btn btn-ghost btn-sm" data-import-all>Choose all</button>
+      <button type="button" class="btn btn-ghost btn-sm" data-import-none>Choose none</button>
+    </div>
+    <ul class="mem-import-list" role="list">
+      {{#each preview.candidates}}
+        <li class="mem-import-row {{#if problem}}is-problem{{else if duplicateOf}}is-duplicate{{/if}}">
+          <label class="flex min-w-0 flex-1 cursor-pointer items-start gap-3">
+            <input type="checkbox" class="check mt-0.5" data-import-pick data-text="{{text}}" data-kind="{{kind}}" data-date="{{date}}" data-recurs="{{recurs}}"
+              {{#if problem}}disabled{{else}}{{#unless duplicateOf}}checked{{/unless}}{{/if}}>
+            <span class="min-w-0 flex-1">
+              <span class="block text-sm leading-snug" dir="auto">{{text}}</span>
+              <span class="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-ink-3">
+                {{#if dateLabel}}<span class="mem-chip">{{icon "calendar-days" class="size-3"}} {{dateLabel}}</span>{{/if}}
+                {{#if problem}}<span class="font-medium text-bad">{{icon "circle-alert" class="size-3.5"}} Can’t save this: {{problem}}</span>
+                {{else if duplicateOf}}<span>{{icon "check" class="size-3.5 text-ok"}} I already remember this</span>{{/if}}
+              </span>
+            </span>
+          </label>
+        </li>
+      {{/each}}
+    </ul>
+    {{#if preview.truncated}}<p class="mt-2 text-xs text-ink-3">That was long, so these are the first {{preview.candidates.length}}. Import the rest afterwards.</p>{{/if}}
+  {{else}}
+    <p class="rounded-xl border border-dashed border-line px-4 py-6 text-center text-sm text-ink-3">I didn’t find anything to remember in that. Try one fact per line, like “Maya’s birthday is 14 March”.</p>
+  {{/if}}
+</div>

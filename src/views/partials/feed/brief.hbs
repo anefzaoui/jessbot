@@ -1,0 +1,18 @@
+{{!-- Jess's signature brief. brief { id, title, at: ISO, bullets: [string], html } --}}
+<article class="feed-card feed-brief" data-post-id="{{brief.id}}" tabindex="0" aria-labelledby="brief-title">
+  <div class="flex items-center gap-3 px-4 pt-4 sm:px-5">
+    {{> avatar size="lg" activity="resting"}}
+    <div class="min-w-0">
+      <p class="text-xs font-medium text-accent-text">{{@root.bot.name}} · <time datetime="{{iso brief.at}}" data-relative>{{timeAgo brief.at}}</time></p>
+      <h2 id="brief-title" class="text-lg font-semibold tracking-tight">{{brief.title}}</h2>
+    </div>
+  </div>
+  <ul class="space-y-2 px-4 pt-3 pb-1 sm:px-5" role="list">
+    {{#each brief.bullets}}<li class="flex gap-2.5 text-[15px] leading-relaxed text-ink-2"><span class="mt-2.5 size-1.5 shrink-0 rounded-full bg-accent"></span><span>{{this}}</span></li>{{/each}}
+  </ul>
+  <div class="flex items-center gap-2 px-4 pt-2 pb-4 sm:px-5">
+    <span class="btn btn-soft btn-sm">{{icon "book-open" class="size-3.5"}} Read the brief</span>
+    <a href="/chat?draft={{urlencode 'About my brief: '}}" class="btn btn-ghost btn-sm" data-stop-open>{{icon "message-circle" class="size-3.5"}} Reply</a>
+  </div>
+  <template data-post-body>{{{brief.html}}}</template>
+</article>

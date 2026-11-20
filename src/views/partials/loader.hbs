@@ -1,0 +1,9 @@
+{{!-- Work in progress where the result will land (mirrors loader() in public/js/core.js).
+  Contract: { label, motion?: an activity (thinking|reading|writing|searching|planning…), iconName?, noLines?: bool } --}}
+<div class="loader" role="status">
+  <span class="run-glyph" data-motion="{{default motion 'thinking'}}">{{icon (default iconName "sparkles") class="size-4"}}</span>
+  <span class="min-w-0 flex-1">
+    <span class="loader-label">{{label}}</span>
+    {{#unless noLines}}<span class="loader-lines"><i></i><i></i><i></i></span>{{/unless}}
+  </span>
+</div>

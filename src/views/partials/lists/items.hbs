@@ -1,0 +1,51 @@
+{{!--
+  A list's body on the Lists page: how far along it is, the open items (a shopping list in aisle groups), then the done
+  ones. The page renders it and GET /api/v1/lists/:id?fragment=1 re-renders it after every change (live or local).
+  Data: detail = services/lists.js detailOf() { list, groups: [{ name, items }], doneItems, members, isWisher, meta,
+  summary: { open, done, total, pct } }.
+--}}
+<div data-list-items data-open="{{detail.summary.open}}" data-done-count="{{detail.summary.done}}">
+  {{#if detail.summary.total}}
+    <div class="li-summary">
+      <p class="text-sm text-ink-2"><span class="tabular font-semibold text-ink">{{detail.summary.open}}</span> {{detail.meta.openWord}}{{#if detail.summary.done}}<span class="text-ink-3">, {{detail.summary.done}} {{detail.meta.doneWord}}</span>{{/if}}</p>
+      {{> progress-bar value=detail.summary.pct label="Done so far" class="w-24 sm:w-32"}}
+    </div>
+  {{/if}}
+
+  {{#each detail.groups}}
+    <section class="li-group" {{#if name}}aria-labelledby="li-g-{{@index}}"{{else}}aria-label="To do"{{/if}}>
+      {{#if name}}<h2 class="li-group-h" id="li-g-{{@index}}">{{name}} <span class="tabular">{{items.length}}</span></h2>{{/if}}
+      <ul class="li-list" role="list">
+        {{#each items}}{{> lists/item this kind=../../detail.list.kind shared=../../detail.list.shared}}{{/each}}
+      </ul>
+    </section>
+  {{else}}
+    {{#if detail.doneItems}}
+      <div class="li-all-done" role="status">
+        <span class="li-all-done-icon">{{icon "check-check" class="size-6"}}</span>
+        <div class="min-w-0">
+          <p class="font-semibold">All done</p>
+          <p class="text-sm text-ink-3">Everything on “{{detail.list.title}}” is ticked. Clear the ticked ones when you’re ready, or add what comes next.</p>
+        </div>
+      </div>
+    {{else}}
+      <div class="li-empty">
+        {{#> empty-state iconName=detail.list.iconName title="Nothing on this list yet" text=(concat "Type above and press Enter. " (iff detail.list.shared (concat "Everyone in " detail.list.scope " sees it straight away.") "You can also ask me in chat to add things."))}}
+          {{#each detail.meta.examples}}<button type="button" class="chip" data-fill="{{this}}" data-fill-target="list-add-input">{{icon "plus" class="size-3.5"}} {{this}}</button>{{/each}}
+        {{/empty-state}}
+      </div>
+    {{/if}}
+  {{/each}}
+
+  {{#if detail.doneItems}}
+    <section class="li-group li-done" aria-labelledby="li-done-h">
+      <div class="flex items-center gap-2">
+        <h2 class="li-group-h flex-1" id="li-done-h">{{detail.doneTitle}} <span class="tabular">{{detail.doneItems.length}}</span></h2>
+        <button type="button" class="btn btn-ghost btn-sm" data-list-clear-done>{{icon "brush-cleaning" class="size-3.5"}} Clear ticked</button>
+      </div>
+      <ul class="li-list" role="list">
+        {{#each detail.doneItems}}{{> lists/item this kind=../detail.list.kind shared=../detail.list.shared}}{{/each}}
+      </ul>
+    </section>
+  {{/if}}
+</div>

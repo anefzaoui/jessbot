@@ -1,0 +1,98 @@
+{{!--
+  Admin → Browser, second half (services/browser-admin.js browserExtras; decision #195). Re-rendered by each change below.
+  extras: { blockAds, adblockOff: [{ host, until }], links: { checkedAt, counts: { ok, broken, blocked, unchecked }, sites: [{ key, label, area,
+            status: ok|broken|blocked|error|unchecked, statusLabel, at, detail }] }, recipes: [{ id, host, shape, okCount, failCount,
+            lastOkAt }], office: { available, path, source, detail, previews, soffice } }
+  Client: public/js/browser-admin.js
+--}}
+<div class="grid gap-6 @4xl/main:grid-cols-2">
+  <section class="card p-5" aria-labelledby="h-links">
+    <div class="flex items-start gap-3">
+      <div class="min-w-0 flex-1">
+        <h2 id="h-links" class="text-sm font-semibold">Search links</h2>
+        <p class="mt-0.5 text-xs text-ink-3">The ready-made searches {{@root.bot.name}} opens (flights, stays, shops, parcels). One that stopped landing on results is switched off, and she uses the site’s own form instead.
+          {{#if extras.links.checkedAt}}Last checked <time datetime="{{extras.links.checkedAt}}" data-relative>{{timeAgo extras.links.checkedAt}}</time>.{{else}}Not checked yet.{{/if}}
+          Check again with <code class="font-mono">npm run links:check</code>.</p>
+      </div>
+    </div>
+    <p class="mt-3 flex flex-wrap gap-1.5 text-xs">
+      <span class="badge badge-ok">{{extras.links.counts.ok}} work</span>
+      {{#if extras.links.counts.broken}}<span class="badge badge-warn">{{extras.links.counts.broken}} switched off</span>{{/if}}
+      {{#if extras.links.counts.blocked}}<span class="badge badge-neutral">{{extras.links.counts.blocked}} blocked here</span>{{/if}}
+      {{#if extras.links.counts.unchecked}}<span class="badge badge-neutral">{{extras.links.counts.unchecked}} not checked</span>{{/if}}
+    </p>
+    <details class="mt-3">
+      <summary class="cursor-pointer text-xs font-medium text-ink-2 select-none hover:text-ink">Every site ({{extras.links.sites.length}})</summary>
+      <ul class="mt-2 max-h-80 divide-y divide-line overflow-y-auto rounded-xl border border-line" role="list" data-browser-links>
+        {{#each extras.links.sites}}
+          <li class="flex items-center gap-3 px-3 py-2 text-[13px]" data-link-site="{{key}}" data-status="{{status}}">
+            <span class="min-w-0 flex-1"><span class="block truncate font-medium">{{label}}</span>
+              <span class="block truncate text-xs text-ink-3">{{area}}{{#if detail}} · {{detail}}{{/if}}</span></span>
+            <span class="link-state" data-status="{{status}}">{{statusLabel}}</span>
+            {{#if at}}<time class="w-20 shrink-0 text-end text-[11px] text-ink-3" datetime="{{at}}" data-relative>{{timeAgo at}}</time>{{else}}<span class="w-20 shrink-0"></span>{{/if}}
+          </li>
+        {{/each}}
+      </ul>
+    </details>
+  </section>
+
+  <section class="card p-5" aria-labelledby="h-recipes">
+    <h2 id="h-recipes" class="text-sm font-semibold">Learned search pages</h2>
+    <p class="mt-0.5 text-xs text-ink-3">When a search on a site lands on a results page, {{@root.bot.name}} keeps its address shape (parameter names only, never what was searched) so next time she goes straight there. Forget one and she uses the site’s form again.</p>
+    {{#if extras.recipes.length}}
+      <ul class="mt-3 max-h-80 divide-y divide-line overflow-y-auto rounded-xl border border-line" role="list" data-browser-recipes>
+        {{#each extras.recipes}}
+          <li class="flex items-center gap-3 px-3 py-2" data-recipe="{{id}}">
+            <span class="min-w-0 flex-1"><span class="block text-[13px] font-medium">{{host}}</span>
+              <span class="block truncate font-mono text-[11px] text-ink-3" title="{{shape}}" dir="ltr">{{shape}}</span>
+              <span class="block text-[11px] text-ink-3">Worked {{okCount}}×{{#if lastOkAt}}, last <time datetime="{{lastOkAt}}" data-relative>{{timeAgo lastOkAt}}</time>{{/if}}{{#if failCount}} · failed once since{{/if}}</span></span>
+            <button type="button" class="btn btn-ghost btn-sm shrink-0 hover:text-bad" data-recipe-delete data-host="{{host}}">Forget</button>
+          </li>
+        {{/each}}
+      </ul>
+    {{else}}
+      <p class="mt-3 rounded-xl border border-dashed border-line px-4 py-5 text-center text-[13px] text-ink-3">None yet. They’re learned as {{@root.bot.name}} searches sites for you.</p>
+    {{/if}}
+  </section>
+
+  <section class="card p-5" aria-labelledby="h-adblock-off">
+    <h2 id="h-adblock-off" class="text-sm font-semibold">Sites with ad blocking off</h2>
+    <p class="mt-0.5 text-xs text-ink-3">A site that asks for ad blocking to be turned off gets it off for 30 days, by itself.</p>
+    {{#if extras.adblockOff.length}}
+      <ul class="mt-3 divide-y divide-line rounded-xl border border-line" role="list" data-browser-adblock-off>
+        {{#each extras.adblockOff}}
+          <li class="flex items-center gap-3 px-3 py-2 text-[13px]" data-off-host="{{host}}">
+            <span class="min-w-0 flex-1 truncate font-medium" dir="ltr">{{host}}</span>
+            <span class="shrink-0 text-xs text-ink-3">back on <time datetime="{{until}}" data-relative>{{timeAgo until}}</time></span>
+            <button type="button" class="btn btn-ghost btn-sm shrink-0" data-adblock-on>Turn it on now</button>
+          </li>
+        {{/each}}
+      </ul>
+    {{else}}
+      <p class="mt-3 rounded-xl border border-dashed border-line px-4 py-5 text-center text-[13px] text-ink-3">{{#if extras.blockAds}}No site has asked. Blocking is on everywhere.{{else}}Ad blocking is off (Settings above).{{/if}}</p>
+    {{/if}}
+  </section>
+
+  <section class="card p-5" aria-labelledby="h-office">
+    <div class="flex items-start gap-3">
+      <span class="grid size-9 shrink-0 place-items-center rounded-xl {{#if extras.office.available}}bg-ok-soft text-ok{{else}}bg-surface-2 text-ink-3{{/if}}">{{icon "file-text" class="size-[18px]"}}</span>
+      <div class="min-w-0 flex-1">
+        <h2 id="h-office" class="text-sm font-semibold">Office previews</h2>
+        <p class="mt-0.5 text-xs text-ink-3">With LibreOffice installed, Word, Excel and PowerPoint files show as they print, and {{@root.bot.name}} can look at their pages. It runs sandboxed, with a time limit.</p>
+        <p class="mt-2 text-[13px] {{#if extras.office.available}}text-ok{{else}}text-ink-2{{/if}}" data-office-status>{{extras.office.detail}}</p>
+      </div>
+    </div>
+    <form method="post" action="/admin/browser/office" class="mt-4 space-y-3" data-ajax data-stay data-busy="Saving…" data-office-form>
+      <label class="flex items-start gap-3">
+        <input type="checkbox" role="switch" class="switch mt-0.5" name="previews" data-bool {{#if extras.office.previews}}checked{{/if}}>
+        <span class="text-sm">Show printed previews<span class="block text-xs text-ink-3">Off: files show from their text, and LibreOffice is never started.</span></span>
+      </label>
+      <div data-field>
+        <label class="label" for="office-path">Where LibreOffice is <span class="font-normal text-ink-3">(optional)</span></label>
+        <input id="office-path" name="soffice" class="input font-mono text-[13px]" value="{{extras.office.soffice}}" placeholder="Found by itself{{#if extras.office.path}}: {{extras.office.path}}{{/if}}" autocomplete="off" spellcheck="false" dir="ltr">
+        <p class="hint">The full path to soffice (soffice.exe on Windows). Leave it empty to find it by itself.</p>
+      </div>
+      <button class="btn btn-secondary btn-sm">Save</button>
+    </form>
+  </section>
+</div>

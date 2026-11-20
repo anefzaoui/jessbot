@@ -1,0 +1,131 @@
+{{!-- Admin → Usage (Phase 9; balance, fallbacks, pictures and scans: Phase 25 #203). Contract: usage = services/usage.js
+     usageOverview(), balance = partials/admin/balance-card.hbs, prep = services/prep.js prepAdminView() (#212). Client: admin-usage.js (read the balance now). --}}
+{{> page-header title="Usage" subtitle="What thinking costs, and who it's for" width="max-w-5xl"}}
+<div class="mx-auto max-w-5xl px-4 py-6 sm:px-6">
+  {{> admin/nav active="usage"}}
+
+  <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4" data-usage-stats>
+    <div class="card p-4"><p class="text-xs text-ink-3">This week</p><p class="tabular mt-1 text-2xl font-semibold">{{usage.weekLabel}}</p><p class="text-xs text-ink-3">{{usage.weekCalls}} model calls · resets Monday</p></div>
+    <div class="card p-4"><p class="text-xs text-ink-3">Last 30 days</p><p class="tabular mt-1 text-2xl font-semibold">{{usage.monthLabel}}</p><p class="text-xs text-ink-3">{{usage.monthCalls}} calls · {{usage.monthTokens}} tokens</p></div>
+    <div class="contents" data-balance-slot>{{> admin/balance-card balance=balance}}</div>
+    <a href="/admin/model" class="card card-hover p-4"><p class="text-xs text-ink-3">Biggest model</p><p class="mt-1 truncate font-mono text-sm font-semibold">{{#with (lookup usage.models 0)}}{{label}}{{else}}None yet{{/with}}</p><p class="text-xs text-ink-3">{{#with (lookup usage.models 0)}}{{pct}}% of spend{{else}}nothing yet{{/with}}</p></a>
+  </div>
+
+  <div data-balance-gap>{{> admin/balance-gap balance=balance}}</div>
+
+  <section class="card mt-6 p-5" aria-labelledby="h-days">
+    <div class="flex items-baseline justify-between"><h2 id="h-days" class="text-sm font-semibold">Last 30 days</h2><p class="text-xs text-ink-3">Hover a day for its cost</p></div>
+    <div class="usage-chart mt-4" role="img" aria-label="Daily spend over the last 30 days">
+      {{#each usage.days}}<span class="usage-bar" style="--h: {{pct}}%" data-tooltip="{{key}} · {{valueLabel}}"><i></i><b>{{label}}</b></span>{{/each}}
+    </div>
+  </section>
+
+  <section class="mt-6" aria-labelledby="h-people">
+    <h2 id="h-people" class="mb-3 text-sm font-semibold">People this week</h2>
+    <ul class="card divide-y divide-line" role="list">
+      {{#each usage.people}}
+        <li class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-1.5 px-4 py-3 sm:grid-cols-[12rem_minmax(0,1fr)_6rem_5rem]">
+          <a href="/admin/people/{{id}}" class="min-w-0 truncate text-sm font-medium hover:underline">{{name}} {{#if (eq role 'admin')}}<span class="badge badge-neutral ms-1">Admin</span>{{/if}}</a>
+          <div class="order-3 col-span-2 sm:order-none sm:col-span-1">
+            {{#if limited}}
+              <div class="h-2 overflow-hidden rounded-full bg-surface-3" role="progressbar" aria-valuenow="{{pct}}" aria-valuemin="0" aria-valuemax="100" aria-label="{{name}}’s weekly budget used">
+                <div class="h-full rounded-full {{#if (eq tone 'bad')}}bg-bad{{else if (eq tone 'warn')}}bg-warn{{else}}bg-accent{{/if}}" style="width: {{pct}}%"></div>
+              </div>
+            {{else}}<p class="text-xs text-ink-3">No weekly limit</p>{{/if}}
+          </div>
+          <p class="tabular text-end text-sm"><span class="font-semibold">{{spentLabel}}</span> <span class="text-ink-3">/ {{budgetLabel}}</span></p>
+          <p class="tabular hidden text-end text-xs text-ink-3 sm:block" data-tooltip="Last 30 days">{{monthLabel}}</p>
+        </li>
+      {{/each}}
+    </ul>
+    <p class="mt-2 text-xs text-ink-3">Budgets are set per person (or group) under Permissions. When someone reaches theirs, new tasks wait until Monday.</p>
+  </section>
+
+  <div class="mt-6 grid gap-6 md:grid-cols-2">
+    <section class="card p-5" aria-labelledby="h-purpose">
+      <h2 id="h-purpose" class="mb-3 text-sm font-semibold">What it went to <span class="font-normal text-ink-3">· 30 days</span></h2>
+      {{#each usage.purposes}}
+        <div class="mb-2.5 last:mb-0"><div class="flex justify-between text-xs"><span class="text-ink-2">{{label}}</span><span class="tabular text-ink-3">{{costLabel}} · {{pct}}%</span></div>
+          <div class="mt-1 h-1.5 overflow-hidden rounded-full bg-surface-3"><div class="h-full rounded-full bg-run" style="width: {{pct}}%"></div></div></div>
+      {{else}}<p class="text-sm text-ink-3">Nothing yet.</p>{{/each}}
+    </section>
+    <section class="card p-5" aria-labelledby="h-models">
+      <h2 id="h-models" class="mb-3 text-sm font-semibold">Models <span class="font-normal text-ink-3">· 30 days</span></h2>
+      {{#each usage.models}}
+        <div class="mb-2.5 last:mb-0"><div class="flex justify-between gap-3 text-xs"><span class="truncate font-mono text-ink-2">{{label}}</span><span class="tabular shrink-0 text-ink-3">{{costLabel}} · {{n}} calls</span></div>
+          <div class="mt-1 h-1.5 overflow-hidden rounded-full bg-surface-3"><div class="h-full rounded-full bg-accent" style="width: {{pct}}%"></div></div></div>
+      {{else}}<p class="text-sm text-ink-3">Nothing yet.</p>{{/each}}
+      {{!-- Calls a fallback model answered (#179): the main model was down, busy or refused. --}}
+      <div class="usage-fallback" data-usage-fallbacks>
+        {{#if usage.fallbacks.count}}
+          <p class="flex items-center gap-2 text-xs font-medium text-ink-2">{{icon "arrow-down-up" class="size-3.5 text-ink-3"}} {{usage.fallbacks.label}}</p>
+          <p class="mt-1 text-xs text-ink-3">{{#each usage.fallbacks.byModel}}<span class="font-mono">{{model}}</span> {{count}}×{{#unless @last}} · {{/unless}}{{/each}}. The main model was down, busy or refused.</p>
+        {{else}}
+          <p class="flex items-center gap-2 text-xs text-ink-3">{{icon "check" class="size-3.5"}} No fallback was needed: the main model answered every time.</p>
+        {{/if}}
+      </div>
+    </section>
+  </div>
+
+  {{!-- Pictures and reading scans (#169, #151): the two features that cost per use, shown even at zero so the admin knows they exist. --}}
+  <div class="mt-6 grid gap-3 sm:grid-cols-2" aria-label="Pictures and scans, last 30 days">
+    <a href="/admin/model#images" class="card card-hover usage-feature">
+      <span class="usage-feature-icon">{{icon "image" class="size-[18px]"}}</span>
+      <div class="min-w-0 flex-1"><p class="text-sm font-semibold">Pictures</p>
+        <p class="text-xs text-ink-3">{{#if usage.features.image.count}}{{usage.features.image.countLabel}} · {{plural usage.features.image.people "person" "people"}}{{else}}None made in the last 30 days{{/if}}</p></div>
+      <p class="tabular shrink-0 text-sm font-semibold">{{usage.features.image.costLabel}}</p>
+    </a>
+    <div class="card usage-feature">
+      <span class="usage-feature-icon">{{icon "scan-text" class="size-[18px]"}}</span>
+      <div class="min-w-0 flex-1"><p class="text-sm font-semibold">Reading scans</p>
+        <p class="text-xs text-ink-3">{{#if usage.features.ocr.count}}{{usage.features.ocr.countLabel}} · {{plural usage.features.ocr.people "person" "people"}}{{else}}No scanned pages read in the last 30 days{{/if}}</p></div>
+      <p class="tabular shrink-0 text-sm font-semibold">{{usage.features.ocr.costLabel}}</p>
+    </div>
+  </div>
+
+  {{!-- Overnight prep (decision #199; the screen is Phase 25 #212): the nightly cap per person and what it did lately.
+       Client: public/js/prep.js (PUT /api/v1/admin/prep { dailyCap } → { prep }; 422 shows under the field). --}}
+  <section id="prep" class="card mt-6 scroll-mt-20 p-5" aria-labelledby="h-prep" data-prep-admin>
+    <div class="flex flex-wrap items-start gap-4">
+      <span class="prep-icon" aria-hidden="true">{{icon "moon" class="size-[18px]"}}</span>
+      <div class="min-w-0 flex-1 basis-64">
+        <h2 id="h-prep" class="text-sm font-semibold">Overnight prep</h2>
+        <p class="mt-0.5 text-xs leading-relaxed text-ink-3">People who switch it on (You → Notifications) get one of their ideas prepared as a first draft in their quiet hours.
+          It can only search, read and save one document, and stops at this amount per person per night. $0 turns it off for everyone.</p>
+        <p class="mt-2 text-xs text-ink-2" data-prep-people>{{#if prep.people.length}}On for {{#each prep.people}}<a href="/admin/people/{{id}}" class="font-medium hover:underline">{{name}}</a>{{#unless @last}}, {{/unless}}{{/each}}{{else}}Nobody has switched it on yet.{{/if}}</p>
+      </div>
+      <form class="prep-cap" method="put" action="/api/v1/admin/prep" data-ajax data-stay data-prep-cap novalidate>
+        <div data-field>
+          <label class="label" for="prep-cap">Up to, per person per night</label>
+          <div class="prep-cap-row">
+            <span class="prep-cap-unit" aria-hidden="true">$</span>
+            <input id="prep-cap" name="dailyCap" type="number" inputmode="decimal" min="0" max="{{prep.maxCap}}" step="0.01" class="input tabular" value="{{prep.dailyCap}}" required>
+            <button type="submit" class="btn btn-secondary">Save</button>
+          </div>
+        </div>
+        <p class="mt-1 text-xs font-medium" data-prep-cap-state role="status" aria-live="polite">{{#unless prep.dailyCap}}Off for everyone.{{/unless}}</p>
+      </form>
+    </div>
+    <dl class="prep-stats">
+      <div><dt>Nights prepared</dt><dd class="tabular">{{prep.nights}}</dd></div>
+      <div><dt>Drafts made</dt><dd class="tabular">{{prep.drafts}}</dd></div>
+      <div><dt>Spent</dt><dd class="tabular">{{prep.spentLabel}}</dd></div>
+      <p class="prep-stats-note">last 30 days</p>
+    </dl>
+  </section>
+
+  <section class="mt-6" aria-labelledby="h-top">
+    <h2 id="h-top" class="mb-3 text-sm font-semibold">Costliest tasks <span class="font-normal text-ink-3">· 30 days</span></h2>
+    <ul class="card divide-y divide-line" role="list">
+      {{#each usage.top}}
+        <li class="flex items-center gap-3 px-4 py-2.5 text-sm">
+          {{#if threadId}}<a href="/chat/{{threadId}}" class="min-w-0 flex-1 truncate hover:underline">{{title}}</a>{{else}}<span class="min-w-0 flex-1 truncate">{{title}}</span>{{/if}}
+          <span class="shrink-0 text-xs text-ink-3">{{person}}</span>
+          <span class="tabular w-16 shrink-0 text-end font-medium">{{costLabel}}</span>
+        </li>
+      {{else}}
+        <li class="px-4 py-6 text-center text-sm text-ink-3">No tasks yet.</li>
+      {{/each}}
+    </ul>
+  </section>
+</div>

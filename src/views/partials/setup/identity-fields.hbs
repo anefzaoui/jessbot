@@ -1,0 +1,60 @@
+{{!-- Identity fields, shared by setup and Admin → Identity. Uses @root.values, @root.errors, @root.variants, @root.tones. --}}
+
+{{!-- Live preview --}}
+<div class="card flex items-center gap-4 p-4" aria-live="polite">
+  <div data-preview-avatar>
+    {{#if (hasPortrait (default @root.values.variant 'female'))}}
+      <span class="portrait-pick" style="--scene: url('/img/scenes/{{default @root.presence.scene 'day-clear'}}-256.webp')">
+        <img src="/img/avatars/{{default @root.values.variant 'female'}}/{{frameOr (default @root.values.variant 'female') 'happy'}}-256.webp" alt="" data-preview-portrait>
+      </span>
+    {{else}}{{> avatar size="xl" activity="resting"}}{{/if}}
+  </div>
+  <div class="min-w-0">
+    <p class="text-lg font-semibold tracking-tight">Hi, I'm <span data-preview-name>{{default @root.values.name 'Jess'}}</span>.</p>
+    <p class="text-sm text-ink-3">A Jessbot<span data-preview-lineage>{{#unless (eq @root.values.name 'Jess')}}, originally Jess{{/unless}}</span> · <span data-preview-pronouns>{{default @root.values.pronouns 'she/her'}}</span></p>
+    <p class="mt-1 line-clamp-2 text-sm text-ink-2" data-preview-description>{{default @root.values.description 'Your personal agent, always working in the background.'}}</p>
+  </div>
+</div>
+
+{{> field name="name" label="Name" maxlength=24 required=true autocomplete="off" hint="Jess, Jane, Jack, Nova… anything you like."}}
+{{> field name="description" label="In one sentence" type="textarea" rows=2 maxlength=160 placeholder="e.g. Our family's organizer. Keeps the calendar, the groceries and everyone's plans in line."}}
+
+<fieldset>
+  <legend class="label">Look</legend>
+  <div class="grid grid-cols-3 gap-2">
+    {{#each @root.variants}}
+      <label class="choice-card">
+        <input type="radio" name="variant" value="{{value}}" class="sr-only" data-pronouns="{{pronouns}}" {{#if (eq value @root.values.variant)}}checked{{/if}}>
+        <span class="choice-portrait" data-variant="{{value}}">
+          {{#if (hasPortrait value)}}
+            <span class="portrait-pick" style="--scene: url('/img/scenes/{{default @root.presence.scene 'day-clear'}}-256.webp')">
+              <img src="/img/avatars/{{value}}/neutral-256.webp" alt="" loading="lazy">
+            </span>
+          {{else}}{{> avatar size="lg" activity="resting"}}{{/if}}
+        </span>
+        <span class="text-[13px] font-medium">{{label}}</span>
+      </label>
+    {{/each}}
+  </div>
+  {{#if @root.errors.variant}}<p class="field-error">{{@root.errors.variant}}</p>{{/if}}
+</fieldset>
+
+<div data-field>
+  <label class="label" for="f-pronouns">Pronouns</label>
+  <input id="f-pronouns" name="pronouns" class="input" value="{{@root.values.pronouns}}" maxlength="20" placeholder="she/her" autocomplete="off">
+  <p class="hint">Follows the look you picked. Change it if you like.</p>
+</div>
+
+<fieldset>
+  <legend class="label">Tone</legend>
+  <div class="grid gap-2 sm:grid-cols-2">
+    {{#each @root.tones}}
+      <label class="choice-card items-start text-start">
+        <input type="radio" name="tone" value="{{value}}" class="sr-only" {{#if (eq value @root.values.tone)}}checked{{/if}}>
+        <span class="text-[13px] font-semibold">{{label}}</span>
+        <span class="text-xs leading-snug text-ink-3">{{text}}</span>
+      </label>
+    {{/each}}
+  </div>
+  {{#if @root.errors.tone}}<p class="field-error">{{@root.errors.tone}}</p>{{/if}}
+</fieldset>

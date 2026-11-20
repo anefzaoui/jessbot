@@ -1,0 +1,4 @@
+{{!-- Image attached to a run step. Contract: { image, href?, label, detail? }. Mirrored in public/js/run.js (stepImage).
+      A Library preview (href /library/…) opens the item; screenshots (/shots/…) open in the lightbox (lightbox.js). --}}
+{{#if (and href (not (startsWith image "/shots/")))}}<a href="{{href}}" class="step-shot" aria-label="Open {{label}}"><img src="{{image}}" alt="" loading="lazy" width="320" height="200"></a>
+{{~else}}<a href="{{image}}" target="_blank" rel="noopener" class="step-shot" data-lightbox="{{image}}" aria-label="View the screenshot larger"><img src="{{image}}" alt="Screenshot: {{detail}}" loading="lazy" width="320" height="200"></a>{{/if}}

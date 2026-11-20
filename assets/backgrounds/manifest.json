@@ -1,0 +1,1714 @@
+{
+  "model": "openai/gpt-image-2.5-flare",
+  "endpoint": "https://openrouter.ai/api/v1/images",
+  "anchor": "day-clear.png",
+  "created": "2026-09-24T16:10:41.471Z",
+  "updated": "2026-09-24T17:00:21.935Z",
+  "totalCost": 1.591654,
+  "images": [
+    {
+      "timeOfDay": "dawn",
+      "weather": "clear",
+      "concept": "sky-square",
+      "file": "dawn-clear.png",
+      "prompt": "The attached reference image shows the scene. Keep the exact same camera angle, square framing and horizon height, and the same low hill and treeline silhouette along the bottom. Change ONLY the sky, the light and the weather as described. A cinematic, photorealistic open skyscape that fills the entire square frame: almost all sky, seen from a fixed camera looking straight ahead with a very slight upward tilt. Only a very low, soft, location-neutral horizon silhouette of gentle rolling hills and a distant treeline runs along the very bottom of the frame (the bottom 12% of the image), softly out of focus. Composed for a circular crop: the mood of the sky sits inside the inscribed circle; the centre and upper centre of the frame stay calm, soft and uncluttered, because a portrait head will cover them. No key details in the centre or in the corners: any sun, moon, glow, lightning or bright highlight sits off-centre in the upper-left or upper-right area, still inside the circle. Calm, premium, cinematic colour grading with a gentle, soft focus. Strictly outdoor sky: no interior, no room, no window, no window frame, no glass, no buildings, no people, no animals, no text, no logos, no landmarks. Square 1:1 image. Time: dawn. A soft pastel gradient of peach, apricot and lilac, the first light glowing low near the horizon and fading to pale blue higher up. Weather: clear. An open, clean sky with only a few soft, small wisps of cloud.",
+      "referenceUsed": "day-clear.png",
+      "cost": 0.062577,
+      "generationId": "gen-img-1790268608-JegU99kb2gJ9y8hxuukU",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1024x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 1365,
+        "completion_tokens": 1756,
+        "total_tokens": 3121,
+        "cost": 0.062577,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.062577,
+          "upstream_inference_prompt_cost": 0.009897,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "createdAt": "2026-09-24T16:50:29.784Z"
+    },
+    {
+      "timeOfDay": "dawn",
+      "weather": "cloudy",
+      "concept": "sky-square",
+      "file": "dawn-cloudy.png",
+      "prompt": "The attached reference image shows the scene. Keep the exact same camera angle, square framing and horizon height, and the same low hill and treeline silhouette along the bottom. Change ONLY the sky, the light and the weather as described. A cinematic, photorealistic open skyscape that fills the entire square frame: almost all sky, seen from a fixed camera looking straight ahead with a very slight upward tilt. Only a very low, soft, location-neutral horizon silhouette of gentle rolling hills and a distant treeline runs along the very bottom of the frame (the bottom 12% of the image), softly out of focus. Composed for a circular crop: the mood of the sky sits inside the inscribed circle; the centre and upper centre of the frame stay calm, soft and uncluttered, because a portrait head will cover them. No key details in the centre or in the corners: any sun, moon, glow, lightning or bright highlight sits off-centre in the upper-left or upper-right area, still inside the circle. Calm, premium, cinematic colour grading with a gentle, soft focus. Strictly outdoor sky: no interior, no room, no window, no window frame, no glass, no buildings, no people, no animals, no text, no logos, no landmarks. Square 1:1 image. Time: dawn. A soft pastel gradient of peach, apricot and lilac, the first light glowing low near the horizon and fading to pale blue higher up. Weather: cloudy. Layered, soft, voluminous clouds drifting across the sky, catching the light of the time of day.",
+      "referenceUsed": "day-clear.png",
+      "cost": 0.062602,
+      "generationId": "gen-img-1790268636-yGrNIgp8rvGMG5aCVBSb",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1024x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 1370,
+        "completion_tokens": 1756,
+        "total_tokens": 3126,
+        "cost": 0.062602,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.062602,
+          "upstream_inference_prompt_cost": 0.009922,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "createdAt": "2026-09-24T16:50:58.942Z"
+    },
+    {
+      "timeOfDay": "dawn",
+      "weather": "fog",
+      "concept": "sky-square",
+      "file": "dawn-fog.png",
+      "prompt": "The attached reference image shows the scene. Keep the exact same camera angle, square framing and horizon height, and the same low hill and treeline silhouette along the bottom. Change ONLY the sky, the light and the weather as described. A cinematic, photorealistic open skyscape that fills the entire square frame: almost all sky, seen from a fixed camera looking straight ahead with a very slight upward tilt. Only a very low, soft, location-neutral horizon silhouette of gentle rolling hills and a distant treeline runs along the very bottom of the frame (the bottom 12% of the image), softly out of focus. Composed for a circular crop: the mood of the sky sits inside the inscribed circle; the centre and upper centre of the frame stay calm, soft and uncluttered, because a portrait head will cover them. No key details in the centre or in the corners: any sun, moon, glow, lightning or bright highlight sits off-centre in the upper-left or upper-right area, still inside the circle. Calm, premium, cinematic colour grading with a gentle, soft focus. Strictly outdoor sky: no interior, no room, no window, no window frame, no glass, no buildings, no people, no animals, no text, no logos, no landmarks. Square 1:1 image. Time: dawn. A soft pastel gradient of peach, apricot and lilac, the first light glowing low near the horizon and fading to pale blue higher up. Weather: fog. Hazy, diffused light; soft fog and mist veil the sky, and the horizon silhouette almost disappears.",
+      "referenceUsed": "day-clear.png",
+      "cost": 0.062602,
+      "generationId": "gen-img-1790268746-kSedWbQjGefKAT36xLNK",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1024x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 1370,
+        "completion_tokens": 1756,
+        "total_tokens": 3126,
+        "cost": 0.062602,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.062602,
+          "upstream_inference_prompt_cost": 0.009922,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "createdAt": "2026-09-24T16:52:47.570Z"
+    },
+    {
+      "timeOfDay": "dawn",
+      "weather": "rain",
+      "concept": "sky-square",
+      "file": "dawn-rain.png",
+      "prompt": "The attached reference image shows the scene. Keep the exact same camera angle, square framing and horizon height, and the same low hill and treeline silhouette along the bottom. Change ONLY the sky, the light and the weather as described. A cinematic, photorealistic open skyscape that fills the entire square frame: almost all sky, seen from a fixed camera looking straight ahead with a very slight upward tilt. Only a very low, soft, location-neutral horizon silhouette of gentle rolling hills and a distant treeline runs along the very bottom of the frame (the bottom 12% of the image), softly out of focus. Composed for a circular crop: the mood of the sky sits inside the inscribed circle; the centre and upper centre of the frame stay calm, soft and uncluttered, because a portrait head will cover them. No key details in the centre or in the corners: any sun, moon, glow, lightning or bright highlight sits off-centre in the upper-left or upper-right area, still inside the circle. Calm, premium, cinematic colour grading with a gentle, soft focus. Strictly outdoor sky: no interior, no room, no window, no window frame, no glass, no buildings, no people, no animals, no text, no logos, no landmarks. Square 1:1 image. Time: dawn. A soft pastel gradient of peach, apricot and lilac, the first light glowing low near the horizon and fading to pale blue higher up. Weather: rain. Soft grey rain clouds with visible rain curtains falling from them and fine rain streaks in the air, a moist, muted atmosphere (rain in the open air only; nothing on glass or on the lens).",
+      "referenceUsed": "day-clear.png",
+      "cost": 0.062697,
+      "generationId": "gen-img-1790268666-dKeaSKW9oqpx71PeiBGQ",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1024x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 1389,
+        "completion_tokens": 1756,
+        "total_tokens": 3145,
+        "cost": 0.062697,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.062697,
+          "upstream_inference_prompt_cost": 0.010017,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "createdAt": "2026-09-24T16:51:29.840Z"
+    },
+    {
+      "timeOfDay": "dawn",
+      "weather": "snow",
+      "concept": "sky-square",
+      "file": "dawn-snow.png",
+      "prompt": "The attached reference image shows the scene. Keep the exact same camera angle, square framing and horizon height, and the same low hill and treeline silhouette along the bottom. Change ONLY the sky, the light and the weather as described. A cinematic, photorealistic open skyscape that fills the entire square frame: almost all sky, seen from a fixed camera looking straight ahead with a very slight upward tilt. Only a very low, soft, location-neutral horizon silhouette of gentle rolling hills and a distant treeline runs along the very bottom of the frame (the bottom 12% of the image), softly out of focus. Composed for a circular crop: the mood of the sky sits inside the inscribed circle; the centre and upper centre of the frame stay calm, soft and uncluttered, because a portrait head will cover them. No key details in the centre or in the corners: any sun, moon, glow, lightning or bright highlight sits off-centre in the upper-left or upper-right area, still inside the circle. Calm, premium, cinematic colour grading with a gentle, soft focus. Strictly outdoor sky: no interior, no room, no window, no window frame, no glass, no buildings, no people, no animals, no text, no logos, no landmarks. Square 1:1 image. Time: dawn. A soft pastel gradient of peach, apricot and lilac, the first light glowing low near the horizon and fading to pale blue higher up. Weather: snow. A pale, soft sky with gentle snowflakes drifting through the air, and the horizon silhouette dusted with white.",
+      "referenceUsed": "day-clear.png",
+      "cost": 0.062607,
+      "generationId": "gen-img-1790268720-9fY4FbjHICvdviUfa7ju",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1024x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 1371,
+        "completion_tokens": 1756,
+        "total_tokens": 3127,
+        "cost": 0.062607,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.062607,
+          "upstream_inference_prompt_cost": 0.009927,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "createdAt": "2026-09-24T16:52:23.922Z"
+    },
+    {
+      "timeOfDay": "dawn",
+      "weather": "storm",
+      "concept": "sky-square",
+      "file": "dawn-storm.png",
+      "prompt": "The attached reference image shows the scene. Keep the exact same camera angle, square framing and horizon height, and the same low hill and treeline silhouette along the bottom. Change ONLY the sky, the light and the weather as described. A cinematic, photorealistic open skyscape that fills the entire square frame: almost all sky, seen from a fixed camera looking straight ahead with a very slight upward tilt. Only a very low, soft, location-neutral horizon silhouette of gentle rolling hills and a distant treeline runs along the very bottom of the frame (the bottom 12% of the image), softly out of focus. Composed for a circular crop: the mood of the sky sits inside the inscribed circle; the centre and upper centre of the frame stay calm, soft and uncluttered, because a portrait head will cover them. No key details in the centre or in the corners: any sun, moon, glow, lightning or bright highlight sits off-centre in the upper-left or upper-right area, still inside the circle. Calm, premium, cinematic colour grading with a gentle, soft focus. Strictly outdoor sky: no interior, no room, no window, no window frame, no glass, no buildings, no people, no animals, no text, no logos, no landmarks. Square 1:1 image. Time: dawn. A soft pastel gradient of peach, apricot and lilac, the first light glowing low near the horizon and fading to pale blue higher up. Weather: storm. Dramatic, towering dark storm clouds with a distant lightning flash glowing inside the clouds low near the horizon, off to one side.",
+      "referenceUsed": "day-clear.png",
+      "cost": 0.062622,
+      "generationId": "gen-img-1790268694-KQYslSGuH9DHxD1E53PK",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1024x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 1374,
+        "completion_tokens": 1756,
+        "total_tokens": 3130,
+        "cost": 0.062622,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.062622,
+          "upstream_inference_prompt_cost": 0.009942,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "createdAt": "2026-09-24T16:51:57.305Z"
+    },
+    {
+      "timeOfDay": "day",
+      "weather": "clear",
+      "concept": "sky-square",
+      "file": "day-clear.png",
+      "prompt": "A cinematic, photorealistic open skyscape that fills the entire square frame: almost all sky, seen from a fixed camera looking straight ahead with a very slight upward tilt. Only a very low, soft, location-neutral horizon silhouette of gentle rolling hills and a distant treeline runs along the very bottom of the frame (the bottom 12% of the image), softly out of focus. Composed for a circular crop: the mood of the sky sits inside the inscribed circle; the centre and upper centre of the frame stay calm, soft and uncluttered, because a portrait head will cover them. No key details in the centre or in the corners: any sun, moon, glow, lightning or bright highlight sits off-centre in the upper-left or upper-right area, still inside the circle. Calm, premium, cinematic colour grading with a gentle, soft focus. Strictly outdoor sky: no interior, no room, no window, no window frame, no glass, no buildings, no people, no animals, no text, no logos, no landmarks. Square 1:1 image. Time: daytime. A luminous blue sky, paler and brighter toward the horizon. Weather: clear. An open, clean sky with only a few soft, small wisps of cloud.",
+      "referenceUsed": null,
+      "cost": 0.05402,
+      "generationId": "gen-img-1790267353-acpzzvw2mMmzATHT4UJQ",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1024x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 268,
+        "completion_tokens": 1756,
+        "total_tokens": 2024,
+        "cost": 0.05402,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.05402,
+          "upstream_inference_prompt_cost": 0.00134,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "createdAt": "2026-09-24T16:29:40.696Z"
+    },
+    {
+      "timeOfDay": "day",
+      "weather": "cloudy",
+      "concept": "sky-square",
+      "file": "day-cloudy.png",
+      "prompt": "The attached reference image shows the scene. Keep the exact same camera angle, square framing and horizon height, and the same low hill and treeline silhouette along the bottom. Change ONLY the sky, the light and the weather as described. A cinematic, photorealistic open skyscape that fills the entire square frame: almost all sky, seen from a fixed camera looking straight ahead with a very slight upward tilt. Only a very low, soft, location-neutral horizon silhouette of gentle rolling hills and a distant treeline runs along the very bottom of the frame (the bottom 12% of the image), softly out of focus. Composed for a circular crop: the mood of the sky sits inside the inscribed circle; the centre and upper centre of the frame stay calm, soft and uncluttered, because a portrait head will cover them. No key details in the centre or in the corners: any sun, moon, glow, lightning or bright highlight sits off-centre in the upper-left or upper-right area, still inside the circle. Calm, premium, cinematic colour grading with a gentle, soft focus. Strictly outdoor sky: no interior, no room, no window, no window frame, no glass, no buildings, no people, no animals, no text, no logos, no landmarks. Square 1:1 image. Time: daytime. A luminous blue sky, paler and brighter toward the horizon. Weather: cloudy. Layered, soft, voluminous clouds drifting across the sky, catching the light of the time of day.",
+      "referenceUsed": "day-clear.png",
+      "cost": 0.062522,
+      "generationId": "gen-img-1790268770-ikd61R7O7km3zIV5VUns",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1024x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 1354,
+        "completion_tokens": 1756,
+        "total_tokens": 3110,
+        "cost": 0.062522,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.062522,
+          "upstream_inference_prompt_cost": 0.009842,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "createdAt": "2026-09-24T16:53:16.967Z"
+    },
+    {
+      "timeOfDay": "day",
+      "weather": "fog",
+      "concept": "sky-square",
+      "file": "day-fog.png",
+      "prompt": "The attached reference image shows the scene. Keep the exact same camera angle, square framing and horizon height, and the same low hill and treeline silhouette along the bottom. Change ONLY the sky, the light and the weather as described. A cinematic, photorealistic open skyscape that fills the entire square frame: almost all sky, seen from a fixed camera looking straight ahead with a very slight upward tilt. Only a very low, soft, location-neutral horizon silhouette of gentle rolling hills and a distant treeline runs along the very bottom of the frame (the bottom 12% of the image), softly out of focus. Composed for a circular crop: the mood of the sky sits inside the inscribed circle; the centre and upper centre of the frame stay calm, soft and uncluttered, because a portrait head will cover them. No key details in the centre or in the corners: any sun, moon, glow, lightning or bright highlight sits off-centre in the upper-left or upper-right area, still inside the circle. Calm, premium, cinematic colour grading with a gentle, soft focus. Strictly outdoor sky: no interior, no room, no window, no window frame, no glass, no buildings, no people, no animals, no text, no logos, no landmarks. Square 1:1 image. Time: daytime. A luminous blue sky, paler and brighter toward the horizon. Weather: fog. Hazy, diffused light; soft fog and mist veil the sky, and the horizon silhouette almost disappears.",
+      "referenceUsed": "day-clear.png",
+      "cost": 0.062522,
+      "generationId": "gen-img-1790268878-uuRrhZrDgYN6UgDQxwwd",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1024x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 1354,
+        "completion_tokens": 1756,
+        "total_tokens": 3110,
+        "cost": 0.062522,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.062522,
+          "upstream_inference_prompt_cost": 0.009842,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "createdAt": "2026-09-24T16:55:10.661Z"
+    },
+    {
+      "timeOfDay": "day",
+      "weather": "rain",
+      "concept": "sky-square",
+      "file": "day-rain.png",
+      "prompt": "The attached reference image shows the scene. Keep the exact same camera angle, square framing and horizon height, and the same low hill and treeline silhouette along the bottom. Change ONLY the sky, the light and the weather as described. A cinematic, photorealistic open skyscape that fills the entire square frame: almost all sky, seen from a fixed camera looking straight ahead with a very slight upward tilt. Only a very low, soft, location-neutral horizon silhouette of gentle rolling hills and a distant treeline runs along the very bottom of the frame (the bottom 12% of the image), softly out of focus. Composed for a circular crop: the mood of the sky sits inside the inscribed circle; the centre and upper centre of the frame stay calm, soft and uncluttered, because a portrait head will cover them. No key details in the centre or in the corners: any sun, moon, glow, lightning or bright highlight sits off-centre in the upper-left or upper-right area, still inside the circle. Calm, premium, cinematic colour grading with a gentle, soft focus. Strictly outdoor sky: no interior, no room, no window, no window frame, no glass, no buildings, no people, no animals, no text, no logos, no landmarks. Square 1:1 image. Time: daytime. A luminous blue sky, paler and brighter toward the horizon. Weather: rain. Soft grey rain clouds with visible rain curtains falling from them and fine rain streaks in the air, a moist, muted atmosphere (rain in the open air only; nothing on glass or on the lens).",
+      "referenceUsed": "day-clear.png",
+      "cost": 0.062617,
+      "generationId": "gen-img-1790268799-PJ1IfxWJnxpWpSZvv2rG",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1024x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 1373,
+        "completion_tokens": 1756,
+        "total_tokens": 3129,
+        "cost": 0.062617,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.062617,
+          "upstream_inference_prompt_cost": 0.009937,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "createdAt": "2026-09-24T16:53:43.309Z"
+    },
+    {
+      "timeOfDay": "day",
+      "weather": "snow",
+      "concept": "sky-square",
+      "file": "day-snow.png",
+      "prompt": "The attached reference image shows the scene. Keep the exact same camera angle, square framing and horizon height, and the same low hill and treeline silhouette along the bottom. Change ONLY the sky, the light and the weather as described. A cinematic, photorealistic open skyscape that fills the entire square frame: almost all sky, seen from a fixed camera looking straight ahead with a very slight upward tilt. Only a very low, soft, location-neutral horizon silhouette of gentle rolling hills and a distant treeline runs along the very bottom of the frame (the bottom 12% of the image), softly out of focus. Composed for a circular crop: the mood of the sky sits inside the inscribed circle; the centre and upper centre of the frame stay calm, soft and uncluttered, because a portrait head will cover them. No key details in the centre or in the corners: any sun, moon, glow, lightning or bright highlight sits off-centre in the upper-left or upper-right area, still inside the circle. Calm, premium, cinematic colour grading with a gentle, soft focus. Strictly outdoor sky: no interior, no room, no window, no window frame, no glass, no buildings, no people, no animals, no text, no logos, no landmarks. Square 1:1 image. Time: daytime. A luminous blue sky, paler and brighter toward the horizon. Weather: snow. A pale, soft sky with gentle snowflakes drifting through the air, and the horizon silhouette dusted with white.",
+      "referenceUsed": "day-clear.png",
+      "cost": 0.062527,
+      "generationId": "gen-img-1790268851-muGWc4wRFDdUPE6q4x3H",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1024x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 1355,
+        "completion_tokens": 1756,
+        "total_tokens": 3111,
+        "cost": 0.062527,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.062527,
+          "upstream_inference_prompt_cost": 0.009847,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "createdAt": "2026-09-24T16:54:35.784Z"
+    },
+    {
+      "timeOfDay": "day",
+      "weather": "storm",
+      "concept": "sky-square",
+      "file": "day-storm.png",
+      "prompt": "The attached reference image shows the scene. Keep the exact same camera angle, square framing and horizon height, and the same low hill and treeline silhouette along the bottom. Change ONLY the sky, the light and the weather as described. A cinematic, photorealistic open skyscape that fills the entire square frame: almost all sky, seen from a fixed camera looking straight ahead with a very slight upward tilt. Only a very low, soft, location-neutral horizon silhouette of gentle rolling hills and a distant treeline runs along the very bottom of the frame (the bottom 12% of the image), softly out of focus. Composed for a circular crop: the mood of the sky sits inside the inscribed circle; the centre and upper centre of the frame stay calm, soft and uncluttered, because a portrait head will cover them. No key details in the centre or in the corners: any sun, moon, glow, lightning or bright highlight sits off-centre in the upper-left or upper-right area, still inside the circle. Calm, premium, cinematic colour grading with a gentle, soft focus. Strictly outdoor sky: no interior, no room, no window, no window frame, no glass, no buildings, no people, no animals, no text, no logos, no landmarks. Square 1:1 image. Time: daytime. A luminous blue sky, paler and brighter toward the horizon. Weather: storm. Dramatic, towering dark storm clouds with a distant lightning flash glowing inside the clouds low near the horizon, off to one side.",
+      "referenceUsed": "day-clear.png",
+      "cost": 0.062542,
+      "generationId": "gen-img-1790268826-HoWVUFLdoPnXzhyAtxKh",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1024x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 1358,
+        "completion_tokens": 1756,
+        "total_tokens": 3114,
+        "cost": 0.062542,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.062542,
+          "upstream_inference_prompt_cost": 0.009862,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "createdAt": "2026-09-24T16:54:08.846Z"
+    },
+    {
+      "timeOfDay": "dusk",
+      "weather": "clear",
+      "concept": "sky-square",
+      "file": "dusk-clear.png",
+      "prompt": "The attached reference image shows the scene. Keep the exact same camera angle, square framing and horizon height, and the same low hill and treeline silhouette along the bottom. Change ONLY the sky, the light and the weather as described. A cinematic, photorealistic open skyscape that fills the entire square frame: almost all sky, seen from a fixed camera looking straight ahead with a very slight upward tilt. Only a very low, soft, location-neutral horizon silhouette of gentle rolling hills and a distant treeline runs along the very bottom of the frame (the bottom 12% of the image), softly out of focus. Composed for a circular crop: the mood of the sky sits inside the inscribed circle; the centre and upper centre of the frame stay calm, soft and uncluttered, because a portrait head will cover them. No key details in the centre or in the corners: any sun, moon, glow, lightning or bright highlight sits off-centre in the upper-left or upper-right area, still inside the circle. Calm, premium, cinematic colour grading with a gentle, soft focus. Strictly outdoor sky: no interior, no room, no window, no window frame, no glass, no buildings, no people, no animals, no text, no logos, no landmarks. Square 1:1 image. Time: dusk. A warm amber, coral and magenta sunset glow low along the horizon, deepening to violet and indigo higher up. Weather: clear. An open, clean sky with only a few soft, small wisps of cloud.",
+      "referenceUsed": "day-clear.png",
+      "cost": 0.062557,
+      "generationId": "gen-img-1790268913-9ap3dt4GEfbFD29ipDwC",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1024x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 1361,
+        "completion_tokens": 1756,
+        "total_tokens": 3117,
+        "cost": 0.062557,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.062557,
+          "upstream_inference_prompt_cost": 0.009877,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "createdAt": "2026-09-24T16:55:39.242Z"
+    },
+    {
+      "timeOfDay": "dusk",
+      "weather": "cloudy",
+      "concept": "sky-square",
+      "file": "dusk-cloudy.png",
+      "prompt": "The attached reference image shows the scene. Keep the exact same camera angle, square framing and horizon height, and the same low hill and treeline silhouette along the bottom. Change ONLY the sky, the light and the weather as described. A cinematic, photorealistic open skyscape that fills the entire square frame: almost all sky, seen from a fixed camera looking straight ahead with a very slight upward tilt. Only a very low, soft, location-neutral horizon silhouette of gentle rolling hills and a distant treeline runs along the very bottom of the frame (the bottom 12% of the image), softly out of focus. Composed for a circular crop: the mood of the sky sits inside the inscribed circle; the centre and upper centre of the frame stay calm, soft and uncluttered, because a portrait head will cover them. No key details in the centre or in the corners: any sun, moon, glow, lightning or bright highlight sits off-centre in the upper-left or upper-right area, still inside the circle. Calm, premium, cinematic colour grading with a gentle, soft focus. Strictly outdoor sky: no interior, no room, no window, no window frame, no glass, no buildings, no people, no animals, no text, no logos, no landmarks. Square 1:1 image. Time: dusk. A warm amber, coral and magenta sunset glow low along the horizon, deepening to violet and indigo higher up. Weather: cloudy. Layered, soft, voluminous clouds drifting across the sky, catching the light of the time of day.",
+      "referenceUsed": "day-clear.png",
+      "cost": 0.062582,
+      "generationId": "gen-img-1790268942-WQBFxREsyH26qgHXkuBu",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1024x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 1366,
+        "completion_tokens": 1756,
+        "total_tokens": 3122,
+        "cost": 0.062582,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.062582,
+          "upstream_inference_prompt_cost": 0.009902,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "createdAt": "2026-09-24T16:56:03.581Z"
+    },
+    {
+      "timeOfDay": "dusk",
+      "weather": "fog",
+      "concept": "sky-square",
+      "file": "dusk-fog.png",
+      "prompt": "The attached reference image shows the scene. Keep the exact same camera angle, square framing and horizon height, and the same low hill and treeline silhouette along the bottom. Change ONLY the sky, the light and the weather as described. A cinematic, photorealistic open skyscape that fills the entire square frame: almost all sky, seen from a fixed camera looking straight ahead with a very slight upward tilt. Only a very low, soft, location-neutral horizon silhouette of gentle rolling hills and a distant treeline runs along the very bottom of the frame (the bottom 12% of the image), softly out of focus. Composed for a circular crop: the mood of the sky sits inside the inscribed circle; the centre and upper centre of the frame stay calm, soft and uncluttered, because a portrait head will cover them. No key details in the centre or in the corners: any sun, moon, glow, lightning or bright highlight sits off-centre in the upper-left or upper-right area, still inside the circle. Calm, premium, cinematic colour grading with a gentle, soft focus. Strictly outdoor sky: no interior, no room, no window, no window frame, no glass, no buildings, no people, no animals, no text, no logos, no landmarks. Square 1:1 image. Time: dusk. A warm amber, coral and magenta sunset glow low along the horizon, deepening to violet and indigo higher up. Weather: fog. Hazy, diffused light; soft fog and mist veil the sky, and the horizon silhouette almost disappears.",
+      "referenceUsed": "day-clear.png",
+      "cost": 0.062582,
+      "generationId": "gen-img-1790269074-OTCc14z8D3gSmzkAW8BQ",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1024x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 1366,
+        "completion_tokens": 1756,
+        "total_tokens": 3122,
+        "cost": 0.062582,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.062582,
+          "upstream_inference_prompt_cost": 0.009902,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "createdAt": "2026-09-24T16:58:17.623Z"
+    },
+    {
+      "timeOfDay": "dusk",
+      "weather": "rain",
+      "concept": "sky-square",
+      "file": "dusk-rain.png",
+      "prompt": "The attached reference image shows the scene. Keep the exact same camera angle, square framing and horizon height, and the same low hill and treeline silhouette along the bottom. Change ONLY the sky, the light and the weather as described. A cinematic, photorealistic open skyscape that fills the entire square frame: almost all sky, seen from a fixed camera looking straight ahead with a very slight upward tilt. Only a very low, soft, location-neutral horizon silhouette of gentle rolling hills and a distant treeline runs along the very bottom of the frame (the bottom 12% of the image), softly out of focus. Composed for a circular crop: the mood of the sky sits inside the inscribed circle; the centre and upper centre of the frame stay calm, soft and uncluttered, because a portrait head will cover them. No key details in the centre or in the corners: any sun, moon, glow, lightning or bright highlight sits off-centre in the upper-left or upper-right area, still inside the circle. Calm, premium, cinematic colour grading with a gentle, soft focus. Strictly outdoor sky: no interior, no room, no window, no window frame, no glass, no buildings, no people, no animals, no text, no logos, no landmarks. Square 1:1 image. Time: dusk. A warm amber, coral and magenta sunset glow low along the horizon, deepening to violet and indigo higher up. Weather: rain. Soft grey rain clouds with visible rain curtains falling from them and fine rain streaks in the air, a moist, muted atmosphere (rain in the open air only; nothing on glass or on the lens).",
+      "referenceUsed": "day-clear.png",
+      "cost": 0.062677,
+      "generationId": "gen-img-1790268966-h2Ju0n848sQQExEVpkrj",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1024x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 1385,
+        "completion_tokens": 1756,
+        "total_tokens": 3141,
+        "cost": 0.062677,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.062677,
+          "upstream_inference_prompt_cost": 0.009997,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "createdAt": "2026-09-24T16:56:57.764Z"
+    },
+    {
+      "timeOfDay": "dusk",
+      "weather": "snow",
+      "concept": "sky-square",
+      "file": "dusk-snow.png",
+      "prompt": "The attached reference image shows the scene. Keep the exact same camera angle, square framing and horizon height, and the same low hill and treeline silhouette along the bottom. Change ONLY the sky, the light and the weather as described. A cinematic, photorealistic open skyscape that fills the entire square frame: almost all sky, seen from a fixed camera looking straight ahead with a very slight upward tilt. Only a very low, soft, location-neutral horizon silhouette of gentle rolling hills and a distant treeline runs along the very bottom of the frame (the bottom 12% of the image), softly out of focus. Composed for a circular crop: the mood of the sky sits inside the inscribed circle; the centre and upper centre of the frame stay calm, soft and uncluttered, because a portrait head will cover them. No key details in the centre or in the corners: any sun, moon, glow, lightning or bright highlight sits off-centre in the upper-left or upper-right area, still inside the circle. Calm, premium, cinematic colour grading with a gentle, soft focus. Strictly outdoor sky: no interior, no room, no window, no window frame, no glass, no buildings, no people, no animals, no text, no logos, no landmarks. Square 1:1 image. Time: dusk. A warm amber, coral and magenta sunset glow low along the horizon, deepening to violet and indigo higher up. Weather: snow. A pale, soft sky with gentle snowflakes drifting through the air, and the horizon silhouette dusted with white.",
+      "referenceUsed": "day-clear.png",
+      "cost": 0.062587,
+      "generationId": "gen-img-1790269046-JhH4DQpr6UmUyQbVabGX",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1024x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 1367,
+        "completion_tokens": 1756,
+        "total_tokens": 3123,
+        "cost": 0.062587,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.062587,
+          "upstream_inference_prompt_cost": 0.009907,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "createdAt": "2026-09-24T16:57:52.088Z"
+    },
+    {
+      "timeOfDay": "dusk",
+      "weather": "storm",
+      "concept": "sky-square",
+      "file": "dusk-storm.png",
+      "prompt": "The attached reference image shows the scene. Keep the exact same camera angle, square framing and horizon height, and the same low hill and treeline silhouette along the bottom. Change ONLY the sky, the light and the weather as described. A cinematic, photorealistic open skyscape that fills the entire square frame: almost all sky, seen from a fixed camera looking straight ahead with a very slight upward tilt. Only a very low, soft, location-neutral horizon silhouette of gentle rolling hills and a distant treeline runs along the very bottom of the frame (the bottom 12% of the image), softly out of focus. Composed for a circular crop: the mood of the sky sits inside the inscribed circle; the centre and upper centre of the frame stay calm, soft and uncluttered, because a portrait head will cover them. No key details in the centre or in the corners: any sun, moon, glow, lightning or bright highlight sits off-centre in the upper-left or upper-right area, still inside the circle. Calm, premium, cinematic colour grading with a gentle, soft focus. Strictly outdoor sky: no interior, no room, no window, no window frame, no glass, no buildings, no people, no animals, no text, no logos, no landmarks. Square 1:1 image. Time: dusk. A warm amber, coral and magenta sunset glow low along the horizon, deepening to violet and indigo higher up. Weather: storm. Dramatic, towering dark storm clouds with a distant lightning flash glowing inside the clouds low near the horizon, off to one side.",
+      "referenceUsed": "day-clear.png",
+      "cost": 0.062602,
+      "generationId": "gen-img-1790269020-LQeOMebzDBPkAgeT9A6N",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1024x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 1370,
+        "completion_tokens": 1756,
+        "total_tokens": 3126,
+        "cost": 0.062602,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.062602,
+          "upstream_inference_prompt_cost": 0.009922,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "createdAt": "2026-09-24T16:57:23.930Z"
+    },
+    {
+      "timeOfDay": "night",
+      "weather": "clear",
+      "concept": "sky-square",
+      "file": "night-clear.png",
+      "prompt": "The attached reference image shows the scene. Keep the exact same camera angle, square framing and horizon height, and the same low hill and treeline silhouette along the bottom. Change ONLY the sky, the light and the weather as described. A cinematic, photorealistic open skyscape that fills the entire square frame: almost all sky, seen from a fixed camera looking straight ahead with a very slight upward tilt. Only a very low, soft, location-neutral horizon silhouette of gentle rolling hills and a distant treeline runs along the very bottom of the frame (the bottom 12% of the image), softly out of focus. Composed for a circular crop: the mood of the sky sits inside the inscribed circle; the centre and upper centre of the frame stay calm, soft and uncluttered, because a portrait head will cover them. No key details in the centre or in the corners: any sun, moon, glow, lightning or bright highlight sits off-centre in the upper-left or upper-right area, still inside the circle. Calm, premium, cinematic colour grading with a gentle, soft focus. Strictly outdoor sky: no interior, no room, no window, no window frame, no glass, no buildings, no people, no animals, no text, no logos, no landmarks. Square 1:1 image. Time: night. A deep indigo-to-navy night sky with a soft, off-centre moon glow and, where the weather allows, a scattering of fine stars. Weather: clear. An open, clean sky with only a few soft, small wisps of cloud.",
+      "referenceUsed": "day-clear.png",
+      "cost": 0.062587,
+      "generationId": "gen-img-1790269100-BQ8C6jQ4MZdrGRl8zhJi",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1024x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 1367,
+        "completion_tokens": 1756,
+        "total_tokens": 3123,
+        "cost": 0.062587,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.062587,
+          "upstream_inference_prompt_cost": 0.009907,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "createdAt": "2026-09-24T16:58:41.371Z"
+    },
+    {
+      "timeOfDay": "night",
+      "weather": "cloudy",
+      "concept": "sky-square",
+      "file": "night-cloudy.png",
+      "prompt": "The attached reference image shows the scene. Keep the exact same camera angle, square framing and horizon height, and the same low hill and treeline silhouette along the bottom. Change ONLY the sky, the light and the weather as described. A cinematic, photorealistic open skyscape that fills the entire square frame: almost all sky, seen from a fixed camera looking straight ahead with a very slight upward tilt. Only a very low, soft, location-neutral horizon silhouette of gentle rolling hills and a distant treeline runs along the very bottom of the frame (the bottom 12% of the image), softly out of focus. Composed for a circular crop: the mood of the sky sits inside the inscribed circle; the centre and upper centre of the frame stay calm, soft and uncluttered, because a portrait head will cover them. No key details in the centre or in the corners: any sun, moon, glow, lightning or bright highlight sits off-centre in the upper-left or upper-right area, still inside the circle. Calm, premium, cinematic colour grading with a gentle, soft focus. Strictly outdoor sky: no interior, no room, no window, no window frame, no glass, no buildings, no people, no animals, no text, no logos, no landmarks. Square 1:1 image. Time: night. A deep indigo-to-navy night sky with a soft, off-centre moon glow and, where the weather allows, a scattering of fine stars. Weather: cloudy. Layered, soft, voluminous clouds drifting across the sky, catching the light of the time of day.",
+      "referenceUsed": "day-clear.png",
+      "cost": 0.062612,
+      "generationId": "gen-img-1790269124-FK4tlbVfYnz5b9Oy4UEy",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1024x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 1372,
+        "completion_tokens": 1756,
+        "total_tokens": 3128,
+        "cost": 0.062612,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.062612,
+          "upstream_inference_prompt_cost": 0.009932,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "createdAt": "2026-09-24T16:59:05.647Z"
+    },
+    {
+      "timeOfDay": "night",
+      "weather": "fog",
+      "concept": "sky-square",
+      "file": "night-fog.png",
+      "prompt": "The attached reference image shows the scene. Keep the exact same camera angle, square framing and horizon height, and the same low hill and treeline silhouette along the bottom. Change ONLY the sky, the light and the weather as described. A cinematic, photorealistic open skyscape that fills the entire square frame: almost all sky, seen from a fixed camera looking straight ahead with a very slight upward tilt. Only a very low, soft, location-neutral horizon silhouette of gentle rolling hills and a distant treeline runs along the very bottom of the frame (the bottom 12% of the image), softly out of focus. Composed for a circular crop: the mood of the sky sits inside the inscribed circle; the centre and upper centre of the frame stay calm, soft and uncluttered, because a portrait head will cover them. No key details in the centre or in the corners: any sun, moon, glow, lightning or bright highlight sits off-centre in the upper-left or upper-right area, still inside the circle. Calm, premium, cinematic colour grading with a gentle, soft focus. Strictly outdoor sky: no interior, no room, no window, no window frame, no glass, no buildings, no people, no animals, no text, no logos, no landmarks. Square 1:1 image. Time: night. A deep indigo-to-navy night sky with a soft, off-centre moon glow and, where the weather allows, a scattering of fine stars. Weather: fog. Hazy, diffused light; soft fog and mist veil the sky, and the horizon silhouette almost disappears.",
+      "referenceUsed": "day-clear.png",
+      "cost": 0.062612,
+      "generationId": "gen-img-1790269198-CQZSMBc56UoYUPZDypJw",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1024x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 1372,
+        "completion_tokens": 1756,
+        "total_tokens": 3128,
+        "cost": 0.062612,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.062612,
+          "upstream_inference_prompt_cost": 0.009932,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "createdAt": "2026-09-24T17:00:21.935Z"
+    },
+    {
+      "timeOfDay": "night",
+      "weather": "rain",
+      "concept": "sky-square",
+      "file": "night-rain.png",
+      "prompt": "The attached reference image shows the scene. Keep the exact same camera angle, square framing and horizon height, and the same low hill and treeline silhouette along the bottom. Change ONLY the sky, the light and the weather as described. A cinematic, photorealistic open skyscape that fills the entire square frame: almost all sky, seen from a fixed camera looking straight ahead with a very slight upward tilt. Only a very low, soft, location-neutral horizon silhouette of gentle rolling hills and a distant treeline runs along the very bottom of the frame (the bottom 12% of the image), softly out of focus. Composed for a circular crop: the mood of the sky sits inside the inscribed circle; the centre and upper centre of the frame stay calm, soft and uncluttered, because a portrait head will cover them. No key details in the centre or in the corners: any sun, moon, glow, lightning or bright highlight sits off-centre in the upper-left or upper-right area, still inside the circle. Calm, premium, cinematic colour grading with a gentle, soft focus. Strictly outdoor sky: no interior, no room, no window, no window frame, no glass, no buildings, no people, no animals, no text, no logos, no landmarks. Square 1:1 image. Time: night. A deep indigo-to-navy night sky with a soft, off-centre moon glow and, where the weather allows, a scattering of fine stars. Weather: rain. Soft grey rain clouds with visible rain curtains falling from them and fine rain streaks in the air, a moist, muted atmosphere (rain in the open air only; nothing on glass or on the lens).",
+      "referenceUsed": "day-clear.png",
+      "cost": 0.062707,
+      "generationId": "gen-img-1790267383-SjeFB1PkwxYZtBfkmWxY",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1024x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 1391,
+        "completion_tokens": 1756,
+        "total_tokens": 3147,
+        "cost": 0.062707,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.062707,
+          "upstream_inference_prompt_cost": 0.010027,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "createdAt": "2026-09-24T16:30:05.633Z"
+    },
+    {
+      "timeOfDay": "night",
+      "weather": "snow",
+      "concept": "sky-square",
+      "file": "night-snow.png",
+      "prompt": "The attached reference image shows the scene. Keep the exact same camera angle, square framing and horizon height, and the same low hill and treeline silhouette along the bottom. Change ONLY the sky, the light and the weather as described. A cinematic, photorealistic open skyscape that fills the entire square frame: almost all sky, seen from a fixed camera looking straight ahead with a very slight upward tilt. Only a very low, soft, location-neutral horizon silhouette of gentle rolling hills and a distant treeline runs along the very bottom of the frame (the bottom 12% of the image), softly out of focus. Composed for a circular crop: the mood of the sky sits inside the inscribed circle; the centre and upper centre of the frame stay calm, soft and uncluttered, because a portrait head will cover them. No key details in the centre or in the corners: any sun, moon, glow, lightning or bright highlight sits off-centre in the upper-left or upper-right area, still inside the circle. Calm, premium, cinematic colour grading with a gentle, soft focus. Strictly outdoor sky: no interior, no room, no window, no window frame, no glass, no buildings, no people, no animals, no text, no logos, no landmarks. Square 1:1 image. Time: night. A deep indigo-to-navy night sky with a soft, off-centre moon glow and, where the weather allows, a scattering of fine stars. Weather: snow. A pale, soft sky with gentle snowflakes drifting through the air, and the horizon silhouette dusted with white.",
+      "referenceUsed": "day-clear.png",
+      "cost": 0.062617,
+      "generationId": "gen-img-1790269173-IvfKY6fDeU69m1r37uRV",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1024x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 1373,
+        "completion_tokens": 1756,
+        "total_tokens": 3129,
+        "cost": 0.062617,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.062617,
+          "upstream_inference_prompt_cost": 0.009937,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "createdAt": "2026-09-24T16:59:55.978Z"
+    },
+    {
+      "timeOfDay": "night",
+      "weather": "storm",
+      "concept": "sky-square",
+      "file": "night-storm.png",
+      "prompt": "The attached reference image shows the scene. Keep the exact same camera angle, square framing and horizon height, and the same low hill and treeline silhouette along the bottom. Change ONLY the sky, the light and the weather as described. A cinematic, photorealistic open skyscape that fills the entire square frame: almost all sky, seen from a fixed camera looking straight ahead with a very slight upward tilt. Only a very low, soft, location-neutral horizon silhouette of gentle rolling hills and a distant treeline runs along the very bottom of the frame (the bottom 12% of the image), softly out of focus. Composed for a circular crop: the mood of the sky sits inside the inscribed circle; the centre and upper centre of the frame stay calm, soft and uncluttered, because a portrait head will cover them. No key details in the centre or in the corners: any sun, moon, glow, lightning or bright highlight sits off-centre in the upper-left or upper-right area, still inside the circle. Calm, premium, cinematic colour grading with a gentle, soft focus. Strictly outdoor sky: no interior, no room, no window, no window frame, no glass, no buildings, no people, no animals, no text, no logos, no landmarks. Square 1:1 image. Time: night. A deep indigo-to-navy night sky with a soft, off-centre moon glow and, where the weather allows, a scattering of fine stars. Weather: storm. Dramatic, towering dark storm clouds with a distant lightning flash glowing inside the clouds low near the horizon, off to one side.",
+      "referenceUsed": "day-clear.png",
+      "cost": 0.062632,
+      "generationId": "gen-img-1790269148-NJmhrVPnjfZsCUIldPIX",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1024x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 1376,
+        "completion_tokens": 1756,
+        "total_tokens": 3132,
+        "cost": 0.062632,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.062632,
+          "upstream_inference_prompt_cost": 0.009952,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "createdAt": "2026-09-24T16:59:30.290Z"
+    }
+  ],
+  "history": [
+    {
+      "timeOfDay": "day",
+      "weather": "clear",
+      "file": "_rejected-window/day-clear.png",
+      "prompt": "Cinematic, photorealistic interior view from inside an elegant, modern, minimal luxury home, looking straight out through a large floor-to-ceiling glass window that fills most of the frame. Slim dark window frames appear only near the left and right edges; the centre of the image is an unobstructed view through the glass. A subtle hint of the calm, minimal interior at the very bottom edge (a low, clean sill and soft floor reflections) and at the extreme sides; nothing in the centre of the frame. Outside: a softly blurred, location-neutral landscape of gentle rolling hills and scattered trees, with a distant small city whose soft lights sit along the horizon; no recognizable landmarks. The horizon sits slightly below the middle of the frame. A gentle depth-of-field blur over the whole scene, as if the camera is focused on a person standing close in front of it, so a portrait reads clearly on top. Calm, premium, cinematic colour grading. Landscape 3:2 image. No people, no animals, no text, no logos. Time of day: full daytime. Bright, natural daylight and a luminous sky. Weather: clear. An open, cloudless sky; if the sun is up, warm sunlight streams in through the glass and falls softly into the room.",
+      "referenceUsed": null,
+      "cost": 0.04249,
+      "generationId": "gen-img-1790266241-h9SgKpCAPo3w49ZWswVh",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1536x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 266,
+        "completion_tokens": 1372,
+        "total_tokens": 1638,
+        "cost": 0.04249,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.04249,
+          "upstream_inference_prompt_cost": 0.00133,
+          "upstream_inference_completions_cost": 0.04116
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1372
+        }
+      },
+      "createdAt": "2026-09-24T16:10:59.727Z",
+      "archived": true,
+      "concept": "window-interior (rejected)"
+    },
+    {
+      "timeOfDay": "night",
+      "weather": "rain",
+      "file": "_rejected-window/night-rain.png",
+      "prompt": "The attached reference image shows the scene. Keep the same room, the same floor-to-ceiling window and frames, the same vantage point, camera position, lens and composition, and the same landscape (hills, trees and distant city in the same places). Change ONLY the time of day, the light, the sky and the weather as described. Cinematic, photorealistic interior view from inside an elegant, modern, minimal luxury home, looking straight out through a large floor-to-ceiling glass window that fills most of the frame. Slim dark window frames appear only near the left and right edges; the centre of the image is an unobstructed view through the glass. A subtle hint of the calm, minimal interior at the very bottom edge (a low, clean sill and soft floor reflections) and at the extreme sides; nothing in the centre of the frame. Outside: a softly blurred, location-neutral landscape of gentle rolling hills and scattered trees, with a distant small city whose soft lights sit along the horizon; no recognizable landmarks. The horizon sits slightly below the middle of the frame. A gentle depth-of-field blur over the whole scene, as if the camera is focused on a person standing close in front of it, so a portrait reads clearly on top. Calm, premium, cinematic colour grading. Landscape 3:2 image. No people, no animals, no text, no logos. Time of day: night. A deep navy-blue sky, the distant city lights glowing as soft bokeh along the horizon, faint moonlight on the hills, a dim warm ambient glow inside the room. Weather: rain. Steady rain falls outside; raindrops cling to the window glass and rain streaks run down it in the foreground, with soft, misty hills and wet, reflective surfaces.",
+      "referenceUsed": "day-clear.png",
+      "cost": 0.055353,
+      "generationId": "gen-img-1790266263-ocFTila7N0m4xXDq85Oa",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1536x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 1917,
+        "completion_tokens": 1372,
+        "total_tokens": 3289,
+        "cost": 0.055353,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.055353,
+          "upstream_inference_prompt_cost": 0.014193,
+          "upstream_inference_completions_cost": 0.04116
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1372
+        }
+      },
+      "createdAt": "2026-09-24T16:11:24.100Z",
+      "archived": true,
+      "concept": "window-interior (rejected)"
+    },
+    {
+      "timeOfDay": "day",
+      "weather": "clear",
+      "concept": "sky-square",
+      "file": "day-clear.png",
+      "prompt": "A cinematic, photorealistic open skyscape that fills the entire square frame: almost all sky, seen from a fixed camera looking straight ahead with a very slight upward tilt. Only a very low, soft, location-neutral horizon silhouette of gentle rolling hills and a distant treeline runs along the very bottom of the frame (the bottom 12% of the image), softly out of focus. Composed for a circular crop: the mood of the sky sits inside the inscribed circle; the centre and upper centre of the frame stay calm, soft and uncluttered, because a portrait head will cover them. No key details in the centre or in the corners: any sun, moon, glow, lightning or bright highlight sits off-centre in the upper-left or upper-right area, still inside the circle. Calm, premium, cinematic colour grading with a gentle, soft focus. Strictly outdoor sky: no interior, no room, no window, no window frame, no glass, no buildings, no people, no animals, no text, no logos, no landmarks. Square 1:1 image. Time: daytime. A luminous blue sky, paler and brighter toward the horizon. Weather: clear. An open, clean sky with only a few soft, small wisps of cloud.",
+      "referenceUsed": null,
+      "cost": 0.05402,
+      "generationId": "gen-img-1790267353-acpzzvw2mMmzATHT4UJQ",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1024x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 268,
+        "completion_tokens": 1756,
+        "total_tokens": 2024,
+        "cost": 0.05402,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.05402,
+          "upstream_inference_prompt_cost": 0.00134,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "createdAt": "2026-09-24T16:29:40.696Z"
+    },
+    {
+      "timeOfDay": "night",
+      "weather": "rain",
+      "concept": "sky-square",
+      "file": "night-rain.png",
+      "prompt": "The attached reference image shows the scene. Keep the exact same camera angle, square framing and horizon height, and the same low hill and treeline silhouette along the bottom. Change ONLY the sky, the light and the weather as described. A cinematic, photorealistic open skyscape that fills the entire square frame: almost all sky, seen from a fixed camera looking straight ahead with a very slight upward tilt. Only a very low, soft, location-neutral horizon silhouette of gentle rolling hills and a distant treeline runs along the very bottom of the frame (the bottom 12% of the image), softly out of focus. Composed for a circular crop: the mood of the sky sits inside the inscribed circle; the centre and upper centre of the frame stay calm, soft and uncluttered, because a portrait head will cover them. No key details in the centre or in the corners: any sun, moon, glow, lightning or bright highlight sits off-centre in the upper-left or upper-right area, still inside the circle. Calm, premium, cinematic colour grading with a gentle, soft focus. Strictly outdoor sky: no interior, no room, no window, no window frame, no glass, no buildings, no people, no animals, no text, no logos, no landmarks. Square 1:1 image. Time: night. A deep indigo-to-navy night sky with a soft, off-centre moon glow and, where the weather allows, a scattering of fine stars. Weather: rain. Soft grey rain clouds with visible rain curtains falling from them and fine rain streaks in the air, a moist, muted atmosphere (rain in the open air only; nothing on glass or on the lens).",
+      "referenceUsed": "day-clear.png",
+      "cost": 0.062707,
+      "generationId": "gen-img-1790267383-SjeFB1PkwxYZtBfkmWxY",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1024x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 1391,
+        "completion_tokens": 1756,
+        "total_tokens": 3147,
+        "cost": 0.062707,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.062707,
+          "upstream_inference_prompt_cost": 0.010027,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "createdAt": "2026-09-24T16:30:05.633Z"
+    },
+    {
+      "timeOfDay": "dawn",
+      "weather": "clear",
+      "concept": "sky-square",
+      "file": "dawn-clear.png",
+      "prompt": "The attached reference image shows the scene. Keep the exact same camera angle, square framing and horizon height, and the same low hill and treeline silhouette along the bottom. Change ONLY the sky, the light and the weather as described. A cinematic, photorealistic open skyscape that fills the entire square frame: almost all sky, seen from a fixed camera looking straight ahead with a very slight upward tilt. Only a very low, soft, location-neutral horizon silhouette of gentle rolling hills and a distant treeline runs along the very bottom of the frame (the bottom 12% of the image), softly out of focus. Composed for a circular crop: the mood of the sky sits inside the inscribed circle; the centre and upper centre of the frame stay calm, soft and uncluttered, because a portrait head will cover them. No key details in the centre or in the corners: any sun, moon, glow, lightning or bright highlight sits off-centre in the upper-left or upper-right area, still inside the circle. Calm, premium, cinematic colour grading with a gentle, soft focus. Strictly outdoor sky: no interior, no room, no window, no window frame, no glass, no buildings, no people, no animals, no text, no logos, no landmarks. Square 1:1 image. Time: dawn. A soft pastel gradient of peach, apricot and lilac, the first light glowing low near the horizon and fading to pale blue higher up. Weather: clear. An open, clean sky with only a few soft, small wisps of cloud.",
+      "referenceUsed": "day-clear.png",
+      "cost": 0.062577,
+      "generationId": "gen-img-1790268608-JegU99kb2gJ9y8hxuukU",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1024x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 1365,
+        "completion_tokens": 1756,
+        "total_tokens": 3121,
+        "cost": 0.062577,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.062577,
+          "upstream_inference_prompt_cost": 0.009897,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "createdAt": "2026-09-24T16:50:29.784Z"
+    },
+    {
+      "timeOfDay": "dawn",
+      "weather": "cloudy",
+      "concept": "sky-square",
+      "file": "dawn-cloudy.png",
+      "prompt": "The attached reference image shows the scene. Keep the exact same camera angle, square framing and horizon height, and the same low hill and treeline silhouette along the bottom. Change ONLY the sky, the light and the weather as described. A cinematic, photorealistic open skyscape that fills the entire square frame: almost all sky, seen from a fixed camera looking straight ahead with a very slight upward tilt. Only a very low, soft, location-neutral horizon silhouette of gentle rolling hills and a distant treeline runs along the very bottom of the frame (the bottom 12% of the image), softly out of focus. Composed for a circular crop: the mood of the sky sits inside the inscribed circle; the centre and upper centre of the frame stay calm, soft and uncluttered, because a portrait head will cover them. No key details in the centre or in the corners: any sun, moon, glow, lightning or bright highlight sits off-centre in the upper-left or upper-right area, still inside the circle. Calm, premium, cinematic colour grading with a gentle, soft focus. Strictly outdoor sky: no interior, no room, no window, no window frame, no glass, no buildings, no people, no animals, no text, no logos, no landmarks. Square 1:1 image. Time: dawn. A soft pastel gradient of peach, apricot and lilac, the first light glowing low near the horizon and fading to pale blue higher up. Weather: cloudy. Layered, soft, voluminous clouds drifting across the sky, catching the light of the time of day.",
+      "referenceUsed": "day-clear.png",
+      "cost": 0.062602,
+      "generationId": "gen-img-1790268636-yGrNIgp8rvGMG5aCVBSb",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1024x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 1370,
+        "completion_tokens": 1756,
+        "total_tokens": 3126,
+        "cost": 0.062602,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.062602,
+          "upstream_inference_prompt_cost": 0.009922,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "createdAt": "2026-09-24T16:50:58.942Z"
+    },
+    {
+      "timeOfDay": "dawn",
+      "weather": "rain",
+      "concept": "sky-square",
+      "file": "dawn-rain.png",
+      "prompt": "The attached reference image shows the scene. Keep the exact same camera angle, square framing and horizon height, and the same low hill and treeline silhouette along the bottom. Change ONLY the sky, the light and the weather as described. A cinematic, photorealistic open skyscape that fills the entire square frame: almost all sky, seen from a fixed camera looking straight ahead with a very slight upward tilt. Only a very low, soft, location-neutral horizon silhouette of gentle rolling hills and a distant treeline runs along the very bottom of the frame (the bottom 12% of the image), softly out of focus. Composed for a circular crop: the mood of the sky sits inside the inscribed circle; the centre and upper centre of the frame stay calm, soft and uncluttered, because a portrait head will cover them. No key details in the centre or in the corners: any sun, moon, glow, lightning or bright highlight sits off-centre in the upper-left or upper-right area, still inside the circle. Calm, premium, cinematic colour grading with a gentle, soft focus. Strictly outdoor sky: no interior, no room, no window, no window frame, no glass, no buildings, no people, no animals, no text, no logos, no landmarks. Square 1:1 image. Time: dawn. A soft pastel gradient of peach, apricot and lilac, the first light glowing low near the horizon and fading to pale blue higher up. Weather: rain. Soft grey rain clouds with visible rain curtains falling from them and fine rain streaks in the air, a moist, muted atmosphere (rain in the open air only; nothing on glass or on the lens).",
+      "referenceUsed": "day-clear.png",
+      "cost": 0.062697,
+      "generationId": "gen-img-1790268666-dKeaSKW9oqpx71PeiBGQ",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1024x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 1389,
+        "completion_tokens": 1756,
+        "total_tokens": 3145,
+        "cost": 0.062697,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.062697,
+          "upstream_inference_prompt_cost": 0.010017,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "createdAt": "2026-09-24T16:51:29.840Z"
+    },
+    {
+      "timeOfDay": "dawn",
+      "weather": "storm",
+      "concept": "sky-square",
+      "file": "dawn-storm.png",
+      "prompt": "The attached reference image shows the scene. Keep the exact same camera angle, square framing and horizon height, and the same low hill and treeline silhouette along the bottom. Change ONLY the sky, the light and the weather as described. A cinematic, photorealistic open skyscape that fills the entire square frame: almost all sky, seen from a fixed camera looking straight ahead with a very slight upward tilt. Only a very low, soft, location-neutral horizon silhouette of gentle rolling hills and a distant treeline runs along the very bottom of the frame (the bottom 12% of the image), softly out of focus. Composed for a circular crop: the mood of the sky sits inside the inscribed circle; the centre and upper centre of the frame stay calm, soft and uncluttered, because a portrait head will cover them. No key details in the centre or in the corners: any sun, moon, glow, lightning or bright highlight sits off-centre in the upper-left or upper-right area, still inside the circle. Calm, premium, cinematic colour grading with a gentle, soft focus. Strictly outdoor sky: no interior, no room, no window, no window frame, no glass, no buildings, no people, no animals, no text, no logos, no landmarks. Square 1:1 image. Time: dawn. A soft pastel gradient of peach, apricot and lilac, the first light glowing low near the horizon and fading to pale blue higher up. Weather: storm. Dramatic, towering dark storm clouds with a distant lightning flash glowing inside the clouds low near the horizon, off to one side.",
+      "referenceUsed": "day-clear.png",
+      "cost": 0.062622,
+      "generationId": "gen-img-1790268694-KQYslSGuH9DHxD1E53PK",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1024x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 1374,
+        "completion_tokens": 1756,
+        "total_tokens": 3130,
+        "cost": 0.062622,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.062622,
+          "upstream_inference_prompt_cost": 0.009942,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "createdAt": "2026-09-24T16:51:57.305Z"
+    },
+    {
+      "timeOfDay": "dawn",
+      "weather": "snow",
+      "concept": "sky-square",
+      "file": "dawn-snow.png",
+      "prompt": "The attached reference image shows the scene. Keep the exact same camera angle, square framing and horizon height, and the same low hill and treeline silhouette along the bottom. Change ONLY the sky, the light and the weather as described. A cinematic, photorealistic open skyscape that fills the entire square frame: almost all sky, seen from a fixed camera looking straight ahead with a very slight upward tilt. Only a very low, soft, location-neutral horizon silhouette of gentle rolling hills and a distant treeline runs along the very bottom of the frame (the bottom 12% of the image), softly out of focus. Composed for a circular crop: the mood of the sky sits inside the inscribed circle; the centre and upper centre of the frame stay calm, soft and uncluttered, because a portrait head will cover them. No key details in the centre or in the corners: any sun, moon, glow, lightning or bright highlight sits off-centre in the upper-left or upper-right area, still inside the circle. Calm, premium, cinematic colour grading with a gentle, soft focus. Strictly outdoor sky: no interior, no room, no window, no window frame, no glass, no buildings, no people, no animals, no text, no logos, no landmarks. Square 1:1 image. Time: dawn. A soft pastel gradient of peach, apricot and lilac, the first light glowing low near the horizon and fading to pale blue higher up. Weather: snow. A pale, soft sky with gentle snowflakes drifting through the air, and the horizon silhouette dusted with white.",
+      "referenceUsed": "day-clear.png",
+      "cost": 0.062607,
+      "generationId": "gen-img-1790268720-9fY4FbjHICvdviUfa7ju",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1024x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 1371,
+        "completion_tokens": 1756,
+        "total_tokens": 3127,
+        "cost": 0.062607,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.062607,
+          "upstream_inference_prompt_cost": 0.009927,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "createdAt": "2026-09-24T16:52:23.922Z"
+    },
+    {
+      "timeOfDay": "dawn",
+      "weather": "fog",
+      "concept": "sky-square",
+      "file": "dawn-fog.png",
+      "prompt": "The attached reference image shows the scene. Keep the exact same camera angle, square framing and horizon height, and the same low hill and treeline silhouette along the bottom. Change ONLY the sky, the light and the weather as described. A cinematic, photorealistic open skyscape that fills the entire square frame: almost all sky, seen from a fixed camera looking straight ahead with a very slight upward tilt. Only a very low, soft, location-neutral horizon silhouette of gentle rolling hills and a distant treeline runs along the very bottom of the frame (the bottom 12% of the image), softly out of focus. Composed for a circular crop: the mood of the sky sits inside the inscribed circle; the centre and upper centre of the frame stay calm, soft and uncluttered, because a portrait head will cover them. No key details in the centre or in the corners: any sun, moon, glow, lightning or bright highlight sits off-centre in the upper-left or upper-right area, still inside the circle. Calm, premium, cinematic colour grading with a gentle, soft focus. Strictly outdoor sky: no interior, no room, no window, no window frame, no glass, no buildings, no people, no animals, no text, no logos, no landmarks. Square 1:1 image. Time: dawn. A soft pastel gradient of peach, apricot and lilac, the first light glowing low near the horizon and fading to pale blue higher up. Weather: fog. Hazy, diffused light; soft fog and mist veil the sky, and the horizon silhouette almost disappears.",
+      "referenceUsed": "day-clear.png",
+      "cost": 0.062602,
+      "generationId": "gen-img-1790268746-kSedWbQjGefKAT36xLNK",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1024x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 1370,
+        "completion_tokens": 1756,
+        "total_tokens": 3126,
+        "cost": 0.062602,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.062602,
+          "upstream_inference_prompt_cost": 0.009922,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "createdAt": "2026-09-24T16:52:47.570Z"
+    },
+    {
+      "timeOfDay": "day",
+      "weather": "cloudy",
+      "concept": "sky-square",
+      "file": "day-cloudy.png",
+      "prompt": "The attached reference image shows the scene. Keep the exact same camera angle, square framing and horizon height, and the same low hill and treeline silhouette along the bottom. Change ONLY the sky, the light and the weather as described. A cinematic, photorealistic open skyscape that fills the entire square frame: almost all sky, seen from a fixed camera looking straight ahead with a very slight upward tilt. Only a very low, soft, location-neutral horizon silhouette of gentle rolling hills and a distant treeline runs along the very bottom of the frame (the bottom 12% of the image), softly out of focus. Composed for a circular crop: the mood of the sky sits inside the inscribed circle; the centre and upper centre of the frame stay calm, soft and uncluttered, because a portrait head will cover them. No key details in the centre or in the corners: any sun, moon, glow, lightning or bright highlight sits off-centre in the upper-left or upper-right area, still inside the circle. Calm, premium, cinematic colour grading with a gentle, soft focus. Strictly outdoor sky: no interior, no room, no window, no window frame, no glass, no buildings, no people, no animals, no text, no logos, no landmarks. Square 1:1 image. Time: daytime. A luminous blue sky, paler and brighter toward the horizon. Weather: cloudy. Layered, soft, voluminous clouds drifting across the sky, catching the light of the time of day.",
+      "referenceUsed": "day-clear.png",
+      "cost": 0.062522,
+      "generationId": "gen-img-1790268770-ikd61R7O7km3zIV5VUns",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1024x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 1354,
+        "completion_tokens": 1756,
+        "total_tokens": 3110,
+        "cost": 0.062522,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.062522,
+          "upstream_inference_prompt_cost": 0.009842,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "createdAt": "2026-09-24T16:53:16.967Z"
+    },
+    {
+      "timeOfDay": "day",
+      "weather": "rain",
+      "concept": "sky-square",
+      "file": "day-rain.png",
+      "prompt": "The attached reference image shows the scene. Keep the exact same camera angle, square framing and horizon height, and the same low hill and treeline silhouette along the bottom. Change ONLY the sky, the light and the weather as described. A cinematic, photorealistic open skyscape that fills the entire square frame: almost all sky, seen from a fixed camera looking straight ahead with a very slight upward tilt. Only a very low, soft, location-neutral horizon silhouette of gentle rolling hills and a distant treeline runs along the very bottom of the frame (the bottom 12% of the image), softly out of focus. Composed for a circular crop: the mood of the sky sits inside the inscribed circle; the centre and upper centre of the frame stay calm, soft and uncluttered, because a portrait head will cover them. No key details in the centre or in the corners: any sun, moon, glow, lightning or bright highlight sits off-centre in the upper-left or upper-right area, still inside the circle. Calm, premium, cinematic colour grading with a gentle, soft focus. Strictly outdoor sky: no interior, no room, no window, no window frame, no glass, no buildings, no people, no animals, no text, no logos, no landmarks. Square 1:1 image. Time: daytime. A luminous blue sky, paler and brighter toward the horizon. Weather: rain. Soft grey rain clouds with visible rain curtains falling from them and fine rain streaks in the air, a moist, muted atmosphere (rain in the open air only; nothing on glass or on the lens).",
+      "referenceUsed": "day-clear.png",
+      "cost": 0.062617,
+      "generationId": "gen-img-1790268799-PJ1IfxWJnxpWpSZvv2rG",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1024x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 1373,
+        "completion_tokens": 1756,
+        "total_tokens": 3129,
+        "cost": 0.062617,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.062617,
+          "upstream_inference_prompt_cost": 0.009937,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "createdAt": "2026-09-24T16:53:43.309Z"
+    },
+    {
+      "timeOfDay": "day",
+      "weather": "storm",
+      "concept": "sky-square",
+      "file": "day-storm.png",
+      "prompt": "The attached reference image shows the scene. Keep the exact same camera angle, square framing and horizon height, and the same low hill and treeline silhouette along the bottom. Change ONLY the sky, the light and the weather as described. A cinematic, photorealistic open skyscape that fills the entire square frame: almost all sky, seen from a fixed camera looking straight ahead with a very slight upward tilt. Only a very low, soft, location-neutral horizon silhouette of gentle rolling hills and a distant treeline runs along the very bottom of the frame (the bottom 12% of the image), softly out of focus. Composed for a circular crop: the mood of the sky sits inside the inscribed circle; the centre and upper centre of the frame stay calm, soft and uncluttered, because a portrait head will cover them. No key details in the centre or in the corners: any sun, moon, glow, lightning or bright highlight sits off-centre in the upper-left or upper-right area, still inside the circle. Calm, premium, cinematic colour grading with a gentle, soft focus. Strictly outdoor sky: no interior, no room, no window, no window frame, no glass, no buildings, no people, no animals, no text, no logos, no landmarks. Square 1:1 image. Time: daytime. A luminous blue sky, paler and brighter toward the horizon. Weather: storm. Dramatic, towering dark storm clouds with a distant lightning flash glowing inside the clouds low near the horizon, off to one side.",
+      "referenceUsed": "day-clear.png",
+      "cost": 0.062542,
+      "generationId": "gen-img-1790268826-HoWVUFLdoPnXzhyAtxKh",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1024x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 1358,
+        "completion_tokens": 1756,
+        "total_tokens": 3114,
+        "cost": 0.062542,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.062542,
+          "upstream_inference_prompt_cost": 0.009862,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "createdAt": "2026-09-24T16:54:08.846Z"
+    },
+    {
+      "timeOfDay": "day",
+      "weather": "snow",
+      "concept": "sky-square",
+      "file": "day-snow.png",
+      "prompt": "The attached reference image shows the scene. Keep the exact same camera angle, square framing and horizon height, and the same low hill and treeline silhouette along the bottom. Change ONLY the sky, the light and the weather as described. A cinematic, photorealistic open skyscape that fills the entire square frame: almost all sky, seen from a fixed camera looking straight ahead with a very slight upward tilt. Only a very low, soft, location-neutral horizon silhouette of gentle rolling hills and a distant treeline runs along the very bottom of the frame (the bottom 12% of the image), softly out of focus. Composed for a circular crop: the mood of the sky sits inside the inscribed circle; the centre and upper centre of the frame stay calm, soft and uncluttered, because a portrait head will cover them. No key details in the centre or in the corners: any sun, moon, glow, lightning or bright highlight sits off-centre in the upper-left or upper-right area, still inside the circle. Calm, premium, cinematic colour grading with a gentle, soft focus. Strictly outdoor sky: no interior, no room, no window, no window frame, no glass, no buildings, no people, no animals, no text, no logos, no landmarks. Square 1:1 image. Time: daytime. A luminous blue sky, paler and brighter toward the horizon. Weather: snow. A pale, soft sky with gentle snowflakes drifting through the air, and the horizon silhouette dusted with white.",
+      "referenceUsed": "day-clear.png",
+      "cost": 0.062527,
+      "generationId": "gen-img-1790268851-muGWc4wRFDdUPE6q4x3H",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1024x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 1355,
+        "completion_tokens": 1756,
+        "total_tokens": 3111,
+        "cost": 0.062527,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.062527,
+          "upstream_inference_prompt_cost": 0.009847,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "createdAt": "2026-09-24T16:54:35.784Z"
+    },
+    {
+      "timeOfDay": "day",
+      "weather": "fog",
+      "concept": "sky-square",
+      "file": "day-fog.png",
+      "prompt": "The attached reference image shows the scene. Keep the exact same camera angle, square framing and horizon height, and the same low hill and treeline silhouette along the bottom. Change ONLY the sky, the light and the weather as described. A cinematic, photorealistic open skyscape that fills the entire square frame: almost all sky, seen from a fixed camera looking straight ahead with a very slight upward tilt. Only a very low, soft, location-neutral horizon silhouette of gentle rolling hills and a distant treeline runs along the very bottom of the frame (the bottom 12% of the image), softly out of focus. Composed for a circular crop: the mood of the sky sits inside the inscribed circle; the centre and upper centre of the frame stay calm, soft and uncluttered, because a portrait head will cover them. No key details in the centre or in the corners: any sun, moon, glow, lightning or bright highlight sits off-centre in the upper-left or upper-right area, still inside the circle. Calm, premium, cinematic colour grading with a gentle, soft focus. Strictly outdoor sky: no interior, no room, no window, no window frame, no glass, no buildings, no people, no animals, no text, no logos, no landmarks. Square 1:1 image. Time: daytime. A luminous blue sky, paler and brighter toward the horizon. Weather: fog. Hazy, diffused light; soft fog and mist veil the sky, and the horizon silhouette almost disappears.",
+      "referenceUsed": "day-clear.png",
+      "cost": 0.062522,
+      "generationId": "gen-img-1790268878-uuRrhZrDgYN6UgDQxwwd",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1024x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 1354,
+        "completion_tokens": 1756,
+        "total_tokens": 3110,
+        "cost": 0.062522,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.062522,
+          "upstream_inference_prompt_cost": 0.009842,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "createdAt": "2026-09-24T16:55:10.661Z"
+    },
+    {
+      "timeOfDay": "dusk",
+      "weather": "clear",
+      "concept": "sky-square",
+      "file": "dusk-clear.png",
+      "prompt": "The attached reference image shows the scene. Keep the exact same camera angle, square framing and horizon height, and the same low hill and treeline silhouette along the bottom. Change ONLY the sky, the light and the weather as described. A cinematic, photorealistic open skyscape that fills the entire square frame: almost all sky, seen from a fixed camera looking straight ahead with a very slight upward tilt. Only a very low, soft, location-neutral horizon silhouette of gentle rolling hills and a distant treeline runs along the very bottom of the frame (the bottom 12% of the image), softly out of focus. Composed for a circular crop: the mood of the sky sits inside the inscribed circle; the centre and upper centre of the frame stay calm, soft and uncluttered, because a portrait head will cover them. No key details in the centre or in the corners: any sun, moon, glow, lightning or bright highlight sits off-centre in the upper-left or upper-right area, still inside the circle. Calm, premium, cinematic colour grading with a gentle, soft focus. Strictly outdoor sky: no interior, no room, no window, no window frame, no glass, no buildings, no people, no animals, no text, no logos, no landmarks. Square 1:1 image. Time: dusk. A warm amber, coral and magenta sunset glow low along the horizon, deepening to violet and indigo higher up. Weather: clear. An open, clean sky with only a few soft, small wisps of cloud.",
+      "referenceUsed": "day-clear.png",
+      "cost": 0.062557,
+      "generationId": "gen-img-1790268913-9ap3dt4GEfbFD29ipDwC",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1024x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 1361,
+        "completion_tokens": 1756,
+        "total_tokens": 3117,
+        "cost": 0.062557,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.062557,
+          "upstream_inference_prompt_cost": 0.009877,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "createdAt": "2026-09-24T16:55:39.242Z"
+    },
+    {
+      "timeOfDay": "dusk",
+      "weather": "cloudy",
+      "concept": "sky-square",
+      "file": "dusk-cloudy.png",
+      "prompt": "The attached reference image shows the scene. Keep the exact same camera angle, square framing and horizon height, and the same low hill and treeline silhouette along the bottom. Change ONLY the sky, the light and the weather as described. A cinematic, photorealistic open skyscape that fills the entire square frame: almost all sky, seen from a fixed camera looking straight ahead with a very slight upward tilt. Only a very low, soft, location-neutral horizon silhouette of gentle rolling hills and a distant treeline runs along the very bottom of the frame (the bottom 12% of the image), softly out of focus. Composed for a circular crop: the mood of the sky sits inside the inscribed circle; the centre and upper centre of the frame stay calm, soft and uncluttered, because a portrait head will cover them. No key details in the centre or in the corners: any sun, moon, glow, lightning or bright highlight sits off-centre in the upper-left or upper-right area, still inside the circle. Calm, premium, cinematic colour grading with a gentle, soft focus. Strictly outdoor sky: no interior, no room, no window, no window frame, no glass, no buildings, no people, no animals, no text, no logos, no landmarks. Square 1:1 image. Time: dusk. A warm amber, coral and magenta sunset glow low along the horizon, deepening to violet and indigo higher up. Weather: cloudy. Layered, soft, voluminous clouds drifting across the sky, catching the light of the time of day.",
+      "referenceUsed": "day-clear.png",
+      "cost": 0.062582,
+      "generationId": "gen-img-1790268942-WQBFxREsyH26qgHXkuBu",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1024x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 1366,
+        "completion_tokens": 1756,
+        "total_tokens": 3122,
+        "cost": 0.062582,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.062582,
+          "upstream_inference_prompt_cost": 0.009902,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "createdAt": "2026-09-24T16:56:03.581Z"
+    },
+    {
+      "timeOfDay": "dusk",
+      "weather": "rain",
+      "concept": "sky-square",
+      "file": "dusk-rain.png",
+      "prompt": "The attached reference image shows the scene. Keep the exact same camera angle, square framing and horizon height, and the same low hill and treeline silhouette along the bottom. Change ONLY the sky, the light and the weather as described. A cinematic, photorealistic open skyscape that fills the entire square frame: almost all sky, seen from a fixed camera looking straight ahead with a very slight upward tilt. Only a very low, soft, location-neutral horizon silhouette of gentle rolling hills and a distant treeline runs along the very bottom of the frame (the bottom 12% of the image), softly out of focus. Composed for a circular crop: the mood of the sky sits inside the inscribed circle; the centre and upper centre of the frame stay calm, soft and uncluttered, because a portrait head will cover them. No key details in the centre or in the corners: any sun, moon, glow, lightning or bright highlight sits off-centre in the upper-left or upper-right area, still inside the circle. Calm, premium, cinematic colour grading with a gentle, soft focus. Strictly outdoor sky: no interior, no room, no window, no window frame, no glass, no buildings, no people, no animals, no text, no logos, no landmarks. Square 1:1 image. Time: dusk. A warm amber, coral and magenta sunset glow low along the horizon, deepening to violet and indigo higher up. Weather: rain. Soft grey rain clouds with visible rain curtains falling from them and fine rain streaks in the air, a moist, muted atmosphere (rain in the open air only; nothing on glass or on the lens).",
+      "referenceUsed": "day-clear.png",
+      "cost": 0.062677,
+      "generationId": "gen-img-1790268966-h2Ju0n848sQQExEVpkrj",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1024x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 1385,
+        "completion_tokens": 1756,
+        "total_tokens": 3141,
+        "cost": 0.062677,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.062677,
+          "upstream_inference_prompt_cost": 0.009997,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "createdAt": "2026-09-24T16:56:57.764Z"
+    },
+    {
+      "timeOfDay": "dusk",
+      "weather": "storm",
+      "concept": "sky-square",
+      "file": "dusk-storm.png",
+      "prompt": "The attached reference image shows the scene. Keep the exact same camera angle, square framing and horizon height, and the same low hill and treeline silhouette along the bottom. Change ONLY the sky, the light and the weather as described. A cinematic, photorealistic open skyscape that fills the entire square frame: almost all sky, seen from a fixed camera looking straight ahead with a very slight upward tilt. Only a very low, soft, location-neutral horizon silhouette of gentle rolling hills and a distant treeline runs along the very bottom of the frame (the bottom 12% of the image), softly out of focus. Composed for a circular crop: the mood of the sky sits inside the inscribed circle; the centre and upper centre of the frame stay calm, soft and uncluttered, because a portrait head will cover them. No key details in the centre or in the corners: any sun, moon, glow, lightning or bright highlight sits off-centre in the upper-left or upper-right area, still inside the circle. Calm, premium, cinematic colour grading with a gentle, soft focus. Strictly outdoor sky: no interior, no room, no window, no window frame, no glass, no buildings, no people, no animals, no text, no logos, no landmarks. Square 1:1 image. Time: dusk. A warm amber, coral and magenta sunset glow low along the horizon, deepening to violet and indigo higher up. Weather: storm. Dramatic, towering dark storm clouds with a distant lightning flash glowing inside the clouds low near the horizon, off to one side.",
+      "referenceUsed": "day-clear.png",
+      "cost": 0.062602,
+      "generationId": "gen-img-1790269020-LQeOMebzDBPkAgeT9A6N",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1024x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 1370,
+        "completion_tokens": 1756,
+        "total_tokens": 3126,
+        "cost": 0.062602,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.062602,
+          "upstream_inference_prompt_cost": 0.009922,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "createdAt": "2026-09-24T16:57:23.930Z"
+    },
+    {
+      "timeOfDay": "dusk",
+      "weather": "snow",
+      "concept": "sky-square",
+      "file": "dusk-snow.png",
+      "prompt": "The attached reference image shows the scene. Keep the exact same camera angle, square framing and horizon height, and the same low hill and treeline silhouette along the bottom. Change ONLY the sky, the light and the weather as described. A cinematic, photorealistic open skyscape that fills the entire square frame: almost all sky, seen from a fixed camera looking straight ahead with a very slight upward tilt. Only a very low, soft, location-neutral horizon silhouette of gentle rolling hills and a distant treeline runs along the very bottom of the frame (the bottom 12% of the image), softly out of focus. Composed for a circular crop: the mood of the sky sits inside the inscribed circle; the centre and upper centre of the frame stay calm, soft and uncluttered, because a portrait head will cover them. No key details in the centre or in the corners: any sun, moon, glow, lightning or bright highlight sits off-centre in the upper-left or upper-right area, still inside the circle. Calm, premium, cinematic colour grading with a gentle, soft focus. Strictly outdoor sky: no interior, no room, no window, no window frame, no glass, no buildings, no people, no animals, no text, no logos, no landmarks. Square 1:1 image. Time: dusk. A warm amber, coral and magenta sunset glow low along the horizon, deepening to violet and indigo higher up. Weather: snow. A pale, soft sky with gentle snowflakes drifting through the air, and the horizon silhouette dusted with white.",
+      "referenceUsed": "day-clear.png",
+      "cost": 0.062587,
+      "generationId": "gen-img-1790269046-JhH4DQpr6UmUyQbVabGX",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1024x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 1367,
+        "completion_tokens": 1756,
+        "total_tokens": 3123,
+        "cost": 0.062587,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.062587,
+          "upstream_inference_prompt_cost": 0.009907,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "createdAt": "2026-09-24T16:57:52.088Z"
+    },
+    {
+      "timeOfDay": "dusk",
+      "weather": "fog",
+      "concept": "sky-square",
+      "file": "dusk-fog.png",
+      "prompt": "The attached reference image shows the scene. Keep the exact same camera angle, square framing and horizon height, and the same low hill and treeline silhouette along the bottom. Change ONLY the sky, the light and the weather as described. A cinematic, photorealistic open skyscape that fills the entire square frame: almost all sky, seen from a fixed camera looking straight ahead with a very slight upward tilt. Only a very low, soft, location-neutral horizon silhouette of gentle rolling hills and a distant treeline runs along the very bottom of the frame (the bottom 12% of the image), softly out of focus. Composed for a circular crop: the mood of the sky sits inside the inscribed circle; the centre and upper centre of the frame stay calm, soft and uncluttered, because a portrait head will cover them. No key details in the centre or in the corners: any sun, moon, glow, lightning or bright highlight sits off-centre in the upper-left or upper-right area, still inside the circle. Calm, premium, cinematic colour grading with a gentle, soft focus. Strictly outdoor sky: no interior, no room, no window, no window frame, no glass, no buildings, no people, no animals, no text, no logos, no landmarks. Square 1:1 image. Time: dusk. A warm amber, coral and magenta sunset glow low along the horizon, deepening to violet and indigo higher up. Weather: fog. Hazy, diffused light; soft fog and mist veil the sky, and the horizon silhouette almost disappears.",
+      "referenceUsed": "day-clear.png",
+      "cost": 0.062582,
+      "generationId": "gen-img-1790269074-OTCc14z8D3gSmzkAW8BQ",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1024x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 1366,
+        "completion_tokens": 1756,
+        "total_tokens": 3122,
+        "cost": 0.062582,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.062582,
+          "upstream_inference_prompt_cost": 0.009902,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "createdAt": "2026-09-24T16:58:17.623Z"
+    },
+    {
+      "timeOfDay": "night",
+      "weather": "clear",
+      "concept": "sky-square",
+      "file": "night-clear.png",
+      "prompt": "The attached reference image shows the scene. Keep the exact same camera angle, square framing and horizon height, and the same low hill and treeline silhouette along the bottom. Change ONLY the sky, the light and the weather as described. A cinematic, photorealistic open skyscape that fills the entire square frame: almost all sky, seen from a fixed camera looking straight ahead with a very slight upward tilt. Only a very low, soft, location-neutral horizon silhouette of gentle rolling hills and a distant treeline runs along the very bottom of the frame (the bottom 12% of the image), softly out of focus. Composed for a circular crop: the mood of the sky sits inside the inscribed circle; the centre and upper centre of the frame stay calm, soft and uncluttered, because a portrait head will cover them. No key details in the centre or in the corners: any sun, moon, glow, lightning or bright highlight sits off-centre in the upper-left or upper-right area, still inside the circle. Calm, premium, cinematic colour grading with a gentle, soft focus. Strictly outdoor sky: no interior, no room, no window, no window frame, no glass, no buildings, no people, no animals, no text, no logos, no landmarks. Square 1:1 image. Time: night. A deep indigo-to-navy night sky with a soft, off-centre moon glow and, where the weather allows, a scattering of fine stars. Weather: clear. An open, clean sky with only a few soft, small wisps of cloud.",
+      "referenceUsed": "day-clear.png",
+      "cost": 0.062587,
+      "generationId": "gen-img-1790269100-BQ8C6jQ4MZdrGRl8zhJi",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1024x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 1367,
+        "completion_tokens": 1756,
+        "total_tokens": 3123,
+        "cost": 0.062587,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.062587,
+          "upstream_inference_prompt_cost": 0.009907,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "createdAt": "2026-09-24T16:58:41.371Z"
+    },
+    {
+      "timeOfDay": "night",
+      "weather": "cloudy",
+      "concept": "sky-square",
+      "file": "night-cloudy.png",
+      "prompt": "The attached reference image shows the scene. Keep the exact same camera angle, square framing and horizon height, and the same low hill and treeline silhouette along the bottom. Change ONLY the sky, the light and the weather as described. A cinematic, photorealistic open skyscape that fills the entire square frame: almost all sky, seen from a fixed camera looking straight ahead with a very slight upward tilt. Only a very low, soft, location-neutral horizon silhouette of gentle rolling hills and a distant treeline runs along the very bottom of the frame (the bottom 12% of the image), softly out of focus. Composed for a circular crop: the mood of the sky sits inside the inscribed circle; the centre and upper centre of the frame stay calm, soft and uncluttered, because a portrait head will cover them. No key details in the centre or in the corners: any sun, moon, glow, lightning or bright highlight sits off-centre in the upper-left or upper-right area, still inside the circle. Calm, premium, cinematic colour grading with a gentle, soft focus. Strictly outdoor sky: no interior, no room, no window, no window frame, no glass, no buildings, no people, no animals, no text, no logos, no landmarks. Square 1:1 image. Time: night. A deep indigo-to-navy night sky with a soft, off-centre moon glow and, where the weather allows, a scattering of fine stars. Weather: cloudy. Layered, soft, voluminous clouds drifting across the sky, catching the light of the time of day.",
+      "referenceUsed": "day-clear.png",
+      "cost": 0.062612,
+      "generationId": "gen-img-1790269124-FK4tlbVfYnz5b9Oy4UEy",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1024x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 1372,
+        "completion_tokens": 1756,
+        "total_tokens": 3128,
+        "cost": 0.062612,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.062612,
+          "upstream_inference_prompt_cost": 0.009932,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "createdAt": "2026-09-24T16:59:05.647Z"
+    },
+    {
+      "timeOfDay": "night",
+      "weather": "storm",
+      "concept": "sky-square",
+      "file": "night-storm.png",
+      "prompt": "The attached reference image shows the scene. Keep the exact same camera angle, square framing and horizon height, and the same low hill and treeline silhouette along the bottom. Change ONLY the sky, the light and the weather as described. A cinematic, photorealistic open skyscape that fills the entire square frame: almost all sky, seen from a fixed camera looking straight ahead with a very slight upward tilt. Only a very low, soft, location-neutral horizon silhouette of gentle rolling hills and a distant treeline runs along the very bottom of the frame (the bottom 12% of the image), softly out of focus. Composed for a circular crop: the mood of the sky sits inside the inscribed circle; the centre and upper centre of the frame stay calm, soft and uncluttered, because a portrait head will cover them. No key details in the centre or in the corners: any sun, moon, glow, lightning or bright highlight sits off-centre in the upper-left or upper-right area, still inside the circle. Calm, premium, cinematic colour grading with a gentle, soft focus. Strictly outdoor sky: no interior, no room, no window, no window frame, no glass, no buildings, no people, no animals, no text, no logos, no landmarks. Square 1:1 image. Time: night. A deep indigo-to-navy night sky with a soft, off-centre moon glow and, where the weather allows, a scattering of fine stars. Weather: storm. Dramatic, towering dark storm clouds with a distant lightning flash glowing inside the clouds low near the horizon, off to one side.",
+      "referenceUsed": "day-clear.png",
+      "cost": 0.062632,
+      "generationId": "gen-img-1790269148-NJmhrVPnjfZsCUIldPIX",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1024x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 1376,
+        "completion_tokens": 1756,
+        "total_tokens": 3132,
+        "cost": 0.062632,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.062632,
+          "upstream_inference_prompt_cost": 0.009952,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "createdAt": "2026-09-24T16:59:30.290Z"
+    },
+    {
+      "timeOfDay": "night",
+      "weather": "snow",
+      "concept": "sky-square",
+      "file": "night-snow.png",
+      "prompt": "The attached reference image shows the scene. Keep the exact same camera angle, square framing and horizon height, and the same low hill and treeline silhouette along the bottom. Change ONLY the sky, the light and the weather as described. A cinematic, photorealistic open skyscape that fills the entire square frame: almost all sky, seen from a fixed camera looking straight ahead with a very slight upward tilt. Only a very low, soft, location-neutral horizon silhouette of gentle rolling hills and a distant treeline runs along the very bottom of the frame (the bottom 12% of the image), softly out of focus. Composed for a circular crop: the mood of the sky sits inside the inscribed circle; the centre and upper centre of the frame stay calm, soft and uncluttered, because a portrait head will cover them. No key details in the centre or in the corners: any sun, moon, glow, lightning or bright highlight sits off-centre in the upper-left or upper-right area, still inside the circle. Calm, premium, cinematic colour grading with a gentle, soft focus. Strictly outdoor sky: no interior, no room, no window, no window frame, no glass, no buildings, no people, no animals, no text, no logos, no landmarks. Square 1:1 image. Time: night. A deep indigo-to-navy night sky with a soft, off-centre moon glow and, where the weather allows, a scattering of fine stars. Weather: snow. A pale, soft sky with gentle snowflakes drifting through the air, and the horizon silhouette dusted with white.",
+      "referenceUsed": "day-clear.png",
+      "cost": 0.062617,
+      "generationId": "gen-img-1790269173-IvfKY6fDeU69m1r37uRV",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1024x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 1373,
+        "completion_tokens": 1756,
+        "total_tokens": 3129,
+        "cost": 0.062617,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.062617,
+          "upstream_inference_prompt_cost": 0.009937,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "createdAt": "2026-09-24T16:59:55.978Z"
+    },
+    {
+      "timeOfDay": "night",
+      "weather": "fog",
+      "concept": "sky-square",
+      "file": "night-fog.png",
+      "prompt": "The attached reference image shows the scene. Keep the exact same camera angle, square framing and horizon height, and the same low hill and treeline silhouette along the bottom. Change ONLY the sky, the light and the weather as described. A cinematic, photorealistic open skyscape that fills the entire square frame: almost all sky, seen from a fixed camera looking straight ahead with a very slight upward tilt. Only a very low, soft, location-neutral horizon silhouette of gentle rolling hills and a distant treeline runs along the very bottom of the frame (the bottom 12% of the image), softly out of focus. Composed for a circular crop: the mood of the sky sits inside the inscribed circle; the centre and upper centre of the frame stay calm, soft and uncluttered, because a portrait head will cover them. No key details in the centre or in the corners: any sun, moon, glow, lightning or bright highlight sits off-centre in the upper-left or upper-right area, still inside the circle. Calm, premium, cinematic colour grading with a gentle, soft focus. Strictly outdoor sky: no interior, no room, no window, no window frame, no glass, no buildings, no people, no animals, no text, no logos, no landmarks. Square 1:1 image. Time: night. A deep indigo-to-navy night sky with a soft, off-centre moon glow and, where the weather allows, a scattering of fine stars. Weather: fog. Hazy, diffused light; soft fog and mist veil the sky, and the horizon silhouette almost disappears.",
+      "referenceUsed": "day-clear.png",
+      "cost": 0.062612,
+      "generationId": "gen-img-1790269198-CQZSMBc56UoYUPZDypJw",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "size": "1024x1024",
+      "background": "opaque",
+      "usage": {
+        "prompt_tokens": 1372,
+        "completion_tokens": 1756,
+        "total_tokens": 3128,
+        "cost": 0.062612,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.062612,
+          "upstream_inference_prompt_cost": 0.009932,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "createdAt": "2026-09-24T17:00:21.935Z"
+    }
+  ]
+}

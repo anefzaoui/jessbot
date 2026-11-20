@@ -1,0 +1,9 @@
+{{#> auth-frame heading=(concat "Welcome back") lead=(concat "Sign in to talk to " bot.name ".")}}
+  <form method="post" action="/login" class="space-y-4" data-ajax data-busy="Signing in…">
+    <input type="hidden" name="next" value="{{next}}">
+    {{> field name="email" label="Email" type="email" autocomplete="username" required=true autofocus=true}}
+    {{> field name="password" label="Password" type="password" autocomplete="current-password" required=true}}
+    <button class="btn btn-primary btn-lg btn-block mt-2">Sign in {{icon "arrow-right" class="size-4"}}</button>
+  </form>
+  <p class="mt-6 text-center text-xs text-ink-3">No account? Ask the person who runs this {{bot.name}} for an invite link.</p>
+{{/auth-frame}}

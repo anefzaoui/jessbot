@@ -1,0 +1,5 @@
+{{!-- Under Admin → Usage's numbers: when OpenRouter counts noticeably more (or less) for this key than was recorded here
+      (#179). Contract: balance (see admin/balance-card). Empty when there's no gap. --}}
+{{#if balance.gap}}
+  <p class="bal-gap" role="note">{{icon "info" class="size-4 shrink-0 text-ink-3"}}<span>{{balance.gap}}</span></p>
+{{/if}}

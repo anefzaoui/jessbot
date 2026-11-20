@@ -1,0 +1,25 @@
+{{!--
+  Live agent status (top of chat) — always says what Jessbot is doing right now.
+  Tap → panel (activity; approvals when waiting).
+  Contract: agent = { activity (public/js/activities.js key), target?, since?: ISO,
+                      doneToday, upcomingCount, nextJob?: { title, at: ISO } }
+  status.js keeps [data-status-*] live from the event stream.
+--}}
+<button type="button" class="status-strip group flex max-w-full min-w-0 items-center gap-2 rounded-full border border-line bg-surface py-1 pr-2.5 pl-2 text-xs transition hover:border-line-strong"
+  data-panel-open="{{#if (eq agent.activity 'waiting')}}approvals{{else}}activity{{/if}}" data-status-strip
+  data-tone="{{activityTone (default agent.activity 'resting')}}">
+  <span class="status-icon grid size-4 shrink-0 place-items-center" data-status-icon aria-hidden="true">
+    {{icon (activityIcon (default agent.activity 'resting')) class="size-3.5"}}
+  </span>
+  <span class="min-w-0 truncate font-medium text-ink-2" data-status-label>
+    {{#if (or (eq agent.activity 'resting') (not agent.activity))}}
+      Resting{{#if agent.nextJob}}<span class="font-normal text-ink-3"> · next: {{agent.nextJob.title}} {{time agent.nextJob.at}}</span>{{/if}}
+    {{else}}{{describeActivity agent.activity agent.target}}{{/if}}
+  </span>
+  <span class="tabular shrink-0 text-ink-3" data-status-elapsed {{#if agent.since}}data-elapsed-since="{{iso agent.since}}"{{else}}hidden{{/if}}></span>
+  <span class="hidden shrink-0 items-center gap-2 border-l border-line pl-2 text-ink-3 sm:flex">
+    <span data-tooltip="Done today"><span class="tabular font-medium text-ink-2" data-status-done>{{default agent.doneToday 0}}</span> done</span>
+    <span data-tooltip="Scheduled"><span class="tabular font-medium text-ink-2" data-status-next>{{default agent.upcomingCount 0}}</span> next</span>
+  </span>
+  <span class="shrink-0 text-ink-3 transition group-hover:translate-x-0.5">{{icon "chevron-right" class="size-3.5"}}</span>
+</button>

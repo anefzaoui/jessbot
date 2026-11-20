@@ -1,0 +1,53 @@
+{{!-- /projects — every project (docs/PROJECTS.md). Data: projects [projectView], archived [projectView].
+  New project starts the interview in the main chat (public/js/projects.js [data-project-new]). --}}
+{{#> page-header title="Projects" subtitle="Ongoing work, each with its own chat, brief and files" width="max-w-5xl"}}
+  <button type="button" class="btn btn-primary btn-sm" data-project-new>{{icon "folder-plus" class="size-4"}}<span class="hidden sm:inline">New project</span></button>
+{{/page-header}}
+<div class="mx-auto max-w-5xl px-4 py-6 sm:px-6">
+  {{#if projects}}
+    <ul class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3" role="list">
+      {{#each projects}}
+        <li>
+          <a href="{{href}}" class="proj-tilecard" style="--hue: {{hue}}" data-status="{{status}}">
+            <div class="flex items-start justify-between gap-2">
+              {{> projects/tile icon=this.icon hue=hue size="lg"}}
+              {{#if waiting}}<span class="badge badge-warn">{{icon "message-circle-question" class="size-3"}} Needs you</span>
+              {{else if running}}<span class="badge badge-run"><span class="dot dot-run"></span> Working</span>
+              {{else unless (eq status 'active')}}<span class="proj-status capitalize" data-status="{{status}}">{{status}}</span>{{/if}}
+            </div>
+            <h2 class="mt-3 truncate text-[15px] font-semibold tracking-tight" dir="auto">{{name}}</h2>
+            <p class="proj-card-eyebrow mt-0.5">{{fieldLabel}}</p>
+            {{#if about}}<p class="mt-2.5 line-clamp-2 text-[13px] text-ink-2" dir="auto">{{about}}</p>{{/if}}
+            {{#if next}}<p class="proj-next">{{icon "arrow-right" class="size-3.5 shrink-0"}}<span class="truncate" dir="auto">{{next}}</span></p>{{/if}}
+            <p class="mt-auto flex items-center gap-3 pt-3 text-[11px] text-ink-3">
+              <span class="inline-flex items-center gap-1">{{icon "files" class="size-3"}} {{plural fileCount "file"}}</span>
+              {{#if lastActivityAt}}<span class="inline-flex items-center gap-1">{{icon "clock" class="size-3"}} <time datetime="{{iso lastActivityAt}}" data-relative>{{timeAgo lastActivityAt}}</time></span>{{/if}}
+            </p>
+          </a>
+        </li>
+      {{/each}}
+    </ul>
+  {{else}}
+    <div class="proj-hero">
+      <div class="proj-hero-tiles" aria-hidden="true">
+        {{> projects/tile icon="hammer" hue=35 size="lg"}}{{> projects/tile icon="heart-pulse" hue=350 size="xl"}}{{> projects/tile icon="code" hue=220 size="lg"}}
+      </div>
+      <h2 class="mt-5 text-xl font-semibold tracking-tight text-balance">Give your bigger things a home</h2>
+      <p class="mx-auto mt-2 max-w-md text-sm text-ink-2 text-pretty">A project is one ongoing chat where {{bot.name}} goes deep as its expert, with a brief that stays current and files that are
+        kept for good. Your main chat always knows where each one stands.</p>
+      <button type="button" class="btn btn-primary mt-5" data-project-new>{{icon "folder-plus" class="size-4"}} Start a project</button>
+      <p class="mt-3 text-xs text-ink-3">Or just tell {{bot.name}} “let’s start a project for…” in any chat.</p>
+    </div>
+  {{/if}}
+
+  {{#if archived}}
+    <details class="mt-8">
+      <summary class="cursor-pointer text-sm font-medium text-ink-3 select-none hover:text-ink-2">Archived · {{archived.length}}</summary>
+      <ul class="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3" role="list">
+        {{#each archived}}
+          <li><a href="{{href}}" class="flex items-center gap-3 rounded-xl border border-line px-3 py-2.5 text-sm opacity-80 hover:opacity-100">{{> projects/tile icon=this.icon hue=hue size="sm"}}<span class="truncate" dir="auto">{{name}}</span></a></li>
+        {{/each}}
+      </ul>
+    </details>
+  {{/if}}
+</div>

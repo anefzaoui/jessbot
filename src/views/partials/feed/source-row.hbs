@@ -1,0 +1,36 @@
+{{!-- One source under a topic on /feed/sources (decision #89). Data: source (services/feed-sources.js sourceView:
+  { id, title, kind, kindLabel, host, favicon, url, siteUrl, query, mine, state: ok|failing|new, error, errorCount, fetchedAt,
+  nextFetchAt, items, latestAt }), topicKey. Client: public/js/feed-sources.js (Check now · Remove). --}}
+<li class="src-row" data-source-row="{{source.id}}" data-state="{{source.state}}" data-mine="{{#if source.mine}}true{{else}}false{{/if}}">
+  <span class="src-icon" aria-hidden="true">
+    {{#if source.favicon}}<img src="{{source.favicon}}" alt="" width="20" height="20" loading="lazy">{{else}}<span>{{initials source.title}}</span>{{/if}}
+  </span>
+  <div class="min-w-0 flex-1">
+    <p class="flex flex-wrap items-center gap-x-2 gap-y-1">
+      <span class="truncate text-sm font-medium" dir="auto" data-source-title>{{source.title}}</span>
+      <span class="badge badge-neutral">{{#if (eq source.kind 'gnews')}}{{icon "search" class="size-3"}}{{else}}{{icon "rss" class="size-3"}}{{/if}} {{source.kindLabel}}</span>
+      {{#if source.mine}}<span class="badge badge-accent">{{icon "user-round" class="size-3"}} Added by you</span>{{/if}}
+    </p>
+    {{#if source.query}}
+      <p class="mt-0.5 truncate text-xs text-ink-3">Searches for <span class="font-mono text-[11.5px] text-ink-2" dir="auto">{{source.query}}</span>{{#if (and source.host (neq source.host 'news.google.com'))}} on {{source.host}}{{/if}}</p>
+    {{else if source.siteUrl}}
+      <p class="mt-0.5 truncate text-xs text-ink-3"><a href="{{source.siteUrl}}" target="_blank" rel="noopener noreferrer" class="hover:text-accent-text">{{source.host}}</a>
+        · <a href="{{source.url}}" target="_blank" rel="noopener noreferrer" class="hover:text-accent-text">feed link</a></p>
+    {{/if}}
+    <p class="src-health" data-source-health>
+      <span class="src-dot" aria-hidden="true"></span>
+      {{#if (eq source.state 'failing')}}
+        <span>Not answering{{#if source.error}}: <span class="font-mono text-[11px]">{{source.error}}</span>{{/if}} · {{plural source.errorCount "try" "tries"}}{{#if source.nextFetchAt}} · next try <time datetime="{{iso source.nextFetchAt}}" data-relative>{{timeAgo source.nextFetchAt}}</time>{{/if}}</span>
+      {{else if (eq source.state 'new')}}
+        <span>Not checked yet. First look within the hour</span>
+      {{else}}
+        <span>Checked <time datetime="{{iso source.fetchedAt}}" data-relative>{{timeAgo source.fetchedAt}}</time>
+          · {{plural source.items "story" "stories"}}{{#if source.latestAt}} · newest <time datetime="{{iso source.latestAt}}" data-relative>{{timeAgo source.latestAt}}</time>{{/if}}</span>
+      {{/if}}
+    </p>
+  </div>
+  <div class="flex shrink-0 items-center gap-0.5">
+    <button type="button" class="btn btn-ghost btn-icon btn-sm" data-source-check data-tooltip="Check now" aria-label="Check {{source.title}} now">{{icon "refresh-cw" class="size-4"}}</button>
+    <button type="button" class="btn btn-ghost btn-icon btn-sm hover:text-bad" data-source-remove data-tooltip="Remove" aria-label="Remove {{source.title}}">{{icon "x" class="size-4"}}</button>
+  </div>
+</li>

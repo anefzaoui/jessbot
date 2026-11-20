@@ -1,0 +1,121 @@
+{{> page-header title="Browser" subtitle=(concat "How " bot.name " reaches the internet") width="max-w-5xl"}}
+<div class="mx-auto max-w-5xl px-4 py-6 sm:px-6" data-browser-admin>
+  {{> admin/nav active="browser"}}
+
+  <section class="card p-5" aria-label="Browser status" data-browser-status>
+    {{> admin/browser-status}}
+  </section>
+
+  <div class="mt-6 grid gap-6 @4xl/main:grid-cols-2">
+    <section class="card p-5" aria-labelledby="h-try">
+      <h2 id="h-try" class="text-sm font-semibold">Try it</h2>
+      <p class="mb-4 text-xs text-ink-3">Runs exactly what {{bot.name}} runs, through the private browser, never from the server directly.</p>
+      <form class="flex gap-2" data-browser-search>
+        <label class="sr-only" for="try-q">Search the web</label>
+        <input id="try-q" name="query" class="input" placeholder="Search the web…" value="weather in Lyon this weekend" autocomplete="off" required>
+        <button class="btn btn-secondary shrink-0">{{icon "search" class="size-4"}} Search</button>
+      </form>
+      <form class="mt-3 flex gap-2" data-browser-shot>
+        <label class="sr-only" for="try-url">Open a page</label>
+        <input id="try-url" name="url" type="url" class="input" placeholder="https://…" value="https://example.com" autocomplete="off" required>
+        <button class="btn btn-secondary shrink-0">{{icon "camera" class="size-4"}} Screenshot</button>
+      </form>
+      <div class="mt-4 empty:hidden" data-browser-result aria-live="polite"></div>
+    </section>
+
+    <section class="card p-5" aria-labelledby="h-set">
+      <h2 id="h-set" class="text-sm font-semibold">Settings</h2>
+      <p class="mb-4 text-xs text-ink-3">Apply to the next page opened.</p>
+      <form method="post" action="/admin/browser/settings" class="space-y-4" data-ajax data-stay data-success="Browser settings saved." data-busy="Saving…">
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="label" for="bs-pages">Pages at once</label>
+            <select id="bs-pages" name="maxPages" class="select">
+              {{#each maxPagesOptions}}<option value="{{this}}" {{#if (eq this @root.settings.maxPages)}}selected{{/if}}>{{this}}</option>{{/each}}
+            </select>
+          </div>
+          <div>
+            <label class="label" for="bs-idle">Sleep after</label>
+            <select id="bs-idle" name="idleMinutes" class="select">
+              {{#each idleOptions}}<option value="{{this}}" {{#if (eq this @root.settings.idleMinutes)}}selected{{/if}}>{{this}} min idle</option>{{/each}}
+            </select>
+          </div>
+        </div>
+        <fieldset>
+          <legend class="label">Search engines <span class="font-normal text-ink-3">(tried in this order)</span></legend>
+          <div class="flex flex-wrap gap-x-5 gap-y-2">
+            {{#each engines}}
+              <label class="flex items-center gap-2 text-sm"><input type="checkbox" class="check" name="engines" value="{{value}}" {{#if (includes @root.settings.engines value)}}checked{{/if}}> {{label}}</label>
+            {{/each}}
+          </div>
+        </fieldset>
+        <div data-field>
+          <label class="label" for="bs-searxng">SearXNG address <span class="font-normal text-ink-3">(optional)</span></label>
+          <input id="bs-searxng" name="searxngUrl" type="text" inputmode="url" class="input font-mono" value="{{settings.searxngUrl}}" placeholder="http://127.0.0.1:8888" autocomplete="off" spellcheck="false">
+          <p class="mt-1 text-xs text-ink-3">Your own SearXNG search, used first when it answers; tested when you save. Install one on this computer with <code class="font-mono">npm run searxng:install</code>. Leave empty to use the engines above only.</p>
+        </div>
+        <label class="flex items-start gap-3">
+          <input type="checkbox" role="switch" class="switch mt-0.5" name="blockMedia" data-bool {{#if settings.blockMedia}}checked{{/if}}>
+          <span class="text-sm">Skip images and video when reading<span class="block text-xs text-ink-3">Faster and lighter. Screenshots always load everything.</span></span>
+        </label>
+        <label class="flex items-start gap-3">
+          <input type="checkbox" role="switch" class="switch mt-0.5" name="blockAds" data-bool {{#if settings.blockAds}}checked{{/if}}>
+          <span class="text-sm">Block ads and trackers<span class="block text-xs text-ink-3">Pages load lighter and quieter. Turned off by itself on a site that asks for it.</span></span>
+        </label>
+        <label class="flex items-start gap-3">
+          <input type="checkbox" role="switch" class="switch mt-0.5" name="allowPrivate" data-bool {{#if settings.allowPrivate}}checked{{/if}}>
+          <span class="text-sm">Allow the local network<span class="block text-xs text-ink-3">Lets {{bot.name}} open addresses like your router or other devices at home. Leave off unless you need it: anyone who can chat could ask for them.</span></span>
+        </label>
+        <button class="btn btn-primary">Save settings</button>
+      </form>
+    </section>
+  </div>
+
+  <div class="mt-6" data-browser-extras>{{> admin/browser-extras extras=extras}}</div>
+
+  <section class="card mt-6 p-5" aria-labelledby="h-key">
+    <div class="flex flex-wrap items-start gap-4">
+      <div class="min-w-0 flex-1">
+        <h2 id="h-key" class="text-sm font-semibold">Licence key <span class="font-normal text-ink-3">(optional)</span></h2>
+        <p class="mt-0.5 max-w-prose text-xs text-ink-3">
+          Works without a key (free build). A free key from <span class="font-medium text-ink-2">cloakbrowser.dev/free</span> (GitHub sign-in)
+          unlocks the newest build; paid keys allow more pages at once. The key stays in <code class="font-mono">tools/cloakbrowser/license.key</code>, never in git or backups.
+        </p>
+      </div>
+      {{#if status.license.present}}
+        <div class="flex items-center gap-2">
+          <span class="badge badge-ok">{{icon "key-round" class="size-3"}} {{status.license.masked}}</span>
+          {{#if (eq status.license.source 'env')}}<span class="text-xs text-ink-3">from .env</span>{{else}}
+            <form method="post" action="/admin/browser/license/remove" data-ajax data-confirm="Remove the licence key? The free build is used from the next page." data-browser-refresh>
+              <button class="btn btn-ghost btn-sm">Remove</button>
+            </form>
+          {{/if}}
+        </div>
+      {{/if}}
+    </div>
+    {{#unless status.license.present}}
+      <form method="post" action="/admin/browser/license" class="mt-4 flex max-w-lg items-start gap-2" data-ajax data-stay data-reset data-busy="Saving…"
+        data-success="Key saved. Downloading the matching browser build." data-browser-refresh>
+        <div class="min-w-0 flex-1" data-field>
+          <label class="sr-only" for="bs-key">Licence key</label>
+          <input id="bs-key" name="key" type="password" class="input font-mono" placeholder="cb_…" autocomplete="off" spellcheck="false" required>
+        </div>
+        <button class="btn btn-secondary shrink-0">Save key</button>
+      </form>
+    {{/unless}}
+  </section>
+
+  <section class="mt-8" aria-labelledby="h-recent">
+    <div class="mb-3 flex items-baseline gap-2">
+      <h2 id="h-recent" class="text-sm font-semibold">Recent browsing</h2>
+      <span class="text-xs text-ink-3">since the server started</span>
+    </div>
+    <div class="card overflow-hidden" data-browser-recent>{{> admin/browser-recent}}</div>
+  </section>
+
+  <p class="mt-8 max-w-prose text-xs text-ink-3">
+    CloakBrowser's wrapper is MIT-licensed; its browser build is proprietary: free to use, not to redistribute. Each Jessbot install downloads its
+    own copy, and it is for your household and team only (offering {{bot.name}} to outside customers needs CloakHQ's commercial licence).
+  </p>
+</div>
+<script type="module" src="/js/browser-admin.js"></script>

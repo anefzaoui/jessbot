@@ -1,0 +1,62 @@
+{{!--
+  Admin → System, the weekly self-review (decision #208; the screen is Phase 25 #212). Contract: review = agent/self-review.js
+  selfReviewPage() { settings: { enabled }, pending, running, everyDays, latest: review | null, earlier: [review] } with review
+  { id, origin, status: running|done|nothing|error, period: { start, end }, note, createdAt, finishedAt, proposals: [proposal] } and
+  proposal (proposalView) { id, kind, kindLabel, title, why, preview: { where, lines: [{ mark, text }], note?, skill? }, evidence:
+  [{ runId, href, label, person, at }], target, status: pending|approved|rejected, reason, result, decidedAt }.
+  GET /admin/system/self-review re-renders it (Run now, a review running when the page opened). Client: public/js/admin-review.js.
+--}}
+<section id="self-review" class="card rv scroll-mt-20" aria-labelledby="h-self-review" data-self-review data-running="{{review.running}}">
+  <div class="rv-head">
+    <span class="rv-icon" aria-hidden="true">{{icon "lightbulb" class="size-[18px]"}}</span>
+    <div class="min-w-0 flex-1 basis-64">
+      <h2 id="h-self-review" class="flex flex-wrap items-center gap-2 text-sm font-semibold">Weekly self-review
+        {{#if review.pending}}<span class="count count-warn tabular" data-rv-pending>{{review.pending}} to decide</span>{{/if}}</h2>
+      <p class="mt-0.5 text-xs leading-relaxed text-ink-3">Once a week, in your quiet hours, I look at what went wrong: thumbs-down, tasks I had to redo,
+        approvals you declined, things people asked for that I can’t do. Then I propose at most 3 changes. Nothing changes until you approve it.
+        From other people’s chats I only see patterns, never their words.</p>
+    </div>
+    <div class="rv-controls">
+      <label class="rv-switch" for="rv-enabled"><span data-rv-switch-label>{{#if review.settings.enabled}}Every {{review.everyDays}} days{{else}}Off{{/if}}</span>
+        <input type="checkbox" id="rv-enabled" class="switch" role="switch" data-rv-enabled {{#if review.settings.enabled}}checked{{/if}}></label>
+      <button type="button" class="btn btn-secondary btn-sm" data-rv-run {{#if review.running}}disabled{{/if}}>{{icon "play" class="size-3.5"}} Run now</button>
+    </div>
+  </div>
+
+  <div class="rv-body" data-rv-body>
+    {{#if review.running}}
+      {{> admin/review-running}}
+    {{else if review.latest}}
+      {{#with review.latest}}
+        <p class="rv-period">
+          {{#if (eq origin 'admin')}}Run by you{{else}}This week’s review{{/if}} · <time datetime="{{iso createdAt}}" data-relative>{{timeAgo createdAt}}</time> ·
+          covers {{date period.start}} to {{date period.end}}
+        </p>
+        {{#if (eq status 'nothing')}}
+          <p class="rv-calm">{{icon "circle-check" class="size-5 shrink-0 text-ok"}} <span>{{default note "Nothing went wrong this week that a rule could fix."}}</span></p>
+        {{else if (eq status 'error')}}
+          <p class="rv-failed">{{icon "circle-alert" class="size-4 shrink-0"}} <span>It didn’t finish: {{note}}</span></p>
+        {{else}}
+          <ol class="rv-props" role="list">{{#each proposals}}{{> admin/review-proposal this}}{{/each}}</ol>
+          {{#if note}}<p class="mt-2 text-xs text-ink-3">{{note}}</p>{{/if}}
+        {{/if}}
+      {{/with}}
+    {{else}}
+      <p class="rv-calm">{{icon "calendar-clock" class="size-5 shrink-0 text-ink-3"}} <span>No review yet. {{#if review.settings.enabled}}The first one runs in your next quiet hours.{{else}}Switch it on, or press Run now to review the last week.{{/if}}</span></p>
+    {{/if}}
+    {{#if review.earlier.length}}
+      <details class="rv-earlier">
+        <summary>{{icon "chevron-right" class="rv-chevron size-3.5"}} Earlier reviews <span class="text-ink-3">· {{review.earlier.length}}</span></summary>
+        <ul class="divide-y divide-line" role="list">
+          {{#each review.earlier}}
+            <li class="rv-earlier-row">
+              <span class="min-w-0 flex-1 truncate"><time datetime="{{iso createdAt}}">{{date createdAt}}</time> · {{#if (eq status 'done')}}{{plural proposals.length "proposal"}}{{else if (eq status 'nothing')}}nothing to fix{{else if (eq status 'error')}}didn’t finish{{else}}running{{/if}}</span>
+              <span class="shrink-0 text-ink-3">{{countWhere proposals "status" "approved"}} approved · {{countWhere proposals "status" "rejected"}} rejected</span>
+            </li>
+          {{/each}}
+        </ul>
+      </details>
+    {{/if}}
+  </div>
+  <template data-rv-running>{{> admin/review-running}}</template>
+</section>

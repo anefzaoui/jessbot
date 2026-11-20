@@ -1,0 +1,57 @@
+{{!--
+  Goals. Data: goals { active: [goal], suggested: [goal], longTerm: [goal] }
+--}}
+{{#> page-header title="Goals" subtitle="What you're working toward, and what I'm doing about it"}}
+  <a href="/goals/new" class="btn btn-primary btn-sm" data-cmd="New goal" data-cmd-group="Actions" data-cmd-icon="target">
+    {{icon "plus" class="size-4"}} <span class="hidden sm:inline">New goal</span>
+  </a>
+{{/page-header}}
+
+<div class="mx-auto max-w-5xl px-4 py-6 sm:px-6">
+  {{#if goals.suggested}}
+    <section aria-labelledby="suggested-goals" class="mb-8">
+      <h2 id="suggested-goals" class="mb-3 text-sm font-semibold">I noticed you care about…</h2>
+      <div class="grid gap-3 sm:grid-cols-2">
+        {{#each goals.suggested}}
+          <div class="card flex items-center gap-3 border-dashed p-3.5" data-goal-id="{{id}}">
+            <div class="min-w-0 flex-1">
+              <p class="truncate text-sm font-semibold">{{title}}</p>
+              {{#if statusLine}}<p class="truncate text-xs text-ink-3">{{statusLine}}</p>{{/if}}
+            </div>
+            <button type="button" class="btn btn-soft btn-sm" data-goal-action="adopt">Make it a goal</button>
+            <button type="button" class="btn btn-ghost btn-icon btn-sm" data-goal-action="dismiss" aria-label="Dismiss suggestion">{{icon "x" class="size-4"}}</button>
+          </div>
+        {{/each}}
+      </div>
+    </section>
+  {{/if}}
+
+  <section aria-labelledby="active-goals">
+    <h2 id="active-goals" class="sr-only">Active goals</h2>
+    {{#if goals.active}}
+      <div class="grid gap-4 @2xl/main:grid-cols-2">{{#each goals.active}}{{> goal-card this}}{{/each}}</div>
+    {{else}}
+      {{#> empty-state iconName="target" title="No goals yet" text="Tell me something you want to achieve. I'll ask a few questions, show you everything I can do about it, and keep at it in the background."}}
+        <a href="/goals/new" class="btn btn-primary">{{icon "plus" class="size-4"}} Set a goal</a>
+      {{/empty-state}}
+    {{/if}}
+  </section>
+
+  {{#if goals.longTerm}}
+    <section aria-labelledby="long-goals" class="mt-10">
+      <h2 id="long-goals" class="mb-3 text-sm font-semibold">Longer horizon</h2>
+      <ul class="card divide-y divide-line" role="list">
+        {{#each goals.longTerm}}
+          <li>
+            <a href="/goals/{{id}}" class="flex items-center gap-3 px-4 py-3 hover:bg-surface-2/60">
+              <span class="min-w-0 flex-1 truncate text-sm font-medium">{{title}}</span>
+              {{> progress-bar value=progress label=title class="hidden w-20 sm:block"}}
+              <span class="tabular w-9 text-end text-xs text-ink-3">{{progress}}%</span>
+              {{icon "chevron-right" class="size-4 text-ink-3"}}
+            </a>
+          </li>
+        {{/each}}
+      </ul>
+    </section>
+  {{/if}}
+</div>

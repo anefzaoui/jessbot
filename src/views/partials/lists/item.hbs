@@ -1,0 +1,27 @@
+{{!--
+  One row on a list (the Lists page). Rendered on the server only; public/js/lists.js ticks it optimistically and then
+  swaps in the server's rendering (GET /api/v1/lists/:id?fragment=1).
+  Contract (services/lists.js itemView + detailOf): { id, text, qty, category, assigneeId, assignee, dueAt, dueLabel?,
+  overdue?, done, doneAt, doneBy, bought } and, from the page: kind (the list's), shared (bool).
+  Tapping anywhere on the words ticks it (the label holds the checkbox): one hand, in a shop.
+--}}
+<li class="li-row" data-item-id="{{id}}" data-done="{{#if done}}true{{else}}false{{/if}}" data-text="{{text}}" data-qty="{{qty}}"
+  data-category="{{category}}" data-assignee="{{assigneeId}}" data-due="{{dueAt}}">
+  <label class="li-main">
+    <input type="checkbox" class="li-check" data-list-tick {{#if done}}checked{{/if}} aria-describedby="li-meta-{{id}}">
+    <span class="min-w-0 flex-1">
+      <span class="li-text"><span class="li-words" dir="auto">{{text}}</span>{{#if qty}}<span class="li-qty">{{qty}}</span>{{/if}}</span>
+      <span class="li-meta" id="li-meta-{{id}}">
+        {{#if done}}
+          {{#if bought}}<span class="li-chip is-bought">{{icon "gift" class="size-3"}} Bought by {{doneBy}}</span>
+          {{else if doneBy}}{{#if shared}}<span>{{doneBy}} ticked it</span>{{/if}}{{/if}}
+          {{#if doneAt}}<time datetime="{{doneAt}}" data-relative>{{timeAgo doneAt}}</time>{{/if}}
+        {{else}}
+          {{#if assignee}}<span class="li-chip">{{icon "user-round" class="size-3"}} {{assignee}}</span>{{/if}}
+          {{#if dueLabel}}<span class="li-chip {{#if overdue}}is-overdue{{/if}}">{{icon "calendar-clock" class="size-3"}} {{#if overdue}}Overdue since {{/if}}{{dueLabel}}</span>{{/if}}
+        {{/if}}
+      </span>
+    </span>
+  </label>
+  <button type="button" class="btn btn-ghost btn-icon btn-sm li-more" data-list-edit aria-expanded="false" aria-label="Change {{text}}">{{icon "pencil" class="size-4"}}</button>
+</li>

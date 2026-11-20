@@ -1,0 +1,20 @@
+{{!-- Health check card body (Admin → System). Contract: health = services/system.js doctor() --}}
+<div class="health-banner" data-status="{{health.status}}">
+  <span class="health-dot" data-status="{{health.status}}"></span>
+  <p class="min-w-0 flex-1 text-sm font-semibold">{{health.summary}}</p>
+  <time class="text-xs text-ink-3" datetime="{{health.checkedAt}}" data-relative>{{timeAgo health.checkedAt}}</time>
+  <button type="button" class="btn btn-secondary btn-sm" data-health-run>{{icon "refresh-cw" class="size-3.5"}} Check again</button>
+</div>
+<ul class="divide-y divide-line" role="list">
+  {{#each health.checks}}
+    <li class="health-row" data-check="{{id}}">
+      <span class="health-dot" data-status="{{status}}" aria-hidden="true"></span>
+      <div class="min-w-0 flex-1">
+        <p class="text-sm"><span class="font-medium">{{label}}</span> <span class="sr-only">: {{status}}</span></p>
+        <p class="text-xs text-ink-2">{{detail}}</p>
+        {{#if fix}}<p class="mt-0.5 text-xs text-ink-3">{{icon "wrench" class="size-3"}} {{fix}}</p>{{/if}}
+      </div>
+      {{#if href}}<a href="{{href}}" class="btn btn-ghost btn-sm shrink-0">Open {{icon "chevron-right" class="size-3.5"}}</a>{{/if}}
+    </li>
+  {{/each}}
+</ul>

@@ -1,0 +1,54 @@
+{{!--
+  Admin → System, What's new in Jess (decision #210; the screen is Phase 25 #213): each release's note, drafted from its commits,
+  edited and published here; people see a published note once, in their main chat. Contract: whatsNew = { entries: services/
+  whats-new.js listEntries() [{ id, release, subjects, lines, status: draft|published|discarded, publishedAt, createdAt }],
+  maxLines }. GET /admin/system/whats-new re-renders it after Publish / Discard. Client: public/js/admin-review.js
+  (PUT /api/v1/admin/whats-new/:id { lines } · POST …/redraft | publish | discard).
+--}}
+<section id="whats-new" class="mt-6 scroll-mt-20" aria-labelledby="h-whats-new" data-wn-admin>
+  <div class="mb-3">
+    <h2 id="h-whats-new" class="text-sm font-semibold">What’s new in {{bot.name}}</h2>
+    <p class="text-xs text-ink-3">After each release I draft a short note from what changed, leaving out the behind-the-scenes work. Edit it, then publish: everyone sees it once, above their chat.</p>
+  </div>
+  {{#if whatsNew.entries.length}}
+    <ul class="space-y-3" role="list">
+      {{#each whatsNew.entries}}{{#unless (eq status 'discarded')}}
+        <li class="card wn-entry" data-wn-entry="{{id}}" data-status="{{status}}">
+          <div class="wn-entry-head">
+            <p class="min-w-0 flex-1 text-sm font-medium">Release <code class="wn-ref">{{release}}</code> <span class="font-normal text-ink-3">· <time datetime="{{iso createdAt}}">{{date createdAt}}</time></span></p>
+            {{#if (eq status 'published')}}<span class="badge badge-accent">{{icon "check" class="size-3"}} Published {{date publishedAt}}</span>{{else}}<span class="badge badge-neutral">Draft</span>{{/if}}
+          </div>
+          <form class="wn-form" data-wn-form novalidate>
+            <div data-field>
+              <label class="label" for="wn-lines-{{id}}">The note, one line each <span class="font-normal text-ink-3" data-wn-count data-max="{{../whatsNew.maxLines}}">{{lines.length}} of {{../whatsNew.maxLines}} lines</span></label>
+              <textarea id="wn-lines-{{id}}" name="lines" rows="4" class="textarea text-sm" dir="auto" data-wn-lines
+                placeholder="You can now…&#10;Reminders can…">{{#each lines}}{{this}}{{#unless @last}}&#10;{{/unless}}{{/each}}</textarea>
+            </div>
+            <div class="wn-drafting" data-wn-drafting hidden>{{> loader label="Drafting the note from the release’s commits…" motion="writing" iconName="pen-line" noLines=true}}</div>
+            <div class="wn-preview" data-wn-preview-box {{#unless lines.length}}hidden{{/unless}}>
+              <p class="text-xs text-ink-3">People will see</p>
+              <ul class="wn-lines" role="list" data-wn-preview>{{#each lines}}<li dir="auto">{{this}}</li>{{/each}}</ul>
+            </div>
+            <div class="wn-actions">
+              {{#if (eq status 'published')}}
+                <button type="submit" class="btn btn-secondary btn-sm" data-wn-save>Save changes</button>
+                <span class="text-xs text-ink-3">People who already saw it won’t see it again.</span>
+              {{else}}
+                <button type="button" class="btn btn-primary btn-sm" data-wn-publish>{{icon "send" class="size-3.5"}} Publish</button>
+                <button type="submit" class="btn btn-secondary btn-sm" data-wn-save>Save draft</button>
+                <button type="button" class="btn btn-ghost btn-sm" data-wn-redraft>{{icon "refresh-cw" class="size-3.5"}} Draft it again</button>
+                <button type="button" class="btn btn-ghost btn-sm ms-auto text-ink-3" data-wn-discard>Discard</button>
+              {{/if}}
+            </div>
+          </form>
+          <details class="wn-commits">
+            <summary>{{icon "chevron-right" class="wn-chevron size-3.5"}} What went into it <span class="text-ink-3">· {{plural subjects.length "commit"}}</span></summary>
+            <ul class="wn-subjects" role="list">{{#each subjects}}<li dir="auto">{{this}}</li>{{/each}}</ul>
+          </details>
+        </li>
+      {{/unless}}{{/each}}
+    </ul>
+  {{else}}
+    <div class="card">{{> empty-state compact=true iconName="megaphone" title="No releases yet" text="When a new version is released, what changed shows up here as a draft note for you to check and publish."}}</div>
+  {{/if}}
+</section>

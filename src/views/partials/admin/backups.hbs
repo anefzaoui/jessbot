@@ -1,0 +1,15 @@
+{{!-- Backup list (Admin → System). Contract: backups = services/system.js listBackups() --}}
+<ul class="divide-y divide-line" role="list" data-backup-list>
+  {{#each backups}}
+    <li class="flex items-center gap-3 px-4 py-2.5 text-sm">
+      {{#if full}}<span class="text-ok">{{icon "archive" class="size-4"}}</span>{{else}}<span class="text-ink-3">{{icon "database" class="size-4"}}</span>{{/if}}
+      <div class="min-w-0 flex-1">
+        <p class="truncate font-mono text-xs">{{name}}</p>
+        <p class="text-xs text-ink-3">{{kindLabel}} · {{sizeLabel}} · <time datetime="{{at}}" data-relative>{{timeAgo at}}</time></p>
+      </div>
+      <a href="/admin/system/backups/{{name}}" class="btn btn-ghost btn-sm shrink-0" download>{{icon "download" class="size-3.5"}} Download</a>
+    </li>
+  {{else}}
+    <li class="px-4 py-6 text-center text-sm text-ink-3">No backups yet. Make the first one now.</li>
+  {{/each}}
+</ul>

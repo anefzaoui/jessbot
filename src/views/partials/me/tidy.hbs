@@ -1,0 +1,39 @@
+{{!--
+  You → Memory, the weekly tidy (decision #189; the screen is Phase 25 #204): what the last pass merged or archived, each
+  change undoable on its own. Opened (and scrolled to) from its Activity item (/me/memory?tidy=<id>); otherwise the latest
+  one of the last two weeks shows folded. GET /api/v1/me/memory-tidies/:id?fragment=1 re-renders it after an Undo.
+  Contract: tidy = services/memory.js listTidies()[0]: { id, at, merged, archived, changes: [{ id, op: merge|archive, why,
+  undone, before: [{ id, text, dateLabel }], after: { id, text } | null }] }, open. Client: public/js/me-lessons.js.
+--}}
+<details class="card tidy" id="tidy-{{tidy.id}}" data-tidy="{{tidy.id}}" {{#if open}}open{{/if}}>
+  <summary class="tidy-head">
+    <span class="grid size-9 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent-text">{{icon "archive" class="size-[18px]"}}</span>
+    <span class="min-w-0 flex-1">
+      <span class="block text-[15px] font-semibold">Weekly tidy <span class="font-normal text-ink-3">· {{date tidy.at}}</span></span>
+      <span class="block text-xs text-ink-3">{{#if tidy.merged}}Merged {{plural tidy.merged "near-duplicate" "near-duplicates"}}{{#if tidy.archived}}, {{/if}}{{/if}}{{#if tidy.archived}}archived {{plural tidy.archived "past event" "past events"}}{{/if}}. Undo any change you don’t want.</span>
+    </span>
+    {{icon "chevron-down" class="size-4 shrink-0 text-ink-3 tidy-chevron"}}
+  </summary>
+  <ol class="tidy-changes" role="list">
+    {{#each tidy.changes}}
+      <li class="tidy-change" data-tidy-change="{{id}}" data-op="{{op}}" data-undone="{{#if undone}}true{{else}}false{{/if}}">
+        <div class="min-w-0 flex-1">
+          <p class="mb-1.5 flex flex-wrap items-center gap-1.5">
+            {{#if (eq op 'merge')}}<span class="mem-chip">{{icon "git-merge" class="size-3"}} Merged {{before.length}} into one</span>
+            {{else}}<span class="mem-chip">{{icon "archive" class="size-3"}} Archived</span>{{/if}}
+            {{#if undone}}<span class="mem-chip is-accent">{{icon "rotate-ccw" class="size-3"}} Undone</span>{{/if}}
+          </p>
+          {{#if (eq op 'merge')}}
+            <ul class="tidy-before" role="list" aria-label="Before">{{#each before}}<li dir="auto">{{text}}</li>{{/each}}</ul>
+            {{#if after}}<p class="tidy-after" dir="auto">{{icon "arrow-down" class="size-3.5 shrink-0 text-ink-3"}}<span>{{after.text}}</span></p>{{/if}}
+          {{else}}
+            {{#each before}}<p class="text-sm leading-relaxed text-ink-2" dir="auto">{{text}}{{#if dateLabel}} <span class="text-xs text-ink-3">· {{dateLabel}}</span>{{/if}}</p>{{/each}}
+          {{/if}}
+          {{#if why}}<p class="mt-1 text-xs text-ink-3" dir="auto">{{why}}</p>{{/if}}
+          <p class="field-error" data-tidy-error hidden></p>
+        </div>
+        {{#unless undone}}<button type="button" class="btn btn-secondary btn-sm shrink-0" data-tidy-undo>{{icon "rotate-ccw" class="size-3.5"}} Undo</button>{{/unless}}
+      </li>
+    {{/each}}
+  </ol>
+</details>

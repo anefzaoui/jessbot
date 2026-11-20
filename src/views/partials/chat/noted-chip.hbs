@@ -1,0 +1,27 @@
+{{!--
+  What a thumbs-down on a reply taught (decision #187; the screen is Phase 25 #211): "Noted: <the rule>" under the reply.
+  Contract: noted = services/lessons.js notedChip() { text, rule, lessonId, keep } (keep: a guess from a thumbs-down without
+  words, waiting for their Keep; otherwise their own words made it and it is in use already). The chat renders it on load
+  (chatview `noted`), POST /api/v1/messages/:id/feedback returns it as `html`. Every state's words are in the markup;
+  data-state picks one: proposed → kept | rejected, active → removed (public/js/run.js). Owner-only buttons (not read-only).
+--}}
+<div class="noted" data-noted="{{noted.lessonId}}" data-state="{{#if noted.keep}}proposed{{else}}active{{/if}}" role="status" aria-live="polite">
+  <span class="noted-icon" aria-hidden="true">{{icon "graduation-cap" class="size-4"}}</span>
+  <div class="min-w-0 flex-1">
+    <p class="noted-rule" dir="auto"><span class="noted-label">Noted:</span> {{noted.rule}}</p>
+    <p class="noted-sub">
+      <span data-when="proposed">My guess from your thumbs-down. Keep it for next time?</span>
+      <span data-when="active">From what you told me. I’ll work this way from now on.</span>
+      <span data-when="kept">{{icon "check" class="size-3.5"}} Kept. It’s in <a href="/me/memory#h-lessons" class="noted-link">How I work with you</a>.</span>
+      <span data-when="rejected">Okay, I won’t use that one, and I won’t guess it again.</span>
+      <span data-when="removed">Removed. I won’t work that way.</span>
+    </p>
+  </div>
+  {{#unless @root.readOnly}}
+    <div class="noted-actions">
+      <button type="button" class="btn btn-primary btn-sm" data-when="proposed" data-noted-keep>{{icon "check" class="size-3.5"}} Keep</button>
+      <button type="button" class="btn btn-ghost btn-sm" data-when="proposed" data-noted-no="reject" aria-label="No, don’t keep this rule">No</button>
+      <button type="button" class="btn btn-ghost btn-sm" data-when="active" data-noted-no="remove" aria-label="Remove this rule">Remove</button>
+    </div>
+  {{/unless}}
+</div>

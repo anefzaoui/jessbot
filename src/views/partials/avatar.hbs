@@ -1,0 +1,36 @@
+{{!--
+  Jessbot avatar — the living presence (decision #33) when a portrait set exists, else the CSS orb fallback.
+  size:     xs | sm | md | lg | xl | 2xl | hero
+  activity: key from public/js/activities.js — drives expression, ring and badge
+  state:    optional orb/ring override (idle|working|creating|waiting|error|offline)
+  label:    accessible name (otherwise decorative) · avatarId: element id (NOT `id` — partials inherit the parent context)
+  Layers: sky scene (two, for crossfade) → weather FX → portrait (two, for crossfade) → ring → badge.
+  public/js/presence.js animates it (breathing, blinks, glances, listening, expression + scene crossfades).
+--}}
+{{#if @root.presence.variant}}
+  <span class="avatar presence avatar-{{default size 'md'}}" data-avatar data-presence
+    data-state="{{default state (activityAvatar (default activity 'resting'))}}" data-activity="{{default activity 'resting'}}"
+    data-variant="{{@root.presence.variant}}" data-scene="{{@root.presence.scene}}" data-weather="{{@root.presence.weather}}"
+    data-time="{{@root.presence.time}}" {{#if @root.presence.sunrise}}data-sunrise="{{@root.presence.sunrise}}" data-sunset="{{@root.presence.sunset}}"{{/if}} data-res="{{imgSuffix size}}" {{#if @root.presence.pinned}}data-pinned{{/if}} {{#if avatarId}}id="{{avatarId}}"{{/if}}
+    {{#if label}}role="img" aria-label="{{label}}"{{else}}aria-hidden="true"{{/if}}>
+    <span class="presence-clip">
+      <span class="presence-scene">
+        {{#if @root.presence.scene}}<img class="is-shown" src="/img/scenes/{{@root.presence.scene}}{{imgSuffix size}}.webp" alt="" decoding="async">{{/if}}
+        <img alt="" decoding="async">
+      </span>
+      <span class="presence-fx" aria-hidden="true"></span>
+      <span class="presence-portrait">
+        <img class="is-shown" src="/img/avatars/{{@root.presence.variant}}/{{presenceFrame @root.presence (default activity 'resting')}}{{imgSuffix size}}.webp" alt="" decoding="async">
+        <img alt="" decoding="async">
+      </span>
+    </span>
+    <span class="avatar-badge" data-tone="{{activityTone (default activity 'resting')}}">{{icon (activityIcon (default activity 'resting')) class="size-full"}}</span>
+  </span>
+{{else}}
+  <span class="avatar avatar-{{default size 'md'}}" data-state="{{default state (activityAvatar (default activity 'resting'))}}"
+    data-activity="{{default activity 'resting'}}" data-avatar {{#if avatarId}}id="{{avatarId}}"{{/if}}
+    {{#if label}}role="img" aria-label="{{label}}"{{else}}aria-hidden="true"{{/if}}>
+    <span class="avatar-orb"><span class="avatar-eyes"><i></i><i></i></span></span>
+    <span class="avatar-badge" data-tone="{{activityTone (default activity 'resting')}}">{{icon (activityIcon (default activity 'resting')) class="size-full"}}</span>
+  </span>
+{{/if}}

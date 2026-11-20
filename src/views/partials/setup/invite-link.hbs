@@ -1,0 +1,9 @@
+{{!-- One-time invite link (shown once — only its hash is stored). name, link --}}
+<div class="rounded-xl border border-ok/30 bg-ok-soft px-4 py-3 animate-rise">
+  <p class="text-sm font-semibold">Invite for {{name}} is ready</p>
+  <p class="text-xs text-ink-2">Send this link to them. It works once and expires in 7 days. Copy it now; it won't be shown again.</p>
+  <div class="mt-2 flex gap-2">
+    <input class="input h-9 flex-1 font-mono text-xs" value="{{link}}" readonly aria-label="Invite link" data-select-on-focus>
+    <button type="button" class="btn btn-secondary btn-sm h-9" data-copy="{{link}}" aria-label="Copy link">{{icon "copy" class="size-4"}} Copy</button>
+  </div>
+</div>

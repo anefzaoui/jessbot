@@ -1,0 +1,21 @@
+{{!--
+  "Ready for you" on the Ideas page (Phase 25 #212): an idea overnight prep turned into a first draft (decision #199).
+  Contract: an idea view (services/ideas.js ideaView) with prepared { itemId, title, type, href, readyAt, chatHref }.
+  "Take it from here" starts the idea in the chat (ideas.js, the same start as a card's "Let's do it").
+--}}
+<article class="card ready-card" data-idea-id="{{id}}" data-ready aria-labelledby="ready-{{id}}">
+  <a href="{{prepared.href}}" class="ready-doc" aria-hidden="true" tabindex="-1">
+    <span class="ready-doc-lines"><i></i><i></i><i></i><i></i></span>
+    <span class="ready-doc-icon">{{icon "moon" class="size-4"}}</span>
+  </a>
+  <div class="min-w-0 flex-1">
+    <p class="text-xs text-ink-3">Prepared overnight · <time datetime="{{iso prepared.readyAt}}" data-relative>{{timeAgo prepared.readyAt}}</time></p>
+    <h3 id="ready-{{id}}" class="mt-0.5 leading-snug font-semibold text-balance"><a href="{{prepared.href}}" class="hover:underline" dir="auto">{{prepared.title}}</a></h3>
+    <p class="mt-1 text-[13px] leading-relaxed text-ink-2">A first draft for your idea <span class="font-medium text-ink" dir="auto">“{{title}}”</span>. What I assumed and the next steps are inside.</p>
+    <div class="mt-3 flex flex-wrap items-center gap-2">
+      <a href="{{prepared.href}}" class="btn btn-primary btn-sm">{{icon "file-text" class="size-3.5"}} Open the draft</a>
+      <button type="button" class="btn btn-secondary btn-sm" data-idea-action="start">Take it from here</button>
+      {{#if prepared.chatHref}}<a href="{{prepared.chatHref}}" class="btn btn-ghost btn-sm">How I made it</a>{{/if}}
+    </div>
+  </div>
+</article>

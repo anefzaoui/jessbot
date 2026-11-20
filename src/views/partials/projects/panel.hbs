@@ -1,0 +1,140 @@
+{{!-- A project's panel beside its chat (lg+) or in a sheet (smaller screens) — rendered twice, ids prefixed.
+  Data: panel { project (projectView), sections: [{ kind, title, items: [{ id, kind, text, mine, state }] }], done: [item], intake: [{ question, answer }],
+               empty, files: [libraryItemView + { pasted }], goals: [{ id, title, state, progress, href }], kinds: [{ value, label }] },
+        prefix: aside|sheet, inSheet?, tab?: brief|files|soul (which opens first). Re-rendered live on project.updated (GET /projects/:id/panel). Client: public/js/projects.js --}}
+<div class="proj-panel" data-project-panel="{{panel.project.id}}" style="--hue: {{panel.project.hue}}">
+  <header class="proj-panel-head">
+    {{> projects/tile icon=panel.project.icon hue=panel.project.hue size="xl"}}
+    <div class="min-w-0 flex-1">
+      <p class="proj-card-eyebrow">{{panel.project.fieldLabel}}{{#unless (eq panel.project.status 'active')}} · <span class="proj-status" data-status="{{panel.project.status}}">{{panel.project.status}}</span>{{/unless}}</p>
+      <h2 class="truncate text-base font-semibold tracking-tight" dir="auto">{{panel.project.name}}</h2>
+      {{#if panel.project.about}}<p class="mt-0.5 line-clamp-3 text-[13px] text-ink-2" dir="auto">{{panel.project.about}}</p>{{/if}}
+    </div>
+    {{#if inSheet}}<button type="button" class="btn btn-ghost btn-icon btn-sm -mt-1 -mr-1" data-modal-close aria-label="Close">{{icon "x" class="size-[18px]"}}</button>{{/if}}
+  </header>
+
+  <div class="px-4">
+    <div role="tablist" class="segmented flex w-full" data-tabs="project" aria-label="Project sections">
+      <button role="tab" id="{{prefix}}-tab-brief" aria-controls="{{prefix}}-brief" aria-selected="{{#if (or (eq tab 'files') (eq tab 'soul'))}}false{{else}}true{{/if}}" class="flex-1 justify-center whitespace-nowrap">Brief</button>
+      <button role="tab" id="{{prefix}}-tab-files" aria-controls="{{prefix}}-files" aria-selected="{{#if (eq tab 'files')}}true{{else}}false{{/if}}" tabindex="-1" class="flex-1 justify-center whitespace-nowrap">
+        Files <span class="count count-quiet">{{panel.files.length}}</span></button>
+      <button role="tab" id="{{prefix}}-tab-soul" aria-controls="{{prefix}}-soul" aria-selected="{{#if (eq tab 'soul')}}true{{else}}false{{/if}}" tabindex="-1" class="flex-1 justify-center whitespace-nowrap">
+        Jess here{{#if panel.soul.proposal}} <span class="count count-warn" title="A change is waiting for you">1</span>{{/if}}</button>
+    </div>
+  </div>
+
+  <div class="min-h-0 flex-1 overflow-y-auto px-4 pt-3 pb-6">
+    <div role="tabpanel" id="{{prefix}}-brief" aria-labelledby="{{prefix}}-tab-brief" {{#if (or (eq tab 'files') (eq tab 'soul'))}}hidden{{/if}}>
+      {{#if panel.empty}}
+        <div class="proj-empty">
+          <span class="proj-empty-icon">{{icon "notebook-pen" class="size-5"}}</span>
+          <p class="font-medium">The brief fills in as you talk</p>
+          <p class="text-xs text-ink-3">Decisions, next steps, open questions and key numbers land here on their own, and {{@root.bot.name}} in your main chat sees them.</p>
+        </div>
+      {{/if}}
+      {{#each panel.sections}}
+        {{#if items}}
+          <section class="brief-sec" data-kind="{{kind}}">
+            <h3 class="brief-sec-title">{{title}}</h3>
+            <ul role="list" class="brief-list">
+              {{#each items}}
+                <li class="brief-row" data-brief-row="{{id}}" data-kind="{{kind}}" data-text="{{text}}">
+                  {{#if (eq kind 'next')}}
+                    <button type="button" class="brief-check" data-brief-done aria-label="Mark done: {{text}}">{{icon "check" class="size-3"}}</button>
+                  {{else}}<span class="brief-dot" aria-hidden="true"></span>{{/if}}
+                  <span class="min-w-0 flex-1" dir="auto">{{text}}{{#if mine}} <span class="brief-mine" title="You wrote or edited this, so {{@root.bot.name}} won’t change it">you</span>{{/if}}</span>
+                  <span class="brief-actions">
+                    <button type="button" class="btn btn-ghost btn-icon size-6" data-brief-edit aria-label="Edit">{{icon "pencil" class="size-3"}}</button>
+                    <button type="button" class="btn btn-ghost btn-icon size-6 hover:text-bad" data-brief-delete aria-label="Remove">{{icon "x" class="size-3"}}</button>
+                  </span>
+                </li>
+              {{/each}}
+            </ul>
+          </section>
+        {{/if}}
+      {{/each}}
+
+      <form class="brief-add" data-brief-add novalidate>
+        <label class="sr-only" for="{{prefix}}-brief-kind">Kind</label>
+        <select id="{{prefix}}-brief-kind" name="kind" class="select h-8 w-auto text-xs">
+          {{#each panel.kinds}}<option value="{{value}}" {{#if (eq value 'next')}}selected{{/if}}>{{label}}</option>{{/each}}
+        </select>
+        <label class="sr-only" for="{{prefix}}-brief-text">Add to the brief</label>
+        <input id="{{prefix}}-brief-text" name="text" class="input h-8 min-w-0 flex-1 text-[13px]" placeholder="Add to the brief…" maxlength="300" autocomplete="off" dir="auto">
+        <button class="btn btn-secondary btn-icon btn-sm h-8 w-8" aria-label="Add">{{icon "plus" class="size-4"}}</button>
+      </form>
+
+      {{#if panel.goals}}
+        <section class="brief-sec">
+          <h3 class="brief-sec-title">Goals in this project</h3>
+          <ul role="list" class="space-y-1.5">
+            {{#each panel.goals}}
+              <li><a href="{{href}}" class="flex items-center gap-2 rounded-lg px-2 py-1.5 text-[13px] hover:bg-surface-2">
+                {{icon "target" class="size-3.5 text-ink-3"}}<span class="min-w-0 flex-1 truncate">{{title}}</span><span class="tabular text-xs text-ink-3">{{progress}}%</span></a></li>
+            {{/each}}
+          </ul>
+        </section>
+      {{/if}}
+
+      {{#if panel.done}}
+        <details class="brief-sec">
+          <summary class="brief-sec-title cursor-pointer select-none">Done · {{panel.done.length}}</summary>
+          <ul role="list" class="brief-list">
+            {{#each panel.done}}
+              <li class="brief-row is-done" data-brief-row="{{id}}" data-kind="{{kind}}" data-text="{{text}}">
+                <button type="button" class="brief-check is-on" data-brief-reopen aria-label="Reopen: {{text}}">{{icon "check" class="size-3"}}</button>
+                <span class="min-w-0 flex-1" dir="auto">{{text}}</span>
+              </li>
+            {{/each}}
+          </ul>
+        </details>
+      {{/if}}
+
+      {{#if panel.intake}}
+        <details class="brief-sec">
+          <summary class="brief-sec-title cursor-pointer select-none">What you told me at the start</summary>
+          <dl class="proj-card-facts !mx-0 mt-2">{{#each panel.intake}}<div><dt dir="auto">{{question}}</dt><dd dir="auto">{{answer}}</dd></div>{{/each}}</dl>
+        </details>
+      {{/if}}
+    </div>
+
+    <div role="tabpanel" id="{{prefix}}-soul" aria-labelledby="{{prefix}}-tab-soul" {{#unless (eq tab 'soul')}}hidden{{/unless}}>
+      {{> projects/soul-tab soul=panel.soul projectId=panel.project.id prefix=prefix}}
+    </div>
+
+    <div role="tabpanel" id="{{prefix}}-files" aria-labelledby="{{prefix}}-tab-files" {{#unless (eq tab 'files')}}hidden{{/unless}}>
+      {{#if panel.files}}
+        <p class="proj-mode" data-full="{{#if panel.fileMode.full}}true{{else}}false{{/if}}">
+          {{#if panel.fileMode.full}}{{icon "eye" class="mt-px size-3.5 shrink-0"}}
+            <span><strong class="font-medium">All files are in view</strong>: a small project ({{panel.fileMode.tokensLabel}} of {{panel.fileMode.limitLabel}} tokens), so {{@root.bot.name}} reads everything every time.</span>
+          {{else}}{{icon "file-search" class="mt-px size-3.5 shrink-0"}}
+            <span><strong class="font-medium">Searched when needed</strong>: {{panel.fileMode.tokensLabel}} tokens is too much to carry every time, so {{@root.bot.name}} searches inside the files and cites the page.</span>{{/if}}
+        </p>
+      {{/if}}
+      <p class="mb-3 flex gap-2 rounded-xl bg-surface-2/60 px-3 py-2.5 text-xs text-ink-2">{{icon "archive" class="mt-px size-3.5 shrink-0 text-ink-3"}}
+        <span>Everything you attach here, everything {{@root.bot.name}} makes here, and long pastes or code are kept as files, never summarized away.</span></p>
+      {{#if panel.files}}
+        <ul role="list" class="space-y-1">
+          {{#each panel.files}}
+            <li>
+              <a href="{{href}}" class="proj-file">
+                <span class="proj-file-icon" data-type="{{type}}">{{#if thumbUrl}}<img src="{{thumbUrl}}" alt="" loading="lazy">{{else if (eq type 'pdf')}}{{icon "file-text" class="size-4"}}{{else if (eq type 'image')}}{{icon "image" class="size-4"}}{{else if (eq type 'sheet')}}{{icon "sheet" class="size-4"}}{{else if (eq type 'slides')}}{{icon "presentation" class="size-4"}}{{else if (eq type 'html')}}{{icon "app-window" class="size-4"}}{{else if pasted}}{{icon "clipboard-paste" class="size-4"}}{{else}}{{icon "file" class="size-4"}}{{/if}}</span>
+                <span class="min-w-0 flex-1">
+                  <span class="block truncate text-[13px] font-medium" dir="auto">{{title}}</span>
+                  <span class="block text-[11px] leading-snug text-ink-3">{{kindLabel}} · {{sizeLabel}} · {{#if pasted}}pasted{{else if uploaded}}uploaded{{else}}by {{@root.bot.name}}{{/if}} · <time datetime="{{iso updatedAt}}" data-relative>{{timeAgo updatedAt}}</time>{{#if useCount}} · <span title="How often I used it in answers">used {{useCount}}×</span>{{/if}}</span>
+                  {{#if caption}}<span class="mt-0.5 line-clamp-2 block text-[11px] text-ink-3" dir="auto">{{caption}}</span>{{/if}}
+                </span>
+              </a>
+            </li>
+          {{/each}}
+        </ul>
+      {{else}}
+        <div class="proj-empty">
+          <span class="proj-empty-icon">{{icon "folder-open" class="size-5"}}</span>
+          <p class="font-medium">No files yet</p>
+          <p class="text-xs text-ink-3">Attach PDFs, photos, spreadsheets or code in the chat. They land here and stay.</p>
+        </div>
+      {{/if}}
+    </div>
+  </div>
+</div>

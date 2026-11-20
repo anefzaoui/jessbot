@@ -1,0 +1,42 @@
+{{!--
+  Setup wizard frame. Block content = the step's form. Params via root: steps [{key,label,n,current,done}], step.
+  Usage: {{#> setup/frame heading="…" lead="…"}} …form… {{/setup/frame}}
+--}}
+<div class="grid min-h-dvh lg:grid-cols-[minmax(360px,5fr)_7fr]">
+  <aside class="setup-hero relative hidden overflow-hidden lg:flex lg:flex-col lg:justify-between lg:p-10" aria-hidden="true">
+    <div class="flex items-center gap-2.5 text-sm font-semibold text-white/90">
+      {{> avatar size="sm" activity="resting"}} Jessbot
+    </div>
+    <div class="relative z-10">
+      <div class="mb-8 w-fit">{{> avatar size="hero" activity=(iff (eq @root.step 'model') 'thinking' (iff (eq @root.step 'identity') 'creating' 'resting'))}}</div>
+      <p class="max-w-sm text-3xl leading-tight font-semibold tracking-tight text-balance text-white">Let's bring your agent to life.</p>
+      <p class="mt-3 max-w-sm text-white/70">A few minutes now, and it'll know who it is, who you are, and who else it works for.</p>
+    </div>
+    <ol class="relative z-10 space-y-3" role="list">
+      {{#each @root.steps}}
+        <li class="flex items-center gap-3 text-sm {{#if current}}text-white{{else if done}}text-white/80{{else}}text-white/45{{/if}}">
+          <span class="grid size-7 place-items-center rounded-full border text-xs font-semibold
+            {{#if done}}border-transparent bg-white/90 text-[oklch(0.35_0.15_285)]{{else if current}}border-white bg-white/10{{else}}border-white/30{{/if}}">
+            {{#if done}}{{icon "check" class="size-3.5"}}{{else}}{{n}}{{/if}}
+          </span>
+          {{label}}
+        </li>
+      {{/each}}
+    </ol>
+  </aside>
+
+  <main id="main" class="flex flex-col px-5 py-8 sm:px-10 lg:py-14">
+    <div class="mx-auto w-full max-w-md">
+      <div class="mb-8 lg:hidden">
+        <div class="flex items-center justify-between text-xs font-medium text-ink-3">
+          {{#each @root.steps}}{{#if current}}<span>Step {{n}} of {{@root.steps.length}} · {{label}}</span>{{/if}}{{/each}}
+        </div>
+        <div class="mt-2 flex gap-1.5">{{#each @root.steps}}<span class="h-1 flex-1 rounded-full {{#if (or done current)}}bg-accent{{else}}bg-surface-3{{/if}}"></span>{{/each}}</div>
+      </div>
+      <h1 class="text-2xl font-semibold tracking-tight text-balance">{{heading}}</h1>
+      {{#if lead}}<p class="mt-2 text-ink-2 text-pretty">{{lead}}</p>{{/if}}
+      {{#if @root.error}}<div class="mt-5 rounded-xl border border-bad/30 bg-bad-soft px-4 py-3 text-sm" role="alert">{{@root.error}}</div>{{/if}}
+      <div class="mt-8">{{> @partial-block}}</div>
+    </div>
+  </main>
+</div>

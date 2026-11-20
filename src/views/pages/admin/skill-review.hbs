@@ -1,0 +1,158 @@
+{{!-- Admin → Skills → one skill's review (decision #195). Data (services/skills.js reviewPage): review = { skill (skillView + category,
+  recommended), raw, findings, groups: [{ key: bad|warn|optional|info, label, hint, items: [finding { level, code, line, excerpt, message,
+  file? }] }], summary: { bad, warn, optional, info } (the approve button), changes: { available, reason?, approvedAt, added, removed, hunks: [{ oldStart,
+  newStart, lines }], files: [{ name, change }] }, usage: { count, lastUsedAt }, proposal? (proposalView), triggerQueries: [{ text,
+  expect }], categoryLabel }, lastTest (skill-trigger.js lastTriggerTest). Client: public/js/admin-skills.js --}}
+{{> page-header title=review.skill.name subtitle=review.categoryLabel width="max-w-5xl"}}
+<div class="mx-auto max-w-5xl px-4 py-6 sm:px-6" data-admin-skills data-skill-review="{{review.skill.name}}">
+  {{> admin/nav active="skills"}}
+  <a href="/admin/skills#{{review.skill.name}}" class="btn btn-ghost btn-sm -ms-2 mb-3">{{icon "arrow-left" class="size-4"}} All skills</a>
+
+  {{!-- What it is, where it stands, the decision --}}
+  <section class="card skr-head" data-skill="{{review.skill.name}}" data-status="{{review.skill.status}}" data-bad="{{review.summary.bad}}"
+    data-bad-list="{{#each review.findings}}{{#if (eq level 'bad')}}{{message}}|{{/if}}{{/each}}">
+    <span class="skill-tile" data-status="{{review.skill.status}}">{{icon "book-marked" class="size-5"}}</span>
+    <div class="min-w-0 flex-1">
+      <p class="flex flex-wrap items-center gap-2">
+        {{#if (eq review.skill.status 'active')}}<span class="badge badge-ok">Active</span>{{else if (eq review.skill.status 'review')}}<span class="badge badge-warn">Needs review</span>{{else if (eq review.skill.status 'broken')}}<span class="badge badge-bad">Broken</span>{{else}}<span class="badge badge-neutral">Off</span>{{/if}}
+        <span class="badge badge-neutral">{{#if (eq review.skill.origin 'yours')}}Yours{{else}}Built-in{{/if}}</span>
+        {{#if review.skill.recommended}}<span class="badge badge-accent">{{icon "star" class="size-3"}} Recommended</span>{{/if}}
+        {{#if review.proposal}}<span class="badge badge-accent">{{icon "notebook-pen" class="size-3"}} Drafted by {{@root.bot.name}}</span>{{/if}}
+      </p>
+      <p class="mt-2 max-w-[65ch] text-[15px] leading-relaxed text-pretty text-ink">{{review.skill.description}}</p>
+      <p class="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-ink-3">
+        <span class="inline-flex items-center gap-1">{{icon "wrench" class="size-3.5"}} {{#if review.skill.toolsets.length}}Uses {{#each review.skill.toolsets}}<span class="font-mono">{{this}}</span>{{#unless @last}}, {{/unless}}{{/each}}{{else}}No extra tools{{/if}}</span>
+        <span class="inline-flex items-center gap-1">{{icon "file-text" class="size-3.5"}} {{review.skill.lines}} lines{{#if review.skill.files.length}} · {{plural review.skill.files.length "supporting file"}}{{/if}}</span>
+        <span class="inline-flex items-center gap-1">{{icon "activity" class="size-3.5"}} {{#if review.usage.count}}Used {{plural review.usage.count "time"}} in 30 days{{else}}Not used in 30 days{{/if}}{{#if review.usage.lastUsedAt}}, last <time datetime="{{review.usage.lastUsedAt}}" data-relative>{{timeAgo review.usage.lastUsedAt}}</time>{{/if}}</span>
+        {{#if review.skill.approvedAt}}<span class="inline-flex items-center gap-1">{{icon "shield-check" class="size-3.5"}} Approved {{when review.skill.approvedAt}}</span>{{/if}}
+      </p>
+      {{#if review.skill.problems.length}}
+        <div class="skr-broken" role="alert">{{icon "triangle-alert" class="size-4 shrink-0 text-bad"}}
+          <div><p class="font-medium text-ink">It can’t be switched on until this is fixed</p>
+            <ul class="mt-1 space-y-0.5" role="list">{{#each review.skill.problems}}<li>{{this}}</li>{{/each}}</ul></div></div>
+      {{/if}}
+    </div>
+    <div class="flex shrink-0 flex-wrap gap-2 sm:flex-col">
+      {{#if (eq review.skill.status 'active')}}<button type="button" class="btn btn-secondary btn-sm" data-skill-action="disable">Turn off</button>
+      {{else if (eq review.skill.status 'broken')}}
+      {{else if review.summary.bad}}<button type="button" class="btn btn-secondary btn-sm text-warn-text" data-skill-action="approve" data-approve-anyway>{{icon "shield-alert" class="size-4"}} Approve anyway…</button>
+      {{else}}<button type="button" class="btn btn-primary btn-sm" data-skill-action="approve">{{icon "check" class="size-4"}} {{#if (eq review.skill.status 'review')}}Approve{{else}}Turn on{{/if}}</button>{{/if}}
+    </div>
+  </section>
+
+  <div class="mt-6 grid gap-6 {{#if review.proposal}}@4xl/main:grid-cols-[minmax(0,1fr)_300px]{{/if}}">
+    <div class="min-w-0 space-y-6">
+      {{!-- The review assistant's findings --}}
+      <section aria-labelledby="h-findings">
+        <h2 id="h-findings" class="mb-3 flex items-center gap-2 text-sm font-semibold">What the review found
+          {{#unless review.findings.length}}<span class="badge badge-ok">{{icon "circle-check" class="size-3"}} Nothing</span>{{/unless}}</h2>
+        {{#each review.groups}}
+          <div class="skr-group" data-group="{{key}}">
+            <p class="skr-group-h"><span class="skr-dot" data-group="{{key}}" aria-hidden="true">{{#if (eq key 'bad')}}{{icon "octagon-alert" class="size-3.5"}}{{else if (eq key 'warn')}}{{icon "triangle-alert" class="size-3.5"}}{{else if (eq key 'optional')}}{{icon "wrench" class="size-3.5"}}{{else}}{{icon "info" class="size-3.5"}}{{/if}}</span>
+              <span class="font-medium text-ink">{{label}}</span> <span class="tabular text-ink-3">{{items.length}}</span> <span class="hidden text-ink-3 sm:inline">· {{hint}}</span></p>
+            <ul class="card divide-y divide-line" role="list">
+              {{#each items}}
+                <li class="skr-finding" data-code="{{code}}">
+                  <p class="text-sm text-ink">{{message}}</p>
+                  <p class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-ink-3">
+                    <span class="font-mono">{{#if file}}{{file}}{{else}}SKILL.md{{/if}}{{#if line}}, line {{line}}{{/if}}</span>
+                    <span class="skr-code">{{code}}</span></p>
+                  {{#if excerpt}}<pre class="skr-excerpt" dir="auto">{{excerpt}}</pre>{{/if}}
+                </li>
+              {{/each}}
+            </ul>
+          </div>
+        {{else}}
+          <p class="card flex items-center gap-3 p-4 text-sm text-ink-2">{{icon "shield-check" class="size-5 text-ok"}} The review assistant found nothing to flag: no hidden text, no requests to run code, no fetching of addresses, the description says when to use it.</p>
+        {{/each}}
+      </section>
+
+      {{!-- What changed since it was approved --}}
+      <section aria-labelledby="h-changes">
+        <h2 id="h-changes" class="mb-3 flex flex-wrap items-center gap-2 text-sm font-semibold">What changed since you approved it
+          {{#if review.changes.available}}{{#if (or review.changes.added review.changes.removed review.changes.files.length)}}<span class="tabular text-xs font-medium"><span class="text-ok">+{{review.changes.added}}</span> <span class="text-bad">−{{review.changes.removed}}</span></span>{{/if}}{{/if}}</h2>
+        {{#if review.changes.available}}
+          {{#if (or review.changes.hunks.length review.changes.files.length)}}
+            {{#if review.changes.files.length}}<ul class="mb-2 flex flex-wrap gap-1.5" role="list">{{#each review.changes.files}}<li class="skr-file" data-change="{{change}}">{{#if (eq change 'added')}}{{icon "file-plus" class="size-3.5"}}{{else if (eq change 'removed')}}{{icon "file-x" class="size-3.5"}}{{else}}{{icon "file-pen" class="size-3.5"}}{{/if}} <span class="font-mono">{{name}}</span> {{change}}</li>{{/each}}</ul>{{/if}}
+            {{#if review.changes.hunks.length}}
+              <div class="skr-diff" dir="ltr">
+                {{#each review.changes.hunks}}
+                  <p class="skr-hunk">From line {{newStart}}</p>
+                  {{#each lines}}<div class="skr-line" data-mark="{{#if (startsWith this '+')}}add{{else if (startsWith this '-')}}del{{else}}same{{/if}}">{{this}}</div>{{/each}}
+                {{/each}}
+              </div>
+            {{/if}}
+          {{else}}
+            <p class="card flex items-center gap-3 p-4 text-sm text-ink-2">{{icon "circle-check" class="size-5 text-ok"}} Exactly what you approved: nothing has changed.</p>
+          {{/if}}
+        {{else}}
+          <p class="card p-4 text-sm text-ink-2">{{#if (eq review.changes.reason 'never-approved')}}Never approved, so there’s nothing to compare with: read the instructions below.{{else}}Approved before Jessbot kept a copy of what was approved, so there’s no comparison this time. The next approval keeps one.{{/if}}</p>
+        {{/if}}
+      </section>
+
+      {{!-- The trigger test --}}
+      <section class="card skt" aria-labelledby="h-trigger" data-trigger-test data-last-test="{{json lastTest}}">
+        <div class="p-4 pb-3 sm:p-5 sm:pb-3">
+          <h2 id="h-trigger" class="text-sm font-semibold">Does {{@root.bot.name}} open it at the right moment?</h2>
+          <p class="mt-1 max-w-[65ch] text-xs text-ink-3">Each request goes to the chat model with every active skill’s description, a few times, and I count how often it opens this one. You see the cost first; nothing changes on its own.</p>
+        </div>
+        <ol class="skt-queries" role="list" data-tt-queries>
+          {{#each review.triggerQueries}}
+            <li class="skt-query" data-tt-row>
+              <div class="segmented shrink-0" role="radiogroup" aria-label="Should it open the skill?">
+                <button type="button" role="radio" aria-checked="{{eq expect 'use'}}" data-tt-expect="use">Use it</button>
+                <button type="button" role="radio" aria-checked="{{eq expect 'skip'}}" data-tt-expect="skip">Skip it</button>
+              </div>
+              <label class="sr-only" for="tt-q{{@index}}">Request</label>
+              <input id="tt-q{{@index}}" class="input h-9 min-w-0 flex-1 text-sm" value="{{text}}" maxlength="300" data-tt-text>
+              <button type="button" class="btn btn-ghost btn-icon btn-sm shrink-0" data-tt-remove aria-label="Remove this request" data-tooltip="Remove">{{icon "x" class="size-4"}}</button>
+            </li>
+          {{/each}}
+        </ol>
+        <template data-tt-row-template>
+          <li class="skt-query" data-tt-row>
+            <div class="segmented shrink-0" role="radiogroup" aria-label="Should it open the skill?">
+              <button type="button" role="radio" aria-checked="true" data-tt-expect="use">Use it</button>
+              <button type="button" role="radio" aria-checked="false" data-tt-expect="skip">Skip it</button>
+            </div>
+            <input class="input h-9 min-w-0 flex-1 text-sm" maxlength="300" placeholder="Something a person would say" aria-label="Request" data-tt-text>
+            <button type="button" class="btn btn-ghost btn-icon btn-sm shrink-0" data-tt-remove aria-label="Remove this request" data-tooltip="Remove">{{icon "x" class="size-4"}}</button>
+          </li>
+        </template>
+        <div class="flex flex-wrap items-center gap-x-4 gap-y-2 px-4 pt-2 pb-4 sm:px-5">
+          <button type="button" class="btn btn-ghost btn-sm -ms-2" data-tt-add>{{icon "plus" class="size-4"}} Add a request</button>
+          <label class="flex items-center gap-2 text-xs text-ink-2">Each
+            <select class="select h-8 w-auto py-0 text-xs" data-tt-runs><option value="1">once</option><option value="2">twice</option><option value="3" selected>3 times</option></select></label>
+          <label class="flex items-center gap-2 text-xs text-ink-2"><input type="checkbox" class="check" data-tt-suggest> Suggest a better description if some fail</label>
+        </div>
+        <div class="skt-foot" data-tt-foot>
+          <p class="min-w-0 flex-1 text-xs text-ink-3" data-tt-estimate>{{#if review.triggerQueries.length}}The cost shows before anything is sent.{{else}}Add a few requests: ones that should open it, and near misses that shouldn’t.{{/if}}</p>
+          <button type="button" class="btn btn-secondary btn-sm" data-tt-dry>{{icon "calculator" class="size-4"}} Check the cost</button>
+          <button type="button" class="btn btn-primary btn-sm" data-tt-run hidden>{{icon "play" class="size-4"}} Run the test</button>
+        </div>
+        <div class="skt-results" data-tt-results aria-live="polite" hidden></div>
+      </section>
+
+      <details class="card overflow-hidden" {{#if (eq review.skill.status 'review')}}open{{/if}}>
+        <summary class="cursor-pointer px-4 py-3 text-sm font-medium select-none hover:text-ink-2">The instructions as written · {{review.skill.lines}} lines</summary>
+        <pre class="skr-raw" dir="auto">{{review.raw}}</pre>
+      </details>
+    </div>
+
+    {{#if review.proposal}}
+    <aside class="order-first min-w-0 space-y-4 @4xl/main:order-none">
+        <section class="card p-4" aria-labelledby="h-proposal" data-skill-proposal>
+          <h2 id="h-proposal" class="flex items-center gap-2 text-sm font-semibold">{{icon "notebook-pen" class="size-4 text-accent-text"}} Drafted by {{@root.bot.name}}</h2>
+          <p class="mt-1 text-xs text-ink-3">{{#if review.proposal.by}}With {{review.proposal.by.name}}{{/if}}{{#if review.proposal.at}}, {{when review.proposal.at}}{{/if}}{{#if review.proposal.thread}}{{#if review.proposal.thread.href}}, in <a class="underline decoration-ink-3/40 underline-offset-2 hover:text-ink-2" href="{{review.proposal.thread.href}}">{{review.proposal.thread.title}}</a>{{else}}, in someone else’s chat{{/if}}{{/if}}</p>
+          {{#unless review.proposal.current}}<p class="mt-2 rounded-lg bg-surface-2 px-2.5 py-1.5 text-xs text-ink-2">Changed since {{@root.bot.name}} drafted it.</p>{{/unless}}
+          {{#if review.proposal.why}}<p class="mt-2 text-[13px] leading-relaxed text-ink-2">{{review.proposal.why}}</p>{{/if}}
+          {{#if review.proposal.tests.length}}<p class="mt-3 text-xs font-medium text-ink-2">Should open it</p>
+            <ul class="mt-1 space-y-1 text-[13px]" role="list">{{#each review.proposal.tests}}<li class="skr-say" data-expect="use">“{{this}}”</li>{{/each}}</ul>{{/if}}
+          {{#if review.proposal.nearMisses.length}}<p class="mt-3 text-xs font-medium text-ink-2">Near misses (shouldn’t)</p>
+            <ul class="mt-1 space-y-1 text-[13px]" role="list">{{#each review.proposal.nearMisses}}<li class="skr-say" data-expect="skip">“{{this}}”</li>{{/each}}</ul>{{/if}}
+          {{#if (gt review.proposal.versions 1)}}<p class="mt-3 text-xs text-ink-3">Version {{review.proposal.versions}} of the draft.</p>{{/if}}
+        </section>
+    </aside>
+    {{/if}}
+  </div>
+</div>

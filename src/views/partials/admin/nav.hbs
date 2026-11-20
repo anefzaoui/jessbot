@@ -1,0 +1,15 @@
+{{!-- Admin sub-navigation. active: overview | people | groups | tools | usage | model | browser | feed | skills | personality | identity | system --}}
+<nav class="tabs mb-6 overflow-x-auto" aria-label="Admin sections">
+  <a href="/admin" {{#if (eq active 'overview')}}aria-current="page"{{/if}}>{{icon "layout-dashboard" class="size-4"}} Overview</a>
+  <a href="/admin/people" {{#if (eq active 'people')}}aria-current="page"{{/if}} data-cmd="Admin · People" data-cmd-group="Admin" data-cmd-icon="users">{{icon "users" class="size-4"}} People</a>
+  <a href="/admin/groups" {{#if (eq active 'groups')}}aria-current="page"{{/if}} data-cmd="Admin · Groups" data-cmd-group="Admin" data-cmd-icon="users-round">{{icon "users-round" class="size-4"}} Groups</a>
+  <a href="/admin/tools" {{#if (eq active 'tools')}}aria-current="page"{{/if}} data-cmd="Admin · Permissions" data-cmd-group="Admin" data-cmd-icon="shield-check">{{icon "shield-check" class="size-4"}} Permissions</a>
+  <a href="/admin/usage" {{#if (eq active 'usage')}}aria-current="page"{{/if}} data-cmd="Admin · Usage" data-cmd-group="Admin" data-cmd-icon="chart-column">{{icon "chart-column" class="size-4"}} Usage</a>
+  <a href="/admin/model" {{#if (eq active 'model')}}aria-current="page"{{/if}} data-cmd="Admin · Models (thinking, voice)" data-cmd-group="Admin" data-cmd-icon="brain">{{icon "brain" class="size-4"}} Models</a>
+  <a href="/admin/browser" {{#if (eq active 'browser')}}aria-current="page"{{/if}} data-cmd="Admin · Browser" data-cmd-group="Admin" data-cmd-icon="globe">{{icon "globe" class="size-4"}} Browser</a>
+  <a href="/admin/feed-sources" {{#if (eq active 'feed')}}aria-current="page"{{/if}} data-cmd="Admin · Feed sources" data-cmd-group="Admin" data-cmd-icon="rss">{{icon "rss" class="size-4"}} Feed</a>
+  <a href="/admin/skills" {{#if (eq active 'skills')}}aria-current="page"{{/if}} data-cmd="Admin · Skills" data-cmd-group="Admin" data-cmd-icon="book-marked">{{icon "book-marked" class="size-4"}} Skills</a>
+  <a href="/admin/personality" {{#if (eq active 'personality')}}aria-current="page"{{/if}} data-cmd="Admin · Personality" data-cmd-group="Admin" data-cmd-icon="sparkles">{{icon "sparkles" class="size-4"}} Personality</a>
+  <a href="/admin/identity" {{#if (eq active 'identity')}}aria-current="page"{{/if}} data-cmd="Admin · Identity" data-cmd-group="Admin" data-cmd-icon="fingerprint">{{icon "fingerprint" class="size-4"}} Identity</a>
+  <a href="/admin/system" {{#if (eq active 'system')}}aria-current="page"{{/if}} data-cmd="Admin · System (health, backups, logs)" data-cmd-group="Admin" data-cmd-icon="activity">{{icon "activity" class="size-4"}} System</a>
+</nav>

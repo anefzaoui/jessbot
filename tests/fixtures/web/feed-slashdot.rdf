@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<rdf:RDF
+ xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+ xmlns="http://purl.org/rss/1.0/"
+ xmlns:admin="http://webns.net/mvcb/"
+ xmlns:content="http://purl.org/rss/1.0/modules/content/"
+ xmlns:dc="http://purl.org/dc/elements/1.1/"
+ xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+ xmlns:syn="http://purl.org/rss/1.0/modules/syndication/"
+ xmlns:taxo="http://purl.org/rss/1.0/modules/taxonomy/"
+>
+
+<channel rdf:about="https://slashdot.org/">
+<title>Slashdot</title>
+<link>https://slashdot.org/</link>
+<description>News for nerds, stuff that matters</description>
+<dc:language>en-us</dc:language>
+<dc:rights>Copyright Slashdot Media. All Rights Reserved.</dc:rights>
+<dc:date>2026-09-26T03:56:04+00:00</dc:date>
+<dc:publisher>Slashdot Media</dc:publisher>
+<dc:creator>feedback@slashdot.org</dc:creator>
+<dc:subject>Technology</dc:subject>
+<syn:updateBase>1970-01-01T00:00+00:00</syn:updateBase>
+<syn:updateFrequency>1</syn:updateFrequency>
+<syn:updatePeriod>hourly</syn:updatePeriod>
+<items>
+ <rdf:Seq>
+  <rdf:li rdf:resource="https://tech.slashdot.org/story/26/09/26/0042239/meta-made-43m-misleading-statements-new-mexico-jury-finds-including-on-its-cambridge-analytica-response?utm_source=rss1.0mainlinkanon&amp;utm_medium=feed" />
+  <rdf:li rdf:resource="https://it.slashdot.org/story/26/09/24/1652228/theres-a-new-way-to-break-rsa-encryption?utm_source=rss1.0mainlinkanon&amp;utm_medium=feed" />
+  <rdf:li rdf:resource="https://science.slashdot.org/story/26/09/24/009238/asteroids-named-after-tom-lehrer-and-weird-al-yankovic?utm_source=rss1.0mainlinkanon&amp;utm_medium=feed" />
+  <rdf:li rdf:resource="https://hardware.slashdot.org/story/26/09/25/0554208/raspberry-pi-stock-jumps-30-as-demand-surges-and-boards-now-locked-to-their-original-ram-size?utm_source=rss1.0mainlinkanon&amp;utm_medium=feed" />
+ </rdf:Seq>
+</items>
+<image rdf:resource="https://a.fsdn.com/sd/topics/topicslashdot.gif" />
+<textinput rdf:resource="https://slashdot.org/search.pl" />
+</channel>
+<image rdf:about="https://a.fsdn.com/sd/topics/topicslashdot.gif">
+<title>Slashdot</title>
+<url>https://a.fsdn.com/sd/topics/topicslashdot.gif</url>
+<link>https://slashdot.org/</link>
+</image>
+<item rdf:about="https://tech.slashdot.org/story/26/09/26/0042239/meta-made-43m-misleading-statements-new-mexico-jury-finds-including-on-its-cambridge-analytica-response?utm_source=rss1.0mainlinkanon&amp;utm_medium=feed">
+<title>Meta Made 43M Misleading Statements, New Mexico Jury Finds, Including on Its Cambridge Analytica Response</title>
+<link>https://tech.slashdot.org/story/26/09/26/0042239/meta-made-43m-misleading-statements-new-mexico-jury-finds-including-on-its-cambridge-analytica-response?utm_source=rss1.0mainlinkanon&amp;utm_medium=feed</link>
+<description>A New Mexico jury on Friday "found Facebook liable for deceiving users" about its privacy protections, reports the Associated Press. 
+
+A New Mexico newspaper calls it "another massive legal victory" against Facebook, reporting that the jury found Facebook "had committed tens of millions of violations of the state's Unfair Practices Act in connection with its lies to consumers about how their perso</description>
+<dc:creator>EditorDavid</dc:creator>
+<dc:date>2026-09-26T02:34:00+00:00</dc:date>
+<dc:subject>facebook</dc:subject>
+<slash:department>meta-commentary</slash:department>
+<slash:section>technology</slash:section>
+<slash:comments>4</slash:comments>
+<slash:hit_parade>4,4,4,3,1,0,0</slash:hit_parade>
+</item>
+<item rdf:about="https://it.slashdot.org/story/26/09/24/1652228/theres-a-new-way-to-break-rsa-encryption?utm_source=rss1.0mainlinkanon&amp;utm_medium=feed">
+<title>There's a New Way to Break RSA Encryption</title>
+<link>https://it.slashdot.org/story/26/09/24/1652228/theres-a-new-way-to-break-rsa-encryption?utm_source=rss1.0mainlinkanon&amp;utm_medium=feed</link>
+<description>"Signature forgery." It's a new way to break RSA keys &amp;mdash; and it doesn't require factoring. Ars Technica reports on new research using classical computing to "reduce the current RSA security level to an unacceptably low threshold" and lower the required computing resources by orders of magnitude. 
+
+
+There's "a gap in current RSA-type security assumptions," according to a paper co-authored </description>
+<dc:creator>EditorDavid</dc:creator>
+<dc:date>2026-09-25T22:04:00+00:00</dc:date>
+<dc:subject>encryption</dc:subject>
+<slash:department>key-holes</slash:department>
+<slash:section>it</slash:section>
+<slash:comments>22</slash:comments>
+<slash:hit_parade>22,22,17,13,4,2,1</slash:hit_parade>
+</item>
+<item rdf:about="https://science.slashdot.org/story/26/09/24/009238/asteroids-named-after-tom-lehrer-and-weird-al-yankovic?utm_source=rss1.0mainlinkanon&amp;utm_medium=feed">
+<title>Asteroids Named After Tom Lehrer and 'Weird Al' Yankovic</title>
+<link>https://science.slashdot.org/story/26/09/24/009238/asteroids-named-after-tom-lehrer-and-weird-al-yankovic?utm_source=rss1.0mainlinkanon&amp;utm_medium=feed</link>
+<description>"Weird Al" Yankovic's name has just been approved for a new asteroid &amp;mdash; (14331) Alyankovic = 1981 EC26 &amp;mdash; by the International Astronomical Union, reports Space.com. 
+
+Yankovic's asteroid was championed by planetary scientist Allison McGraw joined by "several heavy hitters in the planetary science field, according to the Tucson Star. (Astrophysicist Steve Desch from the School of</description>
+<dc:creator>EditorDavid</dc:creator>
+<dc:date>2026-09-25T17:34:00+00:00</dc:date>
+<dc:subject>space</dc:subject>
+<slash:department>white-and-nerdy</slash:department>
+<slash:section>science</slash:section>
+<slash:comments>22</slash:comments>
+<slash:hit_parade>22,22,19,16,6,1,1</slash:hit_parade>
+</item>
+<item rdf:about="https://hardware.slashdot.org/story/26/09/25/0554208/raspberry-pi-stock-jumps-30-as-demand-surges-and-boards-now-locked-to-their-original-ram-size?utm_source=rss1.0mainlinkanon&amp;utm_medium=feed">
+<title>Raspberry Pi Stock Jumps 30% as Demand Surges. (And Boards Now Locked to Their Original RAM Size)</title>
+<link>https://hardware.slashdot.org/story/26/09/25/0554208/raspberry-pi-stock-jumps-30-as-demand-surges-and-boards-now-locked-to-their-original-ram-size?utm_source=rss1.0mainlinkanon&amp;utm_medium=feed</link>
+<description>Raspberry Pi's stock shot up over 30% in the last week. Why are investors so excited? For the six months ending June 30, revenue for Raspberry Pi Holdings "jumped 90% to $256.9 million," reports Investing.com, "while adjusted EBITDA more than doubled to $40.3 million, and profit before tax leapt 216% to $19.6 million."
+
+
+Underpinning the strong numbers was an acceleration in OEM adoption: direct u</description>
+<dc:creator>EditorDavid</dc:creator>
+<dc:date>2026-09-25T13:04:00+00:00</dc:date>
+<dc:subject>business</dc:subject>
+<slash:department>easy-as-Pi</slash:department>
+<slash:section>hardware</slash:section>
+<slash:comments>80</slash:comments>
+<slash:hit_parade>80,79,74,65,21,8,6</slash:hit_parade>
+</item>
+<textinput rdf:about="https://slashdot.org/search.pl">
+<title>Search Slashdot</title>
+<description>Search Slashdot stories</description>
+<name>query</name>
+<link>https://slashdot.org/search.pl</link>
+</textinput>
+</rdf:RDF>

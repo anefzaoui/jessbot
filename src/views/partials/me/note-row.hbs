@@ -1,0 +1,13 @@
+{{!-- One note for later (me/prep.hbs). Contract: services/notes.js noteView() + waiting (still to be told). --}}
+<li class="note-row" data-note="{{id}}" data-priority="{{priority}}">
+  <span class="note-icon" aria-hidden="true">{{#if (eq kind 'prep')}}{{icon "moon" class="size-3.5"}}{{else}}{{icon "notebook-pen" class="size-3.5"}}{{/if}}</span>
+  <div class="min-w-0 flex-1">
+    <p class="text-[13px] leading-relaxed text-ink" dir="auto">{{text}}</p>
+    <p class="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-ink-3">
+      {{#if (eq priority 'high')}}<span class="badge badge-warn">Today</span>{{/if}}
+      {{#if sourceLabel}}<span dir="auto">{{sourceLabel}}</span> ·{{/if}}
+      {{#if waiting}}<span>left <time datetime="{{iso createdAt}}" data-relative>{{timeAgo createdAt}}</time></span>{{else}}<span>told you <time datetime="{{iso deliveredAt}}" data-relative>{{timeAgo deliveredAt}}</time></span>{{/if}}
+    </p>
+  </div>
+  {{#if href}}<a href="{{href}}" class="btn btn-ghost btn-sm shrink-0">Open {{icon "arrow-up-right" class="size-3.5"}}</a>{{/if}}
+</li>

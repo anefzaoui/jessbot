@@ -1,0 +1,73 @@
+{{!--
+  Admin → Overview, Security (Phase 25, decision #203): the standing checks (services/system.js securityChecks(): { id,
+  label, status, detail, fix?, href? }) and what the guards stopped lately (services/security-events.js securityEvents():
+  injections and blocked secrets, grouped by where they came from). Metadata only: where, through what, for whom and when.
+  Never an excerpt of the text or the secret: the audit log holds neither.
+--}}
+<section class="mt-8" aria-labelledby="h-security" data-security>
+  <div class="mb-3 flex items-baseline justify-between gap-3">
+    <h2 id="h-security" class="text-sm font-semibold">Security</h2>
+    <a href="/admin/system" class="text-xs font-medium text-accent-text hover:underline">Full health check</a>
+  </div>
+  <div class="grid gap-3 lg:grid-cols-2">
+    <ul class="card divide-y divide-line overflow-hidden" role="list" aria-label="Security checks">
+      {{#each security.checks}}
+        <li class="sec-check" data-check="{{id}}">
+          <span class="health-dot" data-status="{{status}}" aria-hidden="true"></span>
+          <div class="min-w-0 flex-1">
+            <p class="text-sm font-medium">{{label}} <span class="sr-only">: {{status}}</span></p>
+            <p class="text-xs text-ink-3">{{detail}}</p>
+            {{#if fix}}{{#unless (eq status 'ok')}}<p class="mt-0.5 text-xs text-ink-2">{{icon "wrench" class="size-3"}} {{fix}}</p>{{/unless}}{{/if}}
+          </div>
+          {{#if href}}<a href="{{href}}" class="btn btn-ghost btn-icon btn-sm shrink-0" aria-label="Open {{label}}" data-tooltip="Open">{{icon "chevron-right" class="size-4"}}</a>{{/if}}
+        </li>
+      {{/each}}
+    </ul>
+
+    <div class="card sec-events" aria-labelledby="h-stopped">
+      <div class="sec-events-head">
+        <h3 id="h-stopped" class="text-sm font-semibold">Stopped in the last {{security.events.days}} days</h3>
+        <span class="count {{#if security.events.total}}count-warn{{else}}count-quiet{{/if}} tabular">{{security.events.total}}</span>
+      </div>
+      {{#if security.events.total}}
+        {{#if security.events.injections.total}}
+          <p class="sec-kind">{{icon "shield-alert" class="size-3.5"}} Hidden instructions <span class="tabular text-ink-3">· {{security.events.injections.total}}</span></p>
+          <ul class="sec-list" role="list">
+            {{#each security.events.injections.groups}}
+              <li class="sec-row">
+                <span class="sec-n tabular">{{count}}×</span>
+                <div class="min-w-0 flex-1">
+                  <p class="truncate text-sm" title="{{from}}">{{#if from}}From <span class="font-medium" dir="auto">{{from}}</span>{{else}}From a page or message{{/if}}</p>
+                  <p class="text-xs text-ink-3">Through {{toolLabel}}{{#if people.length}} · for {{#each people}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}{{/if}} · last <time datetime="{{lastAt}}" data-relative>{{timeAgo lastAt}}</time></p>
+                </div>
+                {{#if hidden}}<span class="badge badge-neutral shrink-0" data-tooltip="Text hidden from people (tiny, invisible or off-screen) was removed before {{@root.bot.name}} read it">{{icon "eye-off" class="size-3"}} Hidden text</span>{{/if}}
+              </li>
+            {{/each}}
+          </ul>
+          {{#if security.events.injections.more}}<p class="sec-more">and {{plural security.events.injections.more "more source" "more sources"}}</p>{{/if}}
+        {{/if}}
+        {{#if security.events.secrets.total}}
+          <p class="sec-kind">{{icon "key-round" class="size-3.5"}} Secrets kept in <span class="tabular text-ink-3">· {{security.events.secrets.total}}</span></p>
+          <ul class="sec-list" role="list">
+            {{#each security.events.secrets.groups}}
+              <li class="sec-row">
+                <span class="sec-n tabular">{{count}}×</span>
+                <div class="min-w-0 flex-1">
+                  <p class="truncate text-sm"><span class="font-medium">{{kinds}}</span> stopped on the way out</p>
+                  <p class="text-xs text-ink-3">In {{toolLabel}}{{#if people.length}} · for {{#each people}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}{{/if}} · last <time datetime="{{lastAt}}" data-relative>{{timeAgo lastAt}}</time></p>
+                </div>
+              </li>
+            {{/each}}
+          </ul>
+          {{#if security.events.secrets.more}}<p class="sec-more">and {{security.events.secrets.more}} more</p>{{/if}}
+        {{/if}}
+      {{else}}
+        <div class="sec-calm">
+          <span class="grid size-9 shrink-0 place-items-center rounded-xl bg-ok-soft text-ok">{{icon "shield-check" class="size-[18px]"}}</span>
+          <p class="text-sm text-ink-2">Nothing to stop. No page or message tried to give {{bot.name}} orders, and no secret tried to leave.</p>
+        </div>
+      {{/if}}
+      <p class="sec-foot">{{icon "lock" class="size-3"}} Only where, when and for whom is kept. Never what the text said, and never the secret itself.</p>
+    </div>
+  </div>
+</section>

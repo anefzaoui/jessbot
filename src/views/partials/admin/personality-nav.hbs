@@ -1,0 +1,8 @@
+{{!-- The tabs over Admin → Personality: the three files, then Lessons with how many wait for review (Phase 25 #203).
+      Contract: files [{ key, name, label, active }], lessonsActive, lessonsWaiting (admin.js personalityTabs). --}}
+<div class="-mx-4 mb-5 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+  <nav class="segmented w-max whitespace-nowrap" aria-label="Personality">
+    {{#each files}}<a href="/admin/personality/{{key}}" {{#if active}}aria-current="page"{{/if}}>{{label}} <span class="font-mono text-[11px] opacity-60">{{name}}</span></a>{{/each}}
+    <a href="/admin/personality/lessons" {{#if lessonsActive}}aria-current="page"{{/if}}>Lessons{{#if lessonsWaiting}} <span class="count count-warn tabular ms-1" data-lessons-waiting aria-label="{{lessonsWaiting}} waiting">{{lessonsWaiting}}</span>{{/if}}</a>
+  </nav>
+</div>

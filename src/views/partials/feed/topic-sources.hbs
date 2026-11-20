@@ -1,0 +1,42 @@
+{{!-- One topic and its sources on /feed/sources (decision #89). Data: topic (services/feed-sources.js topicView:
+  { key, label, query, when?, whenValue, paused, custom, failing, sources: [source-row] }).
+  Client: public/js/feed-sources.js — edit / pause / delete the topic, add a site or feed, check or remove a source. --}}
+<section class="card topic-src overflow-hidden p-0" data-topic="{{topic.key}}" data-paused="{{#if topic.paused}}true{{else}}false{{/if}}"
+  data-label="{{topic.label}}" data-query="{{topic.query}}" data-when="{{topic.whenValue}}" aria-labelledby="topic-{{topic.key}}">
+  <header class="flex flex-wrap items-start gap-3 px-4 pt-4 pb-3">
+    <span class="topic-src-icon" aria-hidden="true">{{icon "newspaper" class="size-[18px]"}}</span>
+    <div class="min-w-0 flex-1">
+      <h2 id="topic-{{topic.key}}" class="flex flex-wrap items-center gap-2 text-[15px] font-semibold">
+        <span dir="auto">{{topic.label}}</span>
+        {{#if topic.when}}<span class="badge badge-neutral">{{icon "clock" class="size-3"}} {{topic.when}}</span>{{/if}}
+        {{#if topic.paused}}<span class="badge badge-warn">{{icon "pause" class="size-3"}} Paused</span>{{/if}}
+        {{#if topic.custom}}<span class="badge badge-accent">Set by you</span>{{/if}}
+        {{#if topic.failing}}<span class="badge badge-bad">{{plural topic.failing "source" "sources"}} not answering</span>{{/if}}
+      </h2>
+      <p class="mt-0.5 text-xs text-ink-3">{{plural topic.sources.length "source"}}{{#if topic.paused}} · no new stories while paused{{/if}}</p>
+    </div>
+    <div class="flex shrink-0 items-center gap-1">
+      <button type="button" class="btn btn-secondary btn-sm" data-topic-pause>{{#if topic.paused}}{{icon "play" class="size-3.5"}} Resume{{else}}{{icon "pause" class="size-3.5"}} Pause{{/if}}</button>
+      <button type="button" class="btn btn-ghost btn-icon btn-sm" data-topic-edit data-tooltip="Edit topic" aria-label="Edit {{topic.label}}">{{icon "pencil" class="size-4"}}</button>
+      <button type="button" class="btn btn-ghost btn-icon btn-sm hover:text-bad" data-topic-delete data-tooltip="Delete topic" aria-label="Delete {{topic.label}}">{{icon "trash-2" class="size-4"}}</button>
+    </div>
+  </header>
+
+  <ul class="src-list" role="list" data-source-list>
+    {{#each topic.sources}}{{> feed/source-row source=this topicKey=../topic.key}}{{else}}
+      <li class="px-4 py-5 text-center text-sm text-ink-3">No sources here. Add a site below.</li>
+    {{/each}}
+  </ul>
+
+  <form class="src-add" data-source-add novalidate>
+    <label for="add-{{topic.key}}" class="sr-only">Add a site or feed to {{topic.label}}</label>
+    <div class="flex gap-2">
+      <div class="relative min-w-0 flex-1">
+        <span class="pointer-events-none absolute inset-y-0 left-3 grid place-items-center text-ink-3">{{icon "link" class="size-4"}}</span>
+        <input id="add-{{topic.key}}" name="url" class="input h-9 pl-9 text-sm" placeholder="Add a site or feed, e.g. theverge.com" dir="ltr" autocomplete="off" inputmode="url" enterkeyhint="done">
+      </div>
+      <button class="btn btn-primary btn-sm h-9">{{icon "plus" class="size-3.5"}} Add</button>
+    </div>
+    <div data-source-add-status hidden></div>
+  </form>
+</section>

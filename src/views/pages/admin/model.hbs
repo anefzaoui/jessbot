@@ -1,0 +1,340 @@
+{{!-- Admin → Models (Phase 9; voice: Phase 14; quick decisions: Phase 16): what she thinks, speaks, listens and decides with.
+     Clients: model-test.js (save and test), admin-models.js (fallbacks, background model, pictures), admin-voice.js, admin-decide.js --}}
+{{> page-header title="Models" subtitle=(concat "What " bot.name " thinks, speaks, listens and decides with") width="max-w-5xl"}}
+<div class="mx-auto max-w-5xl px-4 py-6 sm:px-6">
+  {{> admin/nav active="model"}}
+
+  {{!-- At a glance: “the LLM model is x, the voice model is y”. --}}
+  <div class="mb-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+    <div class="model-tile">{{icon "brain" class="size-4"}}<div class="min-w-0"><p class="model-tile-k">Thinks with</p><p class="model-tile-v" title="{{llm.model}}">{{llm.model}}</p></div></div>
+    <a href="#voice" class="model-tile">{{icon "audio-lines" class="size-4"}}<div class="min-w-0"><p class="model-tile-k">Speaks with</p><p class="model-tile-v" data-tile-voice title="{{voice.model}} · {{voice.speaking}}">{{voice.model}} · {{voice.speaking}}</p></div></a>
+    <a href="#voice" class="model-tile">{{icon "ear" class="size-4"}}<div class="min-w-0"><p class="model-tile-k">Listens with</p><p class="model-tile-v" data-tile-stt title="{{voice.sttModel}}">{{voice.sttModel}}</p></div></a>
+    <a href="#decide" class="model-tile">{{icon "zap" class="size-4"}}<div class="min-w-0"><p class="model-tile-k">Decides with</p><p class="model-tile-v" data-tile-decide title="{{decide.model}}">{{decide.model}} · {{decide.summary.on}} of {{decide.summary.total}} on</p></div></a>
+  </div>
+
+  <div class="grid gap-6 md:grid-cols-[minmax(0,1fr)_18rem]">
+    <form class="card space-y-4 p-5" data-model-test action="/admin/model">
+      <div class="rounded-xl border border-line bg-surface px-4 py-3">
+        <div class="flex items-center gap-3">
+          <span class="grid size-9 place-items-center rounded-lg bg-accent-soft text-accent-text">{{icon "key-round" class="size-[18px]"}}</span>
+          <div class="min-w-0 flex-1">
+            <p class="text-sm font-semibold">API key</p>
+            {{#if llm.hasKey}}
+              <p class="text-xs text-ink-3">Saved in this install’s <code class="font-mono">.env</code> · <span class="font-mono" data-masked-key>{{llm.maskedKey}}</span></p>
+            {{else}}
+              <p class="text-xs text-bad">No key yet. {{bot.name}} can’t think until you add one.</p>
+            {{/if}}
+          </div>
+        </div>
+        <div class="mt-3 {{#if llm.hasKey}}hidden{{/if}}" data-key-field>
+          <label class="sr-only" for="f-apiKey">New API key</label>
+          <input id="f-apiKey" name="apiKey" type="password" class="input font-mono text-[13px]" placeholder="sk-or-…" autocomplete="off">
+        </div>
+        {{#if llm.hasKey}}<button type="button" class="mt-2 text-xs font-medium text-accent-text hover:underline" data-show-key-field>Replace the key</button>{{/if}}
+      </div>
+
+      <div data-field>
+        <label class="label" for="f-model">Model</label>
+        <input id="f-model" name="model" class="input font-mono text-[13px]" value="{{llm.model}}" autocomplete="off" spellcheck="false" required>
+        <p class="hint">Any model id your provider offers, e.g. <span class="font-mono">openai/gpt-6-luna</span>. Cheaper models cost less; pick the cheapest that answers well.</p>
+      </div>
+      {{!-- The fallback chain and the background model (decision #179; the screen is Phase 25 #203). Each model answers a tiny
+           test before it counts: a row shows its own test, and Save waits while one runs or refuses one that didn't answer.
+           Saving tests every new one again on the server. Client: admin-models.js (rows, order, tests) + model-test.js (save). --}}
+      <fieldset class="mdl-chain" data-fallbacks data-max="{{llm.maxFallbacks}}">
+        <div class="flex items-baseline justify-between gap-3">
+          <legend class="label mb-0">Fallback models <span class="font-normal text-ink-3">(optional)</span></legend>
+          <span class="text-xs text-ink-3 tabular" data-fb-count>{{llm.fallbackList.length}} of {{llm.maxFallbacks}}</span>
+        </div>
+        <p class="hint mt-0.5">When the main model is down, busy or refuses, the next one answers, in this order.{{#unless llm.onOpenRouter}} This endpoint may not support a fallback order; OpenRouter does.{{/unless}}</p>
+        <ol class="mdl-fb-list" role="list" data-fb-list>
+          <li class="mdl-fb-row is-main">
+            <span class="mdl-fb-n tabular" aria-hidden="true"></span>
+            <div class="min-w-0 flex-1">
+              <p class="truncate font-mono text-[13px] text-ink" title="{{llm.model}}" data-fb-main>{{llm.model}}</p>
+              <p class="mdl-state" data-state="main"><span data-when="main">{{icon "brain" class="size-3.5"}} Main model. Always asked first.</span></p>
+            </div>
+          </li>
+          {{#each llm.fallbackList}}{{> admin/fallback-row model=this state="saved"}}{{/each}}
+        </ol>
+        <div class="mdl-fb-add" data-fb-add {{#if (eq llm.fallbackList.length llm.maxFallbacks)}}data-full{{/if}}>
+          <label class="sr-only" for="f-fb-new">Add a fallback model</label>
+          <input id="f-fb-new" class="input font-mono text-[13px]" placeholder="e.g. anthropic/claude-sonnet" autocomplete="off" spellcheck="false" data-fb-input>
+          <button type="button" class="btn btn-secondary btn-sm shrink-0" data-fb-add-btn>{{icon "flask-conical" class="size-3.5"}} Test and add</button>
+        </div>
+        <p class="mdl-fb-full" data-fb-full-note>That’s the most, {{llm.maxFallbacks}}. Remove one to add another.</p>
+        <p class="field-error" data-fb-add-error hidden></p>
+        <input type="hidden" name="fallbacks" value="{{llm.fallbacks}}" data-fb-value>
+        <template data-fb-template>{{> admin/fallback-row model="" state="testing"}}</template>
+      </fieldset>
+
+      <div data-field data-bg data-state="{{#if llm.background}}saved{{else}}empty{{/if}}" data-saved="{{llm.background}}">
+        <label class="label" for="f-background">Background model <span class="font-normal text-ink-3">(optional)</span></label>
+        <div class="flex gap-2">
+          <input id="f-background" name="background" class="input font-mono text-[13px]" value="{{llm.background}}" placeholder="Same as the main model" autocomplete="off" spellcheck="false" data-bg-input>
+          <button type="button" class="btn btn-secondary btn-sm shrink-0 self-center" data-bg-test>{{icon "flask-conical" class="size-3.5"}} Test</button>
+        </div>
+        <p class="mdl-state" role="status">
+          <span data-when="empty">{{icon "info" class="size-3.5"}} Summaries, memory, the feed and goals use the main model.</span>
+          <span data-when="saved">{{icon "check" class="size-3.5"}} Saved. Summaries, memory, the feed and goals use it.</span>
+          <span data-when="changed">{{icon "circle-alert" class="size-3.5"}} Not tested yet. Press Test, or Save tests it.</span>
+          <span data-when="testing"><span class="spinner size-3" aria-hidden="true"></span> Asking it a tiny question…</span>
+          <span data-when="ok">{{icon "circle-check" class="size-3.5"}} Answered in <span class="tabular" data-bg-ms></span>. Press Save to keep it.</span>
+          <span data-when="failed">{{icon "circle-x" class="size-3.5"}} <span data-bg-error>Didn’t answer.</span></span>
+        </p>
+        <p class="hint">A cheaper model for background work. If it fails or answers badly, the main model tries once.</p>
+      </div>
+      <details class="group">
+        <summary class="cursor-pointer text-xs font-medium text-ink-3 hover:text-ink-2">Advanced: a different endpoint</summary>
+        <div class="mt-3" data-field>
+          <label class="label" for="f-baseUrl">Base URL</label>
+          <input id="f-baseUrl" name="baseUrl" class="input font-mono text-[13px]" value="{{llm.baseUrl}}" placeholder="{{llm.defaultBaseUrl}}">
+          <p class="hint">OpenRouter, OpenAI or a local server (Ollama, LM Studio): anything OpenAI-compatible.</p>
+        </div>
+      </details>
+
+      <button type="submit" class="btn btn-primary btn-block" data-test-button>{{icon "plug-zap" class="size-4"}} Save and test</button>
+      <div data-test-result aria-live="polite"></div>
+    </form>
+
+    <aside class="space-y-3 text-sm text-ink-2">
+      <div class="card p-4">
+        <p class="mb-1 font-semibold text-ink">How it’s used</p>
+        <p>Replies go to the main model. Summaries, memory, the feed and goals go to the background model when you set one. A fallback answers only when the one before it can’t. The key never leaves this computer except to the provider.</p>
+      </div>
+      <a href="/admin/usage" class="card card-hover block p-4"><p class="font-semibold text-ink">{{icon "chart-column" class="size-4"}} See what it costs</p><p class="text-xs text-ink-3">Per person, per feature, per model.</p></a>
+    </aside>
+  </div>
+
+  {{!-- Her voice (Phase 14, docs/VOICE.md). Client: admin-voice.js (save, "Hear her", per-voice samples). --}}
+  <section id="voice" class="mt-10 scroll-mt-20" aria-labelledby="voice-h">
+    <div class="mb-4 flex flex-wrap items-end justify-between gap-3">
+      <div>
+        <h2 id="voice-h" class="text-lg font-semibold tracking-tight">{{bot.name}}’s voice</h2>
+        <p class="text-sm text-ink-3">She speaks when you ask (“send me a voice note”, “say it”), when you press Listen, and when you send her a voice note.</p>
+      </div>
+      <button type="button" class="btn btn-soft" data-voice-hear>{{icon "audio-lines" class="size-4"}} Hear her</button>
+    </div>
+    <div class="grid gap-6 md:grid-cols-[minmax(0,1fr)_18rem]">
+      <form class="card space-y-5 p-5" data-voice-form action="/api/v1/admin/voice">
+        <fieldset>
+          <legend class="label">Voice</legend>
+          <div class="grid grid-cols-2 gap-2">
+            <label class="choice-card voice-card">
+              <input type="radio" name="voice" value="" class="sr-only" {{#unless voice.voice}}checked{{/unless}}>
+              <span class="voice-card-top"><span class="font-semibold">Auto</span><span class="badge badge-accent">{{voice.autoVoice.label}}</span></span>
+              <span class="text-xs text-ink-3">Matches her {{voice.variantLabel}} identity, and follows it if you change her look.</span>
+            </label>
+            {{#each voice.voices}}
+              <label class="choice-card voice-card">
+                <input type="radio" name="voice" value="{{id}}" class="sr-only" {{#if selected}}checked{{/if}}>
+                <span class="voice-card-top"><span class="font-semibold">{{label}}</span>
+                  <button type="button" class="btn btn-ghost btn-icon btn-sm size-7" data-voice-sample="{{id}}" data-tooltip="Hear {{label}}" aria-label="Hear {{label}}">{{icon "play" class="size-3.5"}}</button></span>
+                <span class="text-xs text-ink-3">{{hint}}</span>
+                {{#if matches}}<span class="voice-card-fit">{{icon "check" class="size-3"}} fits her look</span>{{/if}}
+              </label>
+            {{/each}}
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend class="label">Speaking speed</legend>
+          <div class="segmented" role="radiogroup">
+            {{#each voice.speeds}}<label class="segment-choice"><input type="radio" name="speed" value="{{value}}" class="sr-only" {{#if selected}}checked{{/if}}><span>{{value}}×</span></label>{{/each}}
+          </div>
+          <p class="hint">How fast her voice notes play (her voice keeps its pitch). You can still change it on any note.</p>
+        </fieldset>
+
+        <div data-field>
+          <label class="label" for="f-direction">How she speaks</label>
+          <textarea id="f-direction" name="direction" rows="3" maxlength="600" class="input" placeholder="Auto: written from her look, tone and SOUL">{{voice.direction}}</textarea>
+          <p class="hint">Delivery only. The words are always her reply. Leave empty for Auto, which right now says:</p>
+          <p class="voice-auto" data-voice-auto>“{{voice.autoDirection}}”</p>
+        </div>
+
+        <details class="group" {{#unless (eq voice.model 'openai/gpt-audio-mini')}}open{{/unless}}>
+          <summary class="cursor-pointer text-xs font-medium text-ink-3 hover:text-ink-2">Models</summary>
+          <div class="mt-3 grid gap-4 sm:grid-cols-2">
+            <div data-field>
+              <label class="label" for="f-vmodel">Voice model</label>
+              <input id="f-vmodel" name="model" class="input font-mono text-[13px]" value="{{voice.model}}" list="voice-models" autocomplete="off" spellcheck="false">
+              <p class="hint">Mini ≈ $0.005 a minute; every clip is checked against the reply.</p>
+            </div>
+            <div data-field>
+              <label class="label" for="f-vfallback">If a clip drifts</label>
+              <input id="f-vfallback" name="fallbackModel" class="input font-mono text-[13px]" value="{{voice.fallbackModel}}" list="voice-models" autocomplete="off" spellcheck="false">
+              <p class="hint">Used after two tries; full ≈ $0.09 a minute.</p>
+            </div>
+            <div data-field class="sm:col-span-2">
+              <label class="label" for="f-stt">Transcription model (your voice notes)</label>
+              <input id="f-stt" name="sttModel" class="input font-mono text-[13px]" value="{{voice.sttModel}}" autocomplete="off" spellcheck="false">
+              <p class="hint">Any model that takes audio in. Gemini 2.5 Flash-Lite: ~2 s and a fraction of a cent per note.</p>
+            </div>
+          </div>
+          <datalist id="voice-models">{{#each voice.models}}<option value="{{this}}"></option>{{/each}}</datalist>
+        </details>
+
+        <button type="submit" class="btn btn-primary btn-block" data-voice-save>{{icon "save" class="size-4"}} Save voice</button>
+        <div data-voice-result aria-live="polite"></div>
+      </form>
+
+      <aside class="space-y-3 text-sm text-ink-2">
+        <div class="card p-4">
+          <p class="mb-1 font-semibold text-ink">How she sounds like herself</p>
+          <p>Auto picks the voice that matches her look (woman → Marin, man → Cedar, gender-neutral → Sage) and writes the delivery from her tone and SOUL. In a project she sounds like its expert.</p>
+        </div>
+        <div class="card p-4">
+          <p class="mb-1 font-semibold text-ink">Languages</p>
+          <p>English, Arabic, French and other major languages. She speaks the language of the reply.</p>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  {{!-- Quick decisions (Phase 16, docs/JEV.md). Client: admin-decide.js (save, try, refresh the list). --}}
+  <section id="decide" class="mt-10 scroll-mt-20" aria-labelledby="decide-h">
+    <div class="mb-4 flex flex-wrap items-end justify-between gap-3">
+      <div class="max-w-2xl">
+        <h2 id="decide-h" class="text-lg font-semibold tracking-tight">Quick decisions</h2>
+        <p class="text-sm text-ink-3">A decision model answers narrow questions in about a third of a second for a tiny fraction of a cent, so {{bot.name}} skips work that isn’t needed and moves faster in the browser. When it isn’t sure, or doesn’t answer, {{bot.name}} does it the usual way.</p>
+      </div>
+      <p class="dec-today" data-dec-today>{{icon "zap" class="size-3.5"}} {{decide.summary.today}} in the last day · {{decide.summary.todayCost}}</p>
+    </div>
+    {{#unless decide.summary.reachable}}
+      <div class="mb-4 rounded-xl border border-warn/40 bg-warn-soft px-4 py-3 text-sm text-warn-text" role="status">
+        Quick decisions need an OpenRouter key and endpoint (the ones above). Until then {{bot.name}} decides everything the usual way.
+      </div>
+    {{/unless}}
+    <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
+      <form class="card space-y-5 p-5" data-decide-form action="/api/v1/admin/decide">
+        <div class="grid gap-4 2xl:grid-cols-2">
+          <div data-field>
+            <label class="label" for="f-dmodel">Decision model</label>
+            <input id="f-dmodel" name="model" class="input font-mono text-[13px]" value="{{decide.model}}" autocomplete="off" spellcheck="false">
+            <p class="hint">TypeSafe’s Jev through OpenRouter: $0.04 per million input tokens, answers free. Pinned so answers stay steady.</p>
+          </div>
+          <div data-field>
+            <label class="label" for="f-dtext">Writes what the autopilot types</label>
+            <input id="f-dtext" name="textModel" class="input font-mono text-[13px]" value="{{decide.textModel}}" autocomplete="off" spellcheck="false">
+            <p class="hint">A small, fast model fills in a field (a city, a date) when the browser autopilot types. Mercury: ~0.4 s.</p>
+          </div>
+          <fieldset>
+            <legend class="label">Act when at least</legend>
+            <div class="segmented" role="radiogroup">
+              {{#each decide.confidences}}<label class="segment-choice"><input type="radio" name="confidence" value="{{value}}" class="sr-only" {{#if selected}}checked{{/if}}><span>{{pct}}%</span></label>{{/each}}
+            </div>
+            <p class="hint">How sure it must be to skip work or take a browser step. Safety checks only ever get stricter.</p>
+          </fieldset>
+        </div>
+        {{#each decide.groups}}
+          <fieldset class="dec-group">
+            <legend class="dec-group-h">{{label}}</legend>
+            {{#each uses}}
+              <label class="dec-use">
+                <span class="dec-use-icon" aria-hidden="true">{{icon iconName class="size-4"}}</span>
+                <span class="min-w-0 flex-1">
+                  <span class="block text-sm font-medium">{{label}}</span>
+                  <span class="block text-xs text-ink-3">{{hint}}</span>
+                  <span class="mt-1 block text-[11px] text-ink-3 tabular" data-dec-stats="{{key}}">{{stats}}</span>
+                </span>
+                <input type="checkbox" class="switch" name="use:{{key}}" {{#if on}}checked{{/if}} aria-label="{{label}}">
+              </label>
+            {{/each}}
+          </fieldset>
+        {{/each}}
+        <button type="submit" class="btn btn-primary btn-block" data-decide-save>{{icon "save" class="size-4"}} Save quick decisions</button>
+      </form>
+
+      <aside class="space-y-4">
+        <form class="card space-y-3 p-4" data-decide-try novalidate>
+          <p class="flex items-center gap-2 font-semibold">{{icon "flask-conical" class="size-4 text-accent-text"}} Try a decision</p>
+          <div data-field>
+            <label class="label" for="dt-state">What’s going on</label>
+            <textarea id="dt-state" name="state" rows="3" class="textarea text-sm" placeholder="e.g. An email from the school: “Pick-up moved to 2 pm tomorrow because of a staff meeting.”"></textarea>
+          </div>
+          <div class="segmented dec-kinds" role="radiogroup" aria-label="Kind of question">
+            <label class="segment-choice"><input type="radio" name="kind" value="choice" class="sr-only" checked><span>Choice</span></label>
+            <label class="segment-choice"><input type="radio" name="kind" value="noul" class="sr-only"><span>Yes / no</span></label>
+            <label class="segment-choice"><input type="radio" name="kind" value="score" class="sr-only"><span>Scale</span></label>
+          </div>
+          <div data-field>
+            <label class="label" for="dt-q">Question</label>
+            <input id="dt-q" name="question" class="input text-sm" placeholder="e.g. How urgent is this for them?">
+          </div>
+          <div data-field data-dt-options>
+            <label class="label" for="dt-o">Options <span class="font-normal text-ink-3">(one per line)</span></label>
+            <textarea id="dt-o" name="options" rows="3" class="textarea text-sm" placeholder="Handle it today&#10;This week&#10;Just FYI"></textarea>
+          </div>
+          <button type="submit" class="btn btn-soft btn-block" data-dt-run>{{icon "zap" class="size-4"}} Decide</button>
+          <div data-dt-result aria-live="polite"></div>
+        </form>
+        <div class="card p-4 text-sm text-ink-2">
+          <p class="mb-1 font-semibold text-ink">Safe by design</p>
+          <p>It never writes anything and never loosens a check: it can make {{bot.name}} ask before a click that pays or sends, but never skip asking. Web pages can try to steer it, so page judgments only add warnings.</p>
+        </div>
+      </aside>
+    </div>
+
+    <div class="mt-6">
+      <div class="mb-2 flex items-center justify-between">
+        <h3 class="text-sm font-semibold">Recent decisions</h3>
+        <button type="button" class="btn btn-ghost btn-sm" data-dec-refresh>{{icon "refresh-cw" class="size-3.5"}} Refresh</button>
+      </div>
+      <div class="card p-2" data-dec-list>{{> admin/decisions-list decisions=decide.recent}}</div>
+    </div>
+  </section>
+
+  {{!-- Pictures (Phase 22, decisions #169–#170; the card is Phase 25 #203): the image model make_image draws with; empty = off.
+       Who may use it is the "Pictures" permission in People / Groups (off for everyone by default). Saving checks the id on
+       the endpoint's image model list (free) and says what a picture costs and how that was worked out; the last check is
+       kept (images.checked). Client: admin-models.js. --}}
+  <section id="images" class="mt-10 scroll-mt-20" aria-labelledby="images-h">
+    <div class="mb-4 max-w-2xl">
+      <h2 id="images-h" class="text-lg font-semibold tracking-tight">Pictures</h2>
+      <p class="text-sm text-ink-3">An image model can make pictures on request: invitations, colouring pages, story art. It stays off until you choose a model here, and then only the people you allow can use it. Each picture counts against that person’s weekly budget.</p>
+    </div>
+    <div class="grid gap-6 md:grid-cols-[minmax(0,1fr)_18rem]">
+      <form class="card space-y-4 p-5" action="/api/v1/admin/images" data-images-form data-state="{{#if images.model}}on{{else}}off{{/if}}">
+        <div class="img-status">
+          <span class="img-status-icon">{{icon "image" class="size-[18px]"}}</span>
+          <div class="min-w-0 flex-1">
+            <p class="text-sm font-semibold"><span data-when="on">Pictures are on</span><span data-when="off">Pictures are off</span><span data-when="checking">Checking the model…</span></p>
+            <p class="text-xs text-ink-3" data-img-line>{{#if images.model}}<span class="font-mono">{{images.model}}</span>{{else}}No image model chosen, so nobody can make pictures.{{/if}}</p>
+          </div>
+          <span class="badge badge-ok shrink-0" data-when="on">On</span>
+        </div>
+        <div data-field>
+          <label class="label" for="f-imodel">Image model</label>
+          <input id="f-imodel" name="model" class="input font-mono text-[13px]" value="{{images.model}}" placeholder="Off" autocomplete="off" spellcheck="false">
+          <p class="hint">An OpenRouter image model id, e.g. <span class="font-mono">black-forest-labs/flux.2-klein-4b</span> (about $0.015 a picture). Leave it empty to turn pictures off.</p>
+        </div>
+        {{!-- What the last save found. Filled from the save's answer (price.label, price.source, warning) and kept after a reload. --}}
+        <div class="img-check" data-img-check {{#unless images.checked}}hidden{{/unless}}>
+          <div class="img-price" data-img-price {{#unless images.checked.price}}hidden{{/unless}}>
+            <span class="text-ink-3">{{icon "badge-dollar-sign" class="size-4"}}</span>
+            <p class="min-w-0 flex-1 text-sm"><span class="font-semibold" data-img-price-label>{{images.checked.price.label}}</span>
+              <span class="block text-xs text-ink-3" data-img-price-source>{{#if (eq images.checked.price.source 'list')}}From the model’s published price.{{else if (eq images.checked.price.source 'history')}}From what its pictures cost here lately.{{else if (eq images.checked.price.source 'fallback')}}A careful guess: no price is published for it.{{/if}}</span></p>
+          </div>
+          <p class="img-warning" data-img-warning {{#unless images.checked.warning}}hidden{{/unless}}>{{icon "circle-alert" class="size-4 shrink-0"}}<span data-img-warning-text>{{images.checked.warning}}</span></p>
+          {{#if images.checked.at}}<p class="text-xs text-ink-3" data-img-checked-at>Checked <time datetime="{{images.checked.at}}" data-relative>{{timeAgo images.checked.at}}</time></p>{{/if}}
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <button type="submit" class="btn btn-primary" data-img-save>{{icon "save" class="size-4"}} Save</button>
+          <p class="text-xs text-ink-3">Saving checks the id on the provider’s list. No picture is made.</p>
+        </div>
+      </form>
+      <aside class="space-y-3 text-sm text-ink-2">
+        <div class="card p-4">
+          <p class="mb-1 font-semibold text-ink">Last 30 days</p>
+          {{#if images.usage.count}}
+            <p class="tabular"><span class="text-2xl font-semibold text-ink">{{images.usage.countLabel}}</span></p>
+            <p class="text-xs text-ink-3">{{images.usage.costLabel}} · {{plural images.usage.people "person" "people"}}</p>
+          {{else}}
+            <p class="text-xs text-ink-3">No pictures yet.</p>
+          {{/if}}
+        </div>
+        <a href="/admin/people" class="card card-hover block p-4"><p class="font-semibold text-ink">{{icon "shield-check" class="size-4"}} Who may make pictures</p><p class="text-xs text-ink-3">The Pictures permission, per person or group.</p></a>
+      </aside>
+    </div>
+  </section>
+</div>

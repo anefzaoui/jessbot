@@ -1,0 +1,16 @@
+{{!-- Card action row (like / less / save / share / more). Uses the card's context. --}}
+<footer class="flex items-center gap-0.5 px-2 pb-2 sm:px-3" data-card-actions>
+  <button type="button" class="btn btn-ghost btn-icon btn-sm feed-act" data-post-feedback="up" aria-pressed="{{eq feedback 'up'}}" data-tooltip="More like this" aria-label="More like this">{{icon "heart" class="size-[18px]"}}</button>
+  <button type="button" class="btn btn-ghost btn-icon btn-sm feed-act" data-post-feedback="down" aria-pressed="{{eq feedback 'down'}}" data-tooltip="Less like this" aria-label="Less like this">{{icon "thumbs-down" class="size-[18px]"}}</button>
+  <span class="flex-1"></span>
+  <button type="button" class="btn btn-ghost btn-icon btn-sm feed-act" data-post-save aria-pressed="{{#if saved}}true{{else}}false{{/if}}" data-tooltip="Save" aria-label="Save">{{icon "bookmark" class="size-[18px]"}}</button>
+  <button type="button" class="btn btn-ghost btn-icon btn-sm feed-act" data-post-share data-tooltip="Share" aria-label="Share">{{icon "share-2" class="size-[18px]"}}</button>
+  <button type="button" class="btn btn-ghost btn-icon btn-sm feed-act" popovertarget="pm-{{id}}" aria-haspopup="menu" aria-label="More">{{icon "ellipsis-vertical" class="size-[18px]"}}</button>
+  <div id="pm-{{id}}" popover class="menu w-64" role="menu" data-placement="top-end">
+    <a href="/chat?draft={{urlencode (concat 'About “' title '”: ')}}" class="menu-item" role="menuitem">{{icon "message-circle" class="size-4"}} Ask {{@root.bot.name}} about this</a>
+    <button type="button" class="menu-item" role="menuitem" data-topic-follow="{{topic}}">{{icon "plus" class="size-4"}} More about {{topic}}</button>
+    <button type="button" class="menu-item" role="menuitem" data-post-hide="topic">{{icon "eye-off" class="size-4"}} Not interested in {{topic}}</button>
+    <button type="button" class="menu-item" role="menuitem" data-post-hide="source">{{icon "ban" class="size-4"}} Fewer from {{source.name}}</button>
+    {{#if why}}<div class="menu-sep"></div><p class="px-2.5 py-1.5 text-xs leading-snug text-ink-3">{{icon "info" class="size-3"}} {{why}}</p>{{/if}}
+  </div>
+</footer>

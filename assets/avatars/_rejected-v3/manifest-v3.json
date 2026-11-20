@@ -1,0 +1,934 @@
+{
+  "model": "openai/gpt-image-2.5-flare",
+  "endpoint": "https://openrouter.ai/api/v1/images",
+  "created": "2026-09-24T15:38:17.915Z",
+  "updated": "2026-09-24T15:55:15.090Z",
+  "totalCost": 1.563504,
+  "images": [
+    {
+      "variant": "female",
+      "state": "neutral",
+      "file": "female/neutral.png",
+      "prompt": "Cinematic, photorealistic head-and-shoulders portrait of a breathtakingly beautiful humanoid android: the flagship model of a luxury consumer-robotics brand. Refined, elegant, magazine-cover quality; a premium product its owner would be proud of. An original character with an original face that does not resemble any real person or celebrity. Clearly an android: the base body is a flawless pearl-white synthetic chassis in satin ceramic, like high-end consumer robotics, visible as smooth sculpted white panels at the temples, the outer edges of the forehead, along the jawline, the ears, the neck and the shoulders, with precise, thin, crisp seams between the panels. Realistic, warm human skin covers only the central face (cheeks, nose, lips and around the eyes), so natural skin color peeks through and blends into the white chassis at elegant, precisely finished panel edges. A partially skinned face, not a full human face: the white chassis visibly frames the face, with a white band running along the hairline and across the upper outer forehead, down the temples, past the outer cheekbones and along the jaw, and the skin sits inside this opening like an inlay, with a soft, refined transition where it meets the white. Striking eyes with a subtle luminous ring around the edge of each iris, and one tiny soft-glowing indicator light set into a temple panel. No clothing is visible: the neck and shoulders are sculpted white chassis panels with fine seams and subtle soft-graphite joint accents. Lighting: cinematic and moody, a soft key light from the front-left, a cool teal-grey fill light, and a gentle rim light tracing the white panels and shoulders against the background; shallow depth of field. Background: a smooth deep charcoal-to-slate gradient studio backdrop, no props, no text. Composition: square image, subject centered and facing the camera directly, head and shoulders filling about 70% of the frame, eyes on the upper third line, medium close-up. The whole head is inside the frame, with a clear margin of background above the top of the head (the top of the hair sits roughly one tenth of the image height below the top edge); the head is not cropped. Serene and beautiful, never horror or creepy: no exposed wires or mechanical internals, no cracks or damage, no chrome or bare metal. The android is woman-presenting, appearing around 30. The skin on the central face is a warm, softly glowing light-honey tone. Striking pale aqua-grey eyes with long lashes, elegant softly arched brows, a heart-shaped face with a fine straight nose and softly defined lips in a natural rose tone. Sleek, glossy espresso-dark hair swept smoothly back into a polished low chignon, leaving the white temple and ear panels visible. Facial expression: a calm, composed, serene resting expression, mouth closed, eyes looking directly into the camera with a poised, gentle warmth.",
+      "referenceUsed": null,
+      "cost": 0.055715,
+      "generationId": "gen-img-1790265290-BobHHnv4eLt7onT0dRdx",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "usage": {
+        "prompt_tokens": 607,
+        "completion_tokens": 1756,
+        "total_tokens": 2363,
+        "cost": 0.055715,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.055715,
+          "upstream_inference_prompt_cost": 0.003035,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "artDirection": "v3-white-chassis",
+      "createdAt": "2026-09-24T15:55:15.089Z"
+    }
+  ],
+  "history": [
+    {
+      "variant": "female",
+      "state": "neutral",
+      "file": "female/neutral.png",
+      "prompt": "Photorealistic head-and-shoulders studio portrait of a humanoid android: clearly a robot, but skinned with realistic, natural human-like skin. Subtle, elegant android tells: thin vertical seam / panel lines on the forehead and temples, fine seam lines along the jawline and running down the sides of the neck, a few tiny inset sensor points near the temples, and a very faint seam where the neck meets the shoulders. Friendly, warm, calm, intelligent and trustworthy; premium consumer-product design. Not creepy, not uncanny, not horror, no exposed wires or machinery, no chrome or metallic skin. Composition: square image, subject centered and facing the camera directly, head and shoulders filling about 70% of the frame, eyes on the upper third line, medium close-up. Soft, even, flattering studio lighting (large soft key light and gentle fill). Background: a plain seamless studio backdrop in soft light warm grey (#EDEBE8), evenly lit, no gradient, no vignette, no props, no text, no logos. The android is woman-presenting, appearing around 30 years old, with warm deep-brown skin, dark brown eyes, and dark natural hair pulled back into a neat low bun, soft and friendly features. She wears a simple modern soft heather-grey knit crew-neck sweater, with a hint of a synthetic collar seam at the base of the neck. Facial expression: a calm, relaxed resting expression with a subtle pleasant warmth, mouth closed, eyes looking directly into the camera.",
+      "referenceUsed": null,
+      "cost": 0.05426,
+      "generationId": "gen-img-1790264298-YqObRHkTR0UJHw2edx7K",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "usage": {
+        "prompt_tokens": 316,
+        "completion_tokens": 1756,
+        "total_tokens": 2072,
+        "cost": 0.05426,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.05426,
+          "upstream_inference_prompt_cost": 0.00158,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "createdAt": "2026-09-24T15:38:40.910Z",
+      "artDirection": "v1-light-studio (rejected)",
+      "archived": true
+    },
+    {
+      "variant": "male",
+      "state": "neutral",
+      "file": "male/neutral.png",
+      "prompt": "Photorealistic head-and-shoulders studio portrait of a humanoid android: clearly a robot, but skinned with realistic, natural human-like skin. Subtle, elegant android tells: thin vertical seam / panel lines on the forehead and temples, fine seam lines along the jawline and running down the sides of the neck, a few tiny inset sensor points near the temples, and a very faint seam where the neck meets the shoulders. Friendly, warm, calm, intelligent and trustworthy; premium consumer-product design. Not creepy, not uncanny, not horror, no exposed wires or machinery, no chrome or metallic skin. Composition: square image, subject centered and facing the camera directly, head and shoulders filling about 70% of the frame, eyes on the upper third line, medium close-up. Soft, even, flattering studio lighting (large soft key light and gentle fill). Background: a plain seamless studio backdrop in soft light warm grey (#EDEBE8), evenly lit, no gradient, no vignette, no props, no text, no logos. The android is man-presenting, appearing in his mid-30s, with East Asian features, light warm skin tone, dark brown eyes, short neat black hair with a subtle side part, clean-shaven, a gentle but defined jawline. He wears a simple modern charcoal-grey knit crew-neck sweater, with a hint of a synthetic collar seam at the base of the neck. Facial expression: a calm, relaxed resting expression with a subtle pleasant warmth, mouth closed, eyes looking directly into the camera.",
+      "referenceUsed": null,
+      "cost": 0.05429,
+      "generationId": "gen-img-1790264329-pWOBhMDTIACfUVErXp3K",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "usage": {
+        "prompt_tokens": 322,
+        "completion_tokens": 1756,
+        "total_tokens": 2078,
+        "cost": 0.05429,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.05429,
+          "upstream_inference_prompt_cost": 0.00161,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "createdAt": "2026-09-24T15:39:11.590Z",
+      "artDirection": "v1-light-studio (rejected)",
+      "archived": true
+    },
+    {
+      "variant": "neutral",
+      "state": "neutral",
+      "file": "neutral/neutral.png",
+      "prompt": "Photorealistic head-and-shoulders studio portrait of a humanoid android: clearly a robot, but skinned with realistic, natural human-like skin. Subtle, elegant android tells: thin vertical seam / panel lines on the forehead and temples, fine seam lines along the jawline and running down the sides of the neck, a few tiny inset sensor points near the temples, and a very faint seam where the neck meets the shoulders. Friendly, warm, calm, intelligent and trustworthy; premium consumer-product design. Not creepy, not uncanny, not horror, no exposed wires or machinery, no chrome or metallic skin. Composition: square image, subject centered and facing the camera directly, head and shoulders filling about 70% of the frame, eyes on the upper third line, medium close-up. Soft, even, flattering studio lighting (large soft key light and gentle fill). Background: a plain seamless studio backdrop in soft light warm grey (#EDEBE8), evenly lit, no gradient, no vignette, no props, no text, no logos. The android is gender-neutral and androgynous, appearing in their late 20s, with light olive skin and a few faint freckles, grey-green eyes, and short, softly tousled ash-brown hair in a cropped cut; balanced features that read as neither clearly male nor female. They wear a simple modern deep slate-grey knit crew-neck sweater, with a hint of a synthetic collar seam at the base of the neck. Facial expression: a calm, relaxed resting expression with a subtle pleasant warmth, mouth closed, eyes looking directly into the camera.",
+      "referenceUsed": null,
+      "cost": 0.05434,
+      "generationId": "gen-img-1790264351-Mopuh7Ma1WKzVDXhxa3N",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "usage": {
+        "prompt_tokens": 332,
+        "completion_tokens": 1756,
+        "total_tokens": 2088,
+        "cost": 0.05434,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.05434,
+          "upstream_inference_prompt_cost": 0.00166,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "createdAt": "2026-09-24T15:39:35.800Z",
+      "artDirection": "v1-light-studio (rejected)",
+      "archived": true
+    },
+    {
+      "variant": "female",
+      "state": "neutral",
+      "file": "female/neutral.png",
+      "prompt": "Photorealistic head-and-shoulders studio portrait of a humanoid android: clearly a robot, but skinned with realistic, natural human-like skin. Subtle, elegant android tells: thin vertical seam / panel lines on the forehead and temples, fine seam lines along the jawline and running down the sides of the neck, a few tiny inset sensor points near the temples, and a very faint seam where the neck meets the shoulders. The seams are physical, not drawn: very fine recessed hairline grooves in the skin, like precision-fitted panel joins on a premium device, catching a soft shadow on one edge and a faint highlight on the other. Not ink lines, not tattoos, not makeup. Friendly, warm, calm, intelligent and trustworthy; premium consumer-product design. Not creepy, not uncanny, not horror, no exposed wires or machinery, no chrome or metallic skin. Composition: square image, subject centered and facing the camera directly, head and shoulders filling about 70% of the frame, eyes on the upper third line, medium close-up. Soft, even, flattering studio lighting (large soft key light and gentle fill). Background: a plain seamless studio backdrop in soft light warm grey (#EDEBE8), evenly lit, no gradient, no vignette, no props, no text, no logos. The android is woman-presenting, appearing around 30 years old, with warm deep-brown skin, dark brown eyes, and dark natural hair pulled back into a neat low bun, soft and friendly features. She wears a simple modern soft heather-grey knit crew-neck sweater, with a hint of a synthetic collar seam at the base of the neck. Facial expression: a calm, relaxed resting expression with a subtle pleasant warmth, mouth closed, eyes looking directly into the camera.",
+      "referenceUsed": null,
+      "cost": 0.05453,
+      "generationId": "gen-img-1790264401-NeuoXb822zzQBKbTwjiI",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "usage": {
+        "prompt_tokens": 370,
+        "completion_tokens": 1756,
+        "total_tokens": 2126,
+        "cost": 0.05453,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.05453,
+          "upstream_inference_prompt_cost": 0.00185,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "createdAt": "2026-09-24T15:40:51.330Z",
+      "artDirection": "v1-light-studio (rejected)",
+      "archived": true
+    },
+    {
+      "variant": "male",
+      "state": "neutral",
+      "file": "male/neutral.png",
+      "prompt": "Photorealistic head-and-shoulders studio portrait of a humanoid android: clearly a robot, but skinned with realistic, natural human-like skin. Subtle, elegant android tells: thin vertical seam / panel lines on the forehead and temples, fine seam lines along the jawline and running down the sides of the neck, a few tiny inset sensor points near the temples, and a very faint seam where the neck meets the shoulders. The seams are physical, not drawn: very fine recessed hairline grooves in the skin, like precision-fitted panel joins on a premium device, catching a soft shadow on one edge and a faint highlight on the other. Not ink lines, not tattoos, not makeup. Friendly, warm, calm, intelligent and trustworthy; premium consumer-product design. Not creepy, not uncanny, not horror, no exposed wires or machinery, no chrome or metallic skin. Composition: square image, subject centered and facing the camera directly, head and shoulders filling about 70% of the frame, eyes on the upper third line, medium close-up. Soft, even, flattering studio lighting (large soft key light and gentle fill). Background: a plain seamless studio backdrop in soft light warm grey (#EDEBE8), evenly lit, no gradient, no vignette, no props, no text, no logos. The android is man-presenting, appearing in his mid-30s, with East Asian features, light warm skin tone, dark brown eyes, short neat black hair with a subtle side part, clean-shaven, a gentle but defined jawline. He wears a simple modern charcoal-grey knit crew-neck sweater, with a hint of a synthetic collar seam at the base of the neck. Facial expression: a calm, relaxed resting expression with a subtle pleasant warmth, mouth closed, eyes looking directly into the camera.",
+      "referenceUsed": null,
+      "cost": 0.05456,
+      "generationId": "gen-img-1790264452-gu5fg7cHclIuCZojcZIy",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "usage": {
+        "prompt_tokens": 376,
+        "completion_tokens": 1756,
+        "total_tokens": 2132,
+        "cost": 0.05456,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.05456,
+          "upstream_inference_prompt_cost": 0.00188,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "createdAt": "2026-09-24T15:41:17.996Z",
+      "artDirection": "v1-light-studio (rejected)",
+      "archived": true
+    },
+    {
+      "variant": "neutral",
+      "state": "neutral",
+      "file": "neutral/neutral.png",
+      "prompt": "Photorealistic head-and-shoulders studio portrait of a humanoid android: clearly a robot, but skinned with realistic, natural human-like skin. Subtle, elegant android tells: thin vertical seam / panel lines on the forehead and temples, fine seam lines along the jawline and running down the sides of the neck, a few tiny inset sensor points near the temples, and a very faint seam where the neck meets the shoulders. The seams are physical, not drawn: very fine recessed hairline grooves in the skin, like precision-fitted panel joins on a premium device, catching a soft shadow on one edge and a faint highlight on the other. Not ink lines, not tattoos, not makeup. Friendly, warm, calm, intelligent and trustworthy; premium consumer-product design. Not creepy, not uncanny, not horror, no exposed wires or machinery, no chrome or metallic skin. Composition: square image, subject centered and facing the camera directly, head and shoulders filling about 70% of the frame, eyes on the upper third line, medium close-up. Soft, even, flattering studio lighting (large soft key light and gentle fill). Background: a plain seamless studio backdrop in soft light warm grey (#EDEBE8), evenly lit, no gradient, no vignette, no props, no text, no logos. The android is gender-neutral and truly androgynous, appearing in their late 20s, with light olive skin and a few faint freckles, grey-green eyes, straight natural brows, and short, softly tousled ash-brown hair in a cropped cut; a balanced face with a moderately defined jaw and no makeup, which reads as neither clearly male nor female. They wear a simple modern deep slate-grey knit crew-neck sweater, with a hint of a synthetic collar seam at the base of the neck. Facial expression: a calm, relaxed resting expression with a subtle pleasant warmth, mouth closed, eyes looking directly into the camera.",
+      "referenceUsed": null,
+      "cost": 0.054685,
+      "generationId": "gen-img-1790264479-bQjg48SEqDsbvBGuSeI6",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "usage": {
+        "prompt_tokens": 401,
+        "completion_tokens": 1756,
+        "total_tokens": 2157,
+        "cost": 0.054685,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.054685,
+          "upstream_inference_prompt_cost": 0.002005,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "createdAt": "2026-09-24T15:41:54.250Z",
+      "artDirection": "v1-light-studio (rejected)",
+      "archived": true
+    },
+    {
+      "variant": "female",
+      "state": "neutral",
+      "file": "female/neutral.png",
+      "prompt": "Photorealistic head-and-shoulders studio portrait of a humanoid android: clearly a robot, but skinned with realistic, natural human-like skin. Subtle, elegant android tells: thin vertical seam / panel lines on the forehead and temples, fine seam lines along the jawline and running down the sides of the neck, a few tiny inset sensor points near the temples, and a very faint seam where the neck meets the shoulders. The seams are physical, not drawn: very fine recessed hairline grooves in the skin, like precision-fitted panel joins on a premium device, catching a soft shadow on one edge and a faint highlight on the other. Not ink lines, not tattoos, not makeup. Friendly, warm, calm, intelligent and trustworthy; premium consumer-product design. Not creepy, not uncanny, not horror, no exposed wires or machinery, no chrome or metallic skin. Composition: square image, subject centered and facing the camera directly, head and shoulders filling about 70% of the frame, eyes on the upper third line, medium close-up. Soft, even, flattering studio lighting (large soft key light and gentle fill). Background: a plain seamless studio backdrop in soft light warm grey (#EDEBE8), evenly lit, no gradient, no vignette, no props, no text, no logos. The android is woman-presenting, appearing around 30 years old, with warm deep-brown skin, dark brown eyes, and dark natural hair pulled back into a neat low bun, soft and friendly features. She wears a simple modern soft heather-grey knit crew-neck sweater, with a hint of a synthetic collar seam at the base of the neck. Facial expression: a calm, relaxed resting expression with a subtle pleasant warmth, mouth closed, eyes looking directly into the camera.",
+      "referenceUsed": null,
+      "cost": 0.05453,
+      "generationId": "gen-img-1790264529-jHlnOS5qRyxpooGpv4Hp",
+      "model": "openai/gpt-image-2.5-sunburst",
+      "quality": "high",
+      "usage": {
+        "prompt_tokens": 370,
+        "completion_tokens": 1756,
+        "total_tokens": 2126,
+        "cost": 0.05453,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.05453,
+          "upstream_inference_prompt_cost": 0.00185,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "createdAt": "2026-09-24T15:42:50.603Z",
+      "artDirection": "v1-light-studio (rejected)",
+      "archived": true
+    },
+    {
+      "variant": "female",
+      "state": "neutral",
+      "file": "_rejected-v2/female/neutral.png",
+      "prompt": "Cinematic, photorealistic head-and-shoulders portrait of a lifelike humanoid domestic android from a sleek near-future science-fiction film: glamorous, polished and almost too perfect to be human. An original character with an original face that does not resemble any real person or celebrity. Flawless, porcelain-smooth synthetic skin with a subtle satin sheen and no blemishes; sculpted, striking, symmetrical features; a calm, composed, faintly uncanny gaze. Light-colored eyes with a very faint luminous ring around the edge of each iris. Minimal, elegant android tells: hairline-thin seam lines at the temple running up along the hairline, and a hairline-thin seam behind the jaw just below the ear, plus one tiny soft-glowing indicator light at one temple. The seams are fine precision joins in the skin, barely visible, not drawn lines or tattoos. Wardrobe: minimalist, fitted, dark domestic-android attire with a high, clean collar; no logos, no jewelry. Lighting: cinematic and moody, a soft key light from the front-left, a cool teal-grey fill light, and a gentle rim light separating hair and shoulders from the background; shallow depth of field. Background: a smooth deep charcoal-to-slate gradient studio backdrop, no props, no text. Composition: square image, subject centered and facing the camera directly, head and shoulders filling about 70% of the frame, eyes on the upper third line, medium close-up. Elegant and subtly uncanny, but never horror or creepy: no exposed machinery, no wires, no metal or chrome skin. The android is woman-presenting, appearing around 30, with pale ivory porcelain skin, pale grey-blue eyes, elegantly arched brows, high sculpted cheekbones and softly full lips in a muted rose tone. Sleek, glossy dark brown-black hair with a precise side part, smoothed back into a neat, polished low chignon. She wears a fitted black high-collar top with clean tailored lines. Facial expression: a calm, composed, serene resting expression, mouth closed, eyes looking directly into the camera with a faintly uncanny stillness.",
+      "referenceUsed": null,
+      "cost": 0.054895,
+      "generationId": "gen-img-1790264644-qIdyZjwhSxlqusQuiqka",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "usage": {
+        "prompt_tokens": 443,
+        "completion_tokens": 1756,
+        "total_tokens": 2199,
+        "cost": 0.054895,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.054895,
+          "upstream_inference_prompt_cost": 0.002215,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "artDirection": "v2-cinematic-dark (rejected)",
+      "createdAt": "2026-09-24T15:44:30.381Z",
+      "archived": true
+    },
+    {
+      "variant": "male",
+      "state": "neutral",
+      "file": "_rejected-v2/male/neutral.png",
+      "prompt": "Cinematic, photorealistic head-and-shoulders portrait of a lifelike humanoid domestic android from a sleek near-future science-fiction film: glamorous, polished and almost too perfect to be human. An original character with an original face that does not resemble any real person or celebrity. Flawless, porcelain-smooth synthetic skin with a subtle satin sheen and no blemishes; sculpted, striking, symmetrical features; a calm, composed, faintly uncanny gaze. Light-colored eyes with a very faint luminous ring around the edge of each iris. Minimal, elegant android tells: hairline-thin seam lines at the temple running up along the hairline, and a hairline-thin seam behind the jaw just below the ear, plus one tiny soft-glowing indicator light at one temple. The seams are fine precision joins in the skin, barely visible, not drawn lines or tattoos. Wardrobe: minimalist, fitted, dark domestic-android attire with a high, clean collar; no logos, no jewelry. Lighting: cinematic and moody, a soft key light from the front-left, a cool teal-grey fill light, and a gentle rim light separating hair and shoulders from the background; shallow depth of field. Background: a smooth deep charcoal-to-slate gradient studio backdrop, no props, no text. Composition: square image, subject centered and facing the camera directly, head and shoulders filling about 70% of the frame, eyes on the upper third line, medium close-up. Elegant and subtly uncanny, but never horror or creepy: no exposed machinery, no wires, no metal or chrome skin. The android is man-presenting, appearing in his mid-30s, with rich deep-brown skin, light amber-hazel eyes, a strong sculpted jaw, high cheekbones and a calm, even mouth; clean-shaven. Close-cropped black hair with a crisp, perfectly clean hairline. He wears a fitted charcoal-black high-collar jacket with clean tailored lines. Facial expression: a calm, composed, serene resting expression, mouth closed, eyes looking directly into the camera with a faintly uncanny stillness.",
+      "referenceUsed": null,
+      "cost": 0.054865,
+      "generationId": "gen-img-1790264671-LrCDtYlR5RYIeVuiTBvr",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "usage": {
+        "prompt_tokens": 437,
+        "completion_tokens": 1756,
+        "total_tokens": 2193,
+        "cost": 0.054865,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.054865,
+          "upstream_inference_prompt_cost": 0.002185,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "artDirection": "v2-cinematic-dark (rejected)",
+      "createdAt": "2026-09-24T15:45:04.437Z",
+      "archived": true
+    },
+    {
+      "variant": "neutral",
+      "state": "neutral",
+      "file": "_rejected-v2/neutral/neutral.png",
+      "prompt": "Cinematic, photorealistic head-and-shoulders portrait of a lifelike humanoid domestic android from a sleek near-future science-fiction film: glamorous, polished and almost too perfect to be human. An original character with an original face that does not resemble any real person or celebrity. Flawless, porcelain-smooth synthetic skin with a subtle satin sheen and no blemishes; sculpted, striking, symmetrical features; a calm, composed, faintly uncanny gaze. Light-colored eyes with a very faint luminous ring around the edge of each iris. Minimal, elegant android tells: hairline-thin seam lines at the temple running up along the hairline, and a hairline-thin seam behind the jaw just below the ear, plus one tiny soft-glowing indicator light at one temple. The seams are fine precision joins in the skin, barely visible, not drawn lines or tattoos. Wardrobe: minimalist, fitted, dark domestic-android attire with a high, clean collar; no logos, no jewelry. Lighting: cinematic and moody, a soft key light from the front-left, a cool teal-grey fill light, and a gentle rim light separating hair and shoulders from the background; shallow depth of field. Background: a smooth deep charcoal-to-slate gradient studio backdrop, no props, no text. Composition: square image, subject centered and facing the camera directly, head and shoulders filling about 70% of the frame, eyes on the upper third line, medium close-up. Elegant and subtly uncanny, but never horror or creepy: no exposed machinery, no wires, no metal or chrome skin. The android is gender-neutral and truly androgynous, appearing in their late 20s, with smooth light warm-beige skin, pale silver-grey eyes, straight dark brows, a balanced face with a softly defined jaw, and no makeup; features that read as neither clearly male nor female. Sleek jet-black hair in a smooth, precise short cut, swept back from the forehead. They wear a fitted deep slate-grey high mock-neck top with clean tailored lines. Facial expression: a calm, composed, serene resting expression, mouth closed, eyes looking directly into the camera with a faintly uncanny stillness.",
+      "referenceUsed": null,
+      "cost": 0.054955,
+      "generationId": "gen-img-1790264706-lqDBDMTatkrOICChCuwF",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "usage": {
+        "prompt_tokens": 455,
+        "completion_tokens": 1756,
+        "total_tokens": 2211,
+        "cost": 0.054955,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.054955,
+          "upstream_inference_prompt_cost": 0.002275,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "artDirection": "v2-cinematic-dark (rejected)",
+      "createdAt": "2026-09-24T15:45:28.395Z",
+      "archived": true
+    },
+    {
+      "variant": "female",
+      "state": "neutral",
+      "file": "_rejected-v2/female/neutral.png",
+      "prompt": "Cinematic, photorealistic head-and-shoulders portrait of a lifelike humanoid domestic android from a sleek near-future science-fiction film: glamorous, polished and almost too perfect to be human. An original character with an original face that does not resemble any real person or celebrity. Flawless, porcelain-smooth synthetic skin with a subtle satin sheen and no blemishes; sculpted, striking, symmetrical features; a calm, composed, faintly uncanny gaze. Light-colored eyes with a very faint luminous ring around the edge of each iris. Minimal, elegant android tells: hairline-thin seam lines at the temple running up along the hairline, and a hairline-thin seam behind the jaw just below the ear, plus one tiny soft-glowing indicator light at one temple. The seams are fine precision joins in the skin, barely visible, not drawn lines or tattoos. Wardrobe: minimalist, fitted, dark domestic-android attire with a high, clean collar; no logos, no jewelry. Lighting: cinematic and moody, a soft key light from the front-left, a cool teal-grey fill light, and a gentle rim light separating hair and shoulders from the background; shallow depth of field. Background: a smooth deep charcoal-to-slate gradient studio backdrop, no props, no text. Composition: square image, subject centered and facing the camera directly, head and shoulders filling about 70% of the frame, eyes on the upper third line, medium close-up. The whole head is inside the frame, with a clear margin of background above the top of the hair; the head is not cropped. Elegant and subtly uncanny, but never horror or creepy: no exposed machinery, no wires, no metal or chrome skin. The android is woman-presenting, appearing around 30, with pale ivory porcelain skin, pale grey-blue eyes, a heart-shaped face with a delicate narrow chin, a fine straight nose, gently arched brows, high sculpted cheekbones and softly defined lips in a muted rose tone. Sleek, glossy dark brown-black hair with a precise side part, smoothed back into a neat, polished low chignon. She wears a fitted black high-collar top with clean tailored lines. Facial expression: a calm, composed, serene resting expression, mouth closed, eyes looking directly into the camera with a faintly uncanny stillness.",
+      "referenceUsed": null,
+      "cost": 0.055105,
+      "generationId": "gen-img-1790264764-GtzvdxoZeV7vq1O04yq3",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "usage": {
+        "prompt_tokens": 485,
+        "completion_tokens": 1756,
+        "total_tokens": 2241,
+        "cost": 0.055105,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.055105,
+          "upstream_inference_prompt_cost": 0.002425,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "artDirection": "v2-cinematic-dark (rejected)",
+      "createdAt": "2026-09-24T15:46:26.800Z",
+      "archived": true
+    },
+    {
+      "variant": "male",
+      "state": "neutral",
+      "file": "_rejected-v2/male/neutral.png",
+      "prompt": "Cinematic, photorealistic head-and-shoulders portrait of a lifelike humanoid domestic android from a sleek near-future science-fiction film: glamorous, polished and almost too perfect to be human. An original character with an original face that does not resemble any real person or celebrity. Flawless, porcelain-smooth synthetic skin with a subtle satin sheen and no blemishes; sculpted, striking, symmetrical features; a calm, composed, faintly uncanny gaze. Light-colored eyes with a very faint luminous ring around the edge of each iris. Minimal, elegant android tells: hairline-thin seam lines at the temple running up along the hairline, and a hairline-thin seam behind the jaw just below the ear, plus one tiny soft-glowing indicator light at one temple. The seams are fine precision joins in the skin, barely visible, not drawn lines or tattoos. Wardrobe: minimalist, fitted, dark domestic-android attire with a high, clean collar; no logos, no jewelry. Lighting: cinematic and moody, a soft key light from the front-left, a cool teal-grey fill light, and a gentle rim light separating hair and shoulders from the background; shallow depth of field. Background: a smooth deep charcoal-to-slate gradient studio backdrop, no props, no text. Composition: square image, subject centered and facing the camera directly, head and shoulders filling about 70% of the frame, eyes on the upper third line, medium close-up. The whole head is inside the frame, with a clear margin of background above the top of the hair; the head is not cropped. Elegant and subtly uncanny, but never horror or creepy: no exposed machinery, no wires, no metal or chrome skin. The android is man-presenting, appearing in his mid-30s, with rich deep-brown skin, light amber-hazel eyes, a strong sculpted jaw, high cheekbones and a calm, even mouth; clean-shaven. Close-cropped black hair with a crisp, perfectly clean hairline. He wears a fitted charcoal-black high-collar jacket with clean tailored lines. Facial expression: a calm, composed, serene resting expression, mouth closed, eyes looking directly into the camera with a faintly uncanny stillness.",
+      "referenceUsed": null,
+      "cost": 0.055,
+      "generationId": "gen-img-1790264788-pMuNqtpwq8hDQ06PNvxE",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "usage": {
+        "prompt_tokens": 464,
+        "completion_tokens": 1756,
+        "total_tokens": 2220,
+        "cost": 0.055,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.055,
+          "upstream_inference_prompt_cost": 0.00232,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "artDirection": "v2-cinematic-dark (rejected)",
+      "createdAt": "2026-09-24T15:46:51.080Z",
+      "archived": true
+    },
+    {
+      "variant": "neutral",
+      "state": "neutral",
+      "file": "_rejected-v2/neutral/neutral.png",
+      "prompt": "Cinematic, photorealistic head-and-shoulders portrait of a lifelike humanoid domestic android from a sleek near-future science-fiction film: glamorous, polished and almost too perfect to be human. An original character with an original face that does not resemble any real person or celebrity. Flawless, porcelain-smooth synthetic skin with a subtle satin sheen and no blemishes; sculpted, striking, symmetrical features; a calm, composed, faintly uncanny gaze. Light-colored eyes with a very faint luminous ring around the edge of each iris. Minimal, elegant android tells: hairline-thin seam lines at the temple running up along the hairline, and a hairline-thin seam behind the jaw just below the ear, plus one tiny soft-glowing indicator light at one temple. The seams are fine precision joins in the skin, barely visible, not drawn lines or tattoos. Wardrobe: minimalist, fitted, dark domestic-android attire with a high, clean collar; no logos, no jewelry. Lighting: cinematic and moody, a soft key light from the front-left, a cool teal-grey fill light, and a gentle rim light separating hair and shoulders from the background; shallow depth of field. Background: a smooth deep charcoal-to-slate gradient studio backdrop, no props, no text. Composition: square image, subject centered and facing the camera directly, head and shoulders filling about 70% of the frame, eyes on the upper third line, medium close-up. The whole head is inside the frame, with a clear margin of background above the top of the hair; the head is not cropped. Elegant and subtly uncanny, but never horror or creepy: no exposed machinery, no wires, no metal or chrome skin. The android is gender-neutral and truly androgynous, appearing in their late 20s, with smooth light warm-beige skin, pale silver-grey eyes, straight, fairly thick dark brows, a balanced face with a squarer defined jaw, a straight nose, thin natural lips, short natural lashes, and no makeup; features that read as neither clearly male nor female. Sleek jet-black hair in a smooth, precise short cut, swept back from the forehead. They wear a fitted deep slate-grey high mock-neck top with clean tailored lines. Facial expression: a calm, composed, serene resting expression, mouth closed, eyes looking directly into the camera with a faintly uncanny stillness.",
+      "referenceUsed": null,
+      "cost": 0.05517,
+      "generationId": "gen-img-1790264812-NLWQ4RB4JPZ77NVv4Jre",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "usage": {
+        "prompt_tokens": 498,
+        "completion_tokens": 1756,
+        "total_tokens": 2254,
+        "cost": 0.05517,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.05517,
+          "upstream_inference_prompt_cost": 0.00249,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "artDirection": "v2-cinematic-dark (rejected)",
+      "createdAt": "2026-09-24T15:47:14.453Z",
+      "archived": true
+    },
+    {
+      "variant": "female",
+      "state": "happy",
+      "file": "_rejected-v2/female/happy.png",
+      "prompt": "The attached reference image shows an original android character. Create a new photo of the same exact android character: same face and identity, same skin tone and satin skin finish, same eyes with the faint luminous iris ring, same hair and hairstyle, same hairline-thin seams at the temple, hairline and behind the jaw, same tiny soft-glowing temple indicator, same high-collar outfit, same square framing and camera distance, same cinematic lighting (soft key, cool teal-grey fill, gentle rim light) and the same deep charcoal-to-slate gradient background. Change ONLY the facial expression to: a warm, genuine smile with the eyes slightly crinkled, looking into the camera. Keep it photorealistic, polished and cinematic, in exactly the same style as the reference.",
+      "referenceUsed": "female/neutral.png",
+      "cost": 0.061742,
+      "generationId": "gen-img-1790264852-Q5TGzuhC6vsh1TPNPJOP",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "usage": {
+        "prompt_tokens": 1198,
+        "completion_tokens": 1756,
+        "total_tokens": 2954,
+        "cost": 0.061742,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.061742,
+          "upstream_inference_prompt_cost": 0.009062,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "artDirection": "v2-cinematic-dark (rejected)",
+      "createdAt": "2026-09-24T15:47:57.499Z",
+      "archived": true
+    },
+    {
+      "variant": "female",
+      "state": "focused",
+      "file": "_rejected-v2/female/focused.png",
+      "prompt": "The attached reference image shows an original android character. Create a new photo of the same exact android character: same face and identity, same skin tone and satin skin finish, same eyes with the faint luminous iris ring, same hair and hairstyle, same hairline-thin seams at the temple, hairline and behind the jaw, same tiny soft-glowing temple indicator, same high-collar outfit, same square framing and camera distance, same cinematic lighting (soft key, cool teal-grey fill, gentle rim light) and the same deep charcoal-to-slate gradient background. Change ONLY the facial expression to: concentrating intently: a slight brow furrow, lips gently pressed together, eyes looking straight ahead with focus, as if busy working on a task. Keep it photorealistic, polished and cinematic, in exactly the same style as the reference.",
+      "referenceUsed": "female/neutral.png",
+      "cost": 0.061802,
+      "generationId": "gen-img-1790264880-OpHcQjKPQ2bIPqBeo1HV",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "usage": {
+        "prompt_tokens": 1210,
+        "completion_tokens": 1756,
+        "total_tokens": 2966,
+        "cost": 0.061802,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.061802,
+          "upstream_inference_prompt_cost": 0.009122,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "artDirection": "v2-cinematic-dark (rejected)",
+      "createdAt": "2026-09-24T15:48:23.981Z",
+      "archived": true
+    },
+    {
+      "variant": "female",
+      "state": "thinking",
+      "file": "_rejected-v2/female/thinking.png",
+      "prompt": "The attached reference image shows an original android character. Create a new photo of the same exact android character: same face and identity, same skin tone and satin skin finish, same eyes with the faint luminous iris ring, same hair and hairstyle, same hairline-thin seams at the temple, hairline and behind the jaw, same tiny soft-glowing temple indicator, same high-collar outfit, same square framing and camera distance, same cinematic lighting (soft key, cool teal-grey fill, gentle rim light) and the same deep charcoal-to-slate gradient background. Change ONLY the facial expression to: pondering: eyes looking up and off to one side, lips slightly pursed, a thoughtful, contemplative expression. Keep it photorealistic, polished and cinematic, in exactly the same style as the reference.",
+      "referenceUsed": "female/neutral.png",
+      "cost": 0.061767,
+      "generationId": "gen-img-1790264907-CBayBtFIxdGZ7hobxquo",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "usage": {
+        "prompt_tokens": 1203,
+        "completion_tokens": 1756,
+        "total_tokens": 2959,
+        "cost": 0.061767,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.061767,
+          "upstream_inference_prompt_cost": 0.009087,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "artDirection": "v2-cinematic-dark (rejected)",
+      "createdAt": "2026-09-24T15:48:49.969Z",
+      "archived": true
+    },
+    {
+      "variant": "female",
+      "state": "curious",
+      "file": "_rejected-v2/female/curious.png",
+      "prompt": "The attached reference image shows an original android character. Create a new photo of the same exact android character: same face and identity, same skin tone and satin skin finish, same eyes with the faint luminous iris ring, same hair and hairstyle, same hairline-thin seams at the temple, hairline and behind the jaw, same tiny soft-glowing temple indicator, same high-collar outfit, same square framing and camera distance, same cinematic lighting (soft key, cool teal-grey fill, gentle rim light) and the same deep charcoal-to-slate gradient background. Change ONLY the facial expression to: curious and interested: head slightly tilted to one side, eyebrows gently raised, a small intrigued half-smile, looking into the camera. Keep it photorealistic, polished and cinematic, in exactly the same style as the reference.",
+      "referenceUsed": "female/neutral.png",
+      "cost": 0.061787,
+      "generationId": "gen-img-1790264933-gsItPUPIb91NfTtavLq7",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "usage": {
+        "prompt_tokens": 1207,
+        "completion_tokens": 1756,
+        "total_tokens": 2963,
+        "cost": 0.061787,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.061787,
+          "upstream_inference_prompt_cost": 0.009107,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "artDirection": "v2-cinematic-dark (rejected)",
+      "createdAt": "2026-09-24T15:49:15.937Z",
+      "archived": true
+    },
+    {
+      "variant": "female",
+      "state": "reading",
+      "file": "_rejected-v2/female/reading.png",
+      "prompt": "The attached reference image shows an original android character. Create a new photo of the same exact android character: same face and identity, same skin tone and satin skin finish, same eyes with the faint luminous iris ring, same hair and hairstyle, same hairline-thin seams at the temple, hairline and behind the jaw, same tiny soft-glowing temple indicator, same high-collar outfit, same square framing and camera distance, same cinematic lighting (soft key, cool teal-grey fill, gentle rim light) and the same deep charcoal-to-slate gradient background. Change ONLY the facial expression to: reading: eyes looking down as if reading a page or screen just below the frame, eyelids lowered, a calm attentive expression, head angle almost unchanged. Keep it photorealistic, polished and cinematic, in exactly the same style as the reference.",
+      "referenceUsed": "female/neutral.png",
+      "cost": 0.061807,
+      "generationId": "gen-img-1790264960-eezQn8lnOTqqpyAtqX3M",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "usage": {
+        "prompt_tokens": 1211,
+        "completion_tokens": 1756,
+        "total_tokens": 2967,
+        "cost": 0.061807,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.061807,
+          "upstream_inference_prompt_cost": 0.009127,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "artDirection": "v2-cinematic-dark (rejected)",
+      "createdAt": "2026-09-24T15:49:45.535Z",
+      "archived": true
+    },
+    {
+      "variant": "female",
+      "state": "confused",
+      "file": "_rejected-v2/female/confused.png",
+      "prompt": "The attached reference image shows an original android character. Create a new photo of the same exact android character: same face and identity, same skin tone and satin skin finish, same eyes with the faint luminous iris ring, same hair and hairstyle, same hairline-thin seams at the temple, hairline and behind the jaw, same tiny soft-glowing temple indicator, same high-collar outfit, same square framing and camera distance, same cinematic lighting (soft key, cool teal-grey fill, gentle rim light) and the same deep charcoal-to-slate gradient background. Change ONLY the facial expression to: puzzled: one eyebrow raised and the other slightly lowered, mouth slightly skewed to one side, a perplexed look. Keep it photorealistic, polished and cinematic, in exactly the same style as the reference.",
+      "referenceUsed": "female/neutral.png",
+      "cost": 0.061772,
+      "generationId": "gen-img-1790264989-cBhpnO5RRyuyUCqXVmG6",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "usage": {
+        "prompt_tokens": 1204,
+        "completion_tokens": 1756,
+        "total_tokens": 2960,
+        "cost": 0.061772,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.061772,
+          "upstream_inference_prompt_cost": 0.009092,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "artDirection": "v2-cinematic-dark (rejected)",
+      "createdAt": "2026-09-24T15:50:12.780Z",
+      "archived": true
+    },
+    {
+      "variant": "female",
+      "state": "surprised",
+      "file": "_rejected-v2/female/surprised.png",
+      "prompt": "The attached reference image shows an original android character. Create a new photo of the same exact android character: same face and identity, same skin tone and satin skin finish, same eyes with the faint luminous iris ring, same hair and hairstyle, same hairline-thin seams at the temple, hairline and behind the jaw, same tiny soft-glowing temple indicator, same high-collar outfit, same square framing and camera distance, same cinematic lighting (soft key, cool teal-grey fill, gentle rim light) and the same deep charcoal-to-slate gradient background. Change ONLY the facial expression to: surprised: eyebrows raised high, eyes wide open, mouth slightly open in a small \"oh\". Keep it photorealistic, polished and cinematic, in exactly the same style as the reference.",
+      "referenceUsed": "female/neutral.png",
+      "cost": 0.061747,
+      "generationId": "gen-img-1790265016-kz8wKptBeKo9uqowWV16",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "usage": {
+        "prompt_tokens": 1199,
+        "completion_tokens": 1756,
+        "total_tokens": 2955,
+        "cost": 0.061747,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.061747,
+          "upstream_inference_prompt_cost": 0.009067,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "artDirection": "v2-cinematic-dark (rejected)",
+      "createdAt": "2026-09-24T15:50:40.061Z",
+      "archived": true
+    },
+    {
+      "variant": "female",
+      "state": "concerned",
+      "file": "_rejected-v2/female/concerned.png",
+      "prompt": "The attached reference image shows an original android character. Create a new photo of the same exact android character: same face and identity, same skin tone and satin skin finish, same eyes with the faint luminous iris ring, same hair and hairstyle, same hairline-thin seams at the temple, hairline and behind the jaw, same tiny soft-glowing temple indicator, same high-collar outfit, same square framing and camera distance, same cinematic lighting (soft key, cool teal-grey fill, gentle rim light) and the same deep charcoal-to-slate gradient background. Change ONLY the facial expression to: gently worried and caring: inner eyebrows slightly raised and drawn together, a soft slight frown, looking into the camera as if asking for input. Keep it photorealistic, polished and cinematic, in exactly the same style as the reference.",
+      "referenceUsed": "female/neutral.png",
+      "cost": 0.061797,
+      "generationId": "gen-img-1790265043-oBlKrnrjnomaMOER2Mh5",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "usage": {
+        "prompt_tokens": 1209,
+        "completion_tokens": 1756,
+        "total_tokens": 2965,
+        "cost": 0.061797,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.061797,
+          "upstream_inference_prompt_cost": 0.009117,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "artDirection": "v2-cinematic-dark (rejected)",
+      "createdAt": "2026-09-24T15:51:09.037Z",
+      "archived": true
+    },
+    {
+      "variant": "female",
+      "state": "proud",
+      "file": "_rejected-v2/female/proud.png",
+      "prompt": "The attached reference image shows an original android character. Create a new photo of the same exact android character: same face and identity, same skin tone and satin skin finish, same eyes with the faint luminous iris ring, same hair and hairstyle, same hairline-thin seams at the temple, hairline and behind the jaw, same tiny soft-glowing temple indicator, same high-collar outfit, same square framing and camera distance, same cinematic lighting (soft key, cool teal-grey fill, gentle rim light) and the same deep charcoal-to-slate gradient background. Change ONLY the facial expression to: satisfied and accomplished: a confident closed-mouth smile, chin very slightly raised, bright eyes, looking into the camera. Keep it photorealistic, polished and cinematic, in exactly the same style as the reference.",
+      "referenceUsed": "female/neutral.png",
+      "cost": 0.061767,
+      "generationId": "gen-img-1790265072-dqrQCSV7rXoSBOZ2bpP8",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "usage": {
+        "prompt_tokens": 1203,
+        "completion_tokens": 1756,
+        "total_tokens": 2959,
+        "cost": 0.061767,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.061767,
+          "upstream_inference_prompt_cost": 0.009087,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "artDirection": "v2-cinematic-dark (rejected)",
+      "createdAt": "2026-09-24T15:51:37.245Z",
+      "archived": true
+    },
+    {
+      "variant": "female",
+      "state": "apologetic",
+      "file": "_rejected-v2/female/apologetic.png",
+      "prompt": "The attached reference image shows an original android character. Create a new photo of the same exact android character: same face and identity, same skin tone and satin skin finish, same eyes with the faint luminous iris ring, same hair and hairstyle, same hairline-thin seams at the temple, hairline and behind the jaw, same tiny soft-glowing temple indicator, same high-collar outfit, same square framing and camera distance, same cinematic lighting (soft key, cool teal-grey fill, gentle rim light) and the same deep charcoal-to-slate gradient background. Change ONLY the facial expression to: sheepish and apologetic: an awkward small smile with pressed lips, eyebrows tilted up in the middle, gaze slightly lowered. Keep it photorealistic, polished and cinematic, in exactly the same style as the reference.",
+      "referenceUsed": "female/neutral.png",
+      "cost": 0.061777,
+      "generationId": "gen-img-1790265100-QJG6kdIdMpJT7jcZU2I0",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "usage": {
+        "prompt_tokens": 1205,
+        "completion_tokens": 1756,
+        "total_tokens": 2961,
+        "cost": 0.061777,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.061777,
+          "upstream_inference_prompt_cost": 0.009097,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "artDirection": "v2-cinematic-dark (rejected)",
+      "createdAt": "2026-09-24T15:52:04.933Z",
+      "archived": true
+    },
+    {
+      "variant": "female",
+      "state": "excited",
+      "file": "_rejected-v2/female/excited.png",
+      "prompt": "The attached reference image shows an original android character. Create a new photo of the same exact android character: same face and identity, same skin tone and satin skin finish, same eyes with the faint luminous iris ring, same hair and hairstyle, same hairline-thin seams at the temple, hairline and behind the jaw, same tiny soft-glowing temple indicator, same high-collar outfit, same square framing and camera distance, same cinematic lighting (soft key, cool teal-grey fill, gentle rim light) and the same deep charcoal-to-slate gradient background. Change ONLY the facial expression to: bright, energetic and excited: a big open smile showing teeth, eyes wide and sparkling, eyebrows raised. Keep it photorealistic, polished and cinematic, in exactly the same style as the reference.",
+      "referenceUsed": "female/neutral.png",
+      "cost": 0.061757,
+      "generationId": "gen-img-1790265128-43BybLHMhvWejXYapWe0",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "usage": {
+        "prompt_tokens": 1201,
+        "completion_tokens": 1756,
+        "total_tokens": 2957,
+        "cost": 0.061757,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.061757,
+          "upstream_inference_prompt_cost": 0.009077,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "artDirection": "v2-cinematic-dark (rejected)",
+      "createdAt": "2026-09-24T15:52:31.498Z",
+      "archived": true
+    },
+    {
+      "variant": "female",
+      "state": "sleepy",
+      "file": "_rejected-v2/female/sleepy.png",
+      "prompt": "The attached reference image shows an original android character. Create a new photo of the same exact android character: same face and identity, same skin tone and satin skin finish, same eyes with the faint luminous iris ring, same hair and hairstyle, same hairline-thin seams at the temple, hairline and behind the jaw, same tiny soft-glowing temple indicator, same high-collar outfit, same square framing and camera distance, same cinematic lighting (soft key, cool teal-grey fill, gentle rim light) and the same deep charcoal-to-slate gradient background. Change ONLY the facial expression to: drowsy and sleepy: heavy eyelids half-closed, a relaxed soft mouth, a peaceful resting look. Keep it photorealistic, polished and cinematic, in exactly the same style as the reference.",
+      "referenceUsed": "female/neutral.png",
+      "cost": 0.061767,
+      "generationId": "gen-img-1790265154-nThkyYu9qVc06S5vcnQX",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "usage": {
+        "prompt_tokens": 1203,
+        "completion_tokens": 1756,
+        "total_tokens": 2959,
+        "cost": 0.061767,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.061767,
+          "upstream_inference_prompt_cost": 0.009087,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "artDirection": "v2-cinematic-dark (rejected)",
+      "createdAt": "2026-09-24T15:52:56.406Z",
+      "archived": true
+    },
+    {
+      "variant": "female",
+      "state": "neutral",
+      "file": "_pilot-v3/female-neutral-a.png",
+      "prompt": "Cinematic, photorealistic head-and-shoulders portrait of a breathtakingly beautiful humanoid android: the flagship model of a luxury consumer-robotics brand. Refined, elegant, magazine-cover quality; a premium product its owner would be proud of. An original character with an original face that does not resemble any real person or celebrity. Clearly an android: the base body is a flawless pearl-white synthetic chassis in satin ceramic, like high-end consumer robotics, visible as smooth sculpted white panels at the temples, the outer edges of the forehead, along the jawline, the ears, the neck and the shoulders, with precise, thin, crisp seams between the panels. Realistic, warm human skin covers only the central face (cheeks, nose, lips and around the eyes), so natural skin color peeks through and blends into the white chassis at elegant, precisely finished panel edges. A partially skinned face, not a full human face. Striking eyes with a subtle luminous ring around the edge of each iris, and one tiny soft-glowing indicator light set into a temple panel. No clothing is visible: the neck and shoulders are sculpted white chassis panels with fine seams and subtle soft-graphite joint accents. Lighting: cinematic and moody, a soft key light from the front-left, a cool teal-grey fill light, and a gentle rim light tracing the white panels and shoulders against the background; shallow depth of field. Background: a smooth deep charcoal-to-slate gradient studio backdrop, no props, no text. Composition: square image, subject centered and facing the camera directly, head and shoulders filling about 70% of the frame, eyes on the upper third line, medium close-up. The whole head is inside the frame, with a clear margin of background above the top of the head; the head is not cropped. Serene and beautiful, never horror or creepy: no exposed wires or mechanical internals, no cracks or damage, no chrome or bare metal. The android is woman-presenting, appearing around 30. The skin on the central face is a warm, softly glowing light-honey tone. Striking pale aqua-grey eyes with long lashes, elegant softly arched brows, a heart-shaped face with a fine straight nose and softly defined lips in a natural rose tone. Sleek, glossy espresso-dark hair swept smoothly back into a polished low chignon, leaving the white temple and ear panels visible. Facial expression: a calm, composed, serene resting expression, mouth closed, eyes looking directly into the camera with a poised, gentle warmth.",
+      "referenceUsed": null,
+      "cost": 0.055315,
+      "generationId": "gen-img-1790265237-tCc1VMvibzWsto8Pkxev",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "usage": {
+        "prompt_tokens": 527,
+        "completion_tokens": 1756,
+        "total_tokens": 2283,
+        "cost": 0.055315,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.055315,
+          "upstream_inference_prompt_cost": 0.002635,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "artDirection": "v3-white-chassis",
+      "createdAt": "2026-09-24T15:54:21.145Z",
+      "note": "v3 pilot A (superseded by pilot B: head touched top edge, forehead fully skinned)"
+    },
+    {
+      "variant": "female",
+      "state": "neutral",
+      "file": "female/neutral.png",
+      "prompt": "Cinematic, photorealistic head-and-shoulders portrait of a breathtakingly beautiful humanoid android: the flagship model of a luxury consumer-robotics brand. Refined, elegant, magazine-cover quality; a premium product its owner would be proud of. An original character with an original face that does not resemble any real person or celebrity. Clearly an android: the base body is a flawless pearl-white synthetic chassis in satin ceramic, like high-end consumer robotics, visible as smooth sculpted white panels at the temples, the outer edges of the forehead, along the jawline, the ears, the neck and the shoulders, with precise, thin, crisp seams between the panels. Realistic, warm human skin covers only the central face (cheeks, nose, lips and around the eyes), so natural skin color peeks through and blends into the white chassis at elegant, precisely finished panel edges. A partially skinned face, not a full human face: the white chassis visibly frames the face, with a white band running along the hairline and across the upper outer forehead, down the temples, past the outer cheekbones and along the jaw, and the skin sits inside this opening like an inlay, with a soft, refined transition where it meets the white. Striking eyes with a subtle luminous ring around the edge of each iris, and one tiny soft-glowing indicator light set into a temple panel. No clothing is visible: the neck and shoulders are sculpted white chassis panels with fine seams and subtle soft-graphite joint accents. Lighting: cinematic and moody, a soft key light from the front-left, a cool teal-grey fill light, and a gentle rim light tracing the white panels and shoulders against the background; shallow depth of field. Background: a smooth deep charcoal-to-slate gradient studio backdrop, no props, no text. Composition: square image, subject centered and facing the camera directly, head and shoulders filling about 70% of the frame, eyes on the upper third line, medium close-up. The whole head is inside the frame, with a clear margin of background above the top of the head (the top of the hair sits roughly one tenth of the image height below the top edge); the head is not cropped. Serene and beautiful, never horror or creepy: no exposed wires or mechanical internals, no cracks or damage, no chrome or bare metal. The android is woman-presenting, appearing around 30. The skin on the central face is a warm, softly glowing light-honey tone. Striking pale aqua-grey eyes with long lashes, elegant softly arched brows, a heart-shaped face with a fine straight nose and softly defined lips in a natural rose tone. Sleek, glossy espresso-dark hair swept smoothly back into a polished low chignon, leaving the white temple and ear panels visible. Facial expression: a calm, composed, serene resting expression, mouth closed, eyes looking directly into the camera with a poised, gentle warmth.",
+      "referenceUsed": null,
+      "cost": 0.055715,
+      "generationId": "gen-img-1790265290-BobHHnv4eLt7onT0dRdx",
+      "model": "openai/gpt-image-2.5-flare",
+      "quality": "high",
+      "usage": {
+        "prompt_tokens": 607,
+        "completion_tokens": 1756,
+        "total_tokens": 2363,
+        "cost": 0.055715,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.055715,
+          "upstream_inference_prompt_cost": 0.003035,
+          "upstream_inference_completions_cost": 0.05268
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "image_tokens": 1756
+        }
+      },
+      "artDirection": "v3-white-chassis",
+      "createdAt": "2026-09-24T15:55:15.089Z"
+    }
+  ],
+  "artDirection": "v3-white-chassis"
+}

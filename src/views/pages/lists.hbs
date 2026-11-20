@@ -1,0 +1,57 @@
+{{!--
+  Lists (/lists): every list this person can see (theirs and their groups'), a new-list form, the archived ones.
+  Data: page = services/lists.js listsPage() { lists: [card], archived: [card], places: [{ value, label, members }], kinds }.
+  Client: public/js/lists.js (create, restore, live refresh of the cards on list.updated).
+--}}
+{{#> page-header title="Lists" subtitle="Shopping, to-dos and wishes, shared with the people you choose"}}
+  <button type="button" class="btn btn-primary btn-sm" data-list-new aria-expanded="false" aria-controls="list-new">{{icon "plus" class="size-4"}} <span>New list</span></button>
+{{/page-header}}
+
+<div class="mx-auto max-w-5xl px-4 py-6 sm:px-6" data-lists-page>
+  <form id="list-new" class="card li-new mb-6" data-ajax data-stay method="post" action="/api/v1/lists" data-busy="Creating…" data-list-new-form hidden>
+    <div class="flex items-center gap-2">
+      <h2 class="flex-1 text-[15px] font-semibold">A new list</h2>
+      <button type="button" class="btn btn-ghost btn-icon btn-sm" data-list-new-cancel aria-label="Close">{{icon "x" class="size-4"}}</button>
+    </div>
+    <fieldset class="mt-3">
+      <legend class="label">What kind</legend>
+      <div class="li-kinds">
+        {{#each page.kinds}}
+          <label class="li-kind-choice"><input type="radio" class="sr-only" name="kind" value="{{value}}" data-placeholder="{{label}}" {{#if @first}}checked{{/if}}>
+            <span class="list-kind" data-kind="{{value}}">{{icon iconName class="size-[18px]"}}</span><span>{{label}}</span></label>
+        {{/each}}
+      </div>
+    </fieldset>
+    <div class="mt-4 grid gap-4 sm:grid-cols-2">
+      <div data-field>
+        <label class="label" for="ln-title">Name</label>
+        <input id="ln-title" class="input" name="title" maxlength="60" placeholder="Shopping list" data-list-new-title>
+        <p class="hint">Leave it empty and I’ll name it after its kind.</p>
+      </div>
+      {{#if page.places.[1]}}
+        <fieldset data-field>
+          <legend class="label">Who sees it</legend>
+          <div class="segmented" role="radiogroup" aria-label="Who sees it">
+            {{#each page.places}}<label class="segment-choice"><input type="radio" class="sr-only" name="scope" value="{{value}}" {{#if @first}}checked{{/if}}><span>{{label}}</span></label>{{/each}}
+          </div>
+          <p class="hint">Everyone in a group sees its lists and can tick things off.</p>
+        </fieldset>
+      {{else}}<input type="hidden" name="scope" value="private">{{/if}}
+      {{#each page.places}}{{#if members.[1]}}
+        <div data-field data-list-wisher="{{value}}" hidden>
+          <label class="label" for="ln-wisher-{{@index}}">Whose wishes</label>
+          <select id="ln-wisher-{{@index}}" class="select" name="wisherId" disabled>
+            {{#each members}}<option value="{{id}}" {{#if (eq id @root.user.id)}}selected{{/if}}>{{name}}</option>{{/each}}
+          </select>
+          <p class="hint">They see the list but never what’s been bought.</p>
+        </div>
+      {{/if}}{{/each}}
+    </div>
+    <div class="mt-4 flex justify-end gap-2">
+      <button type="button" class="btn btn-ghost" data-list-new-cancel>Cancel</button>
+      <button class="btn btn-primary">Create list</button>
+    </div>
+  </form>
+
+  {{> lists/index-body page=page}}
+</div>
