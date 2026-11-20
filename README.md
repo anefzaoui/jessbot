@@ -286,18 +286,24 @@ others, and it is never included in this repository.
 
 ## Providers
 
-| Feature | OpenRouter | Other OpenAI-compatible endpoints (OpenAI, a local server…) |
-|---|---|---|
-| Chat, tools, memory, Library, everything else | Yes | Yes (with a model that supports tool calls) |
-| Memory search by meaning (embeddings) | Yes | Falls back to keyword search |
-| Voice replies (spoken audio) | Yes | No |
-| Making pictures (`make_image`) | Yes | No |
-| Quick decisions (a small second-opinion model) | Yes | No, the code falls back to its own rules |
-| Model prices, spending budgets, balance alerts | Yes | Prices only from what was used; budgets may not count everything |
+Setup's "Give it a brain" step (and Admin → Models) asks where the models come from:
 
-Set `LLM_BASE_URL` and the key in `.env` (or on the setup page) for another endpoint. The default model is a cheap,
-capable one picked for everyday household use; change it in the setup page or Admin → Models. The weekly budget per
-person caps what each person can spend.
+| Feature | OpenRouter | Ollama | Another OpenAI-compatible service |
+|---|---|---|---|
+| Chat, tools, tasks, goals, the feed, projects | Yes | With a model that calls tools, 7B or larger | Yes, with a model that calls tools |
+| Memory search by meaning | Yes | With `nomic-embed-text` pulled | If it serves an embedding model; otherwise by keywords |
+| Fallback models | Yes | No: the main model only | No: the main model only |
+| Quick decisions | Yes | Off: the full model or plain rules decide | Off |
+| Voice notes (speaking and listening) | Yes | Off: text only | Off |
+| Making pictures | Yes | Off | Off |
+| Reading scans and photos of text | Yes | Off | Off |
+| Spending caps in dollars | Yes | Free, nothing to count | The service doesn't report costs, so budgets can't count spending |
+| Low-balance warning | Yes | n/a | Off |
+
+Features a provider can't serve are switched off and say so (Admin → Models marks them), instead of failing each time.
+A key is only ever sent to the service it was entered for, and Ollama never gets one. Small local models connect but get
+lost in Jessbot's long instructions: use 7B or larger. The weekly budget per person caps what each person can spend
+where the provider reports costs. Details: [docs/guide/providers.md](docs/guide/providers.md).
 
 ## What's missing before a 1.0
 
@@ -307,7 +313,8 @@ Honest list, roughly in order:
   restart are in, but Jessbot is new and needs more use and outside review; prompt injection is mitigated, not solved
   (see [docs/SECURITY-MODEL.md](docs/SECURITY-MODEL.md)).
 - **Install options**: a published image per release (the Dockerfile and compose file are here), a Windows installer.
-- **Providers**: a provider picker with prices for non-OpenRouter endpoints, and tested local models (Ollama, LM Studio).
+- **Providers**: prices for services other than OpenRouter (so their budgets can count spending), and local voice and
+  pictures.
 - **Interface languages**: the interface is English only for now (the agent itself reads and writes in many languages,
   including right-to-left ones).
 - Later: messaging channels (Telegram first), MCP tools, a mobile app.

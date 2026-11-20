@@ -4,7 +4,7 @@
 // migrateEnvSecrets() moves the ones written into .env (by setup, Admin → Model, or by hand) into the database at start.
 import path from 'node:path';
 import { settings } from '../db/index.js';
-import { ENV_FILE, ROOT, paths } from '../config/index.js';
+import { ENV_FILE, ROOT, paths, config } from '../config/index.js';
 import { seal, unseal } from '../lib/secrets.js';
 import { readEnvFile, removeEnvVar } from '../lib/envfile.js';
 
@@ -57,7 +57,15 @@ export function migrateEnvSecrets() {
   for (const [env, name] of MOVE) {
     const v = (file[env] || '').trim();
     if (!(env in file)) continue;
-    if (v && !taken.has(name)) { setSecret(name, v); taken.add(name); }
+    if (v && !taken.has(name)) {
+      setSecret(name, v);
+      taken.add(name);
+      // The model key is for the address in use now (#11): switching services later never sends it elsewhere.
+      if (name === 'llm.apiKey') {
+        const llm = settings.get('llm', {}) || {};
+        try { settings.set('llm', { ...llm, keyFor: new URL(llm.baseUrl || config.llm.baseUrl).origin }); } catch { /* a bad saved address */ }
+      }
+    }
     removeEnvVar(env);
     if (process.env[env] === file[env]) delete process.env[env];
     moved.push(env);

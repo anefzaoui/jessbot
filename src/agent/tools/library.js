@@ -18,6 +18,7 @@ import { browserStatus } from '../../browser/index.js';
 import { publish } from '../../lib/bus.js';
 import { markUsed, pagesOf } from '../../services/project-files.js';
 import { renderFragment } from '../../views/render.js';
+import { providerOffers } from '../../services/llm.js';
 
 const READ_CAP = 60000;
 const CHECK_MS = 25000;
@@ -472,6 +473,7 @@ registerTool({
 });
 
 registerTool({
+  available: () => providerOffers('ocr'), // OpenRouter only (#11)
   name: 'ocr_document', toolset: 'library', risk: args => (args.confirm ? 'write' : 'read'), activity: 'reading', iconName: 'file-search',
   displayName: 'Reads a scan',
   description: 'Read the text of a scanned PDF (one with no text layer) or a photo of a paper (a letter, a receipt, a form) with the '

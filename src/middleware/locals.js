@@ -2,6 +2,7 @@ import { settings } from '../db/index.js';
 import { presenceFor } from '../services/presence.js';
 import { skyOf } from '../services/weather.js';
 import { assetVersion } from '../lib/assets.js';
+import { voiceOn } from '../services/voice.js';
 import { shellFor } from '../services/shell.js';
 import { latestSeq } from '../lib/bus.js';
 import { ACCEPT as UPLOAD_ACCEPT } from '../services/uploads.js';
@@ -37,6 +38,7 @@ export function locals(req, res, next) {
   res.locals.path = req.path;
   res.locals.isDev = process.env.NODE_ENV !== 'production';
   res.locals.user = req.user || null;
+  res.locals.voiceOn = voiceOn(); // the mic and Listen buttons (#11: OpenRouter only)
   res.locals.assetV = assetVersion(); // fingerprint for css / icons / main.js (decision #51)
   res.locals.uploadAccept = UPLOAD_ACCEPT; // the file pickers' accept list: one definition, services/uploads.js
   res.locals.shell = req.user ? shellFor(req.user) : emptyShell();

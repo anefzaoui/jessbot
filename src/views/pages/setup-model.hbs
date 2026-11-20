@@ -1,37 +1,6 @@
-{{#> setup/frame heading="Give it a brain." lead="Jessbot thinks with a language model through any OpenAI-compatible service. The default is fast, capable and very cheap."}}
+{{#> setup/frame heading="Give it a brain." lead="Jessbot thinks with a language model: OpenRouter (every feature, very cheap), Ollama on your own computer, or any OpenAI-compatible service."}}
   <form class="space-y-4" data-model-test action="/setup/model/test">
-    <div class="rounded-xl border border-line bg-surface px-4 py-3">
-      <div class="flex items-center gap-3">
-        <span class="grid size-9 place-items-center rounded-lg bg-accent-soft text-accent-text">{{icon "key-round" class="size-[18px]"}}</span>
-        <div class="min-w-0 flex-1">
-          <p class="text-sm font-semibold">OpenRouter API key</p>
-          {{#if llm.hasKey}}
-            <p class="text-xs text-ink-3">{{#if (eq llm.keySource 'environment')}}Set in the server’s environment{{else}}Saved encrypted with this install’s key{{/if}} · <span class="font-mono">{{llm.maskedKey}}</span></p>
-          {{else}}
-            <p class="text-xs text-ink-3">Paste it once. It’s kept on this machine, encrypted with this install’s own key, and never shown again in full.</p>
-          {{/if}}
-        </div>
-      </div>
-      <div class="mt-3 {{#if llm.hasKey}}hidden{{/if}}" data-key-field>
-        <label class="sr-only" for="f-apiKey">API key</label>
-        <input id="f-apiKey" name="apiKey" type="password" class="input font-mono text-[13px]" placeholder="sk-or-…" autocomplete="off">
-      </div>
-      {{#if llm.hasKey}}<button type="button" class="mt-2 text-xs font-medium text-accent-text hover:underline" data-show-key-field>Use a different key</button>{{/if}}
-    </div>
-
-    <div data-field>
-      <label class="label" for="f-model">Model</label>
-      <input id="f-model" name="model" class="input font-mono text-[13px]" value="{{llm.model}}" autocomplete="off">
-      <p class="hint">Default: <span class="font-mono">openai/gpt-6-luna</span>, about $0.10 per million words read.</p>
-    </div>
-    <details class="group">
-      <summary class="cursor-pointer text-xs font-medium text-ink-3 hover:text-ink-2">Advanced: a different endpoint</summary>
-      <div class="mt-3" data-field>
-        <label class="label" for="f-baseUrl">Base URL</label>
-        <input id="f-baseUrl" name="baseUrl" class="input font-mono text-[13px]" value="{{llm.baseUrl}}">
-        <p class="hint">Works with OpenRouter, OpenAI, or a local server (Ollama, LM Studio).</p>
-      </div>
-    </details>
+    {{> setup/provider-fields}}
 
     <button type="submit" class="btn btn-secondary btn-block" data-test-button>{{icon "plug-zap" class="size-4"}} Test the connection</button>
     <div data-test-result aria-live="polite"></div>

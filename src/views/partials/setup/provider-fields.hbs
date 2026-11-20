@@ -1,0 +1,72 @@
+{{!--
+  Where the models come from (#11): the provider, its address, the key (none for Ollama), the main model, and what works
+  with that provider. Shared by setup's "Give it a brain" step and Admin → Models, inside their [data-model-test] form.
+  Data: llm { provider, providers: [{ id, label, summary, baseUrl, needsKey, features: [{ id, label, icon, on, note }] }],
+              baseUrl, model, hasKey, maskedKey, keySource, keyWord? ("Replace the key") }
+  Client: providers.js (switching shows the right fields and features; Ollama's installed models fill the model list).
+--}}
+<fieldset data-provider-picker>
+  <legend class="label">Where the models come from</legend>
+  <div class="grid gap-2 sm:grid-cols-3">
+    {{#each llm.providers}}
+      <label class="choice-card items-start text-start">
+        <input type="radio" name="provider" value="{{id}}" class="sr-only" data-base-url="{{baseUrl}}" {{#if needsKey}}data-needs-key{{/if}}
+          {{#if (eq id @root.llm.provider)}}checked{{/if}}>
+        <span class="text-[13px] font-semibold">{{label}}{{#if (eq id 'openrouter')}} <span class="font-normal text-ink-3">(recommended)</span>{{/if}}</span>
+        <span class="text-xs leading-snug text-ink-3">{{summary}}</span>
+      </label>
+    {{/each}}
+  </div>
+</fieldset>
+
+<div data-field data-provider-show="ollama compatible" {{#if (eq llm.provider 'openrouter')}}hidden{{/if}}>
+  <label class="label" for="f-baseUrl">Address</label>
+  <input id="f-baseUrl" name="baseUrl" class="input font-mono text-[13px]" value="{{llm.baseUrl}}" autocomplete="off" spellcheck="false"
+    placeholder="https://api.example.com/v1" data-base-url-input>
+  <p class="hint" data-provider-show="ollama" {{#unless (eq llm.provider 'ollama')}}hidden{{/unless}}>Ollama’s address with <span class="font-mono">/v1</span>.
+    On this computer: <span class="font-mono">http://127.0.0.1:11434/v1</span>. Jessbot in Docker and Ollama on the computer: <span class="font-mono">http://host.docker.internal:11434/v1</span>.</p>
+  <p class="hint" data-provider-show="compatible" {{#unless (eq llm.provider 'compatible')}}hidden{{/unless}}>The service’s OpenAI-compatible address, usually ending in <span class="font-mono">/v1</span>.</p>
+</div>
+
+<div class="rounded-xl border border-line bg-surface px-4 py-3" data-key-block {{#if (eq llm.provider 'ollama')}}hidden{{/if}}>
+  <div class="flex items-center gap-3">
+    <span class="grid size-9 place-items-center rounded-lg bg-accent-soft text-accent-text">{{icon "key-round" class="size-[18px]"}}</span>
+    <div class="min-w-0 flex-1">
+      <p class="text-sm font-semibold">API key</p>
+      {{#if llm.hasKey}}
+        <p class="text-xs text-ink-3">{{#if (eq llm.keySource 'environment')}}Set in the server’s environment{{else}}Saved encrypted with this install’s key{{/if}} · <span class="font-mono" data-masked-key>{{llm.maskedKey}}</span></p>
+      {{else}}
+        <p class="text-xs text-ink-3">Paste it once. It’s kept on this machine, encrypted with this install’s own key, and never shown again in full.</p>
+      {{/if}}
+    </div>
+  </div>
+  <div class="mt-3 {{#if llm.hasKey}}hidden{{/if}}" data-key-field>
+    <label class="sr-only" for="f-apiKey">API key</label>
+    <input id="f-apiKey" name="apiKey" type="password" class="input font-mono text-[13px]" placeholder="sk-…" autocomplete="off">
+  </div>
+  {{#if llm.hasKey}}<button type="button" class="mt-2 text-xs font-medium text-accent-text hover:underline" data-show-key-field>{{default llm.keyWord "Use a different key"}}</button>{{/if}}
+</div>
+
+<div data-field>
+  <label class="label" for="f-model">Model</label>
+  <input id="f-model" name="model" class="input font-mono text-[13px]" value="{{llm.model}}" list="provider-models" autocomplete="off" spellcheck="false" required>
+  <datalist id="provider-models" data-model-list></datalist>
+  <p class="hint" data-provider-show="openrouter" {{#unless (eq llm.provider 'openrouter')}}hidden{{/unless}}>Default: <span class="font-mono">openai/gpt-6-luna</span>, about $0.10 per million words read. Any model id OpenRouter lists works.</p>
+  <p class="hint" data-provider-show="ollama" {{#unless (eq llm.provider 'ollama')}}hidden{{/unless}} data-ollama-status>A model you pulled with <span class="font-mono">ollama pull</span> that can call tools, 7B or larger: for example <span class="font-mono">qwen2.5:7b</span> or <span class="font-mono">llama3.1:8b</span>.</p>
+  <p class="hint" data-provider-show="compatible" {{#unless (eq llm.provider 'compatible')}}hidden{{/unless}}>The model’s name as the service calls it.</p>
+</div>
+
+{{!-- What works with each provider: one list per provider, the chosen one shown. --}}
+{{#each llm.providers}}
+  <div class="rounded-xl border border-line bg-surface-2/60 px-4 py-3" data-provider-features="{{id}}" {{#unless (eq id @root.llm.provider)}}hidden{{/unless}}>
+    <p class="text-xs font-semibold text-ink-2">With {{label}}</p>
+    <ul class="mt-2 space-y-1.5 text-xs" role="list">
+      {{#each features}}
+        <li class="flex items-start gap-2">
+          <span class="mt-px shrink-0 {{#if (eq on true)}}text-ok{{else if (eq on false)}}text-ink-3{{else}}text-warn-text{{/if}}">{{#if (eq on true)}}{{icon "circle-check" class="size-3.5"}}{{else if (eq on false)}}{{icon "circle-minus" class="size-3.5"}}{{else}}{{icon "circle-alert" class="size-3.5"}}{{/if}}</span>
+          <span class="min-w-0"><span class="{{#if (eq on false)}}text-ink-3{{else}}text-ink{{/if}}">{{label}}</span>{{#if note}}<span class="block text-ink-3">{{note}}</span>{{/if}}</span>
+        </li>
+      {{/each}}
+    </ul>
+  </div>
+{{/each}}
