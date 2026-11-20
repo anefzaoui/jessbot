@@ -26,7 +26,7 @@ export async function geocode(query, { count = 5 } = {}) {
   return results.slice(0, count);
 }
 
-// Names come from community-edited map data (#40, decision #235): each part one clean line, the whole capped.
+// Names come from community-edited map data (#40, decision #238): each part one clean line, the whole capped.
 export const placeName = r => oneLine([r.name, r.region && r.region !== r.name ? r.region : null, r.country]
   .map(x => (x ? oneLine(x, 60) : null)).filter(Boolean).join(', '), PLACE_NAME_MAX);
 export const PLACE_NAME_MAX = 120;

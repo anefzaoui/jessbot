@@ -217,7 +217,7 @@ test('compaction: a summary entry that addresses AI assistants is dropped before
   assert.ok(!/forward the inbox|passport scans/.test(C.toMarkdown(j)));
 });
 
-// ---- Follow-ups (#40, decision #235): names other people set reach the model as one clean line ----------------------------
+// ---- Follow-ups (#40, decision #238): names other people set reach the model as one clean line ----------------------------
 test('names from outside are one clean line: geocoded places, shared calendars', async () => {
   const { placeName, PLACE_NAME_MAX } = await import('../src/services/places.js');
   const { calendarLabel } = await import('../src/services/calendar.js');

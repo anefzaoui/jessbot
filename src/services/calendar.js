@@ -14,7 +14,7 @@ import { tzOf } from '../lib/when.js';
 import { oneLine } from '../lib/untrusted.js';
 
 const EVENT_FIELD_MAX = 120;
-// A calendar's name is set by whoever owns it, which for a shared calendar is someone else (#40, decision #235): one line.
+// A calendar's name is set by whoever owns it, which for a shared calendar is someone else (#40, decision #238): one line.
 export const calendarLabel = cal => (typeof cal?.displayName === 'string' && oneLine(cal.displayName, 60)) || 'Calendar'; // characters of a title or place in the prompt and on Upcoming
 
 const WINDOW_BACK_MS = 864e5;

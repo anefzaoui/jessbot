@@ -63,6 +63,7 @@ const helpers = {
   countWhere: (arr, key, value) => (Array.isArray(arr) ? arr.filter(x => x?.[key] === value).length : 0),
   plural: (n, word, pluralWord) => `${n} ${n === 1 ? word : (typeof pluralWord === 'string' ? pluralWord : `${word}s`)}`,
   concat: (...args) => args.slice(0, -1).join(''),
+  join: (arr, sep) => (Array.isArray(arr) ? arr.join(typeof sep === 'string' ? sep : ',') : ''),
   // A goal measure's readings as a small line (Phase 25, #196): points [{ at, value }] oldest first → an inline SVG, 2px line in
   // the accent, the latest reading marked, a hover title on every reading ("72 kg · 12 Sep"). One series: no legend.
   sparkline(points, options) {

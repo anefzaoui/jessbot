@@ -5,6 +5,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { paths } from '../config/index.js';
 import { openRead } from '../lib/safe-path.js';
+import { pictureChoices, pictureBase } from './assistant-pictures.js';
 
 const MANIFEST = path.join(paths.public, 'img', 'presence.json');
 let cache = null, cacheMtime = 0;
@@ -54,14 +55,31 @@ export function variantFrames(variant) {
 }
 
 // Presence data for templates (res.locals.presence). weather = services/weather.sky() of the person's home, or null (clear).
+// The admin's pictures (#7, services/assistant-pictures.js) replace the built-in art only for signed-in people: their
+// files are served behind sign-in, so the sign-in and invite pages keep the built-in look.
+//   avatarBase/sceneBase: where frames and scenes load from ("<base>/<frame>[-256].webp", "<base>/<scene>[-256].webp")
+//   pinned: the background doesn't follow the clock (a picked scene or an upload) · liveScene: the sky right now, always
+//   cover: { url, live } for the chat header and the Feed greeting (live: it follows the sky)
 export function presenceFor({ bot, user, weather } = {}) {
-  const variant = variantFrames(bot?.variant).length ? bot.variant : null;
+  const pics = user ? pictureChoices() : { avatar: { kind: 'look' }, background: { kind: 'sky' }, cover: { kind: 'sky' } };
+  const look = variantFrames(bot?.variant).length ? bot.variant : null;
+  const upload = pics.avatar.kind === 'upload';
+  const variant = upload ? look || 'custom' : look;
   const time = timeOfDay({ timeZone: user?.timezone || undefined, sunrise: weather?.sunrise, sunset: weather?.sunset });
   const w = weather?.bucket || 'clear';
+  const liveScene = sceneFor({ time, weather: w });
+  const bg = pics.background;
+  const scene = bg.kind === 'upload' ? 'picture' : bg.kind === 'scene' ? bg.scene : liveScene;
+  const cv = pics.cover;
+  const cover = cv.kind === 'upload' ? { url: `${pictureBase('cover', cv.id)}/picture.webp`, live: false }
+    : cv.kind === 'scene' ? { url: `/img/scenes/${cv.scene}.webp`, live: false }
+    : { url: liveScene ? `/img/scenes/${liveScene}.webp` : null, live: true };
   return {
-    variant, time, weather: w, scene: sceneFor({ time, weather: w }),
+    variant, time, weather: w, scene, liveScene, pinned: bg.kind !== 'sky', cover,
+    sceneBase: bg.kind === 'upload' ? pictureBase('background', bg.id) : '/img/scenes',
+    avatarBase: upload ? pictureBase('avatar', pics.avatar.id) : look ? `/img/avatars/${look}` : null, avatarUpload: upload,
     sunrise: weather?.sunrise || null, sunset: weather?.sunset || null,
     temp: weather?.temp ?? null, weatherLabel: weather?.label || null,
-    frames: variant ? variantFrames(variant) : [],
+    frames: upload ? ['neutral'] : variant ? variantFrames(variant) : [],
   };
 }

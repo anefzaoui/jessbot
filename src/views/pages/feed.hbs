@@ -11,7 +11,7 @@
 
   {{!-- Greeting hero on the living sky --}}
   <header class="feed-hero-head relative mt-3 overflow-hidden rounded-3xl sm:mt-6"
-    {{#if presence.scene}}style="--scene: url('/img/scenes/{{presence.scene}}.webp')"{{/if}} data-time="{{presence.time}}">
+    {{#if presence.cover.url}}style="--scene: url('{{presence.cover.url}}')"{{/if}} {{#if presence.cover.live}}data-sky{{/if}} data-time="{{presence.time}}">
     <div class="relative z-10 flex items-end gap-4 p-5 sm:p-7">
       <div class="min-w-0 flex-1">
         <p class="text-sm font-medium text-white/80">{{feed.greeting.date}}</p>
