@@ -203,7 +203,7 @@ onRunFinished(async (r, status, { error }) => {
     line = oneLine(error || 'Something went wrong.', 200);
     text = `I couldn’t finish **${title}** in the background: ${line} ${link} to see what happened, or press Retry there.`;
   }
-  // The report is the background task's words, not Jess's (#40, decision #233): the model gets it fenced as reported
+  // The report is the background task's words, not Jess's (#40, decision #236): the model gets it fenced as reported
   // content, and what the task read travels with it: the report run carries the task's taint, and every later run in that
   // chat that sees the report is marked the same way (prompt.js), so approvals there count it like a page read here.
   const read = taintOf(r.id);

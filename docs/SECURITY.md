@@ -63,7 +63,7 @@ The overview (who is trusted, every place outside content enters and how it is h
   the task's words, not Jess's: the model gets it fenced (`background_report`, with where the task read things and a
   warning when it read text addressed to AI assistants), and her own visible copy is left out of what she reads back.
   What the task read travels with the report: the report carries the task's taint, and every later run in that chat that
-  sees it is marked the same way, so its approvals count it like a page read there. [#233]
+  sees it is marked the same way, so its approvals count it like a page read there. [#236]
 - **Approval cards show what is actually sent**: the whole email body, calendar description or task instructions, up to
   20,000 characters, and past that an explicit "(cut at 20,000 of N characters)"; secret-looking parts are listed above it
   and masked in it (a card number shows as ••••4242); a line says whether it can be undone and who it reaches ("Can't be

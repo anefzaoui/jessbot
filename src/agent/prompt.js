@@ -193,7 +193,7 @@ const reportRunIds = rows => {
   return new Set(all(`SELECT id FROM runs WHERE origin = 'delegate_report' AND id IN (${ids.map(() => '?').join(',')})`, ...ids).map(x => x.id));
 };
 
-/** A run whose prompt carries a background task's report is marked with what that task read (#233). */
+/** A run whose prompt carries a background task's report is marked with what that task read (#236). */
 export function carryReportTaint(rows, runId) {
   if (!runId) return;
   for (const id of reportRunIds(rows)) for (const s of taintOf(id).sources) markRunTaint(runId, s.level, { tool: 'delegate_report', label: s.label });
@@ -214,7 +214,7 @@ function toChat(rows, ctx = {}) {
     const full = i > turnStart ? r.content : (r.stub || r.content);
     return { role: 'tool', tool_call_id: r.tool_call_id, content: i !== lastSnapshot && String(full).includes(SNAP) ? collapseSnapshot(full) : full };
   };
-  // A background task's report (delegate_report, #233) reaches the model fenced, in its system line; the visible copy is
+  // A background task's report (delegate_report, #236) reaches the model fenced, in its system line; the visible copy is
   // the person's, so the model doesn't read the task's words back as its own.
   const reportRuns = reportRunIds(rows);
   for (const [i, r] of rows.entries()) {

@@ -3697,7 +3697,7 @@ Note: most of Phase 23 part A landed in commit aa56076, whose message reads "Pha
 
 ## 2026-11-20: Prompt-injection review follow-ups (issue #40)
 
-233. **A background task's report is fenced as reported content, and its taint carries into the chat it reports to.** The
+236. **A background task's report is fenced as reported content, and its taint carries into the chat it reports to.** The
     report `delegate` posts back (the first line of the background run's reply, and the titles of what it made) used to
     arrive as an ordinary assistant message: the next turn in that chat read a stranger-influenced line as Jess's own words,
     and none of the background run's taint (even `high`) came along, so approvals there didn't count it. Now the report
