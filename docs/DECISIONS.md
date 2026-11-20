@@ -3527,3 +3527,39 @@ Note: most of Phase 23 part A landed in commit aa56076, whose message reads "Pha
     browser asked our lookup; a name that answers public to the guard and 127.0.0.1 next is refused and the local server
     never sees a request; a bare context without the request guard still can't reach 127.0.0.1 or localhost), and real
     sites over HTTPS and plain HTTP load through it.
+
+## 2026-11-20: Prompt-injection review (issue #8)
+
+224. **Every place outside content reaches the model was reviewed; the gaps are closed at the source, and the model is
+    written down for strangers.** Issue #8 asked for a review of every untrusted input: kept apart from instructions, never
+    able to grant itself tools or skip an approval, documented. The review walked each entry point (web, browser, search,
+    email and attachments, calendar and "Coming up", feeds, uploads and Library files, PDF forms, OCR, pictures, projects,
+    stored results, past chats, compaction, memories, lessons, skills, page checks, background notes) in the code and the
+    tests, and found six gaps, each fixed where it starts:
+    - `pdf_form_fields` returned field names, labels, tooltips (never printed, so a reader can't see them), values,
+      options and a flat form's text raw. They now go through `guardOutside` (kind `pdf_form`: fenced, cleaned, screened,
+      the run marked "form “…” (downloaded from …)").
+    - File titles came from names someone else chose (a download, an email attachment's MIME name) and could hold newlines
+      and invisible characters, quoted raw in a few tool lines. `createFileItem`/`addFileVersion` now store one clean line
+      (invisible characters out, line breaks and runs of spaces collapsed; nothing else in the name changes), and
+      `library_read`/`view_image` quote titles with `oneLine`. A picture's caption (a model's description that copies text
+      in the image) is fenced and screened in `library_read`; `view_image` says where the picture came from instead of
+      "It came from them", which was wrong for downloads and email files.
+    - The calendar in "Coming up", a small project's files and the `project_files` list got the stage-1 banner but never
+      marked the run `high` or wrote `injection_suspected`, unlike attached files (#119/#120). They now call
+      `flagPromptHit` (once per run); `upcomingBlock` and `projectBlock` take the run being built, and a block built
+      without one (a check-in decision) marks nothing. The prompt text is unchanged, so the cache prefix stays stable.
+    - `read_offloaded` opened any stored blob by a hex prefix (blobs are content-addressed and shared across the install).
+      It now opens only a ref stored from the person's own chats (`messages.offloaded_ref` joined to their threads), and a
+      part read with `start` past the opening tag of a fenced result gets the notice line again.
+    - The compaction summary goes into the system prompt of every later turn with nothing marking it as derived from tool
+      lines. Besides the prompt rule (#125), an entry that trips the stage-1 patterns is now dropped before it is stored
+      (`screenSummary`), a plain-code backstop like the memory words check.
+    - `FENCE_KINDS` lacked `feed_stories` and `notes` (and the new `pdf_form`), so their bare closing tags weren't defanged;
+      the random fence id already kept them from closing a fence. A test now checks the source for any kind not listed.
+    Checked and left as is: `search_history` can't surface old tool results (only user and assistant rows are in the FTS
+    index), now pinned by a test; attached and small-project files still mark the run only on a hit (#119); weather and
+    place names stay unfenced short data. Not changed here: error messages from tools reach the model as plain text, and
+    pictures are not screened, both listed as limits. `docs/SECURITY-MODEL.md` is the overview for strangers (trust,
+    layers, a table of every entry point, what is not defended, this review's fixes); `docs/SECURITY.md` stays the detailed
+    control list and links to it. Tested: `tests/injection-review.test.js` (each fix fails without it).

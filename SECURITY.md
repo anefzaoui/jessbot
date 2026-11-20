@@ -28,4 +28,5 @@ agent says, with no action behind it, is a known limit (see [docs/SECURITY.md](d
 report if you found a pattern the guards miss.
 
 How Jessbot protects the people who use it, and its known limits, are described in
-[docs/SECURITY.md](docs/SECURITY.md).
+[docs/SECURITY-MODEL.md](docs/SECURITY-MODEL.md) (the overview: who is trusted, every untrusted input, what isn't
+defended) and [docs/SECURITY.md](docs/SECURITY.md) (each control in detail).
