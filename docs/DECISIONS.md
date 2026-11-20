@@ -3990,7 +3990,9 @@ Note: most of Phase 23 part A landed in commit aa56076, whose message reads "Pha
     pinch or the wheel zooms with clamped panning, a swipe down or Back closes it, the scroll locks without moving the
     page, the focus goes in and comes back, a live region says "3 of 14", right to left mirrors it, reduced motion
     fades it. Here: the gallery's two lists, the home page's screenshots (one group) and every guide picture
-    (`.prose`); the site's words, its fonts (the count in the cue face) and motion curves; day white behind the
-    pictures in the light theme, the night stage in the dark one (docs/DESIGN.md → Website). A gallery link still opens
+    (`.prose`); the site's words, its fonts (the count in the cue face) and motion curves; the stage's black behind the
+    picture in both themes, nearly opaque over a blur of the page, so the open picture is all there is (a first
+    version had day white in the light theme; the page showed through and read as clutter) (docs/DESIGN.md →
+    Website). A gallery link still opens
     the picture with no script. The build gives gallery and guide pictures their width and height (read from the WebP),
     so they keep their place while they load and open at the right size.
