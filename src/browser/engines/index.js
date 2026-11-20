@@ -7,6 +7,7 @@
 //   launch() → Promise<Browser>        a playwright-core Browser, headless
 //   userAgent(version) → string|undefined   the desktop user agent its contexts should use (undefined: leave it)
 //   licence: { info, set, remove } | null
+//   stop(browser)?                     optional: stop a browser it launched for good (its process); else close() is used
 // Built in: "chromium" (open source, the default) and "cloakbrowser" (optional, proprietary binary, user-installed).
 // Another engine (a different stealth build, a remote browser) plugs in by adding a module here.
 import fs from 'node:fs';

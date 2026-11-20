@@ -96,6 +96,7 @@ const installProgress = engine => (install.state === 'installing' && install.eng
 // ---- Status ------------------------------------------------------------------------------------------------
 let browser = null, launching = null, idleTimer = null, active = 0, lastUsedAt = null, blockedCount = 0;
 let runningVersion = null, userAgent; // the running browser's version; the user agent its engine wants contexts to use
+const launchedBy = new WeakMap(); // browser → the engine that launched it (an engine switch closes it with the right one)
 const waiters = [];
 const recent = [];
 
@@ -136,6 +137,7 @@ async function getBrowser() {
   if (!browserStatus().installed) throw new BrowserUnavailable('The browser isn’t installed yet. The admin can install it in Admin → Browser (or run npm run browser:install).');
   launching ||= (async () => {
     const b = await engine.launch();
+    launchedBy.set(b, engine);
     b.on('disconnected', () => { if (browser === b) browser = null; });
     browser = b;
     runningVersion = b.version();
@@ -146,11 +148,20 @@ async function getBrowser() {
   return launching;
 }
 
+// Never wait long on the old browser: a Chromium that hangs while shutting down must not hold up the request that
+// asked for it (an engine switch, a restart). Engines that can stop their process for good (stop) do; the rest get a
+// close() with a time limit, finishing in the background.
+const CLOSE_WAIT_MS = 3000;
 export async function closeBrowser() {
   clearTimeout(idleTimer);
   const b = browser;
   browser = null;
-  if (b) await b.close().catch(() => {});
+  if (!b) return;
+  const engine = launchedBy.get(b) || browserEngine();
+  launchedBy.delete(b);
+  const done = (engine.stop ? engine.stop(b) : b.close()).catch(() => {});
+  const finished = await Promise.race([done.then(() => true), new Promise(r => setTimeout(r, CLOSE_WAIT_MS, false))]);
+  if (!finished) console.warn(`[browser] ${engine.label} is still shutting down; carrying on without waiting for it`);
 }
 
 function scheduleIdle() {
