@@ -41,6 +41,9 @@ const copy = (from, to) => { fs.mkdirSync(path.dirname(path.join(OUT, to)), { re
 // ---- Assets -------------------------------------------------------------------------------------------------------
 copy('website/styles.css', 'assets/styles.css');
 copy('website/site.js', 'assets/site.js');
+// The lightbox: Vitrine (https://github.com/anefzaoui/vitrine), vendored in website/vitrine/ at the commit its
+// vitrine.lock.json pins, checked by scripts/vitrine-check.mjs (tests/site-vitrine.test.js).
+for (const f of ['vitrine-core.js', 'vitrine.js', 'vitrine.css']) copy(`website/vitrine/${f}`, `assets/vitrine/${f}`);
 copy('website/run-poster.webp', 'images/run-poster.webp'); // the recorded run's poster: its frame at 11.5 s, a still
 copy('node_modules/@fontsource-variable/anybody/files/anybody-latin-standard-normal.woff2', 'assets/anybody.woff2');
 copy('node_modules/@fontsource-variable/hanken-grotesk/files/hanken-grotesk-latin-wght-normal.woff2', 'assets/hanken-grotesk.woff2');
@@ -64,6 +67,19 @@ fs.writeFileSync(path.join(OUT, 'site.webmanifest'), JSON.stringify({
 const icon = name => fs.readFileSync(path.join(ROOT, 'node_modules/@phosphor-icons/core/assets/regular', `${name}.svg`), 'utf8')
   .replace('<svg ', '<svg class="icon" aria-hidden="true" focusable="false" ').trim();
 const icons = html => html.replace(/\{\{icon:([a-z0-9-]+)\}\}/g, (_, n) => icon(n));
+
+// A WebP's width and height from its header (VP8X, VP8L or VP8), so a picture keeps its place while it loads and the
+// lightbox knows its size before it arrives.
+function webpSize(file) {
+  const b = fs.readFileSync(file);
+  const kind = b.toString('ascii', 12, 16);
+  if (kind === 'VP8X') return [1 + b.readUIntLE(24, 3), 1 + b.readUIntLE(27, 3)];
+  if (kind === 'VP8L') { const v = b.readUInt32LE(21); return [1 + (v & 0x3fff), 1 + ((v >> 14) & 0x3fff)]; }
+  if (kind === 'VP8 ') return [b.readUInt16LE(26) & 0x3fff, b.readUInt16LE(28) & 0x3fff];
+  return null;
+}
+const sizeOf = name => fs.existsSync(path.join(ROOT, 'docs/images', name)) ? webpSize(path.join(ROOT, 'docs/images', name)) : null;
+const sizeAttrs = name => { const s = sizeOf(name); return s ? ` width="${s[0]}" height="${s[1]}"` : ''; };
 
 // ---- Markdown → HTML, with links rewritten for the site ------------------------------------------------------------
 const md = new MarkdownIt({ html: true, linkify: false, typographer: false });
@@ -94,7 +110,11 @@ function renderDoc(srcFile) {
   for (const t of tokens) {
     for (const c of [t, ...(t.children || [])]) {
       if (c.type === 'link_open') c.attrSet('href', rewrite(c.attrGet('href'), srcFile));
-      if (c.type === 'image') { c.attrSet('src', rewrite(c.attrGet('src'), srcFile)); c.attrSet('loading', 'lazy'); c.attrSet('decoding', 'async'); }
+      if (c.type === 'image') {
+        c.attrSet('src', rewrite(c.attrGet('src'), srcFile)); c.attrSet('loading', 'lazy'); c.attrSet('decoding', 'async');
+        const m = c.attrGet('src').match(/^\.\.\/images\/([\w.-]+\.webp)$/), s = m && sizeOf(m[1]);
+        if (s) { c.attrSet('width', String(s[0])); c.attrSet('height', String(s[1])); }
+      }
       if (c.type === 'link_open' && /^https?:/.test(c.attrGet('href')) && !c.attrGet('href').startsWith(SITE_URL)) c.attrSet('rel', 'noopener');
     }
   }
@@ -167,7 +187,7 @@ const fig = f => {
   const [, base, device] = f.match(/^(.+)-(desktop|phone)-light\.webp$/);
   const dark = fs.existsSync(path.join(ROOT, 'docs/images', `${base}-${device}-dark.webp`));
   const label = LABELS[base] || base;
-  const img = (t, cls) => `<a href="images/${base}-${device}-${t}.webp"${cls}><img src="images/${base}-${device}-${t}.webp" alt="${esc(label)}, ${device === 'phone' ? 'on a phone' : 'on a desktop'}, ${t} theme" loading="lazy" decoding="async"></a>`;
+  const img = (t, cls) => `<a href="images/${base}-${device}-${t}.webp"${cls}><img src="images/${base}-${device}-${t}.webp"${sizeAttrs(`${base}-${device}-${t}.webp`)} alt="${esc(label)}, ${device === 'phone' ? 'on a phone' : 'on a desktop'}, ${t} theme" loading="lazy" decoding="async"></a>`;
   return `<figure class="shot shot-${device}">${dark ? img('light', ' class="only-light"') + img('dark', ' class="only-dark"') : img('light', '')}<figcaption>${esc(label)}</figcaption></figure>`;
 };
 const order = Object.keys(LABELS);
@@ -175,8 +195,8 @@ const sorted = device => shots.filter(f => f.includes(`-${device}-`)).sort((a, b
 urls.push(page({ file: 'gallery.html', title: 'Screenshots · Jessbot', description: 'Every screen of Jessbot, on a desktop and on a phone, in your light or dark theme.',
   body: `<main id="main" class="gallery-page"><header class="page-head"><h1>Screenshots</h1>
     <p>Every main screen, shown in your theme (switch it at the top). The setup wizard, Admin → People and the approval run come from a real install with made-up people; the other screens are the app's own pages with its built-in demo household, because a new install has no weeks of history to show. Click any picture for the full size.</p></header>
-    <h2>On a desktop</h2><div class="shots shots-desktop">${sorted('desktop').map(fig).join('')}</div>
-    <h2>On a phone</h2><div class="shots shots-phone">${sorted('phone').map(fig).join('')}</div></main>`, root: '', current: 'gallery', bodyClass: 'gallery' }));
+    <h2>On a desktop</h2><div class="shots shots-desktop" data-lightbox>${sorted('desktop').map(fig).join('')}</div>
+    <h2>On a phone</h2><div class="shots shots-phone" data-lightbox>${sorted('phone').map(fig).join('')}</div></main>`, root: '', current: 'gallery', bodyClass: 'gallery' }));
 
 // 404, sitemap, robots.
 page({ file: '404.html', title: 'Not found · Jessbot', description: 'This page does not exist.', root: './', current: '', bodyClass: 'lost',
