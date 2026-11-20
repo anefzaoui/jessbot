@@ -59,6 +59,11 @@ The overview (who is trusted, every place outside content enters and how it is h
   offered and allowed in code); a call that would ask is refused (nobody is awake to approve, and no push goes out at night);
   it never gets `ask_user`; its spend is capped per night. Notes left by unattended runs reach the next check-in fenced as
   information, never as instructions. [#197, #199, #200]
+  **A background task's report is reported content.** When it finishes, the line posted back to the chat it came from is
+  the task's words, not Jess's: the model gets it fenced (`background_report`, with where the task read things and a
+  warning when it read text addressed to AI assistants), and her own visible copy is left out of what she reads back.
+  What the task read travels with the report: the report carries the task's taint, and every later run in that chat that
+  sees it is marked the same way, so its approvals count it like a page read there. [#236]
 - **Approval cards show what is actually sent**: the whole email body, calendar description or task instructions, up to
   20,000 characters, and past that an explicit "(cut at 20,000 of N characters)"; secret-looking parts are listed above it
   and masked in it (a card number shows as ••••4242); a line says whether it can be undone and who it reaches ("Can't be
@@ -178,6 +183,9 @@ The overview (who is trusted, every place outside content enters and how it is h
     secrets). Household lessons, which reach everyone, wait for the owner's OK and refuse personal details in code (emails,
     phone or account numbers, IBANs, links with parameters, household members' names). A person's own lessons are shown only
     to them (the owner's review lists household lessons only; a member's chat is never linked). [#186, #187]
+- **Tool errors are one clean line.** An error often quotes a remote server or a page (a mail server's refusal, an HTTP
+  error body), so what a failed tool hands the model is cut to one line of at most 300 characters, invisible characters
+  removed and fence or chat-role look-alikes defanged, like any header from outside. [#237]
 - **Browser downloads** become Library items for the person, typed from their bytes and read like uploads, labelled
   "Downloaded from <host>" (at most 10 files / 100 MB per browsing session, 25 MB per file); the temporary copy is
   deleted, and a type we don't take is named as not kept. [#117]
