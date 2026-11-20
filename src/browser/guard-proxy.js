@@ -59,13 +59,16 @@ function onConnect(req, client, head) {
   });
 }
 
+const TOKEN = /^[!#$%&'*+.^`|~\w-]+$/; // a valid header name (RFC 9110 token)
 const HOP = new Set(['proxy-authorization', 'proxy-connection', 'connection', 'keep-alive', 'te', 'trailer', 'transfer-encoding', 'upgrade']);
 
 // Raw headers ([name, value, name, value…], as sent) minus the hop-by-hop ones: forwarded as a flat array, never copied
 // onto an object keyed by a name the page chose.
 function endToEnd(raw) {
   const out = [];
-  for (let i = 0; i + 1 < raw.length; i += 2) if (!HOP.has(raw[i].toLowerCase())) out.push(raw[i], raw[i + 1]);
+  for (let i = 0; i + 1 < raw.length; i += 2) {
+    if (TOKEN.test(raw[i]) && !HOP.has(raw[i].toLowerCase())) out.push(raw[i], raw[i + 1]);
+  }
   return out;
 }
 
