@@ -1,6 +1,6 @@
 // Admin → Models → her voice (docs/VOICE.md): save the voice settings, "Hear her" with the choices on screen (saved or
 // not), and a sample of any single voice. Samples come back as a WAV (base64) and play in the page's own player.
-import { $, on, api, withBusy, escapeHtml, icon } from './core.js';
+import { $, on, api, withBusy, escapeHtml, icon, botName } from './core.js';
 import { toast } from './toast.js';
 import { play } from './voice.js';
 
@@ -51,7 +51,7 @@ export function initAdminVoice() {
         const speaking = s.voice || $('input[name="voice"][value=""]', form).closest('label').querySelector('.badge').textContent.toLowerCase();
         $('[data-tile-voice]')?.replaceChildren(`${s.model} · ${speaking}`);
         $('[data-tile-stt]')?.replaceChildren(s.sttModel);
-        toast.success(`Saved. She speaks with ${speaking}.`);
+        toast.success(`Saved. ${botName()} speaks with ${speaking}.`);
       } catch (err) { toast.error(err.message, { title: 'Not saved' }); }
     }, 'Saving…');
   });

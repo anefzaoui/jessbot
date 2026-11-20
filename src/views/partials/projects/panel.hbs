@@ -19,7 +19,7 @@
       <button role="tab" id="{{prefix}}-tab-files" aria-controls="{{prefix}}-files" aria-selected="{{#if (eq tab 'files')}}true{{else}}false{{/if}}" tabindex="-1" class="flex-1 justify-center whitespace-nowrap">
         Files <span class="count count-quiet">{{panel.files.length}}</span></button>
       <button role="tab" id="{{prefix}}-tab-soul" aria-controls="{{prefix}}-soul" aria-selected="{{#if (eq tab 'soul')}}true{{else}}false{{/if}}" tabindex="-1" class="flex-1 justify-center whitespace-nowrap">
-        Jess here{{#if panel.soul.proposal}} <span class="count count-warn" title="A change is waiting for you">1</span>{{/if}}</button>
+        {{@root.bot.name}} here{{#if panel.soul.proposal}} <span class="count count-warn" title="A change is waiting for you">1</span>{{/if}}</button>
     </div>
   </div>
 

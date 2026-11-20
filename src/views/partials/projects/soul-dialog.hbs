@@ -3,12 +3,12 @@
 <dialog id="soul-editor" class="modal max-w-2xl" aria-labelledby="soul-editor-title">
   <form data-soul-form novalidate>
     <div class="modal-header">
-      <div><h2 id="soul-editor-title" class="text-base font-semibold">How Jess works in this project</h2>
+      <div><h2 id="soul-editor-title" class="text-base font-semibold">How {{@root.bot.name}} works in this project</h2>
         <p class="text-sm text-ink-3">Concrete beats clever: the standards to rely on, what to ask first, how to check the work.</p></div>
       <button type="button" class="btn btn-ghost btn-icon btn-sm" data-modal-close aria-label="Close">{{icon "x" class="size-4"}}</button>
     </div>
     <div class="modal-body space-y-4">
-      <div data-field><label class="label" for="se-stance">Jess, bringing…</label>
+      <div data-field><label class="label" for="se-stance">{{@root.bot.name}}, bringing…</label>
         <input id="se-stance" name="stance" class="input" maxlength="160" placeholder="a master furniture-maker’s eye. Patient, practical, precise about technique." dir="auto"></div>
       <div data-field><label class="label" for="se-person">About you here</label>
         <textarea id="se-person" name="person" rows="2" class="textarea text-sm" maxlength="500" placeholder="Your level, goal, tools or data, constraints" dir="auto"></textarea></div>

@@ -24,6 +24,7 @@ import { notify } from './notify.js';
 import { logActivity } from './activity.js';
 import { decide, noul, yes, note, threshold, logFallback } from './decide.js';
 import { enqueueRun, onRunFinished, onRunRetried } from '../agent/loop.js';
+import { botName } from './bot.js';
 
 export const PREP_VALUES = ['off', 'ideas'];
 export const PREP_KINDS = ['research', 'plan', 'draft', 'comparison'];
@@ -92,7 +93,7 @@ export async function pickIdea(user, cands) {
     user, timeoutMs: 4000,
     state: {
       ideas: Object.fromEntries(cands.map(i => [`i${i.id}`, `${clip(i.title, 100)} (${ideaKind(i)}): ${clip(i.why, 240)}`])),
-      recent_chat: recent.map(m => `${m.created_at} ${m.role === 'user' ? 'Them' : 'Jess'}: ${clip(m.content, 300)}`).join('\n') || '(no recent chat)',
+      recent_chat: recent.map(m => `${m.created_at} ${m.role === 'user' ? 'Them' : botName()}: ${clip(m.content, 300)}`).join('\n') || '(no recent chat)',
     },
     questions: Object.fromEntries(cands.map(i => [`i${i.id}`, noul(`Is idea \`ideas.i${i.id}\` worth preparing tonight, so a first draft is ready `
       + 'when they wake up: will they still care about it tomorrow (it fits what they talk about, and `recent_chat` does not show it done, '

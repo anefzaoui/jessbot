@@ -10,6 +10,7 @@ import { publish } from '../../lib/bus.js';
 import { fence, oneLine } from '../../lib/untrusted.js';
 import { guardOutside, screenSync, flagPromptHit } from '../injection.js';
 import { isTainted } from '../taint.js';
+import { botName } from '../../services/bot.js';
 
 const BRIEF_ROW = {
   type: 'object', required: ['kind', 'text'], additionalProperties: false,
@@ -240,7 +241,7 @@ registerTool({
     if (readOutsideContent(ctx.run.id)) return 'Not noted: this turn read outside content, and notes must come from them. Note it on a later turn if they say it.';
     try { S.addLearned(p, args.note); } catch (err) { return `Not noted: ${err.message}`; }
     publish(ctx.user.id, 'project.updated', { id: p.public_id, soul: 1 }, { persist: false });
-    return { content: 'Noted (they can see it under “Jess here” and undo it).', step: { detail: String(args.note).slice(0, 80) } };
+    return { content: `Noted (they can see it under “${botName()} here” and undo it).`, step: { detail: String(args.note).slice(0, 80) } };
   },
 });
 

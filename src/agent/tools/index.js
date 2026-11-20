@@ -28,6 +28,7 @@ import './household.js';
 import './image.js';
 import './lessons.js';
 import './feed.js';
+import { botName } from '../../services/bot.js';
 
 // ---- ask_user ------------------------------------------------------------------------------------
 registerTool({
@@ -183,7 +184,8 @@ registerTool({
     }
     const rows = searchHistory(ctx.user.id, query, { limit: 6, from: args.from, to: args.to, tz, context: true });
     if (!rows.length) return `No matches in past chats${args.from || args.to ? ' on those days' : ''}.`;
-    const who = role => (role === 'user' ? 'Them' : 'Jess');
+    const bot = botName();
+    const who = role => (role === 'user' ? 'Them' : bot);
     const local = at => new Intl.DateTimeFormat('en-GB', { timeZone: tz, weekday: 'short', day: 'numeric', month: 'short', year: 'numeric',
       hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(new Date(`${at.replace(' ', 'T')}Z`));
     return rows.map(r => [`${local(r.created_at)} · “${r.thread_title}” · ${who(r.role)}: ${r.snippet}`,

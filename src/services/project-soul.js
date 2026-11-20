@@ -9,6 +9,7 @@
 import { get, all, run, tx } from '../db/index.js';
 import { invalid, badRequest, notFound } from '../lib/errors.js';
 import { toIso } from './chatview.js';
+import { botName, nameAlternation } from './bot.js';
 
 export const SAFETY = {
   health: 'Explain data and patterns; never diagnose, dose or change medication. Glucose sensors (CGM) lag blood glucose by '
@@ -42,7 +43,7 @@ const lines = v => (Array.isArray(v) ? v : String(v ?? '').split('\n'));
 /** Any input → clean fields (trimmed, deduped, capped). */
 export function cleanFields(input = {}) {
   const txt = (v, cap) => String(v ?? '').replace(/\s+/g, ' ').trim().slice(0, cap);
-  const out = { stance: txt(input.stance, CAPS.stance).replace(/^(jess,?\s*)?bringing\s+/i, ''), person: txt(input.person, CAPS.person),
+  const out = { stance: txt(input.stance, CAPS.stance).replace(new RegExp(`^(?:(?:${nameAlternation()}),?\\s*)?bringing\\s+`, 'i'), ''), person: txt(input.person, CAPS.person),
     format: txt(input.format, CAPS.format) };
   for (const k of LIST_FIELDS) {
     const seen = new Set();
@@ -58,8 +59,8 @@ export function soulText(project, fields) {
   if (isEmpty(f)) return null;
   const list = (title, items) => (items.length ? `${title}:\n${items.map(x => `- ${x}`).join('\n')}` : null);
   return [
-    `## Jess here — ${project.name}`,
-    `In this project you are Jess${f.stance ? `, bringing ${f.stance}` : ''}. This extends who you are, it never replaces it: same name, `
+    `## ${botName()} here — ${project.name}`,
+    `In this project you are ${botName()}${f.stance ? `, bringing ${f.stance}` : ''}. This extends who you are, it never replaces it: same name, `
       + 'voice, warmth, honesty and willingness to push back.',
     f.person ? `The person: ${f.person}` : null,
     list('Rely on', f.anchors), list('Before advising, ask about (when you don\'t know yet)', f.askFirst), list('Check your work', f.checkWork),
@@ -78,7 +79,7 @@ export const versionsOf = project => all('SELECT * FROM project_souls WHERE proj
 
 export function saveSoul(project, fields, { by = 'user', note = null, keepProposal = null } = {}) {
   const f = cleanFields(fields);
-  if (isEmpty(f)) throw invalid({ stance: 'Write at least what expertise Jess brings here.' });
+  if (isEmpty(f)) throw invalid({ stance: `Write at least what expertise ${botName()} brings here.` });
   return tx(() => {
     const v = (get('SELECT MAX(version) AS v FROM project_souls WHERE project_id = ?', project.id).v || 0) + 1;
     run('INSERT INTO project_souls (project_id, version, fields, created_by, note) VALUES (?, ?, ?, ?, ?)', project.id, v, JSON.stringify(f), by, note ? String(note).slice(0, 300) : null);
@@ -155,7 +156,7 @@ export function decideProposal(project, id, accept) {
   if (!p) throw notFound('That proposal is gone.');
   if (p.status !== 'pending') throw badRequest(p.status === 'stale' ? 'The soul changed since this was written — ask again if it still matters.' : 'Already decided.');
   if (accept) {
-    const v = saveSoul(project, JSON.parse(p.fields), { by: p.source === 'ai' ? 'ai' : 'jess', note: `${p.source === 'ai' ? 'Improved with AI' : 'Jess’s proposal'}: ${p.reason}`, keepProposal: p.id });
+    const v = saveSoul(project, JSON.parse(p.fields), { by: p.source === 'ai' ? 'ai' : 'jess', note: `${p.source === 'ai' ? 'Improved with AI' : `${botName()}’s proposal`}: ${p.reason}`, keepProposal: p.id });
     run(`UPDATE project_soul_proposals SET status = 'accepted', decided_at = datetime('now') WHERE id = ?`, p.id);
     return { status: 'accepted', version: v };
   }
@@ -173,20 +174,21 @@ export function proposalView(p, project) {
   };
 }
 
-const BY = { draft: 'drafted with you', user: 'you', jess: 'Jess', ai: 'Improve with AI' };
+// created_by 'jess' is the stored value for the assistant (whatever its name is now).
+const byLabel = by => ({ draft: 'drafted with you', user: 'you', jess: botName(), ai: 'Improve with AI' })[by];
 export function soulView(project) {
   const cur = activeSoul(project);
   const text = cur ? soulText(project, cur.fields) : null;
   const first = cur && cur.version > 1 ? row(get('SELECT * FROM project_souls WHERE project_id = ? ORDER BY version LIMIT 1', project.id)) : null;
   return {
-    has: !!cur, version: cur?.version || 0, by: cur ? BY[cur.created_by] : null, note: cur?.note || null,
+    has: !!cur, version: cur?.version || 0, by: cur ? byLabel(cur.created_by) : null, note: cur?.note || null,
     updatedAt: cur ? toIso(cur.created_at) : null, fields: cur?.fields || cleanFields({}),
     stance: cur?.fields.stance || null, safety: SAFETY[project.field] || SAFETY.general,
     tokens: text ? Math.ceil(text.length / 4) : 0,
     sections: cur ? Object.keys(LABELS).filter(k => k !== 'stance').map(k => ({ key: k, label: LABELS[k], list: LIST_FIELDS.includes(k),
       items: LIST_FIELDS.includes(k) ? cur.fields[k] : null, text: LIST_FIELDS.includes(k) ? null : cur.fields[k] }))
       .filter(s => (s.list ? s.items.length : s.text)) : [],
-    versions: versionsOf(project).map(v => ({ version: v.version, by: BY[v.created_by], note: v.note, at: toIso(v.created_at), current: v.version === cur?.version })),
+    versions: versionsOf(project).map(v => ({ version: v.version, by: byLabel(v.created_by), note: v.note, at: toIso(v.created_at), current: v.version === cur?.version })),
     drift: first ? soulDiff(first.fields, cur.fields).length : 0,
     proposal: proposalView(pendingProposal(project), project),
   };

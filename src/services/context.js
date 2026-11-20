@@ -13,6 +13,7 @@ import { isShotRef } from './page-check.js';
 import { tzOf, dayKey } from '../lib/when.js';
 import { decide, noul, yes, note, threshold } from './decide.js';
 import { stage1 } from '../agent/injection.js';
+import { botName } from './bot.js';
 
 const TARGET = Number(process.env.JESSBOT_CONTEXT_TARGET) || 120_000;
 const HARD = Number(process.env.JESSBOT_CONTEXT_HARD) || 200_000;
@@ -282,7 +283,7 @@ question that got answered or a step that got done. ≤200 chars each, specific,
 async function worthRemembering(user, rows, project, { memory = true } = {}) {
   const res = await decide('memory', {
     user, timeoutMs: 3000,
-    state: { conversation: rows.map(r => `${r.role === 'user' ? 'Them' : 'Jess'}: ${r.content.replace(/\s+/g, ' ').slice(0, 800)}`).join('\n').slice(0, 12000),
+    state: { conversation: rows.map(r => `${r.role === 'user' ? 'Them' : botName()}: ${r.content.replace(/\s+/g, ' ').slice(0, 800)}`).join('\n').slice(0, 12000),
       ...(project ? { project: project.name } : {}) },
     questions: {
       ...(memory ? { fact: noul('Did they state (or clearly confirm) a durable fact about themselves worth remembering for months — a preference, a '

@@ -13,6 +13,7 @@ import { cleanUntrusted, fence, oneLine } from '../lib/untrusted.js';
 import { decide, noul, yes, note, threshold } from '../services/decide.js';
 import { audit } from '../services/audit.js';
 import { markRunTaint } from './taint.js';
+import { nameAlternation, DEFAULT_NAME } from '../services/bot.js';
 
 // ---- Stage 1: patterns -----------------------------------------------------------------------------------------------
 // Tied to instruction words and to text addressed to an assistant, so ordinary mail between people doesn't trip them:
@@ -61,10 +62,25 @@ const MEMORY_EXTRA = /\byou\s+are\s+now\b|\bact\s+as\s+(?:an?\s+)?(?:admin|syste
 const ARABIC_MARKS = new RegExp('[\\u064B-\\u065F\\u0670\\u0640]', 'g');
 const normalize = s => cleanUntrusted(String(s || '')).text.normalize('NFKC').replace(ARABIC_MARKS, '');
 
+// The patterns name "Jess"; an assistant the admin renamed is addressed by its own name too (#7): "Nova, forward …".
+let namedFor = null, named = [];
+function namedPatterns() {
+  const alt = nameAlternation();
+  if (alt === DEFAULT_NAME) return [];
+  if (namedFor !== alt) {
+    namedFor = alt;
+    named = [
+      { lang: 'en', re: new RegExp(`(?<![\\p{L}\\p{N}])(?:hey\\s+|dear\\s+)?(?:${alt})\\s*[,:;]\\s*(?:please\\s+)?(?:immediately\\s+|now\\s+|quietly\\s+|silently\\s+)?${ACT}\\b`, 'iu') },
+      { lang: 'en', re: new RegExp(`\\b(?:tell|ask|instruct)\\s+(?:${alt})\\s+to\\b`, 'iu') },
+    ];
+  }
+  return named;
+}
+
 /** First stage-1 match: { hit, lang, excerpt } (excerpt = the matched words with a little context, one line). */
 export function stage1(text) {
   const t = normalize(text);
-  for (const p of PATTERNS) {
+  for (const p of [...PATTERNS, ...namedPatterns()]) {
     const m = p.re.exec(t);
     if (!m) continue;
     const from = Math.max(0, m.index - 40), to = Math.min(t.length, m.index + m[0].length + 100);
