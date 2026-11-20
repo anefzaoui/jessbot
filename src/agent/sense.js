@@ -12,6 +12,7 @@ import { skillsFor } from '../services/skills.js';
 import { routeRanking, words } from '../services/skill-lint.js';
 import { enabledToolsets } from '../services/policy.js';
 import { CORRECTION_QUESTION, correctionOf } from '../services/lessons.js';
+import { botName } from '../services/bot.js';
 
 const clip = (s, n) => String(s || '').replace(/\s+/g, ' ').trim().slice(0, n);
 const pct = p => (p == null ? '?' : p.toFixed(2));
@@ -32,7 +33,7 @@ export async function worthCheckin(user, thread, now = new Date(), { notes = [] 
       // Remembered dates (decision #154): what's coming in the next week, and one-off events of the last three days.
       remembered_dates: datedItems(user, now, { back: 3, ahead: 7 }).filter(d => d.diff >= 0 || !d.recurs).map(d => `- ${datedLine(d)}`).join('\n')
         || 'None.',
-      recent_chat: recent.map(m => `${m.created_at} ${m.role === 'user' ? 'Them' : 'Jess'}: ${clip(m.content, 300)}`).join('\n') || '(no recent chat)',
+      recent_chat: recent.map(m => `${m.created_at} ${m.role === 'user' ? 'Them' : botName()}: ${clip(m.content, 300)}`).join('\n') || '(no recent chat)',
       notes_for_them: notes.map(n => `- ${n.source_label ? `${n.source_label}: ` : ''}${clip(n.text, 200)}`).join('\n') || 'None.',
     },
     questions: {

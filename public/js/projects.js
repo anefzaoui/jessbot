@@ -5,7 +5,7 @@
 //   GET /api/v1/projects/:id → { project, … } · DELETE /api/v1/projects/:id → { redirect }
 //   POST /api/v1/projects/:id/brief { kind, text } · POST /api/v1/projects/:id/brief/:itemId { text?, state? } · DELETE …/brief/:itemId
 //   POST /api/v1/threads/:id/make-project { name } → { redirect } · GET /projects/rail → { html } · GET /projects/:id/panel → { aside, sheet }
-import { $, $$, on, api, h, withBusy, icon } from './core.js';
+import { $, $$, on, api, h, withBusy, icon, botName } from './core.js';
 import { toast } from './toast.js';
 import { openModal, closeModal, confirmDialog, promptDialog } from './modal.js';
 import { selectTab } from './tabs.js';
@@ -116,7 +116,7 @@ export function initProjects() {
       try {
         const out = await api(`/api/v1/projects/${encodeURIComponent(card.dataset.proposal)}/create`, { method: 'POST' });
         if (out.cardHtml) card.replaceWith(h(out.cardHtml));
-        toast.success(`“${out.project.name}” is ready. ${document.documentElement.dataset.botName || 'Jess'} is opening it now.`,
+        toast.success(`“${out.project.name}” is ready. ${botName()} is opening it now.`,
           { action: { label: 'Open', onClick: () => { location.href = out.href; } } });
         refreshRail();
       } catch (err) { card.removeAttribute('aria-busy'); toast.error(err.message, { title: 'Not created' }); }

@@ -21,7 +21,7 @@ export const USES = {
   reflect: { group: 'Before spending a full reply', label: 'Ideas & goal reviews', iconName: 'lightbulb',
     hint: 'Skips idea reflection and goal check-ins when nothing new happened, and picks which idea (if any) is worth preparing overnight.' },
   goal: { group: 'Every message', label: 'See it through', iconName: 'target',
-    hint: 'Before a reply counts as finished: did it deliver what you asked for, meet every requirement, stick to figures she read, and only claim what she did? If not, and the next step isn’t yours, she keeps going.' },
+    hint: 'Before a reply counts as finished: did it deliver what you asked for, meet every requirement, stick to figures from what was read, and only claim what was done? If not, and the next step isn’t yours, the work goes on.' },
   reminder: { group: 'Every message', label: 'Reminder answers', iconName: 'bell',
     hint: 'While a reminder waits for you: does your message say it’s done, ask to stop the reminders, or neither? In any language. If off or unsure, a word list decides.' },
   turn: { group: 'Every message', label: 'Voice, language & memories', iconName: 'sparkles',
@@ -35,7 +35,7 @@ export const USES = {
   feed: { group: 'Feed', label: 'Story relevance', iconName: 'rss',
     hint: 'Scores each story against what you asked the feed for, alongside what you click.' },
   injection: { group: 'Safety', label: 'Injection check', iconName: 'shield-alert',
-    hint: 'When a page, email or file seems to talk to AI assistants, is it really trying to instruct Jess, or just a person writing to a person? If off, every match gets the warning.' },
+    hint: 'When a page, email or file seems to talk to AI assistants, is it really trying to instruct your assistant, or just a person writing to a person? If off, every match gets the warning.' },
 };
 export const CONFIDENCES = [0.5, 0.6, 0.7, 0.8, 0.9];
 // textModel: the small, fast LLM that writes what the browser autopilot types (jev-ultrafast used Mercury: ~0.3–0.6 s).

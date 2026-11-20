@@ -10,7 +10,7 @@
     <div class="flex items-start gap-3">
       <div class="min-w-0 flex-1">
         <h2 id="h-links" class="text-sm font-semibold">Search links</h2>
-        <p class="mt-0.5 text-xs text-ink-3">The ready-made searches {{@root.bot.name}} opens (flights, stays, shops, parcels). One that stopped landing on results is switched off, and she uses the site’s own form instead.
+        <p class="mt-0.5 text-xs text-ink-3">The ready-made searches {{@root.bot.name}} opens (flights, stays, shops, parcels). One that stopped landing on results is switched off, and {{@root.bot.name}} uses the site’s own form instead.
           {{#if extras.links.checkedAt}}Last checked <time datetime="{{extras.links.checkedAt}}" data-relative>{{timeAgo extras.links.checkedAt}}</time>.{{else}}Not checked yet.{{/if}}
           Check again with <code class="font-mono">npm run links:check</code>.</p>
       </div>
@@ -38,7 +38,7 @@
 
   <section class="card p-5" aria-labelledby="h-recipes">
     <h2 id="h-recipes" class="text-sm font-semibold">Learned search pages</h2>
-    <p class="mt-0.5 text-xs text-ink-3">When a search on a site lands on a results page, {{@root.bot.name}} keeps its address shape (parameter names only, never what was searched) so next time she goes straight there. Forget one and she uses the site’s form again.</p>
+    <p class="mt-0.5 text-xs text-ink-3">When a search on a site lands on a results page, {{@root.bot.name}} keeps its address shape (parameter names only, never what was searched) so next time {{@root.bot.name}} goes straight there. Forget one and the site’s form is used again.</p>
     {{#if extras.recipes.length}}
       <ul class="mt-3 max-h-80 divide-y divide-line overflow-y-auto rounded-xl border border-line" role="list" data-browser-recipes>
         {{#each extras.recipes}}

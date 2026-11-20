@@ -12,6 +12,7 @@ import { modelPrice, estimateCost, dollars } from './model-price.js';
 import { countTokens } from '../lib/tokens.js';
 import { HttpError, invalid } from '../lib/errors.js';
 import { allSkills, skillsBlockOf, triggerQueriesOf, DESCRIPTION_MAX } from './skills.js';
+import { botName } from './bot.js';
 import { escapeRegExp } from '../lib/text-safe.js';
 
 export const TRIGGER_RUNS = 3;
@@ -54,7 +55,7 @@ function plan(name, { queries, runs = TRIGGER_RUNS } = {}) {
   if (qs.length > TRIGGER_MAX_QUERIES) throw invalid({ queries: `At most ${TRIGGER_MAX_QUERIES} requests at a time.` });
   // The representative person has every toolset, so every active skill competes; the one under test joins even in review.
   const pool = list.filter(x => x.status === 'active' || x.name === s.name);
-  const bot = settings.get('bot', {}).name || 'Jess';
+  const bot = botName();
   const system = `You are ${bot}, a household assistant.\n\n${skillsBlockOf(pool)}`;
   const messagesFor = q => [{ role: 'system', content: system }, { role: 'user', content: `Someone asks you: “${q.text}”\n\n${QUESTION}` }];
   return { s, pool, names: pool.map(x => x.name), queries: qs, runs: n, messagesFor, system };

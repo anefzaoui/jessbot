@@ -4,7 +4,7 @@
 // mirrors the chat card's live timeline (the same steps, headline, elapsed time and Stop), so you see what she's doing.
 // Server contract (routes/api/v1/browser.js): GET /api/v1/threads/:id/browser/frame.jpg · POST …/browser/input
 //   { kind: click {x,y fractions} | wheel {dy} | type {text} | key {key} | back | reload } → { url, title } · POST …/browser/done
-import { $, on, api, h, icon, escapeHtml } from './core.js';
+import { $, on, api, h, icon, escapeHtml, botName } from './core.js';
 import { scrollToEnd } from './composer.js';
 import { toast } from './toast.js';
 
@@ -15,10 +15,10 @@ let touched = false; // did the person click/type/scroll in the tab this time (v
 const base = () => `${document.documentElement.dataset.apiBase || ''}/api/v1/threads/${encodeURIComponent(threadId)}/browser`;
 
 function build() {
-  const bot = escapeHtml(document.documentElement.dataset.botName || 'Jess');
+  const bot = escapeHtml(botName());
   dlg = document.createElement('dialog');
   dlg.className = 'handover';
-  dlg.setAttribute('aria-label', `${document.documentElement.dataset.botName || 'Jess'}’s browser`);
+  dlg.setAttribute('aria-label', `${botName()}’s browser`);
   dlg.innerHTML = `
     <header class="handover-bar">
       <button type="button" class="btn btn-ghost btn-icon btn-sm" data-ho="back" aria-label="Back">${icon('arrow-left', 'size-4')}</button>
@@ -33,7 +33,7 @@ function build() {
     <div class="handover-warn" role="alert" data-ho-warn hidden></div>
     <div class="handover-main">
       <div class="handover-stage" data-ho-stage>
-        <img alt="Jess’s browser tab" draggable="false" data-ho-img>
+        <img alt="${bot}’s browser tab" draggable="false" data-ho-img>
         <span class="handover-live" data-ho-live hidden><span class="live-dot"></span> Live</span>
       </div>
       <details class="handover-side" data-ho-side open>
@@ -136,7 +136,7 @@ async function syncInfo() {
   if (!alive) return;
   const info = await api(base()).catch(() => null);
   if (info?.open && info.url) showWhere(info);
-  else if (info && !info.open) { toast.error('Jess’s browser tab is closed.', { title: 'Nothing to take over' }); dlg.close(); return; }
+  else if (info && !info.open) { toast.error(`${botName()}’s browser tab is closed.`, { title: 'Nothing to take over' }); dlg.close(); return; }
   infoTimer = setTimeout(syncInfo, 2000);
 }
 
@@ -147,7 +147,7 @@ function mirrorSide() {
   // The newest reply that has a timeline (a plain reply after it — a check-in, a reminder — has none to show).
   const slot = [...document.querySelectorAll('[data-message-list] [data-run-owner] [data-run-slot]')].at(-1);
   if (!slot) {
-    body.innerHTML = '<p class="handover-side-empty">Nothing running right now. Her steps appear here as she works.</p>';
+    body.innerHTML = `<p class="handover-side-empty">Nothing running right now. ${escapeHtml(botName())}’s steps appear here as the work goes on.</p>`;
     count.textContent = '';
     return;
   }
@@ -187,7 +187,7 @@ function refresh() {
     // A frame can fail mid-navigation (503): keep going while the tab is still open; close only when it's gone.
     const info = await api(base()).catch(() => null);
     if (info?.open) { timer = setTimeout(refresh, 1000); return; }
-    toast.error('Jess’s browser tab is closed.', { title: 'Nothing to take over' });
+    toast.error(`${botName()}’s browser tab is closed.`, { title: 'Nothing to take over' });
     dlg.close();
   };
   next.src = `${base()}/frame.jpg?t=${Date.now()}`;
@@ -220,8 +220,8 @@ async function handBack() {
       const list = $('[data-message-list]');
       if (list) { list.append(h(r.messageHtml), h(r.runHtml)); document.dispatchEvent(new CustomEvent('chat:sent', { detail: { runId: r.runId } })); }
       scrollToEnd();
-    } else if (r.next === 'running') toast.success('Handed back. Jess will take a fresh look at the page.');
-    else toast('Handed back. Answer her question to let her continue.', { title: 'Jess is waiting for you' });
+    } else if (r.next === 'running') toast.success(`Handed back. ${botName()} will take a fresh look at the page.`);
+    else toast(`Handed back. Answer the question to let ${botName()} continue.`, { title: `${botName()} is waiting for you` });
   } catch (err) {
     toast.error(err.message, { title: 'Couldn’t hand it back' });
   } finally { handingBack = false; btn?.removeAttribute('aria-busy'); }
