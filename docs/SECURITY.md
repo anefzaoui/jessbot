@@ -232,7 +232,8 @@ and how, so a reviewer (or a future session) can check each control. Decisions a
 - The SSRF check resolves a host before connecting; a DNS answer that changes in between is not caught. The admin's
   local-network switch is the backstop.
 - Google (mail/calendar) and Microsoft 365 need OAuth, which isn't supported yet — app passwords only.
-- CloakBrowser is a proprietary binary downloaded per install (never redistributed). [#15]
+- The default browser is open-source Chromium. CloakBrowser, when an admin picks it, is a proprietary binary downloaded
+  per install (never redistributed). [#15, #218]
 - Hidden-text pruning covers the usual tricks, not all of them: text inside images, canvas, iframes or shadow DOM, and
   hidden text that is also animated, get through. Content hidden with `display:none` is kept unless it trips a pattern.
   The fence, the notice line and the injection check remain the backstop; images (and `view_image`) are not screened.

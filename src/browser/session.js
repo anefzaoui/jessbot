@@ -1,5 +1,5 @@
 // Interactive browsing sessions (decision #56): Jess drives a real page like a person — snapshot, click, type, pick,
-// scroll, tabs, dialogs — through CloakBrowser. Built on Playwright's public AI snapshot API (page.ariaSnapshot
+// scroll, tabs, dialogs — through the browser. Built on Playwright's public AI snapshot API (page.ariaSnapshot
 // { mode: 'ai' } → YAML with [ref=eN]; page.locator('aria-ref=eN'); locator.normalize() fails fast on stale refs),
 // the same design as Playwright MCP, researched in docs/DECISIONS.md #56.
 // One session per chat thread (so "now pick next week" continues on the same page), closed after IDLE_MS.

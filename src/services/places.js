@@ -1,6 +1,6 @@
 // Where people are (decisions #30, #49): home (primary), work, or a custom label. Names come from Open-Meteo geocoding;
-// browser GPS positions get their name from OpenStreetMap Nominatim (rare, cached by the weather cache key, via
-// CloakBrowser like every other request). A home place also fixes the person's timezone when it was unknown/unreliable.
+// browser GPS positions get their name from OpenStreetMap Nominatim (rare, cached by the weather cache key, through
+// the browser like every other request). A home place also fixes the person's timezone when it was unknown/unreliable.
 import { get, all, run } from '../db/index.js';
 import { fetchJson } from '../browser/read.js';
 import { invalid, notFound } from '../lib/errors.js';

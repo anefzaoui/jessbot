@@ -1,5 +1,5 @@
 // Which deep-link recipes still land on results (decision #164): `npm run links:check [-- site site …]`.
-// Opens one sample search per site (src/lib/deeplinks.js) in Jess's own browser (CloakBrowser, same network guard) and
+// Opens one sample search per site (src/lib/deeplinks.js) in Jess's own browser (same network guard) and
 // records the verdicts in <data>/deeplinks-state.json. A recipe that is broken is switched off — open_search then opens
 // the site's own search page and Jess uses its form; a later ok switches it back on. A bot wall is recorded as "blocked"
 // (the recipe may be fine). Needs the browser (npm run browser:install) and internet; run it monthly or after a failure.

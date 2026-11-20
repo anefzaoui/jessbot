@@ -1,5 +1,5 @@
 // The Feed's data layer (decisions #23, #34, #54): per-person preferences and topics, shared sources fetched through
-// CloakBrowser and parsed with feedsmith, deduplicated items, and the stories Jess writes from them.
+// the browser (src/browser/) and parsed with feedsmith, deduplicated items, and the stories Jess writes from them.
 // The model parts (turning a prompt into topics, picking and writing stories) live in src/agent/feed.js.
 import crypto from 'node:crypto';
 import fs from 'node:fs';

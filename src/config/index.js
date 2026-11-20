@@ -30,7 +30,8 @@ export const paths = {
   browserProfiles: path.join(DATA, 'browser-profiles'),
   shots: path.join(DATA, 'shots'),              // web screenshots shown in chat
   voice: path.join(DATA, 'voice'),              // voice notes and Jess's spoken replies (WAV, docs/VOICE.md)
-  cloakbrowser: path.join(TOOLS, 'cloakbrowser'), // CloakBrowser binary + licence key (never committed, decision #15)
+  playwright: path.join(TOOLS, 'ms-playwright'), // the Chromium build the default browser engine downloads (decision #218)
+  cloakbrowser: path.join(TOOLS, 'cloakbrowser'), // the optional CloakBrowser binary + licence key (never committed, decision #15)
   logs: path.join(DATA, 'logs'),
   backups: path.join(DATA, 'backups'),
   skills: path.join(ROOT, 'skills'),
@@ -38,6 +39,10 @@ export const paths = {
   public: path.join(ROOT, 'public'),
   migrations: path.join(ROOT, 'src', 'db', 'migrations'),
 };
+
+// playwright-core reads this when it loads: its Chromium download lives in tools/ and moves with the folder (unless the
+// operator points it elsewhere, as the Docker image does).
+process.env.PLAYWRIGHT_BROWSERS_PATH ||= paths.playwright;
 
 export const config = {
   env: env.NODE_ENV || 'development',

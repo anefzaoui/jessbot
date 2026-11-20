@@ -27,7 +27,7 @@ const unmarkRemoved = (userId, kind, value) => run('DELETE FROM feed_removed WHE
 /** A removed source is remembered per topic: removing it from one topic doesn't block it elsewhere. */
 export const removedKey = (topicKey, url) => `${topicKey} ${url}`;
 
-// ---- Finding a site's feed (feedscout, fetching through CloakBrowser — the only way out to the internet) ---------------
+// ---- Finding a site's feed (feedscout, fetching through the browser — the only way out to the internet) ---------------
 export async function discoverSiteFeed(pageUrl, signal) {
   const fetchFn = async (url, opts = {}) => {
     const r = await fetchRaw(url, { headers: opts.headers, signal, timeout: 15000 });

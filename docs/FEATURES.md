@@ -34,7 +34,7 @@ Tick items only when they work end to end. `Phase` refers to the build plan in A
 - [x] File uploads in chat (images, PDFs, docs) → readable by the agent, saved to Library [U] — P10 (decision #76: text + vision, RTL-correct PDF text)
 
 ## Always working in the background
-- [x] Agent has its own browser/computer and keeps working when the app is closed [T2][T1] — P3/P5 (server-side runs + CloakBrowser + scheduler)
+- [x] Agent has its own browser/computer and keeps working when the app is closed [T2][T1] — P3/P5 (server-side runs + its own headless browser + scheduler)
 - [x] Runs are server-side jobs; clients subscribe to live events over **WebSocket** (/ws, heartbeat, resume from last seq) [R][U] — P3
 - [x] **Alarms, reminders, timers**: set by chat; ring on web (sound + notification) and later the APK (local alarm + server ping backup) [U] — P7 web done (ringing dock + chime, synced Stop/Snooze, notifications, /api/v1/alarms + devices registry for the APK); push transport P12 (Web Push + UnifiedPush, #85)
 - [x] **Reminders that follow up until done** ("keep reminding me until I say done": pills, bins, homework): gentler then firmer
@@ -138,7 +138,7 @@ Tick items only when they work end to end. `Phase` refers to the build plan in A
 - [x] **Library cards and viewer say what each file is** [R]: where it came from (downloaded from a site, from an email, uploaded), what it was made from, an Add to calendar button on calendar files (card and viewer), a listening card for read-aloud audio, slide previews by layout, a notice on PDFs whose form answers the viewer app must draw, and the title and description edited in place — P25 (#175)
 
 ## Connected capabilities
-- [x] Web search & page reading — **only** via headless CloakBrowser (no curl, no stock Chromium) [U] — P5 (+ screenshots shown in chat, Admin → Browser, setup step)
+- [x] Web search & page reading — **only** through its own headless browser (open-source Chromium by default, CloakBrowser optional; no curl) [U] — P5, engines #218 (+ screenshots shown in chat, Admin → Browser, setup step)
 - [x] **Uses websites like a person**: opens pages, types, picks from autocomplete and calendars, clicks through, reads results; asks with a screenshot when stuck or when the choice is yours; pay/book/send always asks [U] — decision #56
 - [x] **Ready-made searches**: `open_search` opens the results of flights (Google Flights, Skyscanner, Kayak, Ryanair), stays (Airbnb, Booking, Google Hotels), maps and directions, nearby places (OpenStreetMap, with distances), shops for the person's country (Senegal → Jumia, amazon.fr), jobs, events, parcel tracking and scholarly search in one step from checked fields (no past dates, children by age, real currencies); `npm run links:check` switches off links that stopped working so Jess uses the form [R] — P21 (#164)
 - [x] **Learns a site's results address** after searching it through its form, keeping only the shape (never what was searched), and offers it next time; forgotten after two failures [R] — P21 (#165)

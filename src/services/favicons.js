@@ -1,4 +1,4 @@
-// Site icons for run steps (owner: "the browser widget should show favicons"). Fetched once through CloakBrowser (the only
+// Site icons for run steps (owner: "the browser widget should show favicons"). Fetched once through the browser (src/browser/, the only
 // way out), cached in data/favicons, served from our own origin (the CSP allows only our images). Sites without an icon
 // get a lettered badge. Page-declared icons (<link rel="icon">) seen while browsing are preferred.
 import fs from 'node:fs';

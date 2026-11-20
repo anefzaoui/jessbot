@@ -1,9 +1,8 @@
-// CloakBrowser — Jessbot's only way onto the internet (decisions #15, #43).
+// The browser — Jessbot's way onto the internet (decisions #15, #43, #218).
 // One headless browser shared by every tool, launched on first use and closed when idle. Each task gets its own
 // incognito context; a request guard blocks the local network (SSRF) and, when reading, heavy media.
-// The binary lives in ./tools/cloakbrowser: downloaded per install, pinned to this wrapper's version, never committed.
-import fs from 'node:fs';
-import path from 'node:path';
+// Which browser is an engine (engines/): open-source Chromium by default, CloakBrowser when the admin installs and picks it.
+// Binaries live in ./tools (downloaded per install, never committed).
 import dns from 'node:dns/promises';
 import net from 'node:net';
 import { paths } from '../config/index.js';
@@ -13,10 +12,9 @@ import { cleanSearxngUrl, testSearxng, resetSearxngHealth, searxngState } from '
 import { currentEngine, loadEngine, adblockDecision, adblockState, noteAdblockError } from './adblock.js';
 import { adsAndTrackingLists } from '@ghostery/adblocker';
 
-process.env.CLOAKBROWSER_CACHE_DIR ||= paths.cloakbrowser;
-process.env.CLOAKBROWSER_AUTO_UPDATE = 'false'; // pinned: the binary changes only when the admin presses Install/Update
-const cb = await import('cloakbrowser');
+import { ENGINES, engineId, browserEngine, engineList } from './engines/index.js';
 
+export { engineList };
 export const DEFAULTS = { maxPages: 2, idleMinutes: 5, blockMedia: true, allowPrivate: false, engines: ['duckduckgo', 'brave', 'bing'], searxngUrl: '', blockAds: false };
 export const ENGINE_LABELS = { duckduckgo: 'DuckDuckGo', brave: 'Brave Search', bing: 'Bing', google: 'Google', startpage: 'Google (via Startpage)' };
 export const browserSettings = () => ({ ...DEFAULTS, ...settings.get('browser', {}) });
@@ -45,9 +43,13 @@ export async function saveBrowserSettings(input, { test = testSearxng, start = (
     searxngUrl,
     // Ad and tracker blocking (decision #168): off unless the admin turns it on; a form that leaves it out keeps it.
     blockAds: input.blockAds === undefined ? !!s.blockAds : !!input.blockAds,
+    // The browser engine (decision #218): a form that leaves it out keeps the current one.
+    engine: ENGINES[input.engine] ? input.engine : engineId(),
   };
   if (!next.engines.length) next.engines = ['duckduckgo'];
+  const engineChanged = next.engine !== engineId();
   settings.set('browser', next);
+  if (engineChanged) await closeBrowser(); // the next page opens in the new engine
   resetSearxngHealth();
   if (next.blockAds) start(); // fetch the lists now, not during someone's first page
   return next;
@@ -57,47 +59,31 @@ export class BrowserUnavailable extends Error {
   constructor(message) { super(message); this.name = 'BrowserUnavailable'; }
 }
 
-// ---- Licence key (optional; free keyless binary works) -------------------------------------------------
-const keyFile = () => path.join(process.env.CLOAKBROWSER_CACHE_DIR, 'license.key');
-const readKey = () => { try { return fs.readFileSync(keyFile(), 'utf8').trim() || null; } catch { return null; } };
-
-export function licenseInfo() {
-  const env = (process.env.CLOAKBROWSER_LICENSE_KEY || '').trim();
-  const key = env || readKey();
-  return key ? { present: true, masked: `${key.slice(0, 5)}…${key.slice(-4)}`, source: env ? 'env' : 'file' } : { present: false };
-}
-
-export async function setLicenseKey(key) {
-  const k = String(key || '').trim();
-  if (!/^cb_[A-Za-z0-9_-]{8,200}$/.test(k)) throw Object.assign(new Error('That doesn’t look like a CloakBrowser key (they start with cb_).'), { status: 422 });
-  fs.mkdirSync(path.dirname(keyFile()), { recursive: true });
-  fs.writeFileSync(keyFile(), k, { mode: 0o600 });
-  await closeBrowser();
-}
-
-export async function removeLicenseKey() {
-  fs.rmSync(keyFile(), { force: true });
-  await closeBrowser();
-}
+// ---- Licence key (CloakBrowser only; its free keyless binary works) -----------------------------------------
+const cloakLicence = ENGINES.cloakbrowser.licence;
+export const licenseInfo = () => cloakLicence.info();
+export async function setLicenseKey(key) { cloakLicence.set(key); if (engineId() === 'cloakbrowser') await closeBrowser(); }
+export async function removeLicenseKey() { cloakLicence.remove(); if (engineId() === 'cloakbrowser') await closeBrowser(); }
 
 // ---- Install / update ------------------------------------------------------------------------------------
 let install = { state: 'idle' };
 let installing = null;
 
-export function installBrowser() {
+/** Download the engine's browser (the current engine, or the one named). Runs in the background; status shows progress. */
+export function installBrowser(id = engineId()) {
   if (installing) return installing;
-  install = { state: 'installing', startedAt: Date.now(), total: null };
-  expectedSize().then(total => { if (install.state === 'installing') install.total = total; });
+  const engine = ENGINES[id] || browserEngine();
+  install = { state: 'installing', engine: engine.id, startedAt: Date.now() };
   installing = (async () => {
     try {
-      await closeBrowser();
-      const binary = await cb.ensureBinary();
-      install = { state: 'done', finishedAt: Date.now(), binary };
-      console.log(`[browser] ready: ${binary}`);
+      if (engine.id === engineId()) await closeBrowser();
+      const binary = await engine.install();
+      install = { state: 'done', engine: engine.id, finishedAt: Date.now(), binary };
+      console.log(`[browser] ${engine.label} ready: ${binary}`);
       return binary;
     } catch (err) {
-      install = { state: 'error', error: err.message.split('\n')[0] };
-      console.error('[browser] install failed:', err.message);
+      install = { state: 'error', engine: engine.id, error: String(err.message).split('\n')[0] };
+      console.error(`[browser] ${engine.label} install failed:`, err.message);
       throw err;
     } finally { installing = null; }
   })();
@@ -105,42 +91,28 @@ export function installBrowser() {
   return installing;
 }
 
-async function expectedSize() {
-  try {
-    const res = await fetch(cb.binaryInfo().downloadUrl, { method: 'HEAD', redirect: 'follow' });
-    return Number(res.headers.get('content-length')) || null;
-  } catch { return null; }
-}
-
-// The wrapper downloads to "_download_<ts>.zip|tar.gz" next to the binary folders; its size is our progress.
-function installProgress() {
-  if (install.state !== 'installing') return null;
-  let downloaded = 0, unpacking = false;
-  try {
-    const dir = process.env.CLOAKBROWSER_CACHE_DIR;
-    const f = fs.readdirSync(dir).find(n => n.startsWith('_download_'));
-    if (f) downloaded = fs.statSync(path.join(dir, f)).size;
-    unpacking = !!(f && install.total && downloaded >= install.total);
-  } catch { /* not created yet */ }
-  const pct = install.total ? Math.min(100, Math.floor((downloaded / install.total) * 100)) : null;
-  return { downloadedMB: Math.round(downloaded / 1048576), totalMB: install.total ? Math.round(install.total / 1048576) : null, pct, unpacking };
-}
+const installProgress = engine => (install.state === 'installing' && install.engine === engine.id ? engine.installProgress() : null);
 
 // ---- Status ------------------------------------------------------------------------------------------------
 let browser = null, launching = null, idleTimer = null, active = 0, lastUsedAt = null, blockedCount = 0;
+let runningVersion = null, userAgent; // the running browser's version; the user agent its engine wants contexts to use
+const launchedBy = new WeakMap(); // browser → the engine that launched it (an engine switch closes it with the right one)
 const waiters = [];
 const recent = [];
 
 export function browserStatus() {
+  const engine = browserEngine();
   let info;
-  try { info = cb.binaryInfo(); } catch (err) { info = { installed: false, error: err.message }; }
-  const override = process.env.CLOAKBROWSER_BINARY_PATH;
+  try { info = engine.info(); } catch (err) { info = { installed: false, unsupported: err.message }; }
+  const version = info.version || runningVersion || null;
   return {
-    installed: !!(info.installed || (override && fs.existsSync(override))),
-    version: info.version || null, major: info.version ? String(info.version).split('.')[0] : null, tier: info.tier || 'free', platform: info.platform || `${process.platform}-${process.arch}`,
-    binaryPath: override || info.binaryPath || null, cacheDir: process.env.CLOAKBROWSER_CACHE_DIR,
-    installing: install.state === 'installing', installError: install.state === 'error' ? install.error : null,
-    progress: installProgress(), unsupported: info.error || null,
+    engine: { id: engine.id, label: engine.label, summary: engine.summary }, engines: engineList(),
+    installed: !!info.installed, source: info.source || 'bundled',
+    version, major: version ? String(version).split('.')[0] : null, tier: info.tier || null, platform: info.platform || `${process.platform}-${process.arch}`,
+    binaryPath: info.binaryPath || null, cacheDir: info.cacheDir || null,
+    installing: install.state === 'installing' && install.engine === engine.id,
+    installError: install.state === 'error' && install.engine === engine.id ? install.error : null,
+    progress: installProgress(engine), unsupported: info.unsupported || null,
     running: !!browser, openPages: active, queued: waiters.length, lastUsedAt, blockedCount,
     license: licenseInfo(),
     searxng: browserSettings().searxngUrl ? { url: browserSettings().searxngUrl, ...searxngState() } : null, // Phase 25: Admin → Browser shows it
@@ -157,26 +129,39 @@ export function note(entry) {
 // ---- Browser lifecycle -----------------------------------------------------------------------------------
 async function getBrowser() {
   if (browser?.isConnected()) return browser;
-  if (install.state === 'installing') {
-    const p = installProgress();
+  const engine = browserEngine();
+  if (install.state === 'installing' && install.engine === engine.id) {
+    const p = installProgress(engine);
     throw new BrowserUnavailable(`The browser is still being installed${p?.pct != null ? ` (${p.pct}%)` : ''} — try again in a minute.`);
   }
-  if (!browserStatus().installed) throw new BrowserUnavailable('The browser isn’t installed yet. The admin can install it in Admin → Browser.');
+  if (!browserStatus().installed) throw new BrowserUnavailable('The browser isn’t installed yet. The admin can install it in Admin → Browser (or run npm run browser:install).');
   launching ||= (async () => {
-    const b = await cb.launch({ headless: true, locale: 'en-US' });
+    const b = await engine.launch();
+    launchedBy.set(b, engine);
     b.on('disconnected', () => { if (browser === b) browser = null; });
     browser = b;
-    console.log(`[browser] launched Chromium ${b.version()}`);
+    runningVersion = b.version();
+    userAgent = engine.userAgent(runningVersion);
+    console.log(`[browser] launched ${engine.label} ${runningVersion}`);
     return b;
   })().finally(() => { launching = null; });
   return launching;
 }
 
+// Never wait long on the old browser: a Chromium that hangs while shutting down must not hold up the request that
+// asked for it (an engine switch, a restart). Engines that can stop their process for good (stop) do; the rest get a
+// close() with a time limit, finishing in the background.
+const CLOSE_WAIT_MS = 3000;
 export async function closeBrowser() {
   clearTimeout(idleTimer);
   const b = browser;
   browser = null;
-  if (b) await b.close().catch(() => {});
+  if (!b) return;
+  const engine = launchedBy.get(b) || browserEngine();
+  launchedBy.delete(b);
+  const done = (engine.stop ? engine.stop(b) : b.close()).catch(() => {});
+  const finished = await Promise.race([done.then(() => true), new Promise(r => setTimeout(r, CLOSE_WAIT_MS, false))]);
+  if (!finished) console.warn(`[browser] ${engine.label} is still shutting down; carrying on without waiting for it`);
 }
 
 function scheduleIdle() {
@@ -210,7 +195,7 @@ export async function withPage(fn, { signal, media = false, viewport = { width: 
   try {
     if (signal?.aborted) throw abortError();
     const b = await getBrowser();
-    ctx = await b.newContext({ viewport, locale: 'en-US', serviceWorkers: 'block', acceptDownloads: false,
+    ctx = await b.newContext({ viewport, locale: 'en-US', serviceWorkers: 'block', acceptDownloads: false, ...(userAgent && !mobile ? { userAgent } : {}),
       storageState: profile ? loadProfile(profile) : storageState, ...(deviceScaleFactor ? { deviceScaleFactor } : {}),
       ...(mobile ? { isMobile: true, hasTouch: true, userAgent: mobileUserAgent(b.version()) } : {}), ...(media ? {} : { reducedMotion: 'reduce' }) });
     await guard(ctx, { blockMedia: !media && browserSettings().blockMedia });
@@ -244,7 +229,8 @@ export const mobileUserAgent = version => `Mozilla/5.0 (Linux; Android 14; Pixel
 let sessionCount = 0;
 export async function openSessionContext({ viewport = { width: 1280, height: 900 }, storageState } = {}) {
   const b = await getBrowser();
-  const ctx = await b.newContext({ viewport, locale: 'en-US', serviceWorkers: 'block', acceptDownloads: true, storageState, reducedMotion: 'reduce' });
+  const ctx = await b.newContext({ viewport, locale: 'en-US', serviceWorkers: 'block', acceptDownloads: true, storageState, reducedMotion: 'reduce',
+    ...(userAgent ? { userAgent } : {}) });
   await guard(ctx, { blockMedia: false });
   ctx.setDefaultTimeout(15000);
   sessionCount++;

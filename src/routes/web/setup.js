@@ -90,8 +90,8 @@ router.post('/model', (req, res) => {
   res.redirect(settings.get('setup', { done: [] }).done.includes('model') ? '/setup/browser' : '/setup/model');
 });
 
-// ---- 2b. Internet (CloakBrowser, decision #15) ------------------------------------------
-// The ~500 MB download runs in the background: the owner can continue while it finishes.
+// ---- 2b. Internet (the browser engine, decisions #15, #218) ------------------------------------
+// The download (about 200 MB for Chromium) runs in the background: the owner can continue while it finishes.
 const browserData = () => stepData('browser', { status: browserStatus(), settings: browserSettings(), installAction: '/setup/browser/install' });
 
 router.get('/browser', (req, res) => res.render('setup-browser', browserData()));

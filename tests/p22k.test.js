@@ -617,7 +617,7 @@ test('OPML, mutes, diet and stories over the API (additive routes; each person o
   assert.match(imp.json.message, /^Added 6 feeds, skipped 3\. New stories arrive with the next check\.$/);
   const res = await fetch(`${base}/api/v1/feed/opml`, { headers: { Authorization: `Bearer ${tokens.feedUser}` } });
   assert.match(res.headers.get('content-type'), /text\/x-opml/);
-  assert.match(res.headers.get('content-disposition'), /attachment; filename="jessbot-feeds\.opml"/);
+  assert.match(res.headers.get('content-disposition'), /^attachment; filename="?jessbot-feeds\.opml"?$/); // quoted or not: both are valid (RFC 6266)
   assert.match(await res.text(), /<outline text="Imported" title="Imported">/);
   const m = await api('feedUser', 'POST', '/feed/mutes', { kind: 'word', value: 'crypto' });
   assert.equal(m.status, 201);

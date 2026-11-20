@@ -3446,3 +3446,25 @@ Note: most of Phase 23 part A landed in commit aa56076, whose message reads "Pha
     Tested: unit (a hands-over tool finishes where the same verdict after a plain step pushes; learn_rule in a project chat →
     project soul, "in every chat" → lesson), npm test 534/0, test:chat projects 2/2 twice, lessons/memory/goals/approval/"see it
     through" 9/9, full test:chat before the fix 64/65.
+
+## 2026-11-20: Open-source browser by default
+
+218. **Open-source Chromium is the default browser engine; CloakBrowser is optional.** Every outbound path (search,
+    web_read, the agent's browsing sessions, feeds, weather, places, favicons, page checks, PDF/PNG export and print) goes
+    through one Playwright Browser, and that browser now comes from an **engine** (`src/browser/engines/`): `chromium`
+    (playwright-core's Chromium build, "Chrome for Testing", downloaded with the playwright-core CLI into
+    `tools/ms-playwright` — `PLAYWRIGHT_BROWSERS_PATH`, set in `src/config` so it moves with the folder — or a Chrome/
+    Chromium already on the machine via `JESSBOT_CHROMIUM_PATH`), and `cloakbrowser` (#15, unchanged, now an optional
+    dependency the admin picks and installs). An engine is a small module: `info()`, `install()`, `installProgress()`,
+    `launch()`, `userAgent(version)`, `licence`; another one (a different stealth build, a remote browser) plugs in by adding
+    a module. Chromium runs in new headless mode (the full browser, not the headless shell) and its contexts use a desktop
+    user agent without "HeadlessChrome", which many sites refuse outright; it has no other stealth, so sites with strong bot
+    walls may refuse it where CloakBrowser gets through (the agent reports a BLOCKED wall honestly, #56). Admin → Browser
+    shows the engine and switches it (the running browser closes; other browser settings stay); the CloakBrowser licence
+    section shows only with that engine. An install that already had CloakBrowser downloaded before engines existed keeps
+    it until the admin switches. `npm run browser:install [-- --engine cloakbrowser]` downloads from the command line. The
+    test scripts find their browser the same way (`scripts/lib/test-browser.js`: `CHROME_PATH`, else Jessbot's Chromium,
+    else a system Chrome/Edge/Chromium) instead of fixed Windows paths. Why: CloakBrowser's binary is proprietary and
+    licensed for internal use only, so a public project can't depend on it. Tested: `npm test` with Chromium installed runs
+    the four real-render tests CloakBrowser used to gate (page check, export to PDF/PNG, make_pdf); e2e switches the engine
+    both ways.
