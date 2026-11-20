@@ -4,14 +4,16 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { paths } from '../config/index.js';
+import { openRead } from '../lib/safe-path.js';
 
 const MANIFEST = path.join(paths.public, 'img', 'presence.json');
 let cache = null, cacheMtime = 0;
 
 export function presenceManifest() {
   try {
-    const m = fs.statSync(MANIFEST).mtimeMs;
-    if (!cache || m !== cacheMtime) { cache = JSON.parse(fs.readFileSync(MANIFEST, 'utf8')); cacheMtime = m; }
+    const f = openRead(MANIFEST);
+    const m = f.stat.mtimeMs;
+    if (!cache || m !== cacheMtime) { cache = JSON.parse(f.read('utf8')); cacheMtime = m; } else f.close();
   } catch { cache = { avatars: {}, scenes: [] }; }
   return cache;
 }

@@ -138,7 +138,8 @@ export async function storeFile(user, { buffer, name, title = null }, { threadId
   if (!kind) throw invalid({ file: unreadable ? unreadable(name) : `I can’t read “${name}” yet — send a PDF, an image, a Word / Excel / PowerPoint file or plain text.` });
   let text = '', pages = null, preview = null, described = null;
   try { ({ text, pages = null, preview = null, description: described = null } = await extract(kind, buffer)); } catch (err) {
-    console.warn('[upload] extract', name, err.message); // the file is still kept; it just has no text for Jess
+    // The file is still kept; it just has no text for Jess. The name is the uploader's: one line in the log.
+    console.warn('[upload] extract %s: %s', String(name).replace(/[\r\n]+/g, ' '), String(err.message).replace(/[\r\n]+/g, ' '));
   }
   const description = kind.type === 'pdf' ? `${pages ? `${pages} page${pages === 1 ? '' : 's'}` : 'PDF'}${hasReadableText(text) ? '' : NO_TEXT_MARK}` : described;
   const item = createFileItem({ user, title: title || titleFrom(name), type: kind.type, ext: kind.ext, mime: kind.mime, buffer, text, preview, description,

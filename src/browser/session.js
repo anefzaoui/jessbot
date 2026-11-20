@@ -26,6 +26,7 @@ import { saveDownload as saveDownloadedFile, UPLOAD_MAX_BYTES, DOWNLOAD_SESSION_
 import { renderFragment } from '../views/render.js';
 import { badRequest } from '../lib/errors.js';
 import { decide, choice, noul, picked, yes, note as noteDecision, threshold } from '../services/decide.js';
+import { openRead } from '../lib/safe-path.js';
 
 const IDLE_MS = 10 * 60000;
 const MAX_SESSIONS = 4;
@@ -110,13 +111,15 @@ export async function keepDownload(s, d) {
     dir = fs.mkdtempSync(path.join(os.tmpdir(), 'jessbot-dl-'));
     const file = path.join(dir, 'download');
     await d.saveAs(file);
-    const size = fs.statSync(file).size;
-    if (size > UPLOAD_MAX_BYTES) { s.events.push(`A download (“${name}”, ${sizeLabel(size)}) was not kept: files over ${sizeLabel(UPLOAD_MAX_BYTES)} aren’t saved to the Library.`); return null; }
-    if (s.saved.bytes + size > DOWNLOAD_SESSION_BYTES) { s.events.push(capped()); return null; }
+    const saved = openRead(file);
+    const size = saved.stat.size;
+    if (size > UPLOAD_MAX_BYTES) { saved.close(); s.events.push(`A download (“${name}”, ${sizeLabel(size)}) was not kept: files over ${sizeLabel(UPLOAD_MAX_BYTES)} aren’t saved to the Library.`); return null; }
+    if (s.saved.bytes + size > DOWNLOAD_SESSION_BYTES) { saved.close(); s.events.push(capped()); return null; }
+    const buffer = saved.read();
     const user = getUser(s.meta.userId);
     if (!user) throw new Error('the person this browser belongs to no longer exists');
     const url = /^https?:/.test(d.url?.() || '') ? d.url() : d.page?.()?.url?.() || '';
-    const view = await saveDownloadedFile(user, { buffer: fs.readFileSync(file), filename: name, url }, { threadId: s.meta.threadId || null, runId: s.meta.runId || null });
+    const view = await saveDownloadedFile(user, { buffer, filename: name, url }, { threadId: s.meta.threadId || null, runId: s.meta.runId || null });
     s.saved.files++;
     s.saved.bytes += size;
     s.imported.push({ id: view.id, title: view.title });

@@ -4,9 +4,10 @@
 // re-exports it), so both read a feed the same way. Pure: no browser, no database.
 import crypto from 'node:crypto';
 import { parseFeed, parseOpml } from 'feedsmith';
+import { decodeEntities, escapeMarkdown } from '../../lib/text-safe.js';
 
-const strip = html => String(html || '').replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&quot;/g, '"')
-  .replace(/&#39;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/\s+/g, ' ').trim();
+// HTML → plain text (entities decoded once: "&amp;lt;" reads "&lt;", never "<").
+const strip = html => decodeEntities(String(html || '').replace(/<[^>]+>/g, ' ')).replace(/\s+/g, ' ').trim();
 const hostOf = u => { try { return new URL(u).hostname.replace(/^www\./, ''); } catch { return null; } };
 const isoDate = v => { const d = v ? new Date(v) : null; return d && !Number.isNaN(d.getTime()) ? d.toISOString() : null; };
 
@@ -39,12 +40,27 @@ export function normalizeFeed(text) {
 
 // ---- Is this a feed? ----------------------------------------------------------------------------------------------------
 // The document element, after a byte-order mark (\s covers it), an XML prolog, comments, doctype or processing instructions (an XSL stylesheet line).
-const FEED_ROOT = /^\s*(?:<\?xml[^>]*\?>\s*)?(?:(?:<!--[\s\S]*?-->|<\?[^>]*\?>|<!DOCTYPE[^>]*>)\s*)*<(rss|feed|rdf:RDF|opml)\b/i;
+// Skipped by scanning, not by one nested pattern (that backtracked exponentially on a page of unclosed "<!--": #224).
+function rootElement(head) {
+  let i = 0;
+  for (;;) {
+    while (i < head.length && /\s/.test(head[i])) i++;
+    const rest = head.slice(i, i + 9);
+    let end = -1;
+    if (rest.startsWith('<!--')) end = head.indexOf('-->', i + 4) + 3;
+    else if (rest.startsWith('<?')) end = head.indexOf('?>', i + 2) + 2;
+    else if (rest.toUpperCase() === '<!DOCTYPE') end = head.indexOf('>', i) + 1;
+    else break;
+    if (end <= i) return null; // never closed
+    i = end;
+  }
+  return /^<(rss|feed|rdf:RDF|opml)\b/i.exec(head.slice(i))?.[1] ?? null;
+}
 
 /** 'feed' | 'opml' | null for a response body (text) and its Content-Type. */
 export function feedKind(contentType = '', text = '') {
   const head = String(text || '').slice(0, 4000);
-  const root = FEED_ROOT.exec(head)?.[1]?.toLowerCase();
+  const root = rootElement(head)?.toLowerCase();
   if (root === 'opml') return 'opml';
   if (root) return 'feed';
   if (/json/i.test(contentType) || /^\s*\{/.test(head)) {
@@ -58,7 +74,7 @@ export function feedKind(contentType = '', text = '') {
 const FORMAT_NAMES = { rss: 'RSS', atom: 'Atom', rdf: 'RDF', json: 'JSON Feed' };
 const dayOf = iso => (iso ? iso.slice(0, 10) : 'undated');
 const oneLine = (s, max) => { const t = String(s || '').replace(/\s+/g, ' ').trim(); return t.length > max ? `${t.slice(0, max - 1).trimEnd()}…` : t; };
-const mdText = s => String(s || '').replace(/([[\]])/g, '\\$1');
+const mdText = s => escapeMarkdown(s || '');
 
 export const FEED_SHOW = 50;
 

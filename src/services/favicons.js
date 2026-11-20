@@ -59,6 +59,6 @@ export async function iconFor(host) {
   if (file && !file.endsWith('.miss')) return { file: path.join(DIR, file) };
   let hue = 0;
   for (const c of host) hue = (hue * 31 + c.charCodeAt(0)) % 360;
-  const letter = host.replace(/^www\./, '')[0].toUpperCase();
+  const letter = (/[a-z0-9]/i.exec(host.replace(/^www\./, ''))?.[0] || '?').toUpperCase();
   return { badge: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="7" fill="hsl(${hue} 55% 45%)"/><text x="16" y="22" font-family="Inter,Arial,sans-serif" font-size="17" font-weight="700" fill="#fff" text-anchor="middle">${letter}</text></svg>` };
 }

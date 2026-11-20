@@ -2,6 +2,7 @@
 // so a crash can never leave a half-written .env. Values are single-line; newlines are rejected.
 import fs from 'node:fs';
 import { ENV_FILE } from '../config/index.js';
+import { trimEndChars } from './text-safe.js';
 
 // The same file config reads (JESSBOT_ENV_FILE when it is set).
 const ENV = ENV_FILE;
@@ -15,7 +16,7 @@ export function setEnvVar(key, value) {
   const i = lines.findIndex(l => l.startsWith(`${key}=`));
   if (i >= 0) lines[i] = line; else lines.splice(lines.at(-1) === '' ? lines.length - 1 : lines.length, 0, line);
   const tmp = `${ENV}.tmp-${process.pid}`;
-  fs.writeFileSync(tmp, lines.join('\n').replace(/\n*$/, '\n'), { mode: 0o600 });
+  fs.writeFileSync(tmp, `${trimEndChars(lines.join('\n'), '\n')}\n`, { mode: 0o600 });
   fs.renameSync(tmp, ENV);
   process.env[key] = v;
 }
