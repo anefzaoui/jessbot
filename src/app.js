@@ -12,6 +12,7 @@ import { isAjax } from './lib/respond.js';
 import { HttpError } from './lib/errors.js';
 import { configureRenderer } from './views/render.js';
 import { staticCacheHeaders } from './lib/assets.js';
+import { limiter } from './lib/ratelimit.js';
 import { checkHost } from './lib/origin.js';
 import './agent/tools/index.js'; // register the built-in tools
 
@@ -37,6 +38,9 @@ export function createApp() {
   app.use(express.json({ limit: '1mb' }));
   app.use(express.urlencoded({ extended: false, limit: '1mb' }));
   app.use(loadUser);
+  // Every page and API call counts against the person (or, signed out, the address): far above what a household's
+  // browsers and apps send, low enough that a script hammering one route is stopped (decision #223).
+  app.use(limiter({ name: 'requests', limit: 1200, windowMs: 60e3, message: m => `Too many requests. Wait ${m} min and try again.` }));
   app.use(locals);
   app.use(sameOrigin);
 

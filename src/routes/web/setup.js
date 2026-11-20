@@ -14,7 +14,7 @@ import { setEnvVar } from '../../lib/envfile.js';
 import { setSessionCookie } from '../../middleware/auth.js';
 import { formPost, isAjax } from '../../lib/respond.js';
 import { invalid, forbidden } from '../../lib/errors.js';
-import { hit } from '../../lib/ratelimit.js';
+import { hit, signInLimit } from '../../lib/ratelimit.js';
 import { config } from '../../config/index.js';
 import { browserStatus, browserSettings, installBrowser } from '../../browser/index.js';
 import { renderFragment } from '../../views/render.js';
@@ -53,7 +53,7 @@ router.get('/account', (req, res) => {
   res.render('setup-account', accountData(req));
 });
 
-router.post('/account', formPost('setup-account', accountData, async (req, res) => {
+router.post('/account', signInLimit, formPost('setup-account', accountData, async (req, res) => {
   if (countUsers()) return { redirect: '/setup/model' };
   if (!hit(`setup:${req.ip}`, { limit: 10, windowMs: 15 * 60e3 }).allowed) throw forbidden('Too many attempts. Wait a few minutes.');
   if (!checkClaimCode(req.body.claim)) throw invalid({ claim: 'That code doesn’t match the one printed in the server console.' });

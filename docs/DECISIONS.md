@@ -3527,3 +3527,19 @@ Note: most of Phase 23 part A landed in commit aa56076, whose message reads "Pha
     browser asked our lookup; a name that answers public to the guard and 127.0.0.1 next is refused and the local server
     never sees a request; a bare context without the request guard still can't reach 127.0.0.1 or localhost), and real
     sites over HTTPS and plain HTTP load through it.
+
+## 2026-11-20: Rate limits that survive a restart (issues #6, #22)
+
+223. **Rate limits are stored in SQLite, and one middleware limits routes.** The sign-in, setup and invite limits lived in a
+    `Map` in the process, so every restart (or a crash someone could provoke) started them over, and most routes had no
+    limit at all. Now `src/lib/ratelimit.js` keeps fixed-window counters in `rate_limits` (migration 054; one UPSERT per
+    hit, expired rows swept every 500 hits): `hit()` keeps its signature for the per-account checks inside handlers, and
+    `limiter()` is the one route middleware: express-rate-limit (maintained, the standard `RateLimit` headers) with a store
+    on the same table, answering a 429 through the normal error handler with `Retry-After`. Applied: a general limit of
+    1,200 requests a minute per person (signed out: per address, IPv6 by its /56) on every page and API call, and
+    `signInLimit`, 30 per 15 minutes per address across `POST /login`, `/api/v1/auth/login`, `/setup/account` and
+    `/invite/:token`, on top of the existing 8 per 15 minutes per address and email. Why fixed windows: one row per key and
+    one write per hit, and the limits are generous enough that the edge of a window doesn't matter. Tested:
+    `tests/ratelimit.test.js` (a count survives closing and reopening the database; eight wrong passwords against the real
+    server, the ninth refused, and still refused after the server process is restarted; the middleware's 429, headers and
+    message).
