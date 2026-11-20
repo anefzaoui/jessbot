@@ -3892,3 +3892,21 @@ Note: most of Phase 23 part A landed in commit aa56076, whose message reads "Pha
     in French, Arabic and the pseudo-locale, the cookie, the extractor and its checks, the list current), and in
     Chromium with a temporary Arabic catalog: the sign-in page right-to-left, its arrow turned, the English line still
     reading left to right; the browser's `t()` per language.
+
+## 2026-11-20: Code scanning, last pass (issue #22)
+
+248. **The last six CodeQL alerts: three changes in the code, one dismissed with a test behind it, two dismissed as test
+    code.** Each was checked against the code. (107) A trailing-slash trim, `/\/+$/`, retried from every slash of a
+    run that didn't end the string, so an address with many slashes took seconds; it is `trimEndChars(s, '/')` from
+    `lib/text-safe.js` now, in all six places that cleaned an address (the provider's address, page addresses read from
+    the web, the SearXNG address, reset links, the balance check), not only the one flagged. (40) The skill linter's line
+    index walked every character of a string; it steps from one newline to the next now (the input was already coerced
+    to a string, so a forged `length` never drove it; the rewrite is shorter and leaves nothing to flag). (34) The
+    lettered favicon badge is SVG served from Jessbot's own origin: its letter now comes from a fixed alphabet rather
+    than from the host name (which `validHost` already limited), and the response carries `Content-Security-Policy:
+    default-src 'none'` and `nosniff`, like the assistant's pictures. (42) The sign-in page's redirect goes through
+    `safeNext` → `localPath`, which only lets a path on this site through; CodeQL doesn't recognise that check, so the
+    alert is dismissed as a false positive, and a test sends the real route every open-redirect form (`//`, `/\`, a tab,
+    a scheme, a repeated parameter). (104, 105) A test that strips `<script>` blocks from Jessbot's own page before
+    reading its words: used in tests. Tested: `tests/code-scanning.test.js` (the first and third fail on the old code:
+    13 s for a 200,000-slash address, and no fixed-alphabet badge).

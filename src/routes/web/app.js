@@ -100,6 +100,8 @@ router.get('/favicons/:host', async (req, res) => {
   // A real icon keeps for a week; a badge only for an hour (the icon may turn up later, e.g. from a page's <link rel=icon>).
   res.set('Cache-Control', `private, max-age=${icon.file ? 604800 : 3600}`);
   if (icon.file) return res.sendFile(icon.file);
+  // An SVG on this origin: no scripts, styles or fetches even if one ever got in (the pictures above get the same).
+  res.set({ 'Content-Security-Policy': "default-src 'none'", 'X-Content-Type-Options': 'nosniff' });
   res.type('image/svg+xml').send(icon.badge);
 });
 

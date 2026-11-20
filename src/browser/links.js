@@ -10,6 +10,7 @@ import { withPage } from './index.js';
 import { probeWall, dismissConsent, trackDocument } from './walls.js';
 import { siteOf } from './profiles.js';
 import { SITES, SITE_KEYS, buildLink, sampleOf, todayIn } from '../lib/deeplinks.js';
+import { trimEndChars } from '../lib/text-safe.js';
 
 export const linkStateFile = () => path.join(paths.data, 'deeplinks-state.json');
 
@@ -35,7 +36,7 @@ export function recipeOff(site, state = loadLinkState()) {
   return s?.status === 'broken' ? { at: s.at, detail: s.detail } : null;
 }
 
-const pathAndQuery = u => { try { const x = new URL(u); return `${x.pathname.replace(/\/+$/, '')}${x.search}`; } catch { return ''; } };
+const pathAndQuery = u => { try { const x = new URL(u); return `${trimEndChars(x.pathname, '/')}${x.search}`; } catch { return ''; } };
 
 /**
  * Did a sample link land on results? Pure. → { status: ok|broken|blocked, detail }.

@@ -37,3 +37,5 @@ in their chat.
   rotated (`npm run secrets:rotate`).
 - Outside content (pages, mail, files) is fenced and screened for instructions aimed at the assistant; see
   [docs/SECURITY-MODEL.md](docs/SECURITY-MODEL.md).
+- The last code-scanning findings are fixed or explained: addresses are cleaned in linear time, and site-icon badges
+  are served with a strict content policy.
