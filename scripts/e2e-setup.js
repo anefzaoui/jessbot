@@ -290,7 +290,9 @@ try {
   });
 
   await test('admin skills: built-ins wait for review; Approve turns one on; members can’t reach the page', async () => {
-    await owner.goto(`${BASE}/admin/skills`, { waitUntil: 'networkidle' });
+    // Background requests don't indicate whether the skills are ready to review.
+    await owner.goto(`${BASE}/admin/skills`, { waitUntil: 'domcontentloaded' });
+    await owner.locator('[data-skill][data-status="review"]').first().waitFor();
     expect(await owner.locator('[data-skill][data-status="review"]').count() >= 4, 'built-in skills not listed for review');
     await owner.locator('[data-skill="research-report"] [data-skill-action="approve"]').click();
     await owner.waitForSelector('[data-skill="research-report"][data-status="active"]', { timeout: 15000 });
