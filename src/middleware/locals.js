@@ -2,6 +2,8 @@ import { settings } from '../db/index.js';
 import { presenceFor } from '../services/presence.js';
 import { skyOf } from '../services/weather.js';
 import { assetVersion } from '../lib/assets.js';
+import { availableLocales, pickLocale, directionOf, clientCatalog } from '../lib/i18n.js';
+import { readCookie } from './auth.js';
 import { voiceOn } from '../services/voice.js';
 import { shellFor } from '../services/shell.js';
 import { latestSeq } from '../lib/bus.js';
@@ -31,8 +33,25 @@ export function emptyShell() {
   };
 }
 
+// The language (#14, lib/i18n.js): ?lang=xx (remembered in a cookie), else the cookie, else the browser's
+// Accept-Language; only languages that have a catalog are picked, else English.
+const LANG_COOKIE = 'jb_lang';
+function localeOf(req, res) {
+  const asked = typeof req.query?.lang === 'string' ? req.query.lang : null;
+  if (asked && availableLocales().includes(asked)) {
+    res.cookie(LANG_COOKIE, asked, { httpOnly: true, sameSite: 'lax', secure: req.secure, maxAge: 365 * 864e5 });
+    return asked;
+  }
+  const saved = readCookie(req, LANG_COOKIE);
+  if (saved && availableLocales().includes(saved)) return saved;
+  return pickLocale(req.get('accept-language'));
+}
+
 // Values every template can rely on.
 export function locals(req, res, next) {
+  res.locals.locale = localeOf(req, res);
+  res.locals.dir = directionOf(res.locals.locale);
+  res.locals.i18nCatalog = JSON.stringify(clientCatalog(res.locals.locale)).replace(/</g, '\\u003c');
   const bot = settings.get('bot', null);
   res.locals.bot = { name: 'Jessbot', ...bot };
   res.locals.path = req.path;

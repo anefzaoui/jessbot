@@ -1,6 +1,6 @@
 {{!-- Bare document: setup, login, error pages. --}}
 <!doctype html>
-<html lang="en" class="h-full" data-asset-v="{{assetV}}"{{#if apiBase}} data-api-base="{{apiBase}}"{{/if}}>
+<html lang="{{default locale 'en'}}" dir="{{default dir 'ltr'}}" class="h-full" data-asset-v="{{assetV}}"{{#if apiBase}} data-api-base="{{apiBase}}"{{/if}}>
 <head>
   {{> shell/head}}
 </head>
@@ -8,6 +8,7 @@
   <a href="#main" class="skip-link">Skip to content</a>
   {{{body}}}
   <div id="toasts" class="toast-region" aria-live="polite" aria-atomic="false"></div>
+  <script type="application/json" id="jb-i18n">{{{default i18nCatalog '{}'}}}</script>
   <script type="module" src="/js/main.js?v={{assetV}}"></script>
 </body>
 </html>
