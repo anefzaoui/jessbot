@@ -1,0 +1,13 @@
+# Every issue starts from a form (bug.yml, feature.yml), so reports carry the system, the install and the version they
+# happened with. Discussions are off for this repository, so questions go to the user guide and its FAQ.
+blank_issues_enabled: false
+contact_links:
+  - name: Security problem
+    url: https://github.com/anefzaoui/jessbot/blob/main/SECURITY.md
+    about: Report it privately, not as an issue. SECURITY.md says how.
+  - name: Help and questions
+    url: https://anefzaoui.github.io/jessbot/docs/
+    about: The user guide covers setup, models, approvals, mail, backups and troubleshooting.
+  - name: Frequently asked questions
+    url: https://anefzaoui.github.io/jessbot/docs/faq.html
+    about: Costs, privacy, and what the assistant can and can't do.

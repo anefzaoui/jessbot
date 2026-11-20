@@ -12,6 +12,8 @@ Thanks for wanting to help. Jessbot is an early preview, so bug reports with cle
 - For anything bigger than a bug fix, open an issue first and describe what you want to change. It saves you from
   building something that doesn't fit.
 - Security problems: don't open a public issue. See [SECURITY.md](SECURITY.md).
+- Questions and where to ask them: [SUPPORT.md](SUPPORT.md). Everyone taking part follows the
+  [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ## Set up a development copy
 

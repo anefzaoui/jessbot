@@ -1,0 +1,36 @@
+# The feature request form. Ideas are weighed against the roadmap (ROADMAP.md) and what Jessbot is for: a self-hosted
+# assistant for a household that asks before it acts.
+name: Feature request
+description: Something Jessbot should do, or do differently.
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the idea. [ROADMAP.md](https://github.com/anefzaoui/jessbot/blob/main/ROADMAP.md) lists what's planned already; if yours is there, add to its issue instead.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What you're trying to do
+      description: The situation in your own words, who in the household needs it, and what gets in the way today.
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would help
+      description: How you'd like it to work, and what Jessbot should ask before doing it.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Other ways you've tried
+      description: Workarounds, or other tools that do it.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before you send it
+      options:
+        - label: I looked through the [open issues](https://github.com/anefzaoui/jessbot/issues) and the roadmap, and this one isn't there yet.
+          required: true
