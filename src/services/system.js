@@ -208,12 +208,22 @@ export function doctor({ cli = false } = {}) {
 const safely = (id, label, fn) => { try { return fn(); } catch (err) { return check(id, label, 'warn', `Couldn’t check: ${err.message}`); } };
 const money = n => `$${n.toFixed(2)}`;
 
+// Chromium's sandbox (#37): known only once the browser has started on this system.
+function browserSandboxCheck() {
+  const s = browserStatus().sandbox;
+  if (s.on === true) return check('browser-sandbox', 'Browser sandbox', 'ok', 'On: pages run in Chromium’s sandbox', null, '/admin/browser');
+  if (s.on === null) return check('browser-sandbox', 'Browser sandbox', 'ok', s.mode === 'off' ? 'Off (JESSBOT_BROWSER_SANDBOX=off); the browser hasn’t started yet' : 'Checked when the browser first starts', null, '/admin/browser');
+  return check('browser-sandbox', 'Browser sandbox', 'warn', `Off: ${s.reason}`,
+    s.mode === 'off' ? 'Remove JESSBOT_BROWSER_SANDBOX=off unless this system can’t run it.' : 'See docs/SECURITY-MODEL.md → Browser sandbox for what this system needs.', '/admin/browser');
+}
+
 export function securityChecks() {
   return [
     safely('local-network', 'Local network', () => (browserSettings().allowPrivate
       ? check('local-network', 'Local network', 'warn', 'Allowed: web pages, the browser, mail, calendar and push can reach devices on this network (Admin → Browser → Local network is on)',
         'Turn it off unless a service you use lives on your own network.', '/admin/browser')
       : check('local-network', 'Local network', 'ok', `Blocked: nothing ${botName()} opens can reach devices on this network`, null, '/admin/browser'))),
+    safely('browser-sandbox', 'Browser sandbox', browserSandboxCheck),
     safely('grants', 'Always-allowed actions', alwaysAllowCheck),
     safely('secret-key', 'Password key', secretKeyCheck),
     safely('skill-lint', 'Skill warnings', () => {

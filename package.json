@@ -35,6 +35,7 @@
     "restore": "node scripts/restore.js",
     "reset-link": "node scripts/reset-link.js",
     "doctor": "node scripts/doctor.js",
+    "browser:sandbox": "node scripts/sandbox-probe.mjs",
     "secrets:rotate": "node scripts/rotate-secret.js"
   },
   "dependencies": {

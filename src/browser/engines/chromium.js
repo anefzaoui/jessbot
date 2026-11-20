@@ -91,7 +91,7 @@ export async function launch() {
     ...(sys ? { executablePath: sys } : { channel: 'chromium' }),
     // The user agent for the whole browser, workers included (a per-context override leaves "HeadlessChrome" in them).
     args: version ? [`--user-agent=${userAgent(version)}`] : [],
-  });
+  }, label);
 }
 
 export const stop = stopServer;
