@@ -1,0 +1,129 @@
+# The bug report form. Every report carries the system, the install method, the version and the log it happened with,
+# because most problems with a self-hosted install depend on them (docs/guide/troubleshooting.md).
+name: Bug report
+description: Something in Jessbot doesn't work as it should.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time. The [troubleshooting page](https://anefzaoui.github.io/jessbot/docs/troubleshooting.html) covers the common setup problems, and `npm run doctor` (or the health check in Admin → System) often names the cause.
+        A security problem? Please don't report it here: see [SECURITY.md](https://github.com/anefzaoui/jessbot/blob/main/SECURITY.md).
+  - type: dropdown
+    id: system
+    attributes:
+      label: System
+      description: Where the Jessbot server runs.
+      options:
+        - Linux
+        - Windows
+        - macOS
+        - Something else (say which below)
+    validations:
+      required: true
+  - type: input
+    id: system-version
+    attributes:
+      label: System version
+      description: The distribution and its version, or Windows' or macOS' version.
+      placeholder: Ubuntu 24.04, Windows 11 24H2, macOS 15.1
+    validations:
+      required: true
+  - type: dropdown
+    id: install
+    attributes:
+      label: Installed with
+      options:
+        - Docker (compose or the image)
+        - Node.js (npm start)
+        - Node.js as a systemd service
+        - Something else (say which below)
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Jessbot version or commit
+      description: Admin → System → About this Jessbot shows the version; in a clone, `git rev-parse --short HEAD` gives the commit.
+      placeholder: 0.1.0, or a commit like c17f254
+    validations:
+      required: true
+  - type: input
+    id: node
+    attributes:
+      label: Node.js version
+      description: "`node --version` (not needed with Docker)."
+      placeholder: v24.19.0
+  - type: dropdown
+    id: provider
+    attributes:
+      label: Model provider
+      options:
+        - OpenRouter
+        - Ollama
+        - Another OpenAI-compatible service
+        - Not set up yet
+  - type: dropdown
+    id: area
+    attributes:
+      label: Part of Jessbot
+      options:
+        - Setup and installing
+        - Chat and background tasks
+        - Approvals and safety
+        - The browser and the web
+        - Mail and calendar
+        - The Feed, goals, lists and reminders
+        - The Library and files
+        - People, sign-in and admin
+        - Updates and backups
+        - Something else
+  - type: input
+    id: browser
+    attributes:
+      label: Your browser
+      description: For a problem with a page or a screen.
+      placeholder: Firefox 133 on Android, Chrome 131 on Windows
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to make it happen
+      value: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+  - type: textarea
+    id: log
+    attributes:
+      label: Log
+      description: |
+        The lines around the problem from Admin → System → Server log, or from `data/logs/jessbot-<date>.log`, `docker compose logs jessbot` or `journalctl -u jessbot`. Jessbot removes keys, passwords and cookies from its log, but read it through before you post it.
+      render: text
+  - type: textarea
+    id: shots
+    attributes:
+      label: Screenshots
+      description: Drag them in here. Hide anything private (names, mail, chats).
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before you send it
+      options:
+        - label: I looked through the [open issues](https://github.com/anefzaoui/jessbot/issues) and this one isn't there yet.
+          required: true
+        - label: The log and the screenshots hold no passwords, keys or other people's private messages.
+          required: true

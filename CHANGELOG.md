@@ -20,6 +20,7 @@ in their chat.
 
 ### Added
 
+- A translation layer for the interface (English first; right-to-left ready): docs/TRANSLATING.md.
 - Chat with tools and background tasks that carry on when the page is closed; approvals with the full text of every
   outgoing action.
 - An agent browser (open-source Chromium, or the installed Google Chrome) behind a guard proxy, in Chromium's sandbox.

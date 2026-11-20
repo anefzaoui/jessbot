@@ -315,8 +315,9 @@ Honest list, roughly in order:
 - **Install options**: a published image per release (the Dockerfile and compose file are here), a Windows installer.
 - **Providers**: prices for services other than OpenRouter (so their budgets can count spending), and local voice and
   pictures.
-- **Interface languages**: the interface is English only for now (the agent itself reads and writes in many languages,
-  including right-to-left ones).
+- **Interface languages**: the translation layer is in (right-to-left included, [docs/TRANSLATING.md](docs/TRANSLATING.md)),
+  but only the sign-in pages are marked so far and no language ships yet (the agent itself reads and writes in many
+  languages, including right-to-left ones).
 - Later: messaging channels (Telegram first), MCP tools, a mobile app.
 
 ## Documentation
@@ -325,6 +326,7 @@ Honest list, roughly in order:
   approvals and safety, mail and calendar, the Feed, the Library, people and admin, backups, FAQ, troubleshooting
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md): how it's built, and the build history
 - [docs/FEATURES.md](docs/FEATURES.md): every feature and its status
+- [ROADMAP.md](ROADMAP.md): what's done, what's being worked on and what's planned
 - [CHANGELOG.md](CHANGELOG.md) and [docs/RELEASING.md](docs/RELEASING.md): what each release changed, and how releases are made
 - [docs/SECURITY-MODEL.md](docs/SECURITY-MODEL.md): the security model: who is trusted, every untrusted input, what isn't defended
 - [docs/SECURITY.md](docs/SECURITY.md): the safety controls in detail
