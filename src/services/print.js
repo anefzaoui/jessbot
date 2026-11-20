@@ -45,5 +45,5 @@ export async function printPdf(html, { page: paper = 'A4', footer, signal } = {}
     await page.goto(PRINT_URL, { waitUntil: 'load', timeout: 20000 });
     await fontsReady(page);
     return page.pdf(pdfOptions({ size: paper === 'Letter' ? 'Letter' : 'A4', footer, margin: { top: '18mm', bottom: '20mm', left: '16mm', right: '16mm' } }));
-  }, { signal, media: true });
+  }, { signal, media: true, render: true });
 }
