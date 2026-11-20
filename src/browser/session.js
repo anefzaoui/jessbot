@@ -160,7 +160,7 @@ export async function sessionFor(key, { userId, threadId = null, runId = null, c
     const profile = profileFile(userId);
     const ctx = await openSessionContext({ storageState: loadProfile(profile) });
     s = new Session(key, ctx, { userId, profile, threadId, runId });
-    // DuckDuckGo's autoconsent talks to us through a binding; engines without bindings (Patchright, #221) skip it, and
+    // DuckDuckGo's autoconsent talks to us through a binding; engines without bindings (Patchright, #227) skip it, and
     // consent pages are still handled by walls.js.
     if (engineCaps().bindings) await withConsent(s, ctx);
     ctx.on('page', p => { s.adopt(p); s.active = p; s.events.push('A new tab opened — it is now the active tab.'); });

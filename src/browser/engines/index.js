@@ -9,7 +9,7 @@
 //   licence: { info, set, remove } | null
 //   stop(browser)?                     optional: stop a browser it launched for good (its process); else close() is used
 //   caps?: { consoleEvents, bindings } what it supports beyond navigation (missing: assumed true)
-// Built in: "chrome" (Patchright + the installed Google Chrome, preferred where Chrome exists, #221), "chromium" (plain
+// Built in: "chrome" (Patchright + the installed Google Chrome, preferred where Chrome exists, #227), "chromium" (plain
 // Playwright + open-source Chromium, the default elsewhere and the renderer for Jessbot's own pages) and "cloakbrowser"
 // (optional, proprietary binary, user-installed).
 // Another engine (a different stealth build, a remote browser) plugs in by adding a module here.

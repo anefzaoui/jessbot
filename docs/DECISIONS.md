@@ -3479,7 +3479,56 @@ Note: most of Phase 23 part A landed in commit aa56076, whose message reads "Pha
     off is audited (`admin.oversight`). Migration 053 keeps it on for an install that already had accounts (their members
     were told under #36). The switch is the first card in Admin → People.
 
-221. **Where Google Chrome is installed, the browser is that Chrome driven by Patchright.** A comparison of open-source
+220. **The server checks which host it is asked for, and origins against PUBLIC_URL.** The same-origin check compared the
+    Origin's host with the request's Host header, both of which a DNS-rebinding page controls (its own name, rebound to
+    127.0.0.1), and invite links were built from that Host header. `src/lib/origin.js`: when Jessbot listens on loopback
+    (the default) or `PUBLIC_URL` is set, a request must name a loopback name, `PUBLIC_URL`'s host or an `ALLOWED_HOSTS`
+    entry, else 421 before any route runs (`checkHost`, first middleware; the WebSocket upgrade too). Listening on all
+    interfaces without `PUBLIC_URL` (a LAN install reached by IP) accepts any host, as before. Cookie-authenticated changes
+    and WebSocket upgrades accept `PUBLIC_URL`'s origin (scheme included), an `ALLOWED_ORIGINS` entry, or the request's own
+    host once it passed. Links handed out (invites, setup) use `PUBLIC_URL` when set. Tests: `tests/origin.test.js` (forged
+    Host refused, PUBLIC_URL behind a proxy that rewrites Host, scheme counts, allow-lists, the LAN case).
+
+## 2026-11-20: Security hardening (issues #9, #22, #6)
+
+221. **Every server-side request goes through one outbound module that connects to the address it checked.** Push
+    delivery, mail (imapflow, nodemailer), calendars (tsdav), the model provider (the OpenAI client's `fetch`), Jev,
+    SearXNG and the price and balance lookups each had their own `fetch` or socket, and the private-address check ran beside
+    the connection: the host was resolved for the check, then resolved again by the connection, so a name whose DNS answer
+    changes in between (rebinding) could reach this machine or the local network. `src/lib/outbound.js` now owns the rule:
+    `outboundFetch` uses undici with a connector whose `lookup` resolves once, checks every answer (a mixed public/private
+    answer is refused whole) and hands the socket only checked addresses; the connected peer is checked again; IPv4 carried
+    in IPv6 (mapped, compatible, NAT64, 6to4) is checked as the IPv4 it reaches. Redirects are followed by hand, each hop
+    under the rule, with `Authorization`/`Cookie` dropped across origins. Libraries that open their own sockets get
+    `resolveTarget()`: the checked address as `host` and the name as `servername` (SNI and certificate checks stay on the
+    name). The admin's switch (Admin → Browser, "allow the local network") is read live. Endpoints the admin typed (the model
+    provider's base URL, SearXNG) are trusted for that exact origin only (`trustedOrigin`): a local Ollama works, a redirect
+    from it to another local address doesn't. Why one module: the same rule written in five places drifts, and the check has
+    to be where the connection is made to mean anything. `undici` is a dependency so `fetch` and its `Agent` come from one
+    version (Node's bundled copy isn't importable). Not covered yet: the browser (Chromium resolves names itself after the
+    request guard), see SECURITY.md → Known limits. Tested: `tests/outbound.test.js` (a name resolving to 127.0.0.1 is
+    refused and the local server never sees a request; a rebinding resolver is asked once and its second answer never used;
+    redirects from a trusted origin to a local one are refused; credentials don't cross origins; mail targets carry the
+    checked address and the name; push to a name resolving to this machine is skipped).
+
+222. **The browser's traffic goes through a guard proxy, so the browser never resolves a host name itself.** The request
+    guard (`routeGuard`) checks a request's host before the browser sends it, but Chromium then resolved the name again on
+    its own, so a name whose answer changed in between could still reach this machine or the local network (the known limit
+    #221 left for the browser). Every context now gets `proxy` = `src/browser/guard-proxy.js`: an HTTP proxy on
+    127.0.0.1 (port picked by the system, random Basic credential per process that Playwright answers the 407 with). With
+    a proxy, Chromium hands host names to it instead of resolving them; HTTPS and WebSockets arrive as CONNECT tunnels
+    (host and port only, never decrypted), plain http:// as absolute-URI requests. The proxy resolves each name once with
+    `outbound.js`'s checked lookup and connects to that address (403 for a local one; IP literals checked directly).
+    `bypass: '<-loopback>'` removes Chromium's implicit localhost exception, so even 127.0.0.1 and localhost reach the
+    proxy and are refused. The request guard stays in front (media and ad blocking, a quick refusal for the plain cases);
+    the admin's local-network switch is read live by both. Why a proxy and not a launch flag: host-resolver rules are
+    fixed at launch, and the engines' launch code stays engine-specific; a context-level proxy works for every Chromium
+    engine. Tested: `tests/browser-proxy.test.js` with the real browser (a name only the fake resolver knows loads, so the
+    browser asked our lookup; a name that answers public to the guard and 127.0.0.1 next is refused and the local server
+    never sees a request; a bare context without the request guard still can't reach 127.0.0.1 or localhost), and real
+    sites over HTTPS and plain HTTP load through it.
+
+227. **Where Google Chrome is installed, the browser is that Chrome driven by Patchright.** A comparison of open-source
     alternatives to CloakBrowser (on Windows and in Linux Docker, against the common bot checks) found Patchright
     (`patchright-core`, Apache-2.0: the Playwright API with its automation traces removed) driving the person's own Google
     Chrome as good as or better than CloakBrowser, with nothing to download; plain Playwright Chromium is flagged

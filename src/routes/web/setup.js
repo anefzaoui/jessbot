@@ -18,6 +18,7 @@ import { hit } from '../../lib/ratelimit.js';
 import { config } from '../../config/index.js';
 import { browserStatus, browserSettings, installBrowser } from '../../browser/index.js';
 import { renderFragment } from '../../views/render.js';
+import { baseUrl } from '../../lib/origin.js';
 
 const router = Router();
 
@@ -147,7 +148,7 @@ export function validateIdentity(body) {
 
 // ---- 4. People ------------------------------------------------------------------
 const peopleData = req => stepData('people', {
-  groups: listGroups(), invites: listPendingInvites(), publicUrl: `${req.protocol}://${req.get('host')}`, values: {},
+  groups: listGroups(), invites: listPendingInvites(), publicUrl: baseUrl(req), values: {},
 });
 
 router.get('/people', (req, res) => res.render('setup-people', peopleData(req)));
@@ -161,7 +162,7 @@ router.post('/people/group', formPost('setup-people', peopleData, req => {
 router.post('/people/invite', formPost('setup-people', peopleData, (req, res) => {
   const { token } = createInvite({ ...req.body, groupId: Number(req.body.groupId) || null, invitedBy: req.user.id });
   audit('user.invite', { actorId: req.user.id, detail: { name: req.body.name, role: req.body.role } });
-  const link = `${req.protocol}://${req.get('host')}/invite/${token}`;
+  const link = `${baseUrl(req)}/invite/${token}`;
   // The link can't be shown again (only its hash is stored), so the no-JS path renders it right away.
   if (!isAjax(req)) return res.render('setup-people', { ...peopleData(req), newLink: link, newLinkName: req.body.name });
   return { json: { link, name: req.body.name } };

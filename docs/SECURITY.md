@@ -7,6 +7,11 @@ and how, so a reviewer (or a future session) can check each control. Decisions a
 - **Accounts.** Passwords are hashed with argon2id. Sessions are HttpOnly, SameSite=Lax cookies (Secure over HTTPS);
   the Android app uses bearer tokens (revocable per device in You → Devices). Logins, invites and password attempts are
   rate-limited. [#6, #12]
+- **Host and origin.** When Jessbot listens on loopback (the default) or `PUBLIC_URL` is set, a request must name an
+  expected host (loopback names, `PUBLIC_URL`'s host, `ALLOWED_HOSTS`); anything else gets 421, which closes DNS
+  rebinding against a local install. Cookie-authenticated changes and WebSocket upgrades must come from `PUBLIC_URL`'s
+  origin, an `ALLOWED_ORIGINS` entry, or the request's own (checked) host. Invite links use `PUBLIC_URL`, never the
+  request's Host header. [#220]
 - **Isolation.** Every query is scoped to the person. Memories are private unless a person shares one with a group
   (which asks first). Admins can *view* other people's chats, projects, Library items and voice notes only when "Let admins
   read other people's chats" is on (Admin → People; off for a new install). Then it is read-only and every chat view is
@@ -178,6 +183,20 @@ and how, so a reviewer (or a future session) can check each control. Decisions a
 - **SSRF.** The browser refuses loopback, private, link-local and cloud-metadata addresses (every request, redirects
   included). Mail, calendar and push endpoints are held to the same rule — someone's own settings can't be used to probe
   this machine or the local network — unless the admin allows the local network in Admin → Browser. [#43, #86]
+  **Every server-side request goes through one module** (`src/lib/outbound.js`): push delivery, mail (IMAP/SMTP),
+  calendars (CalDAV), the model provider, SearXNG and the price and balance lookups. A host name is resolved once by the
+  connection's own lookup, every answer is checked (a mixed public/private answer is refused whole), and the socket
+  connects to an address from that same answer, so a DNS answer that changes after the check can't move the connection;
+  the peer address is checked again once connected. IPv4 addresses carried inside IPv6 (mapped, NAT64, 6to4) are checked as
+  the IPv4 they reach. Redirects are followed hop by hop under the same rule, and credentials never follow one to another
+  origin. Mail libraries get the checked address to connect to and the server's name for TLS. The endpoints the admin
+  configured (model provider, SearXNG) may be on the local network, but only that exact origin: a redirect away from it is
+  held to the public-only rule. [#221]
+  **The browser never looks a host name up itself.** Every browser context sends its traffic through a small proxy inside
+  Jessbot (`src/browser/guard-proxy.js`, 127.0.0.1 only, a random per-process credential): it resolves each name once with
+  the same checked lookup and connects to that address, so a name that passed the request guard and then answers with a
+  local address is refused at the connection. Chromium's built-in exception for localhost is switched off, so loopback
+  goes to the proxy (and is refused) too. [#222]
   Ad and tracker blocking (off by default) runs inside that same request guard, after the network check, never beside it;
   its filter lists come through the browser too. [#168]
 - **Look-alike sites.** The browser warns (never blocks) on sign-in and password pages whose address looks wrong —
@@ -231,8 +250,8 @@ and how, so a reviewer (or a future session) can check each control. Decisions a
   redaction and backup contents.
 
 ## Known limits
-- The SSRF check resolves a host before connecting; a DNS answer that changes in between is not caught. The admin's
-  local-network switch is the backstop.
+- The browser's guard proxy sees HTTPS and WebSocket traffic only as host and port (it never decrypts), so it decides by
+  address alone; what a public site sends back is the page's business (and the request guard's, for subresources).
 - Google (mail/calendar) and Microsoft 365 need OAuth, which isn't supported yet — app passwords only.
 - The default browser is open-source Chromium. CloakBrowser, when an admin picks it, is a proprietary binary downloaded
   per install (never redistributed). [#15, #218]

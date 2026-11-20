@@ -1,4 +1,4 @@
-// The preferred browser engine where Google Chrome is installed (decision #221): Patchright (`patchright-core`,
+// The preferred browser engine where Google Chrome is installed (decision #227): Patchright (`patchright-core`,
 // Apache-2.0, the Playwright API with its automation traces removed) driving the person's own Google Chrome. Nothing is
 // downloaded and Chrome is never redistributed: Jessbot only uses the copy that is already there. In the research
 // behind this choice it looked no more automated than CloakBrowser to the common bot checks.

@@ -8,8 +8,8 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import net from 'node:net';
-import { spawn } from 'node:child_process';
 import { listen } from './helpers/listen.js';
+import { spawnHelper, stopAllHelpers } from './helpers/procs.js';
 
 const HOME = fs.mkdtempSync(path.join(os.tmpdir(), 'jessbot-unit-'));
 process.env.JESSBOT_HOME = HOME;
@@ -59,7 +59,6 @@ const JAR = path.join(TS, 'greenmail-standalone.jar');
 const RAD_PY = path.join(TS, 'radicale-venv', process.platform === 'win32' ? 'Scripts/python.exe' : 'bin/python');
 const haveMail = fs.existsSync(JAR);
 const haveCal = fs.existsSync(RAD_PY);
-const children = [];
 const freePort = async () => { const s = await listen(net.createServer()); const p = s.address().port; await new Promise(r => s.close(r)); return p; };
 const waitPort = async (port, ms = 40000) => {
   for (const t0 = Date.now(); Date.now() - t0 < ms;) {
@@ -71,8 +70,8 @@ const waitPort = async (port, ms = 40000) => {
 let SMTP, IMAP, RAD;
 async function startMail() {
   [SMTP, IMAP] = [await freePort(), await freePort()];
-  children.push(spawn('java', [`-Dgreenmail.smtp.hostname=127.0.0.1`, `-Dgreenmail.smtp.port=${SMTP}`, `-Dgreenmail.imap.hostname=127.0.0.1`, `-Dgreenmail.imap.port=${IMAP}`,
-    '-Dgreenmail.users=owner:secret@local.test,sam:secret@local.test', '-Dgreenmail.users.login=email', '-Dgreenmail.api.enabled=false', '-jar', JAR], { stdio: 'ignore' }));
+  spawnHelper('java', [`-Dgreenmail.smtp.hostname=127.0.0.1`, `-Dgreenmail.smtp.port=${SMTP}`, `-Dgreenmail.imap.hostname=127.0.0.1`, `-Dgreenmail.imap.port=${IMAP}`,
+    '-Dgreenmail.users=owner:secret@local.test,sam:secret@local.test', '-Dgreenmail.users.login=email', '-Dgreenmail.api.enabled=false', '-jar', JAR]);
   await waitPort(SMTP); await waitPort(IMAP);
 }
 async function startCal() {
@@ -81,7 +80,7 @@ async function startCal() {
   fs.writeFileSync(path.join(dir, 'users'), 'owner:secret\n');
   fs.writeFileSync(path.join(dir, 'config'), `[server]\nhosts = 127.0.0.1:${RAD}\n[auth]\ntype = htpasswd\nhtpasswd_filename = ${path.join(dir, 'users')}\n`
     + `htpasswd_encryption = plain\n[storage]\nfilesystem_folder = ${path.join(dir, 'col')}\n`);
-  children.push(spawn(RAD_PY, ['-m', 'radicale', '--config', path.join(dir, 'config')], { stdio: 'ignore' }));
+  spawnHelper(RAD_PY, ['-m', 'radicale', '--config', path.join(dir, 'config')]);
   await waitPort(RAD);
 }
 const imapAs = async user => { const c = new ImapFlow({ host: '127.0.0.1', port: IMAP, secure: false, auth: { user, pass: 'secret' }, logger: false }); await c.connect(); return c; };
@@ -101,8 +100,8 @@ before(async () => {
   settings.set('browser', { allowPrivate: true }); // the test servers run on this machine (the admin's "local network" switch)
   await Promise.all([haveMail ? startMail() : null, haveCal ? startCal() : null]);
 });
-after(() => {
-  for (const c of children) c.kill();
+after(async () => {
+  await stopAllHelpers(); // GreenMail and Radicale, with whatever their launchers started (fails if anything is left)
   closeDb();
   fs.rmSync(HOME, { recursive: true, force: true });
 });

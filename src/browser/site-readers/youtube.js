@@ -158,7 +158,7 @@ export async function readYouTube(url, { withPage, signal, lang = 'en', dismissC
       await page.waitForURL(u => !/^consent\./.test(u.hostname), { timeout: 15000 }).catch(() => {});
       await page.waitForLoadState('domcontentloaded').catch(() => {});
     }
-    const pr = await evaluateInPage(page, () => { // the page's own global: the main world (Patchright, #221)
+    const pr = await evaluateInPage(page, () => { // the page's own global: the main world (Patchright, #227)
       const p = window.ytInitialPlayerResponse;
       return p ? JSON.parse(JSON.stringify({ videoDetails: p.videoDetails, microformat: p.microformat, captions: p.captions, playabilityStatus: { status: p.playabilityStatus?.status } })) : null;
     }).catch(() => null);

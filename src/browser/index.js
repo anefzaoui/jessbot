@@ -3,10 +3,11 @@
 // incognito context; a request guard blocks the local network (SSRF) and, when reading, heavy media.
 // Which browser is an engine (engines/): open-source Chromium by default, CloakBrowser when the admin installs and picks it.
 // Binaries live in ./tools (downloaded per install, never committed).
-import dns from 'node:dns/promises';
 import net from 'node:net';
 import { paths } from '../config/index.js';
 import { settings } from '../db/index.js';
+import { isPrivateIp, isPrivateName, resolveChecked } from '../lib/outbound.js';
+import { guardProxy } from './guard-proxy.js';
 import { loadProfile, saveProfile } from './profiles.js';
 import { cleanSearxngUrl, testSearxng, resetSearxngHealth, searxngState } from './searxng.js';
 import { currentEngine, loadEngine, adblockDecision, adblockState, noteAdblockError } from './adblock.js';
@@ -163,7 +164,7 @@ export const engineCaps = () => caps(browserEngine());
  */
 export const evaluateInPage = (target, fn, arg) => target.evaluate(fn, arg, {}, false);
 
-// The plain Playwright browser for Jessbot's own pages when the engine can't render them (#221): the installed Chrome when
+// The plain Playwright browser for Jessbot's own pages when the engine can't render them (#227): the installed Chrome when
 // the engine is Chrome, else Playwright's Chromium. Closed with the main browser.
 let renderBrowser = null, renderLaunching = null;
 async function getRenderBrowser() {
@@ -225,14 +226,14 @@ const abortError = () => Object.assign(new Error('Request was aborted.'), { name
 // mobile: a phone (touch, the page's mobile viewport rules; web_screenshot's mobile view, decision #166). Pages opened only to
 // be read ask for reduced motion (#168): no animations to wait for; captures (media) keep the page's normal look.
 // render: Jessbot's own pages (page checks, print, export) — they need console events and plain Playwright behaviour, so
-// when the engine doesn't give them (Patchright, #221) they open in a plain Playwright browser on the same machine.
+// when the engine doesn't give them (Patchright, #227) they open in a plain Playwright browser on the same machine.
 export async function withPage(fn, { signal, media = false, viewport = { width: 1280, height: 900 }, profile, storageState, deviceScaleFactor, mobile = false, render = false } = {}) {
   await acquire();
   let ctx;
   try {
     if (signal?.aborted) throw abortError();
     const b = render && !caps(browserEngine()).consoleEvents ? await getRenderBrowser() : await getBrowser();
-    ctx = await b.newContext({ viewport, locale: 'en-US', serviceWorkers: 'block', acceptDownloads: false, ...(userAgent && !mobile ? { userAgent } : {}),
+    ctx = await b.newContext({ viewport, locale: 'en-US', serviceWorkers: 'block', acceptDownloads: false, proxy: await guardProxy(), ...(userAgent && !mobile ? { userAgent } : {}),
       storageState: profile ? loadProfile(profile) : storageState, ...(deviceScaleFactor ? { deviceScaleFactor } : {}),
       ...(mobile ? { isMobile: true, hasTouch: true, userAgent: mobileUserAgent(b.version()) } : {}), ...(media ? {} : { reducedMotion: 'reduce' }) });
     await guard(ctx, { blockMedia: !media && browserSettings().blockMedia });
@@ -267,7 +268,7 @@ let sessionCount = 0;
 export async function openSessionContext({ viewport = { width: 1280, height: 900 }, storageState } = {}) {
   const b = await getBrowser();
   const ctx = await b.newContext({ viewport, locale: 'en-US', serviceWorkers: 'block', acceptDownloads: true, storageState, reducedMotion: 'reduce',
-    ...(userAgent ? { userAgent } : {}) });
+    proxy: await guardProxy(), ...(userAgent ? { userAgent } : {}) });
   await guard(ctx, { blockMedia: false });
   ctx.setDefaultTimeout(15000);
   sessionCount++;
@@ -344,17 +345,8 @@ export function startAdblock({ force = false } = {}) {
   return adblockBuilding;
 }
 
-const PRIVATE = new net.BlockList();
-for (const [a, p] of [['0.0.0.0', 8], ['10.0.0.0', 8], ['100.64.0.0', 10], ['127.0.0.0', 8], ['169.254.0.0', 16], ['172.16.0.0', 12],
-  ['192.0.0.0', 24], ['192.168.0.0', 16], ['198.18.0.0', 15], ['224.0.0.0', 3]]) PRIVATE.addSubnet(a, p, 'ipv4');
-for (const [a, p] of [['::', 128], ['::1', 128], ['fc00::', 7], ['fe80::', 10], ['ff00::', 8]]) PRIVATE.addSubnet(a, p, 'ipv6');
-
-export function isPrivateIp(ip) {
-  const mapped = /^::ffff:(\d+\.\d+\.\d+\.\d+)$/i.exec(ip);
-  if (mapped) return PRIVATE.check(mapped[1], 'ipv4');
-  const v = net.isIP(ip);
-  return v ? PRIVATE.check(ip, v === 6 ? 'ipv6' : 'ipv4') : true;
-}
+// What counts as private, and the one checked lookup, live in lib/outbound.js (decision #221); re-exported for callers.
+export { isPrivateIp };
 
 const dnsCache = new Map();
 /** True for anything that isn't a public http(s) address (localhost, LAN, link-local/cloud metadata, file:, …). */
@@ -364,12 +356,12 @@ export async function isPrivateUrl(u) {
   if (['data:', 'blob:', 'about:'].includes(url.protocol)) return false;
   if (!['http:', 'https:'].includes(url.protocol)) return true;
   const host = url.hostname.replace(/^\[|\]$/g, '').toLowerCase();
-  if (host === 'localhost' || /\.(localhost|local|internal|lan|home\.arpa)$/.test(host)) return true;
   if (net.isIP(host)) return isPrivateIp(host);
+  if (isPrivateName(host)) return true;
   const hit = dnsCache.get(host);
   if (hit && Date.now() - hit.at < 60000) return hit.private;
   let priv = false;
-  try { priv = (await dns.lookup(host, { all: true })).some(a => isPrivateIp(a.address)); } catch { /* unresolvable: the browser fails on its own */ }
+  try { await resolveChecked(host); } catch (err) { priv = err.code === 'EBLOCKED'; /* unresolvable: the browser fails on its own */ }
   if (dnsCache.size > 2000) dnsCache.clear();
   dnsCache.set(host, { private: priv, at: Date.now() });
   return priv;

@@ -41,6 +41,8 @@ globalThis.fetch = async (input, init = {}) => {
   return json({ error: { message: `unexpected ${url}` } }, 500);
 };
 
+// Server-side requests go through lib/outbound.js (decision #221), not globalThis.fetch: send them to the stand-in too.
+(await import('../src/lib/outbound.js')).setTransport((input, init) => globalThis.fetch(input, init));
 const { openDb, closeDb, run, get, all, settings } = await import('../src/db/index.js');
 const { ensureDirs, paths } = await import('../src/config/index.js');
 ensureDirs();

@@ -104,8 +104,9 @@ Open http://127.0.0.1:3737. The setup wizard walks you through:
 5. **People**: invite links for the others in your household (they choose their own passwords).
 
 By default Jessbot listens on 127.0.0.1 only. To use it from your phone on the same network, set `HOST=0.0.0.0` in
-`.env` (and read [What's missing](#whats-missing-before-a-10) first); behind a reverse proxy on the same machine, the
-default `TRUST_PROXY=loopback` is right. Everything else is in [.env.example](.env.example).
+`.env` (and read [What's missing](#whats-missing-before-a-10) first). Behind a reverse proxy, set `PUBLIC_URL` to the
+address people use (invite links use it, and Jessbot then refuses requests for other host names); the default
+`TRUST_PROXY=loopback` is right for a proxy on the same machine. Everything else is in [.env.example](.env.example).
 
 Moving an install: stop it and copy the whole folder (including `data/`). Backups: Jessbot makes a full backup a day
 and keeps a week (`npm run restore` lists and restores them); copy `data/backups/` somewhere else too.
@@ -147,7 +148,7 @@ person caps what each person can spend.
 Honest list, roughly in order:
 
 - **Account hardening for internet exposure**: optional two-factor sign-in for admins, rate limits that survive a
-  restart, a password reset flow, an origin check against `PUBLIC_URL`.
+  restart, a password reset flow.
 - **Install options**: a Docker image (non-root, data volume, healthcheck), a systemd unit, documented Windows and
   macOS service setups, and CI for every pull request.
 - **Providers**: a provider picker with prices for non-OpenRouter endpoints, and tested local models (Ollama, LM Studio).

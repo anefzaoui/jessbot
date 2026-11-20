@@ -5,6 +5,7 @@ import { config } from '../config/index.js';
 import { settings } from '../db/index.js';
 import { recordUsage } from './usage.js';
 import { invalid } from '../lib/errors.js';
+import { boundFetch } from '../lib/outbound.js';
 
 let client, clientKey;
 
@@ -101,6 +102,8 @@ export function getClient() {
   if (!client || clientKey !== cacheKey) {
     client = new OpenAI({
       baseURL: baseUrl, apiKey, timeout: 60_000, maxRetries: 2,
+      // The admin's provider may be local (Ollama, a LAN box); anything it redirects to is held to the public-only rule (#221).
+      fetch: boundFetch({ trustedOrigin: baseUrl }),
       defaultHeaders: { 'HTTP-Referer': config.publicUrl, 'X-OpenRouter-Title': 'Jessbot', 'X-Title': 'Jessbot' },
     });
     clientKey = cacheKey;
