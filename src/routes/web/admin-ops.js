@@ -15,7 +15,7 @@ import { ollamaModels } from '../../services/providers.js';
 import { balanceView, refreshBalance } from '../../services/spend-watch.js';
 import { prepAdminView } from '../../services/prep.js';
 import { selfReviewPage, summaryFor, REVIEW_EVERY_DAYS } from '../../agent/self-review.js';
-import { listEntries, importPending, MAX_LINES as WHATS_NEW_MAX_LINES } from '../../services/whats-new.js';
+import { listEntries, importPending, importChangelog, MAX_LINES as WHATS_NEW_MAX_LINES } from '../../services/whats-new.js';
 import { VOICES, VOICE_MODELS, DEFAULT_VOICE, SPEEDS, voiceSettings, voiceFor, autoDirection } from '../../services/voice.js';
 import { VARIANTS } from '../../services/workspace.js';
 import { decideSettings, usesView, recentDecisions, decideSummary, CONFIDENCES } from '../../services/decide.js';
@@ -74,7 +74,7 @@ router.get('/system', (req, res) => {
 
 // The three Phase 25 parts re-render on their own (one source of markup): after Run now (and while a review runs), a period
 // switch, and a What's new publish or discard. The actions themselves are /api/v1/admin/self-review… and …/whats-new… (docs/API.md).
-const whatsNewPage = () => { importPending(); return { entries: listEntries(10), maxLines: WHATS_NEW_MAX_LINES }; };
+const whatsNewPage = () => { importPending(); importChangelog(); return { entries: listEntries(10), maxLines: WHATS_NEW_MAX_LINES }; };
 router.get('/system/self-review', async (req, res) => {
   const review = selfReviewPage();
   res.json({ running: review.running, pending: review.pending, html: await renderFragment('admin/self-review', { review }, req.user) });

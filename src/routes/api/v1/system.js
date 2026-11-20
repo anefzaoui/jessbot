@@ -9,7 +9,7 @@ import { prepSettings, savePrepSettings } from '../../../services/prep.js';
 import { forbidden, notFound } from '../../../lib/errors.js';
 import { selfReviewSettings, saveSelfReviewSettings, recentReviews, runSelfReview, approveProposal, rejectProposal, summaryFor,
   pendingProposals, ownerOf, REVIEW_EVERY_DAYS } from '../../../agent/self-review.js';
-import { listEntries, saveLines, publishEntry, discardEntry, draftLines, importPending, unseenFor, markSeen } from '../../../services/whats-new.js';
+import { listEntries, saveLines, publishEntry, discardEntry, draftLines, importPending, importChangelog, unseenFor, markSeen } from '../../../services/whats-new.js';
 
 const router = Router();
 const adminOnly = req => { if (req.user.role !== 'admin') throw forbidden('Only the admin can see this.'); };
@@ -89,6 +89,7 @@ router.post('/admin/self-review/proposals/:id/reject', (req, res) => {
 router.get('/admin/whats-new', (req, res) => {
   adminOnly(req);
   importPending();
+  importChangelog();
   res.json({ entries: listEntries(Math.min(30, Number(req.query.limit) || 10)) });
 });
 

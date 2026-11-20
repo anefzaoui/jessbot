@@ -8,7 +8,7 @@
   <div class="mb-3 flex flex-wrap items-end gap-x-3 gap-y-1">
     <div class="min-w-0 flex-1 basis-72">
       <h2 id="h-wishes" class="text-sm font-semibold">Asked for, can’t do yet</h2>
-      <p class="text-xs text-ink-3">What people asked {{bot.name}} for that no tool or skill covers yet, the most asked first. Good ideas for the next skill.</p>
+      <p class="text-xs text-ink-3">What people asked {{@root.bot.name}} for that no tool or skill covers yet, the most asked first. Good ideas for the next skill.</p>
     </div>
     <p class="text-xs text-ink-3 tabular" data-wish-summary {{#unless wishes.wishes}}hidden{{/unless}}>{{plural wishes.wishes "wish" "wishes"}} · asked {{plural wishes.asks "time" "times"}}</p>
   </div>
