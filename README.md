@@ -314,6 +314,8 @@ Honest list, roughly in order:
 
 ## Documentation
 
+- [docs/guide](docs/guide/README.md): the user guide: setup, models and costs, the assistant's name and look,
+  approvals and safety, mail and calendar, the Feed, the Library, people and admin, backups, FAQ, troubleshooting
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md): how it's built, and the build history
 - [docs/FEATURES.md](docs/FEATURES.md): every feature and its status
 - [docs/SECURITY-MODEL.md](docs/SECURITY-MODEL.md): the security model: who is trusted, every untrusted input, what isn't defended
