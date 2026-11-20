@@ -42,7 +42,7 @@ const copy = (from, to) => { fs.mkdirSync(path.dirname(path.join(OUT, to)), { re
 copy('website/styles.css', 'assets/styles.css');
 copy('website/site.js', 'assets/site.js');
 // The lightbox: Vitrine (https://github.com/anefzaoui/vitrine), vendored in website/vitrine/ at the commit its
-// vitrine.lock.json pins, checked by scripts/vitrine-vendor.mjs (tests/site-vitrine.test.js).
+// vitrine.lock.json pins, checked by scripts/vitrine-check.mjs (tests/site-vitrine.test.js).
 for (const f of ['vitrine-core.js', 'vitrine.js', 'vitrine.css']) copy(`website/vitrine/${f}`, `assets/vitrine/${f}`);
 copy('website/run-poster.webp', 'images/run-poster.webp'); // the recorded run's poster: its frame at 11.5 s, a still
 copy('node_modules/@fontsource-variable/anybody/files/anybody-latin-standard-normal.woff2', 'assets/anybody.woff2');

@@ -3984,8 +3984,8 @@ Note: most of Phase 23 part A landed in commit aa56076, whose message reads "Pha
     one lightbox written once for his three sites (Mister Download Manager's, Minecraft Server Manager's and this one),
     each in its own look. It is published as its own project, [Vitrine](https://github.com/anefzaoui/vitrine)
     (GPL-3.0-or-later, like Jessbot; its dialogs are [anefzaoui/vitrine-modal](https://github.com/anefzaoui/vitrine-modal),
-    not needed here). `website/vitrine/` is a copy of the commit `vitrine.lock.json` pins, and `scripts/vitrine-vendor.mjs`
-    (Vitrine's own tools/vendor.mjs, run by `tests/site-vitrine.test.js`) fails when a file differs, so it is changed
+    not needed here). `website/vitrine/` is a copy of the commit `vitrine.lock.json` pins, and `scripts/vitrine-check.mjs`
+    (Vitrine's own tools/vitrine-check.mjs, run by `tests/site-vitrine.test.js`) fails when a file differs, so it is changed
     upstream and fetched again, never edited here. It runs on the browser's own `<dialog>`: the picture flies from its
     thumbnail and back (a cropped one too), arrows, Home, End and swipes go through the group, a click, double tap,
     pinch or the wheel zooms with clamped panning, a swipe down or Back closes it, the scroll locks without moving the
