@@ -60,6 +60,7 @@ function parsePolicy(body) {
 }
 import { formPost, isAjax } from '../../lib/respond.js';
 import { HttpError, badRequest, invalid, notFound } from '../../lib/errors.js';
+import { baseUrl } from '../../lib/origin.js';
 
 const router = Router();
 const base = { nav: 'admin' };
@@ -98,7 +99,7 @@ router.get('/people', (req, res) => res.render('admin/people', peopleData()));
 router.post('/people/invite', formPost('admin/people', peopleData, (req, res) => {
   const { token } = createInvite({ ...req.body, groupId: Number(req.body.groupId) || null, invitedBy: req.user.id });
   audit('user.invite', { actorId: req.user.id, detail: { name: req.body.name, role: req.body.role } });
-  const link = `${req.protocol}://${req.get('host')}/invite/${token}`;
+  const link = `${baseUrl(req)}/invite/${token}`; // PUBLIC_URL when set, never a forged Host (#220)
   if (!isAjax(req)) return res.render('admin/people', { ...peopleData(), newLink: link, newLinkName: req.body.name });
   return { json: { link, name: req.body.name } };
 }));
