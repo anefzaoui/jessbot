@@ -79,6 +79,8 @@ Jessbot is an early preview: run it at home or on a private network, not on the 
   07:00) ([#57](https://github.com/anefzaoui/jessbot/issues/57))
 - ✅ The user guide, the logo, screenshots of every screen and the project site:
   [anefzaoui.github.io/jessbot](https://anefzaoui.github.io/jessbot/)
+- ✅ The site's home page redone as "Jess's day": Jess in her sky through a day, one real run, the install; the guide,
+  gallery and 404 in the same look
 
 ## Being worked on
 

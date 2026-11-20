@@ -82,10 +82,22 @@ tracking -0.035em, in `ink` on light and dark backgrounds alike. A renamed or re
 logo for the project; the app itself shows the look its admin picked.
 
 ## Website
-The public site (`website/`, built by `scripts/build-site.js`; see `website/README.md`) uses this same world: the
-Harbor tokens copied into `website/styles.css` (keep them in step with `src/styles/input.css`), Geist, Phosphor icons
-and the approval card's look. It is the one Persuade surface, so it gets one expressive move the app keeps small: the
-first viewport is Jess in her sky at full size, with the scene picked from the visitor's clock as in the app, beside a
-live copy of a real approval card the visitor can approve or deny. Below that, the page follows one real request
-(the recorded run), then the screens, then safety and privacy, then the install. Screenshots switch with the theme
-(`.only-light` / `.only-dark`); the docs pages are the guide's Markdown with a menu and an "On this page" list.
+The public site (`website/`, built by `scripts/build-site.js`; see `website/README.md`) has its own world, "Jess's day"
+(decision #249), separate from the app's: the site persuades, the app is operated. The direction contract is in
+`.impeccable/surfaces/website-index-html.md`.
+
+- **Colour, a cyclorama:** cyc black `#05060a`, night `#0a1240`, cobalt `#2238b0`, rose `#ec96a6`, day `#f5f6fa`, ink
+  `#0b1030` / `#3b4166`, and one green cue light `#33d17a` for "go" (Send it, Waits for your go, the exits). The home page
+  runs from black through cobalt and rose to day white and back down to black; colour fields own whole sections.
+- **Type:** Anybody (display: condensed, heavy, `font-stretch` 72 to 92%), Hanken Grotesk (reading), Big Shoulders
+  Stencil (cue numbers, times, small labels such as "Guide"). All OFL, from npm, served by the site.
+- **The stage (home):** Jess's portrait for the cue's hour over that hour's sky, picked from the visitor's clock as in the
+  app; a black subtitle strip with her line and the cue board; cues change every six seconds until the visitor picks
+  one. The skies are 1024 px, so they get 1.6 px of depth-of-field blur and film grain over sky and figure; Jess gets a
+  back light, the sky's colour on her edges and a fade at the bottom so she is lit in the scene, not cut out.
+- **Pages with the house lights up** (guide, gallery, 404): the black header with a four-colour horizon line under it,
+  day white in the light theme and night in the dark one, the black footer. The home page has no theme switch.
+- **Motion:** the lights come up once on load (the headline's weight rises with them), the cue crossfades, a slow drift
+  of the sky and breathing of the portrait; all of it stops with reduced motion, and the cues then wait for a click.
+- **Performance:** only the visitor's sky and portrait load first; the rest after the page has loaded; the recorded run's
+  video only when it comes near.

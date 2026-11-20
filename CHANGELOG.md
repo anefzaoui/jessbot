@@ -29,7 +29,9 @@ in their chat.
 - The assistant's own name, pronouns, avatar, background and cover.
 - Model providers: OpenRouter, Ollama, or any OpenAI-compatible service.
 - Docker image and compose file, a systemd unit, install guides for Windows, macOS and Linux.
-- The project site, with the user guide and screenshots: https://anefzaoui.github.io/jessbot/
+- The project site, with the user guide and screenshots: https://anefzaoui.github.io/jessbot/. Its home page is "Jess's
+  day": Jess in her sky through four hours of a day, what she does at each, one real run with its timeline, and the
+  install; the guide, the gallery and the 404 share its look.
 
 ### Security
 

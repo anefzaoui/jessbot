@@ -28,7 +28,7 @@ jobs:
         with:
           node-version: 24
           cache: npm
-      # Only what the build reads from node_modules (markdown-it, the Geist font, the Phosphor icons); no browser.
+      # Only what the build reads from node_modules (markdown-it, the site's fonts, the Phosphor icons); no browser.
       - run: npm ci --no-audit --no-fund --ignore-scripts
       - name: Build the site
         run: node scripts/build-site.js
