@@ -107,8 +107,8 @@ The public site (`website/`, built by `scripts/build-site.js`; see `website/READ
   (`--ease-ui`); the only ambient motion is Jess breathing. The strip keeps room for the day cue's buttons, so no cue
   moves the page. With reduced motion nothing moves through space, the cues wait for a click, and a picked cue's light
   changes in 200 ms.
-- **Pictures, big** (decision #251): screenshots open in SiteKit's lightbox (`website/kit/`, synced from Mister Download
-  Manager's site, themed in `styles.css` with its `--kit-` properties): the stage's black behind the picture in both themes,
+- **Pictures, big** (decision #251): screenshots open in [Vitrine](https://github.com/anefzaoui/vitrine)'s lightbox (vendored in
+  `website/vitrine/`, themed in `styles.css` with its `--vitrine-` properties): the stage's black behind the picture in both themes,
   at 94% over a 20 px blur of the page (solid, no blur, with reduced motion or transparency), the pictures' own 14 px
   corners and a dark shadow, the count in Big Shoulders
   Stencil, the site's `--ease` and 300 ms flights; reduced motion fades.

@@ -3978,14 +3978,15 @@ Note: most of Phase 23 part A landed in commit aa56076, whose message reads "Pha
 
 ## 2026-11-20: The website's lightbox
 
-251. **The site's pictures open in SiteKit, the owner's own small lightbox, shared with his other sites.** The gallery
+251. **The site's pictures open in Vitrine, the owner's own small lightbox, shared with his other sites.** The gallery
     said "click any picture for the full size" and sent the visitor to a bare image file; the home page's and the
     guide's screenshots didn't open at all. Rule 7 keeps the browser free of front-end libraries, and the owner wanted
     one lightbox written once for his three sites (Mister Download Manager's, Minecraft Server Manager's and this one),
-    each in its own look. Its master copy lives in Mister Download Manager's repository (`website/kit/`, with its
-    README and API); `website/kit/` here is a byte-for-byte copy of one version, its header naming it, and
-    `scripts/check-kit.mjs` (run by `tests/site-kit.test.js`) fails when a file differs from that version, so it is
-    changed there and synced, never edited here. It runs on the browser's own `<dialog>`: the picture flies from its
+    each in its own look. It is published as its own project, [Vitrine](https://github.com/anefzaoui/vitrine)
+    (GPL-3.0-or-later, like Jessbot; its dialogs are [anefzaoui/vitrine-modal](https://github.com/anefzaoui/vitrine-modal),
+    not needed here). `website/vitrine/` is a copy of the commit `vitrine.lock.json` pins, and `scripts/vitrine-vendor.mjs`
+    (Vitrine's own tools/vendor.mjs, run by `tests/site-vitrine.test.js`) fails when a file differs, so it is changed
+    upstream and fetched again, never edited here. It runs on the browser's own `<dialog>`: the picture flies from its
     thumbnail and back (a cropped one too), arrows, Home, End and swipes go through the group, a click, double tap,
     pinch or the wheel zooms with clamped panning, a swipe down or Back closes it, the scroll locks without moving the
     page, the focus goes in and comes back, a live region says "3 of 14", right to left mirrors it, reduced motion
@@ -3993,6 +3994,5 @@ Note: most of Phase 23 part A landed in commit aa56076, whose message reads "Pha
     (`.prose`); the site's words, its fonts (the count in the cue face) and motion curves; the stage's black behind the
     picture in both themes, nearly opaque over a blur of the page, so the open picture is all there is (a first
     version had day white in the light theme; the page showed through and read as clutter) (docs/DESIGN.md →
-    Website). A gallery link still opens
-    the picture with no script. The build gives gallery and guide pictures their width and height (read from the WebP),
-    so they keep their place while they load and open at the right size.
+    Website). A gallery link still opens the picture with no script. The build gives gallery and guide pictures their
+    width and height (read from the WebP), so they keep their place while they load and open at the right size.

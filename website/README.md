@@ -10,7 +10,7 @@ publishes it from `.github/workflows/pages.yml`.
 | `index.html` | the home page's content |
 | `styles.css` | every style: the site's own world, "Jess's day" (cyclorama colours, Anybody, Hanken Grotesk, Big Shoulders Stencil; see `docs/DESIGN.md` → Website) |
 | `site.js` | the theme switch (guide and gallery), the home page's cues, the recorded run's timetable, copy buttons, install tabs, and the lightbox's set-up (its words, which pictures) |
-| `kit/` | SiteKit, the lightbox: a copy synced from Mister Download Manager's `website/kit/` (its README there has the API), checked by `scripts/check-kit.mjs` (`tests/site-kit.test.js`); never edit it here, change the master and sync it (decision #251) |
+| `vitrine/` | the lightbox, [Vitrine](https://github.com/anefzaoui/vitrine) (its README has the API), vendored unmodified at the commit `vitrine.lock.json` pins and checked by `scripts/vitrine-vendor.mjs` (`tests/site-vitrine.test.js`); never edit it here: change Vitrine upstream, then `node scripts/vitrine-vendor.mjs fetch website/vitrine --lightbox=<sha>` (decision #251) |
 | `run-poster.webp` | the recorded run's poster: the frame of `docs/images/flow-approval.mp4` at 11.5 s (the approval card), a still so the page doesn't load the animated preview |
 
 Everything else comes from the repository, so the site can't drift from it: the docs pages from `docs/guide/*.md`,

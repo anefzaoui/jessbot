@@ -444,18 +444,18 @@ body:has(.stage[data-cue="dawn"]) .site-head, body:has(.stage[data-cue="day"]) .
   .btn:active, .copy-btn:active, .go:active, .hold:active { transform: none; }
 }
 
-/* ---- The lightbox (SiteKit, website/kit/kit.css: its look from these properties) -----------------------------------
+/* ---- The lightbox (Vitrine, website/vitrine/vitrine.css: its look from these properties) -----------------------------------
    The house lights go down: the stage's black behind the picture in both themes, nearly opaque over a blur of the page
    (solid with reduced motion or transparency), so the picture is all there is. Cue type for the count, the pictures'
    own corners, the site's decelerating motion. */
 :root {
-  --kit-font: var(--body); --kit-ease: var(--ease); --kit-dur: 300ms; --kit-dur-out: 240ms; --kit-dur-fast: var(--t-fast);
-  --kit-focus: var(--mark);
-  --kit-lb-scrim: rgb(5 6 10 / 0.94); --kit-lb-scrim-solid: rgb(5 6 10 / 0.985); --kit-lb-blur: 20px;
-  --kit-lb-fg: #eef0ff; --kit-lb-fg-2: #aeb4da;
-  --kit-lb-btn: rgba(238, 240, 255, 0.1); --kit-lb-btn-hover: rgba(238, 240, 255, 0.18);
-  --kit-lb-btn-radius: var(--r-control); --kit-lb-media-radius: var(--r-media);
-  --kit-lb-media-shadow: 0 40px 90px -40px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(238, 240, 255, 0.08);
-  --kit-lb-cap-size: 0.98rem;
+  --vitrine-font: var(--body); --vitrine-ease: var(--ease); --vitrine-dur: 300ms; --vitrine-dur-out: 240ms; --vitrine-dur-fast: var(--t-fast);
+  --vitrine-focus: var(--mark);
+  --vitrine-scrim: rgb(5 6 10 / 0.94); --vitrine-scrim-solid: rgb(5 6 10 / 0.985); --vitrine-blur: 20px;
+  --vitrine-fg: #eef0ff; --vitrine-fg-2: #aeb4da;
+  --vitrine-btn: rgba(238, 240, 255, 0.1); --vitrine-btn-hover: rgba(238, 240, 255, 0.18);
+  --vitrine-btn-radius: var(--r-control); --vitrine-media-radius: var(--r-media);
+  --vitrine-media-shadow: 0 40px 90px -40px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(238, 240, 255, 0.08);
+  --vitrine-cap-size: 0.98rem;
 }
-.kit-lb-count { font-family: var(--cue); font-size: 1.15rem; font-weight: 600; letter-spacing: 0.04em; }
+.vitrine-count { font-family: var(--cue); font-size: 1.15rem; font-weight: 600; letter-spacing: 0.04em; }

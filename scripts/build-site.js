@@ -41,8 +41,9 @@ const copy = (from, to) => { fs.mkdirSync(path.dirname(path.join(OUT, to)), { re
 // ---- Assets -------------------------------------------------------------------------------------------------------
 copy('website/styles.css', 'assets/styles.css');
 copy('website/site.js', 'assets/site.js');
-// The lightbox (SiteKit, synced from Mister Download Manager's website: website/kit/, checked by scripts/check-kit.mjs).
-for (const f of ['core.js', 'lightbox.js', 'kit.css']) copy(`website/kit/${f}`, `assets/kit/${f}`);
+// The lightbox: Vitrine (https://github.com/anefzaoui/vitrine), vendored in website/vitrine/ at the commit its
+// vitrine.lock.json pins, checked by scripts/vitrine-vendor.mjs (tests/site-vitrine.test.js).
+for (const f of ['vitrine-core.js', 'vitrine.js', 'vitrine.css']) copy(`website/vitrine/${f}`, `assets/vitrine/${f}`);
 copy('website/run-poster.webp', 'images/run-poster.webp'); // the recorded run's poster: its frame at 11.5 s, a still
 copy('node_modules/@fontsource-variable/anybody/files/anybody-latin-standard-normal.woff2', 'assets/anybody.woff2');
 copy('node_modules/@fontsource-variable/hanken-grotesk/files/hanken-grotesk-latin-wght-normal.woff2', 'assets/hanken-grotesk.woff2');
