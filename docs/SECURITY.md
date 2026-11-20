@@ -7,6 +7,11 @@ and how, so a reviewer (or a future session) can check each control. Decisions a
 - **Accounts.** Passwords are hashed with argon2id. Sessions are HttpOnly, SameSite=Lax cookies (Secure over HTTPS);
   the Android app uses bearer tokens (revocable per device in You → Devices). Logins, invites and password attempts are
   rate-limited. [#6, #12]
+- **Host and origin.** When Jessbot listens on loopback (the default) or `PUBLIC_URL` is set, a request must name an
+  expected host (loopback names, `PUBLIC_URL`'s host, `ALLOWED_HOSTS`); anything else gets 421, which closes DNS
+  rebinding against a local install. Cookie-authenticated changes and WebSocket upgrades must come from `PUBLIC_URL`'s
+  origin, an `ALLOWED_ORIGINS` entry, or the request's own (checked) host. Invite links use `PUBLIC_URL`, never the
+  request's Host header. [#220]
 - **Isolation.** Every query is scoped to the person. Memories are private unless a person shares one with a group
   (which asks first). Admins can *view* other people's chats, projects, Library items and voice notes only when "Let admins
   read other people's chats" is on (Admin → People; off for a new install). Then it is read-only and every chat view is
