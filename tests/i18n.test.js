@@ -112,5 +112,6 @@ test('extractor: finds texts in templates and scripts (plurals with their singul
 
 test('the repository’s list of texts is current (npm run i18n)', () => {
   const file = path.join(import.meta.dirname, '..', 'locales', 'messages.json');
-  assert.equal(fs.readFileSync(file, 'utf8'), `${JSON.stringify(X.collect(), null, 2)}\n`, 'run npm run i18n and commit locales/messages.json');
+  // A Windows checkout turns the file's line ends into CRLF; the text is the same.
+  assert.equal(fs.readFileSync(file, 'utf8').replace(/\r\n/g, '\n'), `${JSON.stringify(X.collect(), null, 2)}\n`, 'run npm run i18n and commit locales/messages.json');
 });

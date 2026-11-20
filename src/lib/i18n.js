@@ -26,9 +26,12 @@ function catalogs() {
   for (const f of files) {
     const lang = f.slice(0, -5);
     try {
-      const file = path.join(dir(), f);
-      const mtime = fs.statSync(file).mtimeMs;
-      out[lang] = cache?.[lang]?.mtime === mtime ? cache[lang] : { catalog: JSON.parse(fs.readFileSync(file, 'utf8')), mtime };
+      // One open file for both the age check and the read: nothing can swap it in between.
+      const fd = fs.openSync(path.join(dir(), f), 'r');
+      try {
+        const mtime = fs.fstatSync(fd).mtimeMs;
+        out[lang] = cache?.[lang]?.mtime === mtime ? cache[lang] : { catalog: JSON.parse(fs.readFileSync(fd, 'utf8')), mtime };
+      } finally { fs.closeSync(fd); }
     } catch (err) { console.warn(`[i18n] ${f} can’t be read: ${err.message}`); }
   }
   cache = out;

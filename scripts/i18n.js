@@ -77,7 +77,9 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
   const messages = collect();
   const json = `${JSON.stringify(messages, null, 2)}\n`;
   let failed = false;
-  const current = fs.existsSync(MESSAGES) ? fs.readFileSync(MESSAGES, 'utf8') : '';
+  // One read, no exists-then-read race; a Windows checkout's CRLF counts as the same text.
+  let current = '';
+  try { current = fs.readFileSync(MESSAGES, 'utf8').replace(/\r\n/g, '\n'); } catch { /* not written yet */ }
   if (current !== json) {
     if (check) { console.error('locales/messages.json is out of date: run npm run i18n and commit it.'); failed = true; }
     else { fs.mkdirSync(LOCALES, { recursive: true }); fs.writeFileSync(MESSAGES, json); }
