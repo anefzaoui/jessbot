@@ -31,9 +31,12 @@ does leave:
 Partly. Jessbot works with any OpenAI-compatible endpoint, including a server on your own network such as Ollama or LM
 Studio: set the Base URL on the setup page or in Admin → Models. The model needs to support tool calls. Without
 OpenRouter you lose spoken replies, making pictures, search of your memories by meaning (it falls back to keyword
-search) and the small second-opinion model, and budgets may not count everything. Local models haven't been tested yet,
-so expect rough edges. The assistant's browser still goes out to the internet when it looks things up. See
-[Models and costs](providers.md).
+search) and the small second-opinion model, and budgets may not count everything. With Ollama, a 7B model is the
+smallest that copes, and it needs a 32,768-token context set on the Ollama server (`OLLAMA_CONTEXT_LENGTH=32768`; on an
+8 GB graphics card also `OLLAMA_FLASH_ATTENTION=1` and `OLLAMA_KV_CACHE_TYPE=q8_0`): with Ollama's default, it loses
+Jessbot's instructions. Local models are slower and less careful than the default one, so expect rough edges. The
+assistant's browser still goes out to the internet when it looks things up. See
+[Models and costs](providers.md#give-ollama-a-context-of-32768-tokens).
 
 ## Can it pay for things on its own?
 

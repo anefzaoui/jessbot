@@ -52,7 +52,7 @@
   <input id="f-model" name="model" class="input font-mono text-[13px]" value="{{llm.model}}" list="provider-models" autocomplete="off" spellcheck="false" required>
   <datalist id="provider-models" data-model-list></datalist>
   <p class="hint" data-provider-show="openrouter" {{#unless (eq llm.provider 'openrouter')}}hidden{{/unless}}>Default: <span class="font-mono">openai/gpt-6-luna</span>, about $0.10 per million words read. Any model id OpenRouter lists works.</p>
-  <p class="hint" data-provider-show="ollama" {{#unless (eq llm.provider 'ollama')}}hidden{{/unless}} data-ollama-status>A model you pulled with <span class="font-mono">ollama pull</span> that can call tools, 7B or larger: for example <span class="font-mono">qwen2.5:7b</span> or <span class="font-mono">llama3.1:8b</span>.</p>
+  <p class="hint" data-provider-show="ollama" {{#unless (eq llm.provider 'ollama')}}hidden{{/unless}} data-ollama-status>A model you pulled with <span class="font-mono">ollama pull</span> that can call tools, 7B or larger: for example <span class="font-mono">qwen2.5:7b</span> or <span class="font-mono">llama3.1:8b</span>. Start Ollama with <span class="font-mono">OLLAMA_CONTEXT_LENGTH=32768</span>: its default context is too small for Jessbot's instructions.</p>
   <p class="hint" data-provider-show="compatible" {{#unless (eq llm.provider 'compatible')}}hidden{{/unless}}>The model’s name as the service calls it.</p>
 </div>
 

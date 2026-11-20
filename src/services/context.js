@@ -14,6 +14,9 @@ import { tzOf, dayKey } from '../lib/when.js';
 import { decide, noul, yes, note, threshold } from './decide.js';
 import { stage1 } from '../agent/injection.js';
 import { botName } from './bot.js';
+import { knownContext, requestTokens, REPLY_ROOM } from './context-fit.js';
+import { toolSchemasFor } from '../agent/tools/registry.js';
+import { enabledToolsets } from './policy.js';
 
 const TARGET = Number(process.env.JESSBOT_CONTEXT_TARGET) || 120_000;
 const HARD = Number(process.env.JESSBOT_CONTEXT_HARD) || 200_000;
@@ -24,23 +27,40 @@ const EXTRACT_DELAY = Number(process.env.JESSBOT_EXTRACT_DELAY_MS) || 10 * 60_00
 const compacting = new Set();
 const KINDS = new Set(['fact', 'preference', 'profile', 'event', 'schedule', 'place']); // what extraction and the flush may write
 
-export async function maybeCompact(thread, { hard = false } = {}) {
-  if (!thread || compacting.has(thread.id)) return false;
-  if (hard) {
-    const user = getUser(thread.user_id);
-    const est = countMessages(buildPrompt({ user, thread }).messages, llmSettings().model);
-    if (est <= HARD) return false;
-  } else if ((thread.last_prompt_tokens || 0) <= TARGET) return false;
-  return compact(thread);
+/**
+ * When compaction starts and what it keeps → { target, hard, tail, minMsgs, small }. The usual numbers suit the large
+ * windows of hosted models. A small known window (Ollama, #69, decision #252) scales them: the prompt's fixed part (the
+ * instructions and the tool list, about 25k tokens) can't be folded, so compaction starts at 90 % of the window less the
+ * reply's room, keeps a verbatim tail of 8 % of it, and fewer messages when the window is under 64k; the hard check then
+ * counts the tool list too.
+ */
+export function compactionLimits(context = knownContext()) {
+  const room = context ? context - REPLY_ROOM : Infinity;
+  if (room >= HARD) return { target: TARGET, hard: HARD, tail: KEEP_TAIL, minMsgs: KEEP_MIN_MSGS, small: false };
+  return { target: Math.min(TARGET, Math.floor(room * 0.9)), hard: room, tail: Math.min(KEEP_TAIL, Math.max(1_000, Math.floor(room * 0.08))),
+    minMsgs: room < 64_000 ? 6 : KEEP_MIN_MSGS, small: true };
 }
 
-// Pick the cut: keep ≥ KEEP_TAIL tokens and ≥ KEEP_MIN_MSGS messages verbatim; cut only at a user message
-// (a clean turn boundary — never between a tool call and its result, never during a pending question).
-function chooseCut(rows) {
+export async function maybeCompact(thread, { hard = false } = {}) {
+  if (!thread || compacting.has(thread.id)) return false;
+  const limits = compactionLimits();
+  if (hard) {
+    const user = getUser(thread.user_id);
+    const { messages } = buildPrompt({ user, thread });
+    const est = limits.small ? requestTokens(messages, toolSchemasFor(user, { toolsets: enabledToolsets(user) }))
+      : countMessages(messages, llmSettings().model);
+    if (est <= limits.hard) return false;
+  } else if ((thread.last_prompt_tokens || 0) <= limits.target) return false;
+  return compact(thread, limits);
+}
+
+// Pick the cut: keep ≥ KEEP_TAIL tokens and ≥ KEEP_MIN_MSGS messages verbatim (or a small window's limits); cut only at a
+// user message (a clean turn boundary — never between a tool call and its result, never during a pending question).
+function chooseCut(rows, { tail = KEEP_TAIL, minMsgs = KEEP_MIN_MSGS } = {}) {
   let tokens = 0, kept = 0, cut = rows.length;
   for (let i = rows.length - 1; i >= 0; i--) {
     tokens += rows[i].token_count; kept++;
-    if (tokens >= KEEP_TAIL && kept >= KEEP_MIN_MSGS) { cut = i; break; }
+    if (tokens >= tail && kept >= minMsgs) { cut = i; break; }
   }
   // Cut just before a message of theirs — and never between a tool call and its result: a message sent while she was
   // mid-step sits between them by id (call 461, their message 462, result 463), and a result without its call breaks the prompt.
@@ -146,12 +166,12 @@ function toMarkdown(j) {
   ].filter(Boolean).join('\n\n');
 }
 
-export async function compact(thread) {
+export async function compact(thread, limits = compactionLimits()) {
   compacting.add(thread.id);
   try {
     const prev = thread.active_summary_id ? get('SELECT * FROM thread_summaries WHERE id = ?', thread.active_summary_id) : null;
     const rows = turnsAfter(thread.id, prev?.to_msg_id || 0);
-    const cut = chooseCut(rows);
+    const cut = chooseCut(rows, limits);
     if (cut <= 0) return false;
     const span = rows.slice(0, cut);
     // Attached files are named in the transcript (title + library id), so the summary keeps pointing at them.

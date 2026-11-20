@@ -25,6 +25,11 @@
       "src/views/pages/reset.hbs:5"
     ]
   },
+  "Check the context window": {
+    "where": [
+      "public/js/model-test.js:68"
+    ]
+  },
   "Checking…": {
     "where": [
       "src/views/pages/login-code.hbs:3"
@@ -172,6 +177,11 @@
   "Start over": {
     "where": [
       "src/views/pages/login-code.hbs:14"
+    ]
+  },
+  "The context window is too small": {
+    "where": [
+      "public/js/model-test.js:68"
     ]
   },
   "the owner": {

@@ -83,6 +83,9 @@ Jessbot is an early preview: run it at home or on a private network, not on the 
   gallery and 404 in the same look
 - ✅ The site refined: a still headline, short and eased motion that respects reduced motion, steadier type and spacing,
   no layout shift between the hours
+- ✅ Local models: Ollama's context window checked against Jessbot's prompt, with what to set on the server; a cut
+  prompt stops the task instead of driving tools; the agent eval runs against Ollama
+  ([#69](https://github.com/anefzaoui/jessbot/issues/69))
 
 ## Being worked on
 

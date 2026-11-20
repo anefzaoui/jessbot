@@ -1,7 +1,7 @@
 // The agent loop: one run = stream a reply (maybe calling tools, maybe pausing to ask) until done.
 // Runs are server-side jobs: they continue when the browser closes; every step is an event (refresh-proof).
 import { get, all, run as sql, settings } from '../db/index.js';
-import { getClient, llmSettings, modelChoice, answeredBy } from '../services/llm.js';
+import { getClient, llmSettings, llmState, modelChoice, answeredBy, onOpenRouter } from '../services/llm.js';
 import { buildPrompt, timeBlock, upcomingBlock } from './prompt.js';
 import { getTool, toolSchemasFor } from './tools/registry.js';
 import { addMessage } from '../services/messages.js';
@@ -38,6 +38,7 @@ import { supportsReasoning } from '../services/model-price.js';
 import { secretsIn, argText } from '../lib/dlp.js';
 import { audit } from '../services/audit.js';
 import { botName } from '../services/bot.js';
+import { requestTokens, textTokens, currentContext, fitOf, promptWasCut, cutMessage, forgetContext } from '../services/context-fit.js';
 
 const SILENT = /^\s*NOTHING\s*\.?\s*$/i;
 
@@ -720,9 +721,26 @@ async function execute(runId) {
         // …and when the message sense already decided about a spoken reply, the tool isn't needed at all.
         .filter(t => !(noAsk && t.function.name === 'ask_user') && !((r.voice || sensed) && t.function.name === 'reply_by_voice'));
       const raw = rawMessageTokens(messages);
+      // A context window too small for the request (Ollama, #69, decision #252): stop with what to set, rather than let the
+      // model read a cut prompt and call tools at random. Only a provider that reports its window is checked here.
+      const misfit = fitOf(requestTokens(messages, tools), await currentContext().catch(() => null));
+      if (misfit) {
+        console.warn(`[agent] run ${runId}: the request (~${misfit.tokens} tokens) doesn't fit the model's context (${misfit.context})`);
+        await failRun(runId, misfit.message, 'permanent');
+        return;
+      }
 
       const result = await streamOnce({ run: r, user, model, messages, tools, signal: ctrl.signal, effort });
       const by = result.by; // the model that answered (the fallback chain, #179)
+      // Ollama read far fewer tokens than were sent: it cut the prompt (#69; other services refuse a prompt that is too long
+      // with an error, and count with their own tokenizers). Nothing it asked for runs.
+      const sent = textTokens(messages, tools);
+      if (llmState().provider === 'ollama' && promptWasCut({ sent, reported: result.usage?.prompt_tokens })) {
+        console.warn(`[agent] run ${runId}: the provider read ${result.usage.prompt_tokens} of ~${sent} prompt tokens (a cut prompt; its context window is too small)`);
+        forgetContext();
+        await failRun(runId, cutMessage({ sent, reported: result.usage.prompt_tokens }), 'permanent');
+        return;
+      }
       if (result.usage?.prompt_tokens) {
         calibrate(by.model, raw, result.usage.prompt_tokens);
         sql('UPDATE threads SET last_prompt_tokens = ?, last_cached_tokens = ? WHERE id = ?',
@@ -814,6 +832,9 @@ async function execute(runId) {
 async function streamOnce({ run: r, user, model, messages, tools, signal, toolChoice = 'auto', effort = null }) {
   const params = {
     ...modelChoice(model), messages, stream: true, max_tokens: 4096,
+    // OpenRouter always ends a stream with its usage; Ollama and other OpenAI-compatible services only when asked, and the
+    // prompt count is what tells a cut prompt (#69) and keeps compaction and budgets right.
+    ...(onOpenRouter() ? {} : { stream_options: { include_usage: true } }),
     reasoning: { effort: effort || settings.get('llm', {}).reasoning || 'low' },
     user: `jessbot-u${user.id}`, session_id: `jessbot-t${r.thread_id}`,
     ...(tools.length ? { tools, tool_choice: toolChoice, ...(toolChoice === 'auto' ? { parallel_tool_calls: false } : {}) } : {}),
