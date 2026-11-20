@@ -38,7 +38,7 @@ const { compactionLimits } = await import('../src/services/context.js');
 // ---- A fake Ollama -----------------------------------------------------------------------------------------------------
 // /api/ps reports `ps` (the loaded models), /api/show `show`; /v1/chat/completions streams the next `script` item
 // ({ tool } or { text }) with `promptTokens` as its usage, and records every body.
-let ps = { models: [] }, show = {}, promptTokens = 10, script = [];
+let ps = { models: [] }, show = {}, promptTokens = 10, script = [], dropNextPs = false;
 const bodies = [];
 const fake = http.createServer((req, res) => {
   let raw = '';
@@ -46,6 +46,7 @@ const fake = http.createServer((req, res) => {
   req.on('end', () => {
     const body = raw ? JSON.parse(raw) : {};
     res.setHeader('content-type', 'application/json');
+    if (req.url === '/api/ps' && dropNextPs) { dropNextPs = false; return req.socket.destroy(); } // a kept-alive socket closed under it
     if (req.url === '/api/ps') return res.end(JSON.stringify(ps));
     if (req.url === '/api/show') return res.end(JSON.stringify(show));
     bodies.push(body);
@@ -236,4 +237,12 @@ test('a small reading kept from before Ollama was restarted with a bigger contex
   const r = await settle(chatRun('Hello?'));
   assert.equal(r.status, 'done', r.error);
   assert.equal(F.knownContext(), 32768);
+});
+
+test('a connection the server closed just as it was reused is tried once more, not read as "Ollama didn’t say"', async () => {
+  ps = loaded(4096);
+  dropNextPs = true;
+  const c = await F.ollamaContext(`${BASE}/v1`, 'qwen2.5:7b', { fresh: true });
+  assert.equal(dropNextPs, false, 'the first read was cut off');
+  assert.deepEqual([c.context, c.source], [4096, 'loaded']);
 });

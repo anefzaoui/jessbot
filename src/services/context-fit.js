@@ -53,11 +53,22 @@ const KNOWN_FOR = 60_000;
 const keyOf = (origin, model) => `${origin}|${model}`;
 const sameModel = (a, b) => a === b || a === `${b}:latest` || `${a}:latest` === b;
 
-async function ollamaJson(root, path, body) {
-  const res = await outboundFetch(`${root}${path}`, {
-    method: body ? 'POST' : 'GET', signal: AbortSignal.timeout(5000),
-    ...(body ? { headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) } : {}),
-  }, { trustedOrigin: root }); // the admin's own address
+// A kept-alive connection the server closed just as it was reused fails at once (ECONNRESET, "other side closed"): seen
+// when the reads come a few seconds after the last ones, the server's idle timeout. Both reads only look, so that one
+// failure is tried again on a fresh connection; anything else (refused, a timeout, a bad answer) is not.
+const STALE_SOCKET = new Set(['ECONNRESET', 'EPIPE', 'UND_ERR_SOCKET']);
+const staleSocket = err => [err, err?.cause].some(e => STALE_SOCKET.has(e?.code));
+async function ollamaJson(root, path, body, retry = true) {
+  let res;
+  try {
+    res = await outboundFetch(`${root}${path}`, {
+      method: body ? 'POST' : 'GET', signal: AbortSignal.timeout(5000),
+      ...(body ? { headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) } : {}),
+    }, { trustedOrigin: root }); // the admin's own address
+  } catch (err) {
+    if (retry && staleSocket(err)) return ollamaJson(root, path, body, false);
+    throw err;
+  }
   if (!res.ok) throw new Error(`Ollama answered ${res.status} at ${path}.`);
   return res.json();
 }
