@@ -98,11 +98,11 @@ a reason, that you can start or turn down.
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="docs/images/goals-desktop-dark.webp">
-    <img src="docs/images/goals-desktop-light.webp" alt="Goals: suggested goals to adopt, and goals in progress with their percentage and next step" width="434">
+    <img src="docs/images/goals-desktop-light.webp" alt="Goals: suggested goals to adopt, and goals in progress with their percentage and next step" width="400">
   </picture>
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="docs/images/ideas-desktop-dark.webp">
-    <img src="docs/images/ideas-desktop-light.webp" alt="Ideas: things Jess can do, each with the reason it suggests it, and Let's do it or Later" width="434">
+    <img src="docs/images/ideas-desktop-light.webp" alt="Ideas: things Jess can do, each with the reason it suggests it, and Let's do it or Later" width="400">
   </picture>
 </p>
 
@@ -127,11 +127,11 @@ that only speak when something changed, alarms and timers, and everything coming
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="docs/images/lists-desktop-dark.webp">
-    <img src="docs/images/lists-desktop-light.webp" alt="Lists: the weekly shop, house to-dos, Keiko's birthday wish list and a packing list" width="434">
+    <img src="docs/images/lists-desktop-light.webp" alt="Lists: the weekly shop, house to-dos, Keiko's birthday wish list and a packing list" width="400">
   </picture>
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="docs/images/upcoming-desktop-dark.webp">
-    <img src="docs/images/upcoming-desktop-light.webp" alt="Upcoming: the week ahead, dates Jess remembers, and alarms, reminders and timers" width="434">
+    <img src="docs/images/upcoming-desktop-light.webp" alt="Upcoming: the week ahead, dates Jess remembers, and alarms, reminders and timers" width="400">
   </picture>
 </p>
 
@@ -231,7 +231,7 @@ everyone sees a line saying so in their chat and on their You page.
 **With Docker** (any system):
 
 ```bash
-git clone <this repository> jessbot && cd jessbot
+git clone https://github.com/anefzaoui/jessbot && cd jessbot
 docker compose up -d --build
 docker compose logs jessbot | grep "setup code"     # you'll need this code on the setup page
 ```
@@ -240,7 +240,7 @@ docker compose logs jessbot | grep "setup code"     # you'll need this code on t
 Windows and Linux; macOS should work but hasn't been tested by a person yet (CI runs the tests there).
 
 ```bash
-git clone <this repository> jessbot
+git clone https://github.com/anefzaoui/jessbot
 cd jessbot
 npm install
 cp .env.example .env      # optional: put your model key here, or paste it in the setup page later
