@@ -783,9 +783,17 @@ try {
     await sam.goto(`${BASE}/chat`, { waitUntil: 'networkidle' });
     const samThread = await sam.locator('[data-chat]').getAttribute('data-thread-id');
     const ownerThread = await owner.locator('[data-chat]').getAttribute('data-thread-id');
-    expect(await sam.locator('text=The owner of this').count() > 0, 'member notice missing');
+    // Oversight is off on a new install (#219): no notice, and the admin can't open the member's chat.
+    expect(await sam.locator('text=Admins can read your chats').count() === 0, 'member told chats are read while oversight is off');
+    expect((await owner.goto(`${BASE}/chat/${samThread}`)).status() === 404, 'admin opened a member chat with oversight off');
     const res = await sam.goto(`${BASE}/chat/${ownerThread}`);
     expect(res.status() === 404, `member could open owner's chat (${res.status()})`);
+    // Turned on in Admin → People: the member is told, the admin reads it read-only.
+    await owner.goto(`${BASE}/admin/people`, { waitUntil: 'networkidle' });
+    await owner.click('[data-oversight] label');
+    await Promise.all([owner.waitForResponse(r => r.url().endsWith('/admin/oversight') && r.ok()), owner.click('[data-oversight] button')]);
+    await sam.goto(`${BASE}/chat`, { waitUntil: 'networkidle' });
+    expect(await sam.locator('text=Admins can read your chats').count() > 0, 'member notice missing with oversight on');
     await owner.goto(`${BASE}/chat/${samThread}`, { waitUntil: 'networkidle' });
     expect(await owner.locator('text=as admin').count() > 0, 'admin banner missing');
     expect(!(await owner.locator('[data-composer]').count()), 'admin can type in member chat');

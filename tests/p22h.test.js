@@ -243,6 +243,7 @@ test('shape: a model without the wanted ratio gets its nearest listed one; PNG a
 
 // ---- 4. A source picture: theirs only -----------------------------------------------------------------------------------
 test('make_image: a source picture must be the person’s own image; it is sent as a data URL and linked', async () => {
+  (await import('../src/services/oversight.js')).setOversight(true, null); // admins view others' things only with oversight on (#219)
   const mine = library.createFileItem({ user: alice, title: 'Our dog', type: 'image', ext: 'png', mime: 'image/png', buffer: PNG });
   const out = await images.makeImage(alice, { prompt: 'Turn this into a colouring page', depicts: 'no_real_people', style: 'colouring_page', sourceImageId: mine.public_id });
   assert.equal(posts[0].input_references.length, 1);

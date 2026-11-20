@@ -13,6 +13,7 @@ import { recordUsage } from './usage.js';
 import { overBudget } from './policy.js';
 import { VARIANTS, TONES, readWorkspaceFile } from './workspace.js';
 import { badRequest, notFound } from '../lib/errors.js';
+import { adminMayView } from './oversight.js';
 
 // All 13 voices answer on OpenRouter (probed 2026-09-25). Descriptions are ours, for the picker.
 export const VOICES = [
@@ -324,7 +325,7 @@ export const linkClip = (clipId, messageId) => run('UPDATE voice_clips SET messa
 /** A clip its owner (or an admin, read-only oversight) may play. */
 export function clipFor(user, publicId) {
   const clip = get('SELECT * FROM voice_clips WHERE public_id = ?', String(publicId || ''));
-  if (!clip || (clip.user_id !== user.id && user.role !== 'admin')) throw notFound("That voice note wasn't found.");
+  if (!clip || (clip.user_id !== user.id && !adminMayView(user))) throw notFound("That voice note wasn't found.");
   return clip;
 }
 export const clipFile = clip => clipPath(clip);

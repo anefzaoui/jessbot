@@ -18,6 +18,7 @@ ensureDirs();
 await openDb();
 
 const { createUser } = await import('../src/services/users.js');
+const { setOversight } = await import('../src/services/oversight.js');
 const { createGroup, addMember } = await import('../src/services/groups.js');
 const memory = await import('../src/services/memory.js');
 const { normalizeQuestions, validateAnswers, describeAnswers } = await import('../src/services/questions.js');
@@ -275,6 +276,7 @@ test('library: create → update keeps versions → restore; search finds body t
 });
 
 test('library: owners change, admins only view, others never see', () => {
+  setOversight(true, null); // admins view others' things only with oversight on (#219)
   const item = library.createItem({ user: bob, title: 'Bob notes', type: 'md', content: '# Notes\n\nprivate' });
   assert.throws(() => library.itemForUser(carol, item.public_id), /isn’t in the library/);
   assert.equal(library.itemForUser(alice, item.public_id).id, item.id, 'admin can view');
@@ -647,6 +649,7 @@ test('feed sources: re-tune keeps the person’s own sources and edits; paused t
 });
 
 test('projects: a draft becomes a project on Create; its chat leaves side chats; the brief is patched, never rewritten; big pastes become files', async () => {
+  setOversight(true, null); // admins view others' things only with oversight on (#219)
   const P = await import('../src/services/projects.js');
   const { sideThreads, createSideThread } = await import('../src/services/threads.js');
   const { createItem } = await import('../src/services/library.js');

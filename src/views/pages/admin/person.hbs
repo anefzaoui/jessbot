@@ -70,11 +70,15 @@
       {{#unless isSelf}}
         <section class="card p-5" aria-labelledby="h-chats">
           <h2 id="h-chats" class="text-sm font-semibold">Their chats</h2>
+          {{#unless oversight}}
+          <p class="mt-0.5 text-xs text-ink-3">Private to them. Admins can read chats only when “Let admins read other people’s chats” is on in <a href="/admin/people" class="font-medium text-accent-text hover:underline">People</a>, and then everyone is told.</p>
+          {{else}}
           <p class="mt-0.5 text-xs text-ink-3">Read-only. Opening one is logged.</p>
           <ul class="mt-2 space-y-1 text-sm" role="list">
             {{#each threads}}<li><a href="/chat/{{id}}" class="flex items-center gap-2 rounded-md px-1 py-1 text-ink-2 hover:bg-surface-2 hover:text-ink">{{icon "message-circle" class="size-4 text-ink-3"}}<span class="flex-1 truncate">{{#if (eq kind 'main')}}Main chat{{else}}{{title}}{{/if}}</span><time class="text-xs text-ink-3" datetime="{{iso last_activity_at}}" data-relative>{{timeAgo last_activity_at}}</time></a></li>
             {{else}}<li class="text-xs text-ink-3">No chats yet.</li>{{/each}}
           </ul>
+          {{/unless}}
         </section>
       {{/unless}}
 
