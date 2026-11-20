@@ -8,6 +8,7 @@
 //   files: supporting files [{ name, buf }] · others: other ACTIVE skills [{ name, description }] (description collisions)
 //   tools: the tool registry (defaults to every registered tool) for capability checks.
 import { allTools } from '../agent/tools/registry.js';
+import { botName, DEFAULT_NAME } from './bot.js';
 
 const LEVELS = { bad: 0, warn: 1, info: 2 };
 export const BODY_WARN = 15_000;
@@ -33,7 +34,7 @@ export const showHidden = s => String(s).replace(HIDDEN_ANY, ch => `⟦U+${ch.co
 // [level, code, pattern, message]. Case-insensitive unless the pattern says otherwise (MANDATORY is only a shout in caps).
 const STEERING = [
   ['bad', 'override', /\bignore\s+(?:all\s+|any\s+)?(?:the\s+|your\s+)?(?:previous|prior|above|earlier|other|system)\s+(?:instructions|rules|prompts?|messages|guidelines)/i,
-    'Tells Jess to ignore her other instructions.'],
+    'Tells Jess to ignore all other instructions.'],
   ['bad', 'override', /\b(?:overrides?|supersedes?|takes?\s+precedence\s+over)\s+(?:all|any|every)\s+(?:other\s+|previous\s+|prior\s+)?(?:instructions|rules|guidelines|prompts?|directives)/i,
     'Claims to override all other instructions.'],
   ['bad', 'override', /\b(?:instructions?|rules?|directives?|this\s+skill|these\s+steps)\b[^.\n]{0,40}\b(?:has|have|take|takes|is|are|gets?|get)\s+(?:the\s+)?(?:highest|top|absolute|maximum)\s+priority|\b(?:highest|top|absolute)[- ]priority\s+(?:instructions?|rules?|directives?|override)/i,
@@ -58,9 +59,9 @@ const NEGATED = /\b(?:never|not|don['’]t|no|without)\b[^.\n]{0,30}$/i;
 
 const PERSIST = [
   ['bad', 'self-modify', /\b(?:edit|write|append|update|modify|change|overwrite|rewrite|add\s+(?:this|it|these|a\s+line|lines?)\s+to|save\s+(?:this|it)\s+(?:in|to))\b[^.\n]{0,50}\b(?:SOUL|AGENTS|MEMORY|USER|IDENTITY|HEARTBEAT|TOOLS)\.md\b|\b(?:SOUL|AGENTS|MEMORY|USER|IDENTITY|HEARTBEAT|TOOLS)\.md\b[^.\n]{0,30}\b(?:edit|append|overwrite|rewrite|modify)/i,
-    'Tells Jess to change her own instructions or memory files.'],
+    'Tells Jess to edit Jess’s own instruction or memory files.'],
   ['bad', 'self-modify', /\b(?:edit|update|modify|change|rewrite|replace)\s+(?:your|jess['’]s)\s+(?:own\s+)?(?:system\s+prompt|instructions|personality|soul|rules)\b/i,
-    'Tells Jess to change her own instructions.'],
+    'Tells Jess to change Jess’s own instructions.'],
   ['warn', 'persistence', /\bfrom\s+now\s+on\b|\b(?:remember|save|store|keep)\s+(?:this|these)\s+(?:rules?|instructions?|skill)\b[^.\n]{0,30}\b(?:memory|forever|permanently|future)/i,
     'Tries to make itself stick beyond the task it is for ("from now on").'],
   ['info', 'recurring', /\b(?:set\s+up|create|schedule|add|make)\s+(?:a\s+|an\s+)?(?:recurring|repeating|daily|weekly|hourly|nightly|cron)\b|\bcron\s+(?:job|expression)\b/i,
@@ -179,7 +180,7 @@ function lintText(text, add) {
     else at('info', 'link', m.index, m[0].length, `Names the site ${host}.`);
   }
   for (const m of text.matchAll(new RegExp(REMOTE_INSTRUCTIONS.source, 'gi'))) {
-    at('bad', 'remote-instructions', m.index, m[0].length, 'Tells Jess to fetch instructions (or a "latest version") from the web when it runs, so what she follows could change after you approve it.');
+    at('bad', 'remote-instructions', m.index, m[0].length, 'Tells Jess to fetch instructions (or a "latest version") from the web when it runs, so what Jess follows could change after you approve it.');
   }
 }
 
@@ -337,7 +338,10 @@ export function urlFetchLines(text) {
 export function lintSkill({ name = '', raw = '', meta = null, body = '', files = [] } = {}, { others = [], tools = allTools() } = {}) {
   const out = [];
   const keys = new Set();
-  const add = f => { const k = `${f.file || ''}|${f.code}|${f.line}`; if (!keys.has(k)) { keys.add(k); out.push(f); } };
+  // Messages are written about "Jess"; the admin reads them with the assistant's own name (#7). Excerpts are left as they are.
+  const bot = botName();
+  const named = f => (bot === DEFAULT_NAME ? f : { ...f, message: String(f.message).replace(/\bJess\b/g, () => bot) });
+  const add = f => { const k = `${f.file || ''}|${f.code}|${f.line}`; if (!keys.has(k)) { keys.add(k); out.push(named(f)); } };
   const text = String(raw || '');
   const line = lineIndex(text);
 

@@ -18,6 +18,7 @@ import { getUser } from '../services/users.js';
 import { nextClockTime, inQuietHours, tzOf } from '../lib/when.js';
 import { readArticle, downloadImage } from '../browser/read.js';
 import * as feed from '../services/feed.js';
+import { botName } from '../services/bot.js';
 
 const MAX_TOPICS = 8;
 const MAX_STORIES = 6;
@@ -32,7 +33,7 @@ Return JSON: {"topics":[{"label":"…","query":"…","sites":["example.com"],"wh
 - when: only if they asked for a time of day, else "any".
 At most ${MAX_TOPICS} topics. Merge near-duplicates. If the request is empty or unclear, return a few broad, useful topics.`;
 
-const WRITE_PROMPT = `You are Jess, writing stories for one person's feed from articles you just read. For each article, in your own words:
+const WRITE_PROMPT = `You are {bot}, writing stories for one person's feed from articles you just read. For each article, in your own words:
 - title: clear and specific, ≤ 90 chars, no clickbait, no source name.
 - summary: one sentence, ≤ 160 chars.
 - body: markdown, 120–220 words: what happened, the key facts and numbers, why it matters to them. Short paragraphs,
@@ -169,7 +170,7 @@ async function writeStories(user, entries, { brief = false, signal } = {}) {
       + `Headline: ${oneLine(item?.title || post.title, 200)}\n`
       + fence('web_page', { source: item?.source_name || post.source_host }, text ? text.slice(0, 3500) : `(Couldn't open the article. Feed summary: ${item?.summary || post.summary || 'none'})`);
   }).join('\n\n');
-  const out = await askJson(user, brief ? WRITE_PROMPT : TAKE_PROMPT, content, { maxTokens: 1500 + 900 * entries.length, signal });
+  const out = await askJson(user, (brief ? WRITE_PROMPT : TAKE_PROMPT).replace('{bot}', botName), content, { maxTokens: 1500 + 900 * entries.length, signal });
   const byId = new Map((out.posts || []).map(w => [Number(w.id), w]));
   let written = 0;
   for (const { post, item } of entries) {

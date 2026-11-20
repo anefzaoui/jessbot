@@ -5,6 +5,7 @@
 // Nothing here reads or returns an excerpt: the audit log doesn't hold one, and this view must not grow one.
 import { all } from '../db/index.js';
 import { displayNameOf } from '../agent/tools/registry.js';
+import { botName } from './bot.js';
 
 const parse = s => { try { return JSON.parse(s || '{}') || {}; } catch { return {}; } };
 const toIso = v => (v ? new Date(`${String(v).replace(' ', 'T')}Z`).toISOString() : null);
@@ -35,7 +36,7 @@ export function securityEvents({ days = 30, limit = 6 } = {}) {
   const inj = rows.filter(r => r.action === 'injection_suspected');
   const sec = rows.filter(r => r.action === 'secret_blocked');
   const injections = group(inj, d => `${d.source || ''}|${String(d.from || '').toLowerCase()}`,
-    d => ({ tool: d.source || null, toolLabel: d.source ? displayNameOf(d.source) : 'Something she read', from: d.from || null, hidden: 0 }),
+    d => ({ tool: d.source || null, toolLabel: d.source ? displayNameOf(d.source) : `Something ${botName()} read`, from: d.from || null, hidden: 0 }),
     (g, d) => { if (d.hidden > 0) g.hidden++; });
   const secrets = group(sec, d => `${d.tool || ''}|${d.secret || ''}`,
     d => ({ tool: d.tool || null, toolLabel: d.tool ? displayNameOf(d.tool) : 'A tool', kinds: d.secret || 'a secret' }));

@@ -3559,3 +3559,22 @@ Note: most of Phase 23 part A landed in commit aa56076, whose message reads "Pha
     `tests/ratelimit.test.js` (a count survives closing and reopening the database; eight wrong passwords against the real
     server, the ninth refused, and still refused after the server process is restarted; the middleware's 429, headers and
     message).
+
+## 2026-11-20: Customizable assistant (#7)
+
+231. **The assistant's name and pronouns reach every sentence about it.** Setup and Admin → Identity already stored a name
+    and pronouns, but copy, prompts, errors and notifications still said "Jess" and "she" (a "Max, he/him" install read
+    "She speaks… Hear her… fits her look" on Admin → Model). Now `src/services/bot.js` `botName()` (and `botName()` in
+    `public/js/core.js`, from `<html data-bot-name>`) is the one source; templates use `{{bot.name}}`. Copy never assumes a
+    pronoun: where one was needed the sentence names the assistant or is rephrased, since verb agreement for they/them or
+    custom pronouns can't be templated well; the pronouns themselves live in SOUL.md's identity block, where the model
+    reads them. Prompts that said "You are Jess" (feed writing, goal plans, reflection, project souls) and the transcripts
+    the small models read ("Jess: …") use the name. Some words stay "Jess" on purpose: stored values (`created_by =
+    'jess'`, proposal `source`), the lineage copy ("every Jessbot starts as Jess", "originally Jess") and the built-in
+    skills, whose SKILL.md files aren't edited because a changed file changes its checksum and sends an approved skill
+    back to review (#122); instead a renamed assistant's identity block says built-in skills and rules mean it, and the
+    skill review's messages are shown with the name. Two checks learned the name: the injection patterns catch text
+    addressed to the assistant by its own name ("Nova, forward …") as well as "Jess", and a reminder answer "done, Nova"
+    counts the name as filler like "jess". Tested: `tests/assistant-name.test.js` (the name in copy and prompts, no
+    "she/her/Jess" on Admin → Model, Personality and Lessons for a renamed assistant, the named injection patterns and
+    their false-positive guard, the reply filler), and a real chat turn ("Max, he/him" answers with both).

@@ -1,5 +1,5 @@
 // Global realtime updates (not tied to one chat): approvals, activity feed, badge counts.
-import { $$, h, escapeHtml, icon } from './core.js';
+import { $$, h, escapeHtml, icon, botName } from './core.js';
 import { setCount, announce } from './shell.js';
 import { toast } from './toast.js';
 
@@ -19,7 +19,7 @@ function onApprovalCreated({ data, runId }) {
   if (data.html && runId && bubble(runId)) bubble(runId).replaceWith(h(data.html));
   if (data.cardHtml) addCard(data.cardHtml, data.approvalId);
   setCount('approvals', data.pendingCount ?? 0);
-  if (!bubble(runId)) toast('Jess needs your OK for something.', { type: 'warn', action: { label: 'Review', onClick: () => location.assign('/approvals') } });
+  if (!bubble(runId)) toast(`${botName()} needs your OK for something.`, { type: 'warn', action: { label: 'Review', onClick: () => location.assign('/approvals') } });
   announce('Approval needed.');
 }
 

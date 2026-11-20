@@ -8,6 +8,7 @@ import { overBudget } from './policy.js';
 import { renderMarkdown } from '../lib/markdown.js';
 import { publish } from '../lib/bus.js';
 import { badRequest, HttpError } from '../lib/errors.js';
+import { botName } from './bot.js';
 
 /** The text an item's read-aloud reads (its own text; a page's visible text). Pictures and audio have none. */
 export function textToRead(item) {
@@ -31,7 +32,7 @@ export async function recordAloud(user, { item = null, text = null, title = null
   const saved = createFileItem({
     user, title: partial ? `${name} (part)` : name, type: 'audio', ext: 'wav', mime: 'audio/wav', buffer: out.wav,
     text: out.script, preview: renderMarkdown(out.script), meta: { durationMs: out.durationMs, peaks: out.peaks, voice: out.voice, parts: out.made },
-    description: `Read aloud · ${length}${partial ? ` · ${out.made} of ${out.parts} parts` : ''}`, threadId, runId, sourceLabel: 'Read aloud by Jess',
+    description: `Read aloud · ${length}${partial ? ` · ${out.made} of ${out.parts} parts` : ''}`, threadId, runId, sourceLabel: `Read aloud by ${botName()}`,
     sourceItemId: item?.id ?? null,
   });
   return { item: saved, view: itemView(saved), length, partial, made: out.made, parts: out.parts, stopped: out.stopped, error: out.error || null };

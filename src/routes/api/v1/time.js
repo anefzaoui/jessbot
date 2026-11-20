@@ -12,6 +12,7 @@ import { run } from '../../../db/index.js';
 import { invalid, badRequest, tooMany } from '../../../lib/errors.js';
 import { hit } from '../../../lib/ratelimit.js';
 import { notesFor } from '../../../services/notes.js';
+import { botName } from '../../../services/bot.js';
 
 const router = Router();
 const view = a => alarms.alarmView(a);
@@ -117,7 +118,7 @@ router.post('/push/test', async (req, res) => {
   if (!l.allowed) throw tooMany('Enough tests for now — try again in a few minutes.');
   const devices = devicesOf(req.user.id).filter(d => d.push_token);
   if (!devices.length) throw badRequest('No device is set up for notifications yet.');
-  const results = await Promise.all(devices.map(d => pushTo(d, { kind: 'message', title: 'Test from Jess', body: 'Notifications reach this device.', href: '/me/notifications', tag: 'push-test' })));
+  const results = await Promise.all(devices.map(d => pushTo(d, { kind: 'message', title: `Test from ${botName()}`, body: 'Notifications reach this device.', href: '/me/notifications', tag: 'push-test' })));
   res.json({ sent: results.filter(r => r === 'sent').length, gone: results.filter(r => r === 'gone').length, failed: results.filter(r => r === 'failed').length });
 });
 

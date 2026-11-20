@@ -10,6 +10,7 @@ import { ftsAny } from '../lib/fts.js';
 import { validTimezone, dayKey, dayLabel } from '../lib/when.js';
 import { invalid } from '../lib/errors.js';
 import { settleNudge } from './reply-actions.js';
+import { botName } from './bot.js';
 
 export const OFFLOAD_OVER = Number(process.env.JESSBOT_OFFLOAD_TOKENS) || 2000;
 const BLOBS = path.join(paths.data, 'blobs');
@@ -161,11 +162,11 @@ export function dayDigest(userId, { from, to, tz = 'UTC', maxLines = 40 } = {}) 
     const acts = [...new Set(d.activity)];
     lines.push(`${d.day} (${label}): ${d.messages.length} message${d.messages.length === 1 ? '' : 's'}`
       + `${d.threads.size ? ` in ${[...d.threads].slice(0, 3).map(t => `“${clip(t, 40)}”`).join(', ')}${d.threads.size > 3 ? ` and ${d.threads.size - 3} more` : ''}` : ''}`
-      + `${acts.length ? `; Jess: ${acts.slice(0, 3).map(a => clip(a, 60)).join(', ')}${acts.length > 3 ? ` (+${acts.length - 3})` : ''}` : ''}`);
+      + `${acts.length ? `; ${botName()}: ${acts.slice(0, 3).map(a => clip(a, 60)).join(', ')}${acts.length > 3 ? ` (+${acts.length - 3})` : ''}` : ''}`);
     const detail = [...d.notes.map(n => `  Noted: ${clip(n, 200)}`),
       // Their own words say best what the day was about; Jess's replies only when they said nothing (a briefing day).
       ...(d.messages.some(m => m.role === 'user') ? d.messages.filter(m => m.role === 'user') : d.messages)
-        .map(m => `  - ${time(m.created_at)} ${m.role === 'user' ? 'Them' : 'Jess'}: ${clip(m.content, 100)}`)];
+        .map(m => `  - ${time(m.created_at)} ${m.role === 'user' ? 'Them' : botName()}: ${clip(m.content, 100)}`)];
     for (const l of detail.slice(0, perDay)) { if (lines.length >= maxLines) break; lines.push(l); }
   }
   if (shown < list.length) lines.push(`(${list.length - shown} more day${list.length - shown === 1 ? '' : 's'} not shown: ask for fewer days)`);

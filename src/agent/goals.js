@@ -26,6 +26,7 @@ import { enqueueRun, cancelRun, onRunFinished, onRunRetried } from './loop.js';
 import { pokeScheduler } from './proactive.js';
 import { worthReviewing, worthReflecting } from './sense.js';
 import { prepTick } from '../services/prep.js';
+import { botName } from '../services/bot.js';
 
 const REVIEW_EVERY_MS = 864e5;           // active goals get a check-in daily…
 const REVIEW_LONG_MS = 3 * 864e5;        // …longer-horizon ones every three days
@@ -45,7 +46,7 @@ already tell you. If nothing important is missing, return no questions: that is 
 Options must be concrete and specific to their answers (3–6 each).
 Return JSON {"questions":[{"header":"1–2 words","question":"…","kind":"single|multi","options":[{"label":"…","description":"optional"}]}]}`;
 
-const PLAN_PROMPT = `You are Jess, the person's capable personal agent. From their goal and answers, lay out everything YOU can do for them:
+const PLAN_PROMPT = `You are {bot}, the person's capable personal agent. From their goal and answers, lay out everything YOU can do for them:
 concrete things you will actually do with your capabilities (listed below) — never generic advice they must do alone.
 4–8 steps: mostly one-off deliverables (research, a plan document, a tracker or dashboard page, a draft, a comparison, a shortlist),
 plus at most 3 recurring routines (a weekly progress check, a daily nudge, a monthly review). Order: the best ones to start with first.
@@ -71,7 +72,7 @@ const REVIEW_PROMPT = `You keep track of one of the person's goals. From the pla
   after = numbers of PLAN steps it needs finished first) only when clearly useful and new.
 - done: true only if the goal is clearly achieved.`;
 
-const REFLECT_PROMPT = `You are Jess, reflecting on recent conversations with the person to find ways to help proactively.
+const REFLECT_PROMPT = `You are {bot}, reflecting on recent conversations with the person to find ways to help proactively.
 Return JSON {"ideas":[{"title":"…","why":"…","category":"…","icon":"…","kind":"…","prompt":"…","from":123}],"goals":[{"title":"…","category":"…","why":"…"}]}
 - ideas (0–5): concrete things you could do for them, e.g. "Lower back recovery regimen", "Kindergarten coordination", "Permit applications".
   title ≤ 60 chars · why: 1–2 sentences speaking to them, grounded in what they said · category: one of CATEGORIES · icon: one of ICONS ·
@@ -167,7 +168,7 @@ export function skipIntake(g) {
 // ---- Plan -----------------------------------------------------------------------------------------------------
 export const buildPlan = g => job(g, 'plan', async () => {
   const user = getUser(g.user_id);
-  const out = await ask(user, PLAN_PROMPT.replace('ICONS', G.TASK_ICONS.join(', ')),
+  const out = await ask(user, PLAN_PROMPT.replace('{bot}', botName).replace('ICONS', G.TASK_ICONS.join(', ')),
     `GOAL: ${g.title} (${G.categoryOf(g.category).label}${g.horizon === 'long' ? ', longer horizon' : ''})\nTHEIR ANSWERS:\n${answersText(g)}\n\n`
     + `${knownAbout(user)}\n\nYOUR CAPABILITIES FOR THEM:\n${capabilities(user)}`, 'goals', 4000);
   const added = G.addTasks(g, out.steps);
@@ -366,7 +367,7 @@ export async function reflect(user, { force = false } = {}) {
       convo.unshift(line);
     }
     const goals = all(`SELECT title, state FROM goals WHERE user_id = ?`, user.id);
-    const out = await ask(user, REFLECT_PROMPT.replace('CATEGORIES', IDEA_CATEGORIES.join(', ')).replace('ICONS', IDEA_ICONS.join(', ')),
+    const out = await ask(user, REFLECT_PROMPT.replace('{bot}', botName).replace('CATEGORIES', IDEA_CATEGORIES.join(', ')).replace('ICONS', IDEA_ICONS.join(', ')),
       `RECENT MESSAGES FROM THEM:\n${convo.join('\n') || '(none yet)'}\n\n${knownAbout(user)}\n\n`
       + `ALREADY SUGGESTED:\n${ideaTitles(user).map(i => `- ${i.title} (${i.state})`).join('\n') || '(none)'}\n\n`
       + `${G.turnedDownBlock(user, 20) || 'TURNED DOWN (with why): (none)'}\n\n`
@@ -426,7 +427,7 @@ async function nudgeWelcome(user, g, lapse) {
     user, timeoutMs: 4000,
     state: { goal: g.title, rhythm: `${m.label}: ${m.per_week} a week`, this_week: `${G.weekCount(m, { tz: tzOf(user) })} so far`,
       last_logged: lapse.lastAt ? `${lapse.idleDays} days ago` : 'never yet',
-      recent_chat: recent.map(x => `${x.created_at} ${x.role === 'user' ? 'Them' : 'Jess'}: ${String(x.content).replace(/\s+/g, ' ').slice(0, 300)}`).join('\n') || '(no recent chat)' },
+      recent_chat: recent.map(x => `${x.created_at} ${x.role === 'user' ? 'Them' : botName()}: ${String(x.content).replace(/\s+/g, ' ').slice(0, 300)}`).join('\n') || '(no recent chat)' },
     questions: { welcome: noul('Would a short, friendly "how is it going?" nudge about this goal be welcome right now? Not if `recent_chat` '
       + 'shows they are ill, injured, travelling, grieving or taking a deliberate break, have dropped or paused this goal, or already '
       + 'said they did it recently.') },

@@ -20,6 +20,7 @@ import { getTool, displayNameOf } from '../agent/tools/registry.js';
 import { unseal } from '../lib/secrets.js';
 import { officeRenderStatus } from './office-render.js';
 import { spendSpike, balanceView } from './spend-watch.js';
+import { botName } from './bot.js';
 
 const INCLUDE = ['workspace', 'users', 'artifacts', 'uploads', 'blobs', 'feed', 'shots', 'voice'];
 const KEEP = { auto: 7, manual: 20, 'pre-migrate': 10 };
@@ -130,7 +131,7 @@ export function doctor({ cli = false } = {}) {
   // Model
   const llm = llmSettings();
   out.push(llm.apiKey ? check('model', 'AI model', 'ok', `${llm.model}${llm.fallbacks.length ? ` · falls back to ${llm.fallbacks.join(', ')}` : ''}`, null, '/admin/model')
-    : check('model', 'AI model', 'bad', 'No API key — Jess can’t think.', 'Add an OpenRouter key in Admin → Model.', '/admin/model'));
+    : check('model', 'AI model', 'bad', `No API key — ${botName()} can’t think.`, 'Add an OpenRouter key in Admin → Model.', '/admin/model'));
   // The OpenRouter balance (decision #179), as last read by the spend watch (refreshed every few hours and from Admin → Usage).
   const bal = llm.apiKey ? balanceCheck() : null;
   if (bal) out.push(bal);
@@ -207,7 +208,7 @@ export function securityChecks() {
     safely('local-network', 'Local network', () => (browserSettings().allowPrivate
       ? check('local-network', 'Local network', 'warn', 'Allowed: web pages, the browser, mail, calendar and push can reach devices on this network (Admin → Browser → Local network is on)',
         'Turn it off unless a service you use lives on your own network.', '/admin/browser')
-      : check('local-network', 'Local network', 'ok', 'Blocked: nothing Jess opens can reach devices on this network', null, '/admin/browser'))),
+      : check('local-network', 'Local network', 'ok', `Blocked: nothing ${botName()} opens can reach devices on this network`, null, '/admin/browser'))),
     safely('grants', 'Always-allowed actions', alwaysAllowCheck),
     safely('secret-key', 'Password key', secretKeyCheck),
     safely('skill-lint', 'Skill warnings', () => {
@@ -230,7 +231,7 @@ export function securityChecks() {
       }
       return check('injection', 'Hidden instructions', 'warn',
         `${rows.length} suspected in the last 7 days (${Object.entries(bySource).map(([k, n]) => `${k} ${n}`).join(', ')})${latest ? `; latest from ${latest}` : ''}`,
-        'Jess treated them as information, not instructions. If one keeps coming from the same sender or site, stop using it; the audit log has each one.');
+        `${botName()} treated them as information, not instructions. If one keeps coming from the same sender or site, stop using it; the audit log has each one.`);
     }),
     safely('spend', 'Spending', () => spendSpikeCheck()),
   ];
