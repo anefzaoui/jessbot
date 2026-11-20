@@ -12,7 +12,7 @@ Base path: `/api/v1`. It's used by the web UI's JavaScript and by the future And
 | 404 | Not found |
 | 410 | Gone (e.g. a used invite) |
 | 422 | Validation failed |
-| 429 | Rate limited |
+| 429 | Rate limited (`Retry-After` and `RateLimit`/`RateLimit-Policy` headers say when to try again) |
 | 503 | Setup not finished |
 
 ## Authentication
@@ -27,7 +27,10 @@ Only a SHA-256 of each token is stored. Revoking a session (`/me/sessions/:id/re
 
 ### `POST /auth/login`
 Body: `{ "email", "password", "device"?: "Pixel 9" }` → `200 { token, user }`.
-Rate limit: 8 attempts per 15 minutes per IP and email. Wrong email and wrong password get the same response and take the same time.
+Rate limit: 8 attempts per 15 minutes per IP and email, and 30 per 15 minutes per IP across sign-in, setup and invites.
+Limits are stored in the database, so a restart doesn't reset them. Wrong email and wrong password get the same
+response and take the same time. Every request also counts against a general limit of 1,200 a minute per person
+(signed out: per address).
 
 ### `POST /auth/logout` (auth)
 Revokes the current session. → `{ ok: true }`

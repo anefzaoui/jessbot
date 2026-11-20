@@ -9,7 +9,7 @@ import { audit } from '../../services/audit.js';
 import { setSessionCookie, clearSessionCookie } from '../../middleware/auth.js';
 import { formPost, localPath } from '../../lib/respond.js';
 import { HttpError, invalid, tooMany } from '../../lib/errors.js';
-import { hit, reset } from '../../lib/ratelimit.js';
+import { hit, reset, signInLimit } from '../../lib/ratelimit.js';
 import { oversightOn } from '../../services/oversight.js';
 
 const router = Router();
@@ -41,7 +41,7 @@ router.get('/login', (req, res) => {
   res.render('login', loginData(req));
 });
 
-router.post('/login', formPost('login', loginData, async (req, res) => {
+router.post('/login', signInLimit, formPost('login', loginData, async (req, res) => {
   const user = await authenticate(req, req.body);
   setSessionCookie(req, res, createSession(user.id, { device: deviceLabel(req.get('user-agent')), ip: req.ip }));
   return { redirect: safeNext(req.body.next) };
@@ -69,7 +69,7 @@ router.get('/invite/:token', (req, res) => {
   res.status(data.invite ? 200 : 410).render('invite', data);
 });
 
-router.post('/invite/:token', formPost('invite', inviteData, async (req, res) => {
+router.post('/invite/:token', signInLimit, formPost('invite', inviteData, async (req, res) => {
   if (!hit(`invite:${req.ip}`, { limit: 10, windowMs: 15 * 60e3 }).allowed) throw tooMany('Too many attempts. Wait a few minutes.');
   if (req.body.password !== req.body.confirm) throw invalid({ confirm: 'Passwords don’t match.' });
   const user = await acceptInvite(req.params.token, req.body);
