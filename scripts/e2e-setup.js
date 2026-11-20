@@ -207,18 +207,23 @@ try {
     // The engine (decision #218): Chromium by default, no licence section; switching keeps the other settings.
     expect(await owner.isChecked('input[name="engine"][value="chromium"]'), 'Chromium is not the default engine');
     expect(await owner.locator('form[action="/admin/browser/license"]').count() === 0, 'a licence form shows for Chromium');
-    await owner.click('label:has(input[name="engine"][value="cloakbrowser"])');
-    await Promise.all([owner.waitForEvent('framenavigated'), owner.click('form[action="/admin/browser/engine"] button')]);
-    await owner.waitForLoadState('load');
+    // Switch, then wait for the reloaded page to show the engine as saved (its server-rendered `checked`), not for a
+    // navigation event that can come and go before the wait starts.
+    const switchEngine = async id => {
+      await owner.click(`label:has(input[name="engine"][value="${id}"])`);
+      const [res] = await Promise.all([owner.waitForResponse(r => r.url().endsWith('/admin/browser/engine') && r.request().method() === 'POST'),
+        owner.click('form[action="/admin/browser/engine"] button')]);
+      expect(res.ok(), `switching to ${id} failed (${res.status()})`);
+      await owner.waitForFunction(v => document.querySelector(`input[name="engine"][value="${v}"]`)?.defaultChecked, id, { timeout: 15000 });
+    };
+    await switchEngine('cloakbrowser');
     await owner.waitForSelector('form[action="/admin/browser/license"]');
     expect((await owner.innerText('[data-browser-status] h2')).includes('CloakBrowser'), 'status card not on CloakBrowser');
     expect(!(await owner.isChecked('input[name="blockMedia"]')), 'switching the engine reset another setting');
     await owner.fill('#bs-key', 'not-a-key');
     await owner.click('form[action="/admin/browser/license"] button');
     await owner.waitForSelector('form[action="/admin/browser/license"] [data-field-error]');
-    await owner.click('label:has(input[name="engine"][value="chromium"])');
-    await Promise.all([owner.waitForEvent('framenavigated'), owner.click('form[action="/admin/browser/engine"] button')]);
-    await owner.waitForLoadState('load');
+    await switchEngine('chromium');
     expect(await owner.getAttribute('[data-browser-state]', 'data-browser-state') === 'ready', 'Chromium not ready after switching back');
   });
 

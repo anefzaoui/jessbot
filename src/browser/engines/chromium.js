@@ -83,9 +83,23 @@ const lastLine = s => s.split('\n').map(l => l.trim()).filter(Boolean).at(-1) ||
 export const installProgress = () => progress;
 
 /** Launch it: the full Chromium in new headless mode. */
+// Launched as a browser server we hold on to: Chromium's own shutdown can hang on some systems (seen on Windows with
+// Chromium, Chrome and Edge alike), and a server can always be stopped by killing its process (stop() below).
+const servers = new WeakMap();
 export async function launch() {
   const sys = systemPath();
-  return chromium.launch({ headless: true, ...(sys ? { executablePath: sys } : { channel: 'chromium' }) });
+  const server = await chromium.launchServer({ headless: true, ...(sys ? { executablePath: sys } : { channel: 'chromium' }) });
+  const browser = await chromium.connect(server.wsEndpoint());
+  servers.set(browser, server);
+  return browser;
+}
+
+/** Stop a browser this engine launched for good (its process, not just our connection to it). */
+export async function stop(browser) {
+  const server = servers.get(browser);
+  servers.delete(browser);
+  await browser.close().catch(() => {}); // a connected browser: this only disconnects
+  await server?.kill().catch(() => {});
 }
 
 /** A desktop user agent for this browser's version, without "HeadlessChrome". */
