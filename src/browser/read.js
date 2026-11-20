@@ -1,4 +1,4 @@
-// Reading pages, searching and screenshots — all through CloakBrowser (./index.js).
+// Reading pages, searching and screenshots — all through the browser (./index.js).
 // Extraction: @mozilla/readability on a linkedom DOM → Turndown markdown (links reduced to their text,
 // media dropped: fewer tokens, same meaning). Text hidden from readers never gets that far (decision #118): an in-page
 // pass with computed styles (visibleHtml), then the same rules on inline styles in extract(). web_read: site readers

@@ -140,7 +140,7 @@ export function doctor({ cli = false } = {}) {
   const failed = recent.filter(r => r.ok === false).length;
   out.push(!b.installed ? check('browser', 'Web browser', 'bad', 'Not installed — no web search, reading or feed.', 'Install it in Admin → Browser.', '/admin/browser')
     : recent.length >= 5 && failed / recent.length > 0.5 ? check('browser', 'Web browser', 'warn', `${failed} of the last ${recent.length} page loads failed`, 'Check the internet connection; see Admin → Browser for which sites.', '/admin/browser')
-      : check('browser', 'Web browser', 'ok', `CloakBrowser ${b.version || ''}${b.running ? ' · running' : ' · idle'}`, null, '/admin/browser'));
+      : check('browser', 'Web browser', 'ok', `${b.engine.label} ${b.version || ''}${b.running ? ' · running' : ' · idle'}`, null, '/admin/browser'));
   // Office previews (decision #162): LibreOffice is optional, so its absence is information, never a problem.
   const office = officeRenderStatus();
   out.push(check('office', 'Office previews', 'ok', office.available

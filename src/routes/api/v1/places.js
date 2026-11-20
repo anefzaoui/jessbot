@@ -1,5 +1,5 @@
 // Places + weather (Phase 7b, decisions #30/#49). Saving a place by name geocodes it; by coordinates (browser GPS)
-// reverse-geocodes it. Both go through CloakBrowser.
+// reverse-geocodes it. Both go through the browser.
 import { Router } from 'express';
 import { geocode, placeName, reverseGeocode, savePlace, placesOf, placeForUser, removePlace, primaryPlace, placeView } from '../../../services/places.js';
 import * as weather from '../../../services/weather.js';

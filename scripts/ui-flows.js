@@ -1,11 +1,9 @@
 // DEV: interaction regression tests against the styleguide's simulated API (local Edge/Chrome, localhost only).
 //   node scripts/ui-flows.js [--base http://127.0.0.1:3738]
 import fs from 'node:fs';
-import { chromium } from 'playwright-core';
+import { chromium, executablePath as exe } from './lib/test-browser.js';
 
 const BASE = process.argv.includes('--base') ? process.argv[process.argv.indexOf('--base') + 1] : 'http://127.0.0.1:3738'; // dev server
-const exe = ['C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe', 'C:/Program Files/Google/Chrome/Application/chrome.exe',
-  '/usr/bin/google-chrome', '/usr/bin/chromium'].find(p => fs.existsSync(p));
 
 const browser = await chromium.launch({ executablePath: exe, headless: true });
 const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });

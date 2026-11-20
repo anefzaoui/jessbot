@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
 import net from 'node:net';
-import { chromium } from 'playwright-core';
+import { chromium, executablePath as exe } from './lib/test-browser.js';
 import WebSocket from 'ws';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname.replace(/^\/(\w:)/, '$1')), '..');
@@ -48,8 +48,6 @@ await http('POST', '/admin/groups', { body: { name: 'Family' }, cookie: ownerCoo
 await http('POST', `/admin/people/${ownerId}/groups`, { body: { groups: ['1'] }, cookie: ownerCookie });
 
 // ---- Browser ---------------------------------------------------------------------------------------
-const exe = ['C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe', 'C:/Program Files/Google/Chrome/Application/chrome.exe',
-  '/usr/bin/google-chrome', '/usr/bin/chromium'].find(p => fs.existsSync(p));
 const browser = await chromium.launch({ executablePath: exe, headless: true });
 const errors = [];
 async function pageFor(cookie) {
@@ -272,7 +270,7 @@ try {
     }, before, { timeout });
   };
 
-  await test('web: searches, reads a page through CloakBrowser, answers with a source', async () => {
+  await test('web: searches, reads a page through the browser, answers with a source', async () => {
     await sendAndWait('Use web_search to find the English Wikipedia article about Lyon, then web_read that article. '
       + 'Tell me in one sentence which river(s) Lyon sits on, and include the article link.', 180000);
     const steps = await owner.locator('[data-run-owner]').last().locator('[data-step-id]').allTextContents(); // collapsed <details>: innerText is empty

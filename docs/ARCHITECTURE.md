@@ -18,7 +18,7 @@ Product scope: `docs/FEATURES.md`. Why things are the way they are: `docs/DECISI
  │        │                                                    │
  │ agent/loop  ── prompt layers ── tools/registry ── skills     │
  │        │              │                    │                │
- │   OpenRouter (LLM)  data/workspace/*.md   CloakBrowser (./tools) │
+ │   OpenRouter (LLM)  data/workspace/*.md   Chromium (./tools)     │
  │        │                                                    │
  │ scheduler (croner) · background runs · run_events log       │
  └──────────────── node:sqlite  data/jessbot.sqlite ───────────┘
@@ -43,7 +43,7 @@ src/routes/web/      one file per page group, each page = one route
 src/routes/api/v1/   JSON API for web JS + Android
 src/services/        domain logic (no HTTP) — shared by web + API
 src/agent/           loop, prompt builder, tool registry, tools/*
-src/browser/         CloakBrowser: shared headless browser, network guard, search / read / screenshot (P5)
+src/browser/         shared headless browser (engines/: Chromium, optional CloakBrowser), network guard, search / read / screenshot (P5)
 src/agent/proactive.js  the scheduler: alarms, reminders, timers, scheduled tasks, check-ins (P7)
 src/views/           layouts/ (base, app) · partials/ (components) · pages/
 src/styles/input.css Tailwind v4 design system → public/css/app.css
@@ -101,7 +101,7 @@ npm run dev          # dev server on :3738 (data/dev); restarts when src/ change
 npm start            # the server on :3737 (data/)
 npm run doctor       # health checks from the command line (works with Jessbot stopped)
 npm run restore      # list backups; `npm run restore -- <name>` restores one (Jessbot stopped)
-npm run browser:install   # download CloakBrowser into tools/cloakbrowser (also from setup or Admin → Browser)
+npm run browser:install   # download the browser (Chromium into tools/ms-playwright; also from setup or Admin → Browser)
 npm test             # unit tests (node --test, throwaway data dir)
 npm run test:e2e     # setup/auth/invites end-to-end (own server, throwaway data)
 npm run test:chat    # chat core against the REAL model (a few cheap calls)

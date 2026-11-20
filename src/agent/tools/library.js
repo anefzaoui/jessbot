@@ -51,7 +51,7 @@ function screenedProblems(ctx, r, item) {
 }
 
 /**
- * An HTML page just saved: one render through CloakBrowser gives its thumbnail, the checks and a phone screenshot
+ * An HTML page just saved: one render through the browser gives its thumbnail, the checks and a phone screenshot
  * (services/page-check.js). Best effort and time-bounded: without the browser, or when the render fails, the save stands
  * and there are no checks. → { item, note: text for the model ('' when none), shot: attachment ref | null }.
  */

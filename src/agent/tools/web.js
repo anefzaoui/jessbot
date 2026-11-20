@@ -1,4 +1,4 @@
-// Web tools (Phase 5) — search, read and screenshot through CloakBrowser (src/browser/, decision #15).
+// Web tools (Phase 5) — search, read and screenshot through the browser (src/browser/, decisions #15, #218).
 // All reads: the policy may still turn the whole "web" toolset off or to ask-first per person.
 // Phase 21: web_read has site readers (PDF, feeds, YouTube, X, Reddit — #135) and an escalation ladder past bot walls
 // (#136); web_search searches by intent (freshness, news, reference, cross-check — #137), SearXNG first when set up (#138).

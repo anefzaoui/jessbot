@@ -1,5 +1,5 @@
 // Place + weather tools (Phase 7b, decisions #30/#49; by day and hour, UV, wind and history #140). Weather comes from
-// Open-Meteo through CloakBrowser.
+// Open-Meteo through the browser.
 import { registerTool } from './registry.js';
 import { geocode, placeName, savePlace, primaryPlace } from '../../services/places.js';
 import * as weather from '../../services/weather.js';

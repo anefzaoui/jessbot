@@ -1,7 +1,7 @@
 // Phase 22 part D (decisions #144–#147): Library edits (find/replace patches, appends to logs, rows added to their
 // spreadsheets), searchable titles for any file, a page exported as a print-ready PDF or PNG, and the visual self-check
-// of the pages Jess makes. Run: npm test (node --test, throwaway data dir). The render tests need CloakBrowser in
-// tools/cloakbrowser (`npm run browser:install`) and are skipped without it; everything else runs anywhere.
+// of the pages Jess makes. Run: npm test (node --test, throwaway data dir). The render tests need the browser in
+// tools/ (`npm run browser:install`) and are skipped without it; everything else runs anywhere.
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -370,7 +370,7 @@ test('check results read as short lines; a blank screen needs flat pixels; shot 
   for (const badRef of ['shot:../../.env', 'shot:u7-zz.jpg', 'abc123', `shot:u7-${'0'.repeat(16)}.jpg`]) assert.equal(check.shotImagePart(badRef), null, badRef);
 });
 
-// ---- Real renders through CloakBrowser ------------------------------------------------------------------------------
+// ---- Real renders through the browser ------------------------------------------------------------------------------------
 const BROKEN = `<!doctype html>
 <html><head><meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="https://evil.example.com/x.js"></script></head>
@@ -379,7 +379,7 @@ const BROKEN = `<!doctype html>
 new Chart(document.body, {});
 </script></body></html>`;
 
-test('page check (real render): a JS error with its line, a blocked script and phone overflow; the thumbnail is saved; the model gets a phone screenshot', { skip: !BROWSER && 'CloakBrowser is not installed (npm run browser:install)' }, async () => {
+test('page check (real render): a JS error with its line, a blocked script and phone overflow; the thumbnail is saved; the model gets a phone screenshot', { skip: !BROWSER && 'the browser is not installed (npm run browser:install)' }, async () => {
   const u = await createUser({ name: 'Page Maker', email: 'page.maker@t.dev', password: 'correct horse battery' });
   const ctx = await toolCtx(u);
   const out = await (await tool('library_create')).run({ title: 'Broken budget', type: 'html', content: BROKEN }, ctx);
@@ -410,7 +410,7 @@ test('page check (real render): a JS error with its line, a blocked script and p
   assert.equal(get(`SELECT level FROM run_taint WHERE run_id = ? AND tool = 'page_check'`, ctx.run.id)?.level, 'high');
 });
 
-test('library_export (real render): an A5 landscape PDF and a square PNG from a page, linked back; the same size again is a new version', { skip: !BROWSER && 'CloakBrowser is not installed (npm run browser:install)' }, async () => {
+test('library_export (real render): an A5 landscape PDF and a square PNG from a page, linked back; the same size again is a new version', { skip: !BROWSER && 'the browser is not installed (npm run browser:install)' }, async () => {
   const { getDocumentProxy, extractText } = await import('unpdf');
   const u = await createUser({ name: 'Print Maker', email: 'print.maker@t.dev', password: 'correct horse battery' });
   const ctx = await toolCtx(u);

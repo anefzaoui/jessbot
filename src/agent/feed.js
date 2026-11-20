@@ -1,7 +1,7 @@
 // The Feed's writer (decisions #34, #54). Three cheap model calls, everything else is plain code:
 //   tune   — the person's words → topics (a Google News query each, plus sites they named, discovered with feedscout)
 //   rank   — recent unposted items → the few worth their time, with a one-line "why"
-//   write  — the picked articles (read through CloakBrowser) → stories in Jess's words + a short brief
+//   write  — the picked articles (read through the browser) → stories in Jess's words + a short brief
 // Digests run when someone tunes or refreshes, and on their own at 07:00 / 12:30 / 18:30 local (outside quiet hours).
 import { all, run as sql } from '../db/index.js';
 import { discoverSiteFeed, removedOf, removedKey, slug, cleanDomain, MAX_TOPICS as MAX_TOPICS_TOTAL } from '../services/feed-sources.js';

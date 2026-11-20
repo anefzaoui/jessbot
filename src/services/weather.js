@@ -1,4 +1,4 @@
-// Weather (decisions #30, #49): Open-Meteo forecasts fetched through CloakBrowser, normalised, cached per ~1 km
+// Weather (decisions #30, #49): Open-Meteo forecasts fetched through the browser, normalised, cached per ~1 km
 // (coords rounded to 2 dp) for 30 min and served stale up to 6 h when a refresh fails. Buckets drive the avatar's sky.
 // Data by Open-Meteo.com (CC BY 4.0) — credited wherever weather is shown.
 import { get, run } from '../db/index.js';
@@ -171,7 +171,7 @@ export const skyOf = user => (user ? sky(weatherOf(user)?.forecast) : null);
 // ---- One day by the hour, and the past (decision #140) ---------------------------------------------------------------
 // "Saturday at the beach?" and "when does the rain stop?" need one date's hours, up to 16 days out (fetched on demand, not
 // part of the cached 7-day forecast); "how hot was last August?" needs the archive (ERA5, 1940 onwards). Same source, same
-// fetch path (CloakBrowser, #15/#30), same credit. Small in-process caches: a day for 30 min, the past for 12 h.
+// fetch path (the browser, #15/#30), same credit. Small in-process caches: a day for 30 min, the past for 12 h.
 export const FORECAST_DAYS_MAX = 16;
 export const HISTORY_DAYS_MAX = 731;
 export const HISTORY_FROM = '1940-01-01';

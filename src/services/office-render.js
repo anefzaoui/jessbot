@@ -4,7 +4,7 @@
 // 500 MB), never required and never installed by Jessbot; without it the Library keeps its HTML previews built from the
 // file's content (services/office.js).
 //
-// Found like CloakBrowser is: an admin setting (`office.soffice`: a path, or `office.previews: false` to switch previews
+// Found like the browser is: an admin setting (`office.soffice`: a path, or `office.previews: false` to switch previews
 // off), the JESSBOT_SOFFICE environment variable, `soffice` on PATH, then the standard install folders. Each conversion:
 //   - runs alone (one queue for the whole server), with a time limit; on timeout the whole process tree is killed;
 //   - gets a fresh, throwaway LibreOffice profile (-env:UserInstallation) seeded so the document can't reach out or run

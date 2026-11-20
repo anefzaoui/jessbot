@@ -1,6 +1,7 @@
 {{!--
-  CloakBrowser status card body (Admin → Browser). Re-rendered by GET /admin/browser/status while it changes.
-  status: { installed, version, tier, platform, binaryPath, installing, installError, progress: { downloadedMB, totalMB, pct, unpacking }?,
+  Browser status card body (Admin → Browser, setup's Internet step). Re-rendered by GET /admin/browser/status while it changes.
+  status: { engine: { id, label, summary }, engines: [{ id, label, summary }], installed, source: bundled|system, version, tier?,
+            platform, binaryPath, installing, installError, progress: { downloadedMB, totalMB, pct, unpacking }?,
             unsupported?, running, openPages, queued, lastUsedAt, blockedCount, license: { present, masked?, source? },
             adblock?: { ready, error, building, blocked }, searxng?: { url, healthy, lastError, downUntil } }
 --}}
@@ -10,19 +11,20 @@
   </span>
   <div class="min-w-0 flex-1">
     <div class="flex flex-wrap items-center gap-2">
-      <h2 class="text-base font-semibold">CloakBrowser</h2>
+      <h2 class="text-base font-semibold">{{status.engine.label}}</h2>
       {{#if status.installing}}<span class="badge badge-accent">Installing</span>
       {{else if status.installed}}<span class="badge badge-ok">Ready</span>
       {{else}}<span class="badge badge-warn">Not installed</span>{{/if}}
-      {{#if status.installed}}<span class="badge badge-neutral">{{#if (eq status.tier 'pro')}}Licensed build{{else}}Free build{{/if}}</span>{{/if}}
+      {{#if (and status.installed status.tier)}}<span class="badge badge-neutral">{{#if (eq status.tier 'pro')}}Licensed build{{else}}Free build{{/if}}</span>{{/if}}
+      {{#if (and status.installed (eq status.source 'system'))}}<span class="badge badge-neutral">Installed on this computer</span>{{/if}}
     </div>
     <p class="mt-0.5 text-[13px] text-ink-2">
       {{#if status.installing}}
-        {{#if status.progress.unpacking}}Unpacking the browser…{{else}}Downloading the private browser. You can leave this page; it keeps going.{{/if}}
+        {{#if status.progress.unpacking}}Unpacking the browser…{{else}}Downloading the browser. You can leave this page; it keeps going.{{/if}}
       {{else if status.installed}}
-        {{@root.bot.name}} reads the web through this private, stealth Chromium. It starts when needed and sleeps when idle.
+        {{@root.bot.name}} reads the web through this browser, running on this computer. It starts when needed and sleeps when idle.
       {{else}}
-        {{@root.bot.name}} can’t search or read the web until the browser is installed (about 500 MB, downloaded once into <code class="font-mono text-xs">tools/cloakbrowser</code>).
+        {{@root.bot.name}} can’t search or read the web until the browser is installed ({{#if (eq status.engine.id 'cloakbrowser')}}about 500 MB, downloaded once into <code class="font-mono text-xs">tools/cloakbrowser</code>{{else}}about 200 MB, downloaded once into <code class="font-mono text-xs">tools/ms-playwright</code>{{/if}}).
       {{/if}}
     </p>
 
