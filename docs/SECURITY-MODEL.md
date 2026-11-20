@@ -149,7 +149,9 @@ injection detector (stage 1 = patterns only, used where the prompt must stay byt
 | Delegated task results | yes (`background_report`, with what the task read) | yes | the task's taint, on every run that sees the report | warning when the task read a suspected injection | The person sees the report as before; the model never reads it back as its own words [#236]. The brief is shown on the approval card when the task read outside content. |
 | Voice notes | n/a | n/a | n/a | n/a | The person's own speech, transcribed as their message. |
 | Shared lists, group memories | no | yes, one line | n/a | memories: refused when instruction-like | Written by members (trusted); sharing a memory asks first. |
-| Weather and place names | no | short | no | no | Short structured data from public services. |
+| Place names (geocoding, "use my location") | other matches: yes (`geocoding_matches`) | one clean line, capped [#238] | no | no | Community-edited map data; short, structured, and never more than a name. |
+| Calendar names, mail folder names | no | one clean line, capped [#238] | n/a | no | Set by whoever owns a shared calendar or mailbox; they appear only as labels ("Added to …", "Moved to …"). |
+| Weather | no | n/a | no | no | Numbers and fixed words from a public service. |
 
 ## What is not defended
 
