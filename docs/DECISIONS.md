@@ -3820,3 +3820,16 @@ Note: most of Phase 23 part A landed in commit aa56076, whose message reads "Pha
     answered, the mic and Listen were gone, Admin → Models showed the three notices, System said "Ollama · qwen2.5:1.5b".
     A 1.5B model is too small for Jessbot's prompt (about 2 minutes on CPU, and it wrote a tool call as text), hence
     the 7B advice.
+
+## 2026-11-20: Logo, screenshots and the website
+
+243. **The project's public face is built from the app itself, and the site is static and built from the repository.**
+    The logo is Jess's default portrait over her night sky, layered the way the living avatar is
+    (`scripts/build-brand.js`, no new image generation). Screenshots come from `scripts/docs-shots.js`: the setup
+    wizard, Admin → People and an approval run from a real install with made-up people, the other screens from the dev
+    styleguide's demo household (a new install has no weeks of history to show), all labelled as such. The website is a
+    plain build script (`scripts/build-site.js`, markdown-it already a dependency) rather than a site generator, so it
+    adds no dependency and renders the user guide (`docs/guide/`) as it is, published by a pinned GitHub Pages
+    workflow. Its home page leads with a live copy of a real approval card, because "asks before it acts" is what sets
+    Jessbot apart; the sky follows the visitor's clock like the app's. A custom domain is a settings change plus a
+    `SITE_URL` variable (website/README.md), not a file in the repository.

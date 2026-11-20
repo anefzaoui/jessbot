@@ -80,3 +80,12 @@ Rules: one portrait and one sky everywhere (never a mood frame or another varian
 or stretch it; leave clear space of a quarter of the mark's width around it. The name is set in Geist, weight 620,
 tracking -0.035em, in `ink` on light and dark backgrounds alike. A renamed or re-dressed install still uses the Jessbot
 logo for the project; the app itself shows the look its admin picked.
+
+## Website
+The public site (`website/`, built by `scripts/build-site.js`; see `website/README.md`) uses this same world: the
+Harbor tokens copied into `website/styles.css` (keep them in step with `src/styles/input.css`), Geist, Phosphor icons
+and the approval card's look. It is the one Persuade surface, so it gets one expressive move the app keeps small: the
+first viewport is Jess in her sky at full size, with the scene picked from the visitor's clock as in the app, beside a
+live copy of a real approval card the visitor can approve or deny. Below that, the page follows one real request
+(the recorded run), then the screens, then safety and privacy, then the install. Screenshots switch with the theme
+(`.only-light` / `.only-dark`); the docs pages are the guide's Markdown with a menu and an "On this page" list.
