@@ -3834,6 +3834,29 @@ Note: most of Phase 23 part A landed in commit aa56076, whose message reads "Pha
     Jessbot apart; the sky follows the visitor's clock like the app's. A custom domain is a settings change plus a
     `SITE_URL` variable (website/README.md), not a file in the repository.
 
+## 2026-11-20: Releases and What's new (#13)
+
+244. **CHANGELOG.md is the release record; `npm run release` makes a release; What's new comes from the changelog.** The
+    What's new feed (#210) only took entries from a maintainer-only step that wrote commit subjects to a file, so public
+    installs never got any. Now CHANGELOG.md (Keep a Changelog, semver) has an `[Unreleased]` section every pull request
+    adds to, with a short `Highlights` list in plain words. `npm run release -- <version>` (scripts/release.js; main, a
+    clean tree, a version newer than the last tag, a non-empty Unreleased; `--dry-run`, `--any-branch` for a release pull
+    request) stamps it `[<version>] - <date>`, opens a new Unreleased, sets the version in package.json and its lock, and
+    commits `Release v<version>`; it tags only with `--tag`. A pushed `v*` tag publishes the GitHub release with that
+    section's notes (.github/workflows/release.yml, which first checks the tag against package.json and the changelog via
+    scripts/release-notes.js) beside the container image (docker.yml). In the app, `importChangelog()` (at start, on the
+    scheduler's tick and when Admin → System opens) turns each release newer than `settings.whatsNew.version` into a
+    draft: its Highlights as the lines (no model call), else its other entries as the list the model drafts from. A new
+    install, or the first start of a version with this, records its version and shows no backlog. One parser
+    (src/lib/changelog.js) serves the script, the workflow and the server. Also: four partials re-rendered as fragments
+    (Admin → System's What's new, its security card, wishes, the chat's What's new card) said "What's new in" with no
+    name, because a fragment's context is its data; they use `@root.bot.name` now (#231's sweep missed them). Tested:
+    `tests/releases.test.js` (semver order, parsing, stamping and its refusals, the import with and without Highlights,
+    no backlog, nothing newer than the code, the release script in a real git repository with and without `--tag` and
+    its refusals, the notes script refusing a mismatched tag), and for real: the release script stamped 0.1.0 on a
+    throwaway branch (no tag, nothing pushed); that code, started on an install that last saw 0.0.9, showed the v0.1.0
+    draft in Admin → System; publishing it put the card in a member's chat (light, dark, phone).
+
 ## 2026-11-20: Coming back to an unfinished setup (#50)
 
 245. **Once the owner's account exists, an unfinished setup lets people sign in, and never loops.** `requireSetup` sent every

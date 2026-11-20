@@ -1,10 +1,10 @@
-// "What's new in Jess" (decision #210, F7): an update step leaves the commit subjects since the previous release in
+// "What's new in Jess" (decision #210, F7; releases from CHANGELOG.md: #13, below): an update step leaves the commit subjects since the previous release in
 // data/whats-new-pending.json ({ releases: [{ release, subjects }] }); the server turns each release into a draft (one background-model call: 3-6 plain lines,
 // internal commits left out), the admin edits and publishes it, and each person gets a published entry once (a card,
 // Phase 25). Entries published before someone joined aren't shown to them.
 import fs from 'node:fs';
 import path from 'node:path';
-import { get, all, run } from '../db/index.js';
+import { get, all, run, settings } from '../db/index.js';
 import { paths } from '../config/index.js';
 import { askJson } from './llm.js';
 import { overBudget } from './policy.js';
@@ -12,6 +12,7 @@ import { getUser } from './users.js';
 import { oneLine } from '../lib/untrusted.js';
 import { invalid, notFound, conflict } from '../lib/errors.js';
 import { replaceSpaced } from '../lib/text-safe.js';
+import { releases, compareVersions, SEMVER } from '../lib/changelog.js';
 
 export const PENDING_FILE = 'whats-new-pending.json';
 export const MAX_LINES = 6;
@@ -32,6 +33,37 @@ export function importPending() {
     added += run('INSERT OR IGNORE INTO whats_new (commit_ref, subjects) VALUES (?, ?)', release, JSON.stringify(subjects)).changes;
   }
   fs.rmSync(file, { force: true }); // taken in (a malformed file is dropped too: the next release writes a new one)
+  return added;
+}
+
+// ---- Releases from CHANGELOG.md (#13) ----------------------------------------------------------------------------------
+// The install's own CHANGELOG.md says what each release changed. On the scheduler's tick and when an admin opens Admin →
+// System, every release newer than the one this install last took in becomes a draft: its Highlights as the lines (the
+// admin edits and publishes them), its other entries as the subjects (the model drafts lines from them when there are
+// no Highlights). A fresh install, or one updating to the first version with this, takes in nothing from before: it
+// starts at its own version. settings.whatsNew = { version }.
+const CHANGELOG = () => path.join(paths.root, 'CHANGELOG.md');
+const ownVersion = () => { try { return JSON.parse(fs.readFileSync(path.join(paths.root, 'package.json'), 'utf8')).version; } catch { return null; } };
+
+/** → entries added. `text` and `version` are for tests (default: CHANGELOG.md and package.json). */
+export function importChangelog({ text = null, version = ownVersion() } = {}) {
+  const seen = settings.get('whatsNew', {})?.version;
+  if (!seen || !SEMVER.test(seen)) { if (version) settings.set('whatsNew', { version }); return 0; }
+  let source = text;
+  if (source == null) { try { source = fs.readFileSync(CHANGELOG(), 'utf8'); } catch { return 0; } }
+  const fresh = releases(source).filter(r => compareVersions(r.version, seen) > 0 && (!version || compareVersions(r.version, version) <= 0))
+    .reverse(); // oldest first, so the newest gets the highest id
+  let added = 0;
+  for (const r of fresh) {
+    const lines = (r.sections.Highlights || []).map(cleanLine).filter(Boolean).slice(0, MAX_LINES);
+    const subjects = Object.entries(r.sections).filter(([k]) => k !== 'Highlights').flatMap(([k, items]) => items.map(i => oneLine(`${k}: ${i}`, 200))).slice(0, 200);
+    if (!lines.length && !subjects.length) continue;
+    // With Highlights, the lines are written: the model isn't asked (drafted_at set). Without, the tick drafts them.
+    added += run(`INSERT OR IGNORE INTO whats_new (commit_ref, subjects, lines, drafted_at) VALUES (?, ?, ?, ${lines.length ? "datetime('now')" : 'NULL'})`,
+      `v${r.version}`, JSON.stringify(subjects), JSON.stringify(lines)).changes;
+  }
+  const newest = [version, ...fresh.map(r => r.version)].filter(Boolean).sort(compareVersions).at(-1);
+  if (newest && compareVersions(newest, seen) > 0) settings.set('whatsNew', { version: newest });
   return added;
 }
 
@@ -62,6 +94,7 @@ export async function whatsNewTick() {
   drafting = true;
   try {
     importPending();
+    importChangelog();
     const e = get(`SELECT id FROM whats_new WHERE status = 'draft' AND lines = '[]' AND drafted_at IS NULL ORDER BY id LIMIT 1`);
     if (!e) return null;
     run(`UPDATE whats_new SET drafted_at = datetime('now') WHERE id = ?`, e.id); // tried once; Redraft asks again

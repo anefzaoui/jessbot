@@ -9,6 +9,7 @@ import { closeBrowser } from './src/browser/index.js';
 import { startScheduler } from './src/agent/proactive.js';
 import { startAutoBackup } from './src/services/system.js';
 import { migrateEnvSecrets } from './src/services/stored-secrets.js';
+import { importChangelog } from './src/services/whats-new.js';
 
 ensureDirs();
 installLog(paths.logs); // Admin → System → Logs + data/logs/*.log
@@ -21,6 +22,8 @@ try {
 }
 // Secrets written in .env (the model key, the push key) move into the database, sealed (#10).
 try { migrateEnvSecrets(); } catch (err) { console.error(`[secrets] couldn’t move secrets out of .env: ${err.message}`); }
+// This version's release notes (CHANGELOG.md) become a What's new draft for the admin; a first start just records the version (#13).
+try { importChangelog(); } catch (err) { console.error(`[whats-new] couldn’t read CHANGELOG.md: ${err.message}`); }
 
 const app = createApp();
 const server = app.listen(config.port, config.host, () => {
