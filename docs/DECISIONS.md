@@ -3500,3 +3500,20 @@ Note: most of Phase 23 part A landed in commit aa56076, whose message reads "Pha
     refused and the local server never sees a request; a rebinding resolver is asked once and its second answer never used;
     redirects from a trusted origin to a local one are refused; credentials don't cross origins; mail targets carry the
     checked address and the name; push to a name resolving to this machine is skipped).
+
+222. **The browser's traffic goes through a guard proxy, so the browser never resolves a host name itself.** The request
+    guard (`routeGuard`) checks a request's host before the browser sends it, but Chromium then resolved the name again on
+    its own, so a name whose answer changed in between could still reach this machine or the local network (the known limit
+    #221 left for the browser). Every context now gets `proxy` = `src/browser/guard-proxy.js`: an HTTP proxy on
+    127.0.0.1 (port picked by the system, random Basic credential per process that Playwright answers the 407 with). With
+    a proxy, Chromium hands host names to it instead of resolving them; HTTPS and WebSockets arrive as CONNECT tunnels
+    (host and port only, never decrypted), plain http:// as absolute-URI requests. The proxy resolves each name once with
+    `outbound.js`'s checked lookup and connects to that address (403 for a local one; IP literals checked directly).
+    `bypass: '<-loopback>'` removes Chromium's implicit localhost exception, so even 127.0.0.1 and localhost reach the
+    proxy and are refused. The request guard stays in front (media and ad blocking, a quick refusal for the plain cases);
+    the admin's local-network switch is read live by both. Why a proxy and not a launch flag: host-resolver rules are
+    fixed at launch, and the engines' launch code stays engine-specific; a context-level proxy works for every Chromium
+    engine. Tested: `tests/browser-proxy.test.js` with the real browser (a name only the fake resolver knows loads, so the
+    browser asked our lookup; a name that answers public to the guard and 127.0.0.1 next is refused and the local server
+    never sees a request; a bare context without the request guard still can't reach 127.0.0.1 or localhost), and real
+    sites over HTTPS and plain HTTP load through it.

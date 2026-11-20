@@ -187,6 +187,11 @@ and how, so a reviewer (or a future session) can check each control. Decisions a
   origin. Mail libraries get the checked address to connect to and the server's name for TLS. The endpoints the admin
   configured (model provider, SearXNG) may be on the local network, but only that exact origin: a redirect away from it is
   held to the public-only rule. [#221]
+  **The browser never looks a host name up itself.** Every browser context sends its traffic through a small proxy inside
+  Jessbot (`src/browser/guard-proxy.js`, 127.0.0.1 only, a random per-process credential): it resolves each name once with
+  the same checked lookup and connects to that address, so a name that passed the request guard and then answers with a
+  local address is refused at the connection. Chromium's built-in exception for localhost is switched off, so loopback
+  goes to the proxy (and is refused) too. [#222]
   Ad and tracker blocking (off by default) runs inside that same request guard, after the network check, never beside it;
   its filter lists come through the browser too. [#168]
 - **Look-alike sites.** The browser warns (never blocks) on sign-in and password pages whose address looks wrong —
@@ -240,9 +245,8 @@ and how, so a reviewer (or a future session) can check each control. Decisions a
   redaction and backup contents.
 
 ## Known limits
-- Server-side requests connect to the address they checked (above), but the browser still resolves a page's host itself
-  after the request guard checked it, so a DNS answer that changes in between is not caught there. The admin's
-  local-network switch is the backstop.
+- The browser's guard proxy sees HTTPS and WebSocket traffic only as host and port (it never decrypts), so it decides by
+  address alone; what a public site sends back is the page's business (and the request guard's, for subresources).
 - Google (mail/calendar) and Microsoft 365 need OAuth, which isn't supported yet — app passwords only.
 - The default browser is open-source Chromium. CloakBrowser, when an admin picks it, is a proprietary binary downloaded
   per install (never redistributed). [#15, #218]

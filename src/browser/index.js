@@ -7,6 +7,7 @@ import net from 'node:net';
 import { paths } from '../config/index.js';
 import { settings } from '../db/index.js';
 import { isPrivateIp, isPrivateName, resolveChecked } from '../lib/outbound.js';
+import { guardProxy } from './guard-proxy.js';
 import { loadProfile, saveProfile } from './profiles.js';
 import { cleanSearxngUrl, testSearxng, resetSearxngHealth, searxngState } from './searxng.js';
 import { currentEngine, loadEngine, adblockDecision, adblockState, noteAdblockError } from './adblock.js';
@@ -195,7 +196,7 @@ export async function withPage(fn, { signal, media = false, viewport = { width: 
   try {
     if (signal?.aborted) throw abortError();
     const b = await getBrowser();
-    ctx = await b.newContext({ viewport, locale: 'en-US', serviceWorkers: 'block', acceptDownloads: false, ...(userAgent && !mobile ? { userAgent } : {}),
+    ctx = await b.newContext({ viewport, locale: 'en-US', serviceWorkers: 'block', acceptDownloads: false, proxy: await guardProxy(), ...(userAgent && !mobile ? { userAgent } : {}),
       storageState: profile ? loadProfile(profile) : storageState, ...(deviceScaleFactor ? { deviceScaleFactor } : {}),
       ...(mobile ? { isMobile: true, hasTouch: true, userAgent: mobileUserAgent(b.version()) } : {}), ...(media ? {} : { reducedMotion: 'reduce' }) });
     await guard(ctx, { blockMedia: !media && browserSettings().blockMedia });
@@ -230,7 +231,7 @@ let sessionCount = 0;
 export async function openSessionContext({ viewport = { width: 1280, height: 900 }, storageState } = {}) {
   const b = await getBrowser();
   const ctx = await b.newContext({ viewport, locale: 'en-US', serviceWorkers: 'block', acceptDownloads: true, storageState, reducedMotion: 'reduce',
-    ...(userAgent ? { userAgent } : {}) });
+    proxy: await guardProxy(), ...(userAgent ? { userAgent } : {}) });
   await guard(ctx, { blockMedia: false });
   ctx.setDefaultTimeout(15000);
   sessionCount++;
