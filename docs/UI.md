@@ -34,6 +34,10 @@ blinks, glances), listening while typing, activity → expression (`activities.j
 scene by the viewer's clock (`data-pinned` freezes it for demos), and `jb:variant` character switching.
 Sizes xs–xl use 256 px frames with face zoom; `2xl`/`hero` use 1024 px full head-and-shoulders.
 Demo any combination: `/styleguide?variant=male&time=dusk&weather=storm`.
+The admin can replace the art (Admin → Identity → Pictures, #7): an uploaded avatar (one frame, shown whole: no face zoom),
+a background that is a picked scene or an upload (`data-pinned`), and a cover for the chat header and the Feed greeting
+(`presence.cover`; `data-sky` only while it follows the sky). Images load from `presence.avatarBase` / `presence.sceneBase`
+(`data-avatar-base`, `data-scene-base`), never from a hard-coded `/img/…` path.
 
 ## Components (partials → JS module)
 | Partial | Purpose | JS |

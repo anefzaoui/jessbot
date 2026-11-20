@@ -10,17 +10,18 @@
 {{#if @root.presence.variant}}
   <span class="avatar presence avatar-{{default size 'md'}}" data-avatar data-presence
     data-state="{{default state (activityAvatar (default activity 'resting'))}}" data-activity="{{default activity 'resting'}}"
-    data-variant="{{@root.presence.variant}}" data-scene="{{@root.presence.scene}}" data-weather="{{@root.presence.weather}}"
+    data-variant="{{@root.presence.variant}}" data-avatar-base="{{@root.presence.avatarBase}}" data-frames="{{join @root.presence.frames ','}}" {{#if @root.presence.avatarUpload}}data-avatar-upload{{/if}}
+    data-scene="{{@root.presence.scene}}" data-scene-base="{{@root.presence.sceneBase}}" data-weather="{{@root.presence.weather}}"
     data-time="{{@root.presence.time}}" {{#if @root.presence.sunrise}}data-sunrise="{{@root.presence.sunrise}}" data-sunset="{{@root.presence.sunset}}"{{/if}} data-res="{{imgSuffix size}}" {{#if @root.presence.pinned}}data-pinned{{/if}} {{#if avatarId}}id="{{avatarId}}"{{/if}}
     {{#if label}}role="img" aria-label="{{label}}"{{else}}aria-hidden="true"{{/if}}>
     <span class="presence-clip">
       <span class="presence-scene">
-        {{#if @root.presence.scene}}<img class="is-shown" src="/img/scenes/{{@root.presence.scene}}{{imgSuffix size}}.webp" alt="" decoding="async">{{/if}}
+        {{#if @root.presence.scene}}<img class="is-shown" src="{{@root.presence.sceneBase}}/{{@root.presence.scene}}{{imgSuffix size}}.webp" alt="" decoding="async">{{/if}}
         <img alt="" decoding="async">
       </span>
       <span class="presence-fx" aria-hidden="true"></span>
       <span class="presence-portrait">
-        <img class="is-shown" src="/img/avatars/{{@root.presence.variant}}/{{presenceFrame @root.presence (default activity 'resting')}}{{imgSuffix size}}.webp" alt="" decoding="async">
+        <img class="is-shown" src="{{@root.presence.avatarBase}}/{{presenceFrame @root.presence (default activity 'resting')}}{{imgSuffix size}}.webp" alt="" decoding="async">
         <img alt="" decoding="async">
       </span>
     </span>

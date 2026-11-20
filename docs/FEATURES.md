@@ -77,6 +77,7 @@ Tick items only when they work end to end. `Phase` refers to the build plan in A
 - [x] **Approvals** — pending permission requests with badge counts [T1] — P4
 - [x] **Upcoming** — scheduled tasks / cron jobs [T1] — P7 (7-day strip, alarms, tasks with run/pause, check-ins; live)
 - [x] **Identity** — personality + memories: editable but tucked away for power users [T1] — P3/P9 (You → Memory; Admin → Personality)
+- [x] **Pictures** — the admin uploads or picks the avatar, the background behind it and the cover (chat header, Feed greeting); uploads are re-saved without their metadata [U] — #7 (Admin → Identity)
 - [x] **Quick decisions** — a decision model (Jev) skips needless work, reads pages in any language, speeds up browsing (fast steps, the autopilot: a flight search in ~12 s) and ranks the feed by what you asked for [U] — P16 (#106–#111, docs/JEV.md)
 - [x] **Markdown editors** — coloured markdown and Edit / Preview (server-rendered, Ctrl+Shift+P) on SOUL / AGENTS / MEMORY, skills and instructions [U] — P15 (#103)
 

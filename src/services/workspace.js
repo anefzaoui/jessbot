@@ -6,6 +6,7 @@ import path from 'node:path';
 import Handlebars from 'handlebars';
 import { paths, ROOT } from '../config/index.js';
 import { get as dbGet, all as dbAll, run as dbRun } from '../db/index.js';
+import { pictureChoices } from './assistant-pictures.js';
 
 const TEMPLATES = path.join(ROOT, 'src', 'content', 'workspace');
 const START = '<!-- jessbot:identity:start — managed by Settings → Identity; edit it there -->';
@@ -46,7 +47,7 @@ export function identityBlock(bot) {
     `- **What I am:** a Jessbot — a personal AI agent. The original Jessbot is called Jess; this instance is ${bot.name}.`,
     `- **Pronouns:** ${bot.pronouns || v.pronouns}`,
     // The avatar is presentation, not identity: never volunteered (the owner didn't want "android" in introductions).
-    `- **Avatar:** the app shows me as a portrait of ${v.look}. That's just how I'm drawn — I don't bring it up unless someone asks.`,
+    `- **Avatar:** the app shows me as ${pictureChoices().avatar.kind === 'upload' ? 'a picture the admin chose' : `a portrait of ${v.look}`}. That's just how I'm drawn — I don't bring it up unless someone asks.`,
     bot.description ? `- **In a sentence:** ${bot.description}` : null,
     `- **Tone:** ${t.text}.`,
     END,

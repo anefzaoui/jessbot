@@ -301,6 +301,7 @@ Only the chat's owner. Run steps may carry `handover: true` (show "Take over the
 | `GET /library/:id/download?v=` | cookie or Bearer | Same, as an attachment |
 | `GET /library/:id/thumb.jpg` | cookie or Bearer | Preview image of HTML items |
 | `GET /feed/covers/:file` | cookie or Bearer | Story cover images (content-addressed, cached immutably) |
+| `GET /assistant-pictures/:slot-:id/:frame.webp` | cookie or Bearer | The assistant's pictures the admin uploaded (avatar, background, cover; `-256` for the small size). Only the current upload of each; `image/webp`, `nosniff`, CSP `default-src 'none'`, cached for good (a new upload is a new address) |
 | `GET /shots/:file` | cookie or Bearer | Web screenshots referenced by run steps (`step.image`). Only the person they were taken for, or an admin; otherwise 404 |
 
 Run steps (in `runHtml`, `run.step` frames and `run.done` html) may carry `image` — a screenshot path as above.

@@ -51,7 +51,7 @@ public/js/           in-house client modules (no libraries)
 scripts/             build-assets.js (fonts + tree-shaken icon sprite)
 skills/              SKILL.md folders (admin-reviewed)
 docs/                this file, DECISIONS, FEATURES, UI, API, SKILLS, WEB, EVAL, PLAN-SKILLS (+ topic docs)
-data/   (ignored)    jessbot.sqlite, workspace/, users/, artifacts/, uploads/, browser-profiles/, logs/, backups/
+data/   (ignored)    jessbot.sqlite, workspace/, users/, artifacts/, uploads/, assistant/ (the admin's pictures), browser-profiles/, logs/, backups/
 tools/  (ignored)    cloakbrowser/ binary (downloaded per install — never committed, see decision #15)
 ```
 
