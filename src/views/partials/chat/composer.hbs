@@ -25,9 +25,9 @@
         {{icon "paperclip" class="size-[18px]"}}
       </button>
       <input type="file" multiple hidden accept="{{@root.uploadAccept}}" data-composer-file>
-      <button type="button" class="btn btn-ghost btn-icon btn-sm" data-composer-mic aria-pressed="false" data-tooltip="Record a voice note" aria-label="Record a voice note">
+      {{#if @root.voiceOn}}<button type="button" class="btn btn-ghost btn-icon btn-sm" data-composer-mic aria-pressed="false" data-tooltip="Record a voice note" aria-label="Record a voice note">
         {{icon "mic" class="size-[18px]"}}
-      </button>
+      </button>{{/if}}
       <span class="flex-1" aria-hidden="true"></span>
       <span class="hidden text-[11px] text-ink-3 sm:inline" data-composer-hint><span class="kbd">↵</span> send · <span class="kbd">⇧↵</span> new line</span>
       <button type="button" class="btn btn-secondary btn-icon btn-sm ml-2 rounded-full" data-composer-stop hidden data-tooltip="Stop" aria-label="Stop the current task">

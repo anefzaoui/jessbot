@@ -11,7 +11,7 @@ import { createInvite, listPendingInvites, revokeInvite } from '../../services/i
 import { listGroups, getGroup, createGroup, groupsOfUser, addMember, removeMember } from '../../services/groups.js';
 import { currentInstructions, instructionHistory, saveInstructions, INSTRUCTIONS_MAX } from '../../services/instructions.js';
 import { VARIANTS, TONES, writeIdentity, EDITABLE, WORKSPACE_MAX, readWorkspaceFile, saveWorkspaceFile, workspaceVersions, workspaceVersion } from '../../services/workspace.js';
-import { llmSettings, maskKey } from '../../services/llm.js';
+import { llmState, maskKey } from '../../services/llm.js';
 import { audit, recentAudit } from '../../services/audit.js';
 import { threadsOfUser } from '../../services/threads.js';
 import { validateIdentity } from './setup.js';
@@ -73,14 +73,14 @@ const base = { nav: 'admin' };
 
 router.get('/', (req, res) => {
   const users = listUsers();
-  const llm = llmSettings();
+  const llm = llmState();
   res.render('admin/overview', {
     ...base, title: 'Admin',
     stats: {
       people: users.length, active: users.filter(u => u.status === 'active').length,
       invites: listPendingInvites().length, groups: listGroups().length,
     },
-    llm: { model: llm.model, hasKey: !!llm.apiKey, maskedKey: maskKey(llm.apiKey) },
+    llm: { model: llm.model, hasKey: llm.ready, maskedKey: llm.needsKey ? maskKey(llm.apiKey) : llm.providerLabel },
     health: doctor(),
     ops: {
       week: weekTotalLabel(),

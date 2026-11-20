@@ -12,7 +12,7 @@ import * as tar from 'tar';
 import { inside } from '../lib/safe-path.js';
 import { exec, get, all, migrationStatus } from '../db/index.js';
 import { paths, config } from '../config/index.js';
-import { llmSettings } from './llm.js';
+import { llmState } from './llm.js';
 import { browserStatus, recentBrowsing, browserSettings } from '../browser/index.js';
 import { schedulerHealth } from '../agent/proactive.js';
 import { errorCountSince } from '../lib/log.js';
@@ -134,8 +134,8 @@ export function doctor({ cli = false } = {}) {
       `${human(free)} free · data uses ${human(dirSize(paths.data))}`, free < 2 * 1073741824 ? 'Free up space on this drive, or move data/ to a bigger one (JESSBOT_HOME).' : null));
   } catch { out.push(check('disk', 'Disk space', 'warn', 'Couldn’t read free space on this system.')); }
   // Model
-  const llm = llmSettings();
-  out.push(llm.apiKey ? check('model', 'AI model', 'ok', `${llm.model}${llm.fallbacks.length ? ` · falls back to ${llm.fallbacks.join(', ')}` : ''}`, null, '/admin/model')
+  const llm = llmState();
+  out.push(llm.ready ? check('model', 'AI model', 'ok', `${llm.providerLabel} · ${llm.model}${llm.fallbacks.length ? ` · falls back to ${llm.fallbacks.join(', ')}` : ''}`, null, '/admin/model')
     : check('model', 'AI model', 'bad', `No API key — ${botName()} can’t think.`, 'Add an OpenRouter key in Admin → Model.', '/admin/model'));
   // The OpenRouter balance (decision #179), as last read by the spend watch (refreshed every few hours and from Admin → Usage).
   const bal = llm.apiKey ? balanceCheck() : null;

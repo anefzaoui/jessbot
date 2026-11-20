@@ -4,14 +4,66 @@
 // Admin → Models (Phase 25 #203): a cancelable `model:before-save` on the form lets admin-models.js hold the save (a fallback
 // still testing, or one that didn't answer); field errors (422: fallbacks, background…) show under their fields; a save
 // that went through fires `model:saved` with the answer.
-import { $, on, api, withBusy, escapeHtml, icon } from './core.js';
+import { $, $$, on, api, withBusy, escapeHtml, icon } from './core.js';
 import { toast } from './toast.js';
 import { showErrors, clearErrors } from './forms.js';
+
+// The provider picker (#11, partials/setup/provider-fields.hbs): the chosen provider's fields and feature list show, its
+// usual address fills in (unless someone typed another), and with Ollama the installed models fill the model list.
+const OPENROUTER_MODEL = 'openai/gpt-6-luna';
+function initProviderPicker(form) {
+  if (!$('[data-provider-picker]', form)) return;
+  const url = $('[data-base-url-input]', form), model = $('#f-model', form), list = $('[data-model-list]', form);
+  const status = $('[data-ollama-status]', form);
+  const statusHtml = status?.innerHTML;
+  const radios = $$('input[name="provider"]', form);
+  const defaults = Object.fromEntries(radios.map(r => [r.value, r.dataset.baseUrl || '']));
+  const base = form.getAttribute('action').replace(/\/test$/, ''); // /setup/model or /admin/model
+  let asked = 0;
+
+  async function loadOllama(fillModel) {
+    const n = ++asked;
+    if (status) status.textContent = 'Looking for Ollama’s models…';
+    let r;
+    try { r = await api(`${base}/ollama?baseUrl=${encodeURIComponent(url.value.trim())}`); } catch (err) { r = { models: [], error: err.message }; }
+    if (n !== asked) return; // a newer address or provider won
+    list.replaceChildren(...r.models.map(m => new Option(m, m)));
+    if (fillModel && r.models.length && !r.models.includes(model.value.trim())) model.value = r.models[0];
+    if (!status) return;
+    if (r.error) status.textContent = r.error;
+    else if (!r.models.length) status.textContent = 'Ollama has no chat models yet. Pull one that can call tools, for example: ollama pull qwen2.5:7b';
+    else status.textContent = `Installed: ${r.models.join(', ')}. Pick one that can call tools, 7B or larger.`;
+  }
+
+  function show(id, picked) {
+    for (const el of $$('[data-provider-show]', form)) el.hidden = !el.dataset.providerShow.split(' ').includes(id);
+    for (const el of $$('[data-provider-features]', form)) el.hidden = el.dataset.providerFeatures !== id;
+    $('[data-key-block]', form).hidden = id === 'ollama';
+    if (picked) {
+      if (!url.value.trim() || Object.values(defaults).includes(url.value.trim())) url.value = defaults[id] || '';
+      if (id === 'openrouter' && !model.value.trim()) model.value = OPENROUTER_MODEL;
+      if (id !== 'openrouter' && model.value.trim() === OPENROUTER_MODEL) model.value = '';
+    }
+    list.replaceChildren();
+    if (status && id === 'ollama' && statusHtml) status.innerHTML = statusHtml;
+    if (id === 'ollama') loadOllama(picked);
+  }
+
+  form.addEventListener('change', e => { if (e.target.name === 'provider') show(e.target.value, true); });
+  let t;
+  url.addEventListener('input', () => {
+    clearTimeout(t);
+    t = setTimeout(() => { if ($('input[name="provider"]:checked', form)?.value === 'ollama') loadOllama(false); }, 500);
+  });
+  const current = $('input[name="provider"]:checked', form)?.value;
+  if (current) show(current, false);
+}
 
 export function initModelTest() {
   const form = $('[data-model-test]');
   if (!form || form.dataset.bound) return; // setup pages load both main.js and setup.js
   form.dataset.bound = '1';
+  initProviderPicker(form);
   const result = $('[data-test-result]', form);
   const cont = $('[data-continue]');
   on(document, 'click', '[data-show-key-field]', (e, b) => { $('[data-key-field]').classList.remove('hidden'); b.remove(); $('#f-apiKey')?.focus(); });

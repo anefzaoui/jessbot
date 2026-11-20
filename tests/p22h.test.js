@@ -92,7 +92,8 @@ before(async () => {
   carol = await createUser({ name: 'Carol Other', email: 'carol@p22h.dev', password: 'correct horse battery' });
   policy.setPolicy('global', null, { toolsets: { core: 'allow', memory: 'allow', library: 'allow' } }, alice.id);
   await listen(fake);
-  settings.set('llm', { baseUrl: `http://127.0.0.1:${fake.address().port}/v1`, model: 'fake/model' });
+  // A fake of OpenRouter's image API, chosen as the provider (#11: pictures are OpenRouter's).
+  settings.set('llm', { provider: 'openrouter', baseUrl: `http://127.0.0.1:${fake.address().port}/v1`, model: 'fake/model' });
 });
 after(() => { fake.close(); closeDb(); fs.rmSync(HOME, { recursive: true, force: true }); });
 beforeEach(() => {

@@ -6,7 +6,7 @@
 import { registerTool } from './registry.js';
 import { run as sql } from '../../db/index.js';
 import { EAR } from '../prompt.js';
-import { MAX_AUDIO_MINUTES } from '../../services/voice.js';
+import { MAX_AUDIO_MINUTES, voiceOn } from '../../services/voice.js';
 import { recordAloud } from '../../services/read-aloud.js';
 import { itemForUser } from '../../services/library.js';
 import { setNameSay } from '../../services/users.js';
@@ -15,6 +15,7 @@ import { setActivity } from '../../services/runs.js';
 
 registerTool({
   name: 'reply_by_voice', displayName: 'Voice notes', toolset: 'core', risk: 'read', activity: 'speaking', iconName: 'audio-lines',
+  available: () => voiceOn(), // OpenRouter only (#11)
   description: 'Send your reply as a voice note in your own voice. Use it only when the person asks to HEAR you — "send me a voice '
     + 'note", "say it", "read it to me", "tell me verbally", "speak it out", "I want to listen". Not for ordinary questions. Call it '
     + 'once, before writing the reply; the reply you then write is spoken and also shown as text. Not needed when their message '

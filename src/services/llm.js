@@ -7,23 +7,72 @@ import { recordUsage } from './usage.js';
 import { invalid } from '../lib/errors.js';
 import { boundFetch } from '../lib/outbound.js';
 import { readSecret } from './stored-secrets.js';
+import { PROVIDERS, currentProvider, providerFor, supports, featureSupport } from './providers.js';
 
 let client, clientKey;
 
 // fallbacks: models tried in order when the main one is down, rate-limited, over its context or refuses (decision #179);
 // background: an optional (cheaper) model for JSON jobs (compaction, memory, feed, goals), retried once on the main one.
+// The key: the operator's environment wins (never stored); otherwise the key entered in setup or Admin → Model, sealed
+// (#10), and only for the address it was entered for (#11: `keyFor`), so switching to another service never sends it the
+// old one. Ollama never gets a key: it needs none, and the server may be anyone's on the network.
+const originOf = u => { try { return new URL(u).origin; } catch { return ''; } };
 export function llmSettings() {
   const s = settings.get('llm', {});
+  const baseUrl = s.baseUrl || config.llm.baseUrl;
+  const envKey = process.env.OPENROUTER_KEY || process.env.LLM_API_KEY || '';
+  const ollama = currentProvider(baseUrl) === 'ollama';
+  const storedFits = !s.keyFor || s.keyFor === originOf(baseUrl);
   return {
-    baseUrl: s.baseUrl || config.llm.baseUrl,
+    baseUrl,
     model: s.model || config.llm.model,
-    // The operator's environment wins (never stored); otherwise the key entered in setup or Admin → Model, sealed (#10).
-    apiKey: process.env.OPENROUTER_KEY || process.env.LLM_API_KEY || readSecret('llm.apiKey'),
-    keySource: process.env.OPENROUTER_KEY || process.env.LLM_API_KEY ? 'environment' : 'sealed',
+    apiKey: ollama ? '' : envKey || (storedFits ? readSecret('llm.apiKey') : ''),
+    keySource: envKey ? 'environment' : 'sealed',
     fallbacks: modelList(s.fallbacks),
     background: String(s.background || '').trim(),
   };
 }
+
+/** llmSettings() plus the provider (#11, services/providers.js): provider, needsKey, ready (a key, or none needed). */
+export function llmState() {
+  const s = llmSettings();
+  const provider = currentProvider(s.baseUrl);
+  const needsKey = PROVIDERS[provider].needsKey && !(provider === 'compatible' && isLocalUrl(s.baseUrl));
+  return { ...s, provider, providerLabel: PROVIDERS[provider].label, needsKey, ready: !!s.apiKey || !needsKey };
+}
+/** What the provider picker shows (partials/setup/provider-fields.hbs), for setup and Admin → Models. */
+export function llmView() {
+  const s = llmState();
+  return { baseUrl: s.baseUrl, model: s.model, hasKey: !!s.apiKey, maskedKey: maskKey(s.apiKey), keySource: s.keySource,
+    provider: s.provider, providerLabel: s.providerLabel, needsKey: s.needsKey, ready: s.ready,
+    providers: Object.values(PROVIDERS).map(p => ({ id: p.id, label: p.label, summary: p.summary,
+      baseUrl: p.id === s.provider ? s.baseUrl : p.baseUrl, needsKey: p.needsKey, features: featureSupport(p.id) })) };
+}
+
+/**
+ * The provider and address a form sent → { provider, baseUrl, model } or throws invalid() with field errors. An empty
+ * address is the provider's own (OpenRouter's, Ollama's on this machine); another service needs one. An empty model is
+ * OpenRouter's default there; elsewhere it must be given.
+ */
+export function providerInput(body = {}) {
+  const errors = {};
+  let baseUrl = String(body.baseUrl || '').trim();
+  const provider = PROVIDERS[body.provider] ? body.provider : providerFor(baseUrl || config.llm.baseUrl);
+  if (provider === 'openrouter') baseUrl = PROVIDERS.openrouter.baseUrl; // its features depend on its address
+  baseUrl ||= PROVIDERS[provider].baseUrl;
+  if (!baseUrl) errors.baseUrl = 'Enter the service’s address.';
+  else { try { if (!/^https?:$/.test(new URL(baseUrl).protocol)) throw new Error(); } catch { errors.baseUrl = 'That isn’t a web address.'; } }
+  const model = String(body.model || '').trim() || (provider === 'openrouter' ? config.llm.model : '');
+  if (!model) errors.model = provider === 'ollama' ? 'Pick one of the models Ollama has.' : 'Enter the model’s name.';
+  else if (!MODEL_ID.test(model)) errors.model = 'Use a model id like openai/gpt-6-luna or qwen2.5:7b.';
+  if (Object.keys(errors).length) throw invalid(errors);
+  return { provider, baseUrl: baseUrl.replace(/\/+$/, ''), model };
+}
+
+/** Does the current provider offer this feature (services/providers.js FEATURES)? true only when it surely does. */
+export const providerOffers = feature => supports(feature, llmState().provider) === true;
+// A server on this machine or the network (LM Studio, a local vLLM): such servers usually take any key or none.
+const isLocalUrl = u => { try { return /^(localhost|127\.|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.|\[::1\]|host\.docker\.internal)/.test(new URL(u).hostname); } catch { return false; } };
 
 export const MAX_FALLBACKS = 3;
 export const MODEL_ID = /^[\w.-]+\/[\w.:-]+$|^[\w.:-]+$/;
@@ -99,14 +148,34 @@ export function withPromptCache(messages, models = []) {
 
 export const maskKey = key => (key ? `${key.slice(0, 6)}…${key.slice(-4)}` : '');
 
+// Request fields only OpenRouter understands (#11). Other services reject them (OpenAI: an unknown argument) or read them
+// their own way (Ollama turns `reasoning` into "thinking", which most local models refuse with a 400), so they are taken
+// out of the body for every other provider: one place, whatever call made the request.
+const OPENROUTER_ONLY = ['reasoning', 'models', 'provider', 'transforms', 'plugins'];
+export function withoutOpenRouterFields(f) {
+  return (url, init = {}) => {
+    if (typeof init.body === 'string' && init.body.startsWith('{')) {
+      try {
+        const body = JSON.parse(init.body);
+        if (OPENROUTER_ONLY.some(k => k in body)) {
+          for (const k of OPENROUTER_ONLY) delete body[k];
+          init = { ...init, body: JSON.stringify(body) };
+        }
+      } catch { /* not JSON: sent as it is */ }
+    }
+    return f(url, init);
+  };
+}
+
 export function getClient() {
-  const { baseUrl, apiKey } = llmSettings();
-  const cacheKey = `${baseUrl}|${apiKey}`;
+  const { baseUrl, apiKey: key, needsKey, provider } = llmState();
+  const apiKey = key || (needsKey ? '' : 'no-key-needed'); // the OpenAI client insists on one
+  const cacheKey = `${baseUrl}|${apiKey}|${provider}`;
   if (!client || clientKey !== cacheKey) {
     client = new OpenAI({
       baseURL: baseUrl, apiKey, timeout: 60_000, maxRetries: 2,
       // The admin's provider may be local (Ollama, a LAN box); anything it redirects to is held to the public-only rule (#221).
-      fetch: boundFetch({ trustedOrigin: baseUrl }),
+      fetch: provider === 'openrouter' ? boundFetch({ trustedOrigin: baseUrl }) : withoutOpenRouterFields(boundFetch({ trustedOrigin: baseUrl })),
       defaultHeaders: { 'HTTP-Referer': config.publicUrl, 'X-OpenRouter-Title': 'Jessbot', 'X-Title': 'Jessbot' },
     });
     clientKey = cacheKey;
@@ -169,7 +238,7 @@ export function generateImage({ model, prompt, aspectRatio = null, outputFormat 
 // Real round-trip used by setup/admin: proves the key, the model id and the endpoint all work.
 export async function testConnection({ model } = {}) {
   const s = llmSettings();
-  if (!s.apiKey) return { ok: false, error: 'No API key yet.' };
+  if (!llmState().ready) return { ok: false, error: 'No API key yet.' };
   const started = Date.now();
   try {
     const res = await getClient().chat.completions.create({
@@ -204,10 +273,10 @@ export async function testConnection({ model } = {}) {
  * call. A bad id or a model that doesn't answer → 422 { errors: { fallbacks | background } } with those two left as they were.
  * → the saved llmSettings().
  */
-export async function saveModelSettings({ model, baseUrl, fallbacks = undefined, background = undefined }) {
+export async function saveModelSettings({ model, baseUrl, provider = undefined, fallbacks = undefined, background = undefined }) {
   const before = llmSettings();
   const cur = settings.get('llm', {}) || {};
-  settings.set('llm', { ...cur, baseUrl, model, fallbacks: before.fallbacks.filter(m => m !== model), background: before.background === model ? '' : before.background });
+  settings.set('llm', { ...cur, baseUrl, model, ...(provider ? { provider } : {}), fallbacks: before.fallbacks.filter(m => m !== model), background: before.background === model ? '' : before.background });
   const errors = {};
   const raw = fallbacks === undefined ? before.fallbacks : (Array.isArray(fallbacks) ? fallbacks : String(fallbacks || '').split(/[\s,]+/)).map(String).filter(Boolean);
   const list = modelList(raw).filter(m => m !== model);

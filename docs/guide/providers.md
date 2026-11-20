@@ -12,27 +12,40 @@ encrypted with the install's own key; a key written in `.env` moves there the ne
 the server's environment (Docker's `environment:`, systemd) is used as it is and never stored. The default model is `openai/gpt-6-luna`, a cheap, capable one picked for everyday
 household use.
 
-## Any OpenAI-compatible endpoint
+## Ollama: models on your own computer
 
-You can use another service that speaks the OpenAI API instead: OpenAI itself, or a model server you run yourself.
-On the setup page or in Admin → Models, open **Advanced: a different endpoint** and enter its **Base URL**. Before the
-first setup you can also set `LLM_BASE_URL` (and `LLM_MODEL`) in `.env`; after setup, change them in Admin → Models,
-because the values in `.env` are only the starting defaults. The key goes in the same place either way
-(`OPENROUTER_KEY`, or `LLM_API_KEY`).
+[Ollama](https://ollama.com) runs models on your computer or another one on your network: free, private (nothing leaves
+your network), and slower. On the setup page or in Admin → Models pick **Ollama**: the address fills in
+(`http://127.0.0.1:11434/v1`; with Jessbot in Docker and Ollama on the computer, `http://host.docker.internal:11434/v1`),
+no key is asked for, and the models Ollama has are listed. Pick one that can call tools and is **7B or larger**
+(`ollama pull qwen2.5:7b`, `llama3.1:8b`): smaller ones connect but get lost in Jessbot's instructions. For memory
+search by meaning, also `ollama pull nomic-embed-text`. A few features need OpenRouter and are off (below).
+
+## Another OpenAI-compatible service
+
+OpenAI itself, LM Studio, a LiteLLM or vLLM server: pick **Another OpenAI-compatible service**, enter its address
+(usually ending in `/v1`), its key if it needs one, and the model's name as the service calls it. Before the first
+setup you can also set `LLM_BASE_URL` (and `LLM_MODEL`) in `.env`. A key you save is used only for the address you saved
+it with: switching to another service asks for that service's key.
 
 A model server on your own network works without opening the local network to the agent's browser: the address you
-configure is allowed, and only that one. Choose a model that supports tool calls, or the assistant can't act.
+configure is allowed, and only that one.
 
 ## What works where
 
-| Feature | OpenRouter | Other OpenAI-compatible endpoints |
-|---|---|---|
-| Chat, tools, memory, Library, everything else | Yes | Yes, with a model that supports tool calls |
-| Memory search by meaning | Yes | Falls back to keyword search |
-| Voice replies (spoken audio) | Yes | No |
-| Making pictures | Yes | No |
-| Quick decisions (a small second-opinion model) | Yes | No, the built-in rules are used instead |
-| Model prices, spending budgets, balance alerts | Yes | Prices only from what was used; budgets may not count everything |
+| Feature | OpenRouter | Ollama | Another OpenAI-compatible service |
+|---|---|---|---|
+| Chat, tools, tasks, goals, the feed, projects | Yes | With a model that calls tools, 7B or larger | Yes, with a model that calls tools |
+| Memory search by meaning | Yes | With `nomic-embed-text` pulled | If it serves an embedding model; otherwise by keywords |
+| Fallback models | Yes | No: the main model only | No: the main model only |
+| Quick decisions | Yes | Off: the full model or plain rules decide | Off |
+| Voice notes (speaking and listening) | Yes | Off: text only | Off |
+| Making pictures | Yes | Off | Off |
+| Reading scans and photos of text | Yes | Off | Off |
+| Spending caps in dollars | Yes | Free, nothing to count | The service doesn't report costs, so budgets can't count spending |
+| Low-balance warning | Yes | n/a | Off |
+
+Admin → Models marks each feature that is off with your provider, and keeps its settings for when you switch back.
 
 ## Admin → Models
 
@@ -44,8 +57,8 @@ Below them:
 - **Model**: the main model. Every reply goes to it first. Any model id your provider offers works; the cheapest one
   that answers well is usually the right choice.
 - **Fallback models** (optional, up to 3): when the main model is down, busy or refuses, the next one answers, in the
-  order you set. Each one answers a tiny test before it is added (**Test and add**). OpenRouter supports a fallback
-  order; other endpoints may not. Admin → Usage shows how often a fallback answered.
+  order you set. Each one answers a tiny test before it is added (**Test and add**). Only OpenRouter takes a
+  fallback order; with other providers the main model answers alone. Admin → Usage shows how often a fallback answered.
 - **Background model** (optional): a cheaper model for summaries, memory, the feed and goals. If it fails or answers
   badly, the main model tries once. Leave it empty and the main model does this work too.
 - **Save and test** saves your changes and checks that the model answers.
