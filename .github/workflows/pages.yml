@@ -1,0 +1,54 @@
+# Builds the website (scripts/build-site.js → _site/) and publishes it with GitHub Pages: on every push to main that
+# touches the site, the docs it renders or the images it shows, and by hand. Pull requests that touch them build it too,
+# without publishing, so a broken page fails before it is merged. Actions are pinned by commit (Dependabot keeps them
+# current). The repository's Pages source must be "GitHub Actions" (Settings → Pages); see website/README.md.
+name: Pages
+
+on:
+  push:
+    branches: [main]
+    paths: ['website/**', 'docs/**', 'scripts/build-site.js', 'public/img/**', '.github/workflows/pages.yml']
+  pull_request:
+    paths: ['website/**', 'docs/**', 'scripts/build-site.js', 'public/img/**', '.github/workflows/pages.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          cache: npm
+      # Only what the build reads from node_modules (markdown-it, the Geist font, the Phosphor icons); no browser.
+      - run: npm ci --no-audit --no-fund --ignore-scripts
+      - name: Build the site
+        run: node scripts/build-site.js
+        env:
+          SITE_URL: ${{ vars.SITE_URL }}
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: _site
+
+  deploy:
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
+      - id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1

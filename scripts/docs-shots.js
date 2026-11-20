@@ -2,6 +2,9 @@
 //   node scripts/docs-shots.js capture [--base http://127.0.0.1:3738] [--only chat,feed] [--raw dir]
 //       screenshots the app's own pages with its built-in demo household (the dev styleguide, /styleguide/screens/*,
 //       the pages `npm run ui:check` tests) at desktop 1440×900 and phone 390×844 (2x), light and dark, into --raw.
+//   node scripts/docs-shots.js crop [--raw dir]
+//       cuts the main column out of the desktop shots the website's feature rows use (<name>-main-desktop-<theme>.png),
+//       so their content reads at row size; frame them afterwards like any other.
 //   node scripts/docs-shots.js frame [--raw dir] [--only name,…]
 //       frames every raw PNG in --raw (these and any taken from a real install, named <name>-<desktop|phone>-<theme>.png)
 //       into docs/images/<name>-<desktop|phone>-<theme>.webp: rounded corners, a hairline edge and a soft shadow on a
@@ -101,6 +104,16 @@ async function frameAll() {
   console.log(`framed ${files.length} screenshots, ${(bytes / 1048576).toFixed(1)} MB → ${path.relative(ROOT, OUT)}`);
 }
 
-if (cmd === 'capture') await capture();
+// The website's feature rows: the main column (between the 264 px rail and the right panel at 1080 px), top 720 px.
+async function crop() {
+  for (const base of ['feed', 'goals', 'library', 'upcoming', 'admin-people-real']) for (const theme of ['light', 'dark']) {
+    await sharp(path.join(RAW, `${base}-desktop-${theme}.png`)).extract({ left: 264, top: 0, width: 816, height: 720 })
+      .toFile(path.join(RAW, `${base}-main-desktop-${theme}.png`));
+  }
+  console.log('cropped 10 main columns');
+}
+
+if (cmd === 'crop') await crop();
+else if (cmd === 'capture') await capture();
 else if (cmd === 'frame') await frameAll();
-else { console.log('usage: node scripts/docs-shots.js capture|frame [options]'); process.exitCode = 1; }
+else { console.log('usage: node scripts/docs-shots.js capture|crop|frame [options]'); process.exitCode = 1; }
