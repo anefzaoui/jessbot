@@ -13,6 +13,7 @@ import { countTokens } from '../lib/tokens.js';
 import { HttpError, invalid } from '../lib/errors.js';
 import { allSkills, skillsBlockOf, triggerQueriesOf, DESCRIPTION_MAX } from './skills.js';
 import { botName } from './bot.js';
+import { escapeRegExp } from '../lib/text-safe.js';
 
 export const TRIGGER_RUNS = 3;
 export const TRIGGER_MAX_QUERIES = 10;
@@ -28,7 +29,7 @@ export function parseChoice(answer, names) {
   const t = ` ${String(answer || '').toLowerCase().replace(/[`*_"“”‘’'.,!?:;()[\]{}<>]/g, ' ')} `;
   let best = null;
   for (const n of names) {
-    const i = t.search(new RegExp(`(?<![a-z0-9-])${n.replace(/-/g, '\\-')}(?![a-z0-9-])`));
+    const i = t.search(new RegExp(`(?<![a-z0-9-])${escapeRegExp(n)}(?![a-z0-9-])`));
     if (i >= 0 && (!best || i < best.i || (i === best.i && n.length > best.n.length))) best = { n, i };
   }
   if (best) return best.n;

@@ -3560,6 +3560,25 @@ Note: most of Phase 23 part A landed in commit aa56076, whose message reads "Pha
     server, the ninth refused, and still refused after the server process is restarted; the middleware's 429, headers and
     message).
 
+## 2026-11-20: Code scanning, first pass (issue #22)
+
+229. **Untrusted text is parsed in linear time, escapes cover the escape character, and request-supplied names go through
+    one safe-path helper.** CodeQL (security-extended) listed 88 alerts. The real ones are fixed at the root, with shared
+    helpers so the next caller gets it right: `src/lib/text-safe.js` (`escapeRegExp`, `escapeMarkdown` that escapes the
+    backslash first, `decodeEntities` in one pass so "&amp;lt;" stays "&lt;", `trimEndChars`, `replaceSpaced`, and
+    `isEmail`, capped at 254 characters with a pattern that can't backtrack) and `src/lib/safe-path.js` (`inside(root,
+    name)`: a plain name resolved inside its folder; `openRead` checks size or age on the same open file it reads;
+    `writeNew` creates content-addressed files exclusively). Patterns that could take seconds or forever on hostile input
+    are rewritten: feed sniffing (a nested pattern was exponential on unclosed comments in a fetched page), the skill
+    linter's code-block and comment scans, the bearer-token, email and page-range patterns. Also: a Cloudflare challenge
+    frame and Bing's redirect host are matched by host, not substring; the error log line uses a fixed format string; the
+    upload log line is one line; a form's redirect back stays on this site (`localPath`, which `safeNext` now uses); ad-block
+    switch-offs and admin toolset fields only touch known keys; client-side icon names are escaped; the admin's voice
+    preview direction is capped like the saved one. False positives (Handlebars-escaped output, the admin's own settings,
+    test and developer scripts) are dismissed in code scanning with a one-line reason each. Tested:
+    `tests/hardening.test.js` (each helper; the old patterns' worst inputs now finish in milliseconds; feeds, code blocks
+    and comments are still found; path, redirect and property-name refusals).
+
 ## 2026-11-20: Customizable assistant (#7)
 
 231. **The assistant's name and pronouns reach every sentence about it.** Setup and Admin → Identity already stored a name

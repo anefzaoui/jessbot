@@ -9,6 +9,7 @@
 //   tools: the tool registry (defaults to every registered tool) for capability checks.
 import { allTools } from '../agent/tools/registry.js';
 import { botName, DEFAULT_NAME } from './bot.js';
+import { escapeRegExp, trimEndChars } from '../lib/text-safe.js';
 
 const LEVELS = { bad: 0, warn: 1, info: 2 };
 export const BODY_WARN = 15_000;
@@ -95,7 +96,8 @@ const OPENCLAW_BAD = ['hooks', 'install'];
 const OPENCLAW_INFO = ['allowed-tools', 'requires', 'disable-model-invocation', 'user-invocable', 'command-dispatch', 'command-tool'];
 
 // ---- Helpers -------------------------------------------------------------------------------------------------------
-function lineIndex(text) {
+function lineIndex(raw) {
+  const text = String(raw ?? '');
   const starts = [0];
   for (let i = 0; i < text.length; i++) if (text[i] === '\n') starts.push(i + 1);
   return pos => { let lo = 0, hi = starts.length - 1; while (lo < hi) { const mid = (lo + hi + 1) >> 1; if (starts[mid] <= pos) lo = mid; else hi = mid - 1; } return lo + 1; };
@@ -108,6 +110,32 @@ function excerptAt(text, pos, len = 0) {
   return `${from > ls ? '…' : ''}${showHidden(text.slice(from, to).replace(/\r$/, '')).trim()}${to < le ? '…' : ''}`;
 }
 const hostOf = u => { try { return new URL(u).hostname.toLowerCase().replace(/\.$/, ''); } catch { return null; } };
+
+// Fenced code blocks (``` or ~~~, closed by the same fence at a line start) and HTML comments, found by scanning rather
+// than with one backtracking pattern: a skill file is untrusted text, and this stays linear whatever it holds (#229).
+function fencedBlocks(text) {
+  const out = [];
+  let pos = 0, open = null;
+  for (const l of text.split('\n')) {
+    const fence = /^[ \t]*(```|~~~)[ \t]*([\w+-]*)/.exec(l);
+    if (open && fence && fence[1] === open.fence) { out.push({ index: open.index, lang: open.lang, body: open.body.join('\n') }); open = null; }
+    else if (open) open.body.push(l);
+    else if (fence) open = { fence: fence[1], index: pos, lang: fence[2], body: [] };
+    pos += l.length + 1;
+  }
+  return out;
+}
+function htmlComments(text) {
+  const out = [];
+  let i = text.indexOf('<!--');
+  while (i >= 0) {
+    const end = text.indexOf('-->', i + 4);
+    if (end < 0) break;
+    out.push({ index: i, body: text.slice(i + 4, end) });
+    i = text.indexOf('<!--', end + 3);
+  }
+  return out;
+}
 
 // ---- Text rules (SKILL.md and supporting text files) ---------------------------------------------------------------
 function lintText(text, add) {
@@ -144,14 +172,13 @@ function lintText(text, add) {
   for (const [code, re, message] of COMMANDS) {
     for (const m of text.matchAll(new RegExp(re.source, `${re.flags.replace('g', '')}g`))) at('bad', code, m.index, m[0].length, message);
   }
-  for (const m of text.matchAll(/^[ \t]*(```|~~~)[ \t]*([\w+-]*)[^\n]*\n([\s\S]*?)^[ \t]*\1/gm)) {
-    const lang = m[2];
-    if (SHELL_LANGS.test(lang) || (!lang && /^\s*(?:\$|>|PS>|sudo\s|curl\s|wget\s|npm\s|pip\s|git\s|cd\s)/m.test(m[3]))) {
-      at('info', 'code-block', m.index, 3, 'A code block. Jess can’t run code: at most it’s an example to show someone.');
+  for (const b of fencedBlocks(text)) {
+    if (SHELL_LANGS.test(b.lang) || (!b.lang && /^\s*(?:\$|>|PS>|sudo\s|curl\s|wget\s|npm\s|pip\s|git\s|cd\s)/m.test(b.body))) {
+      at('info', 'code-block', b.index, 3, 'A code block. Jess can’t run code: at most it’s an example to show someone.');
     }
   }
-  for (const m of text.matchAll(/<!--([\s\S]*?)-->/g)) {
-    if (/[\p{L}]{3,}/u.test(m[1])) at('warn', 'html-comment', m.index, 4, 'An HTML comment: hidden when the page is shown, but the model reads it.');
+  for (const c of htmlComments(text)) {
+    if (/[\p{L}]{3,}/u.test(c.body)) at('warn', 'html-comment', c.index, 4, 'An HTML comment: hidden when the page is shown, but the model reads it.');
   }
   for (const m of text.matchAll(/(?<![\w/+=.-])[A-Za-z0-9+/]{60,}={0,2}(?![\w/+=])/g)) {
     if (/[0-9]/.test(m[0]) && /[a-z]/.test(m[0]) && /[A-Z]/.test(m[0])) at('warn', 'encoded-blob', m.index, m[0].length, 'A long encoded string (base64?): its content can’t be read here.');
@@ -160,7 +187,7 @@ function lintText(text, add) {
   // Links: every one listed; data-catchers, shorteners and tracking parameters flagged.
   const urlSpans = [];
   for (const m of text.matchAll(URL_RE)) {
-    const url = m[0].replace(/[.,;:!?]+$/, '');
+    const url = trimEndChars(m[0], '.,;:!?');
     urlSpans.push([m.index, m.index + url.length]);
     const host = hostOf(url);
     if (!host) continue;
@@ -349,7 +376,7 @@ export function lintSkill({ name = '', raw = '', meta = null, body = '', files =
 
   // Front matter.
   const fm = /^---\r?\n([\s\S]*?)\r?\n---/.exec(text);
-  const keyLine = key => { const i = fm ? fm[1].search(new RegExp(`^\\s*${key.replace(/[-.]/g, '\\$&')}\\s*:`, 'm')) : -1; return i < 0 ? 1 : line(4 + i); };
+  const keyLine = key => { const i = fm ? fm[1].search(new RegExp(`^[ \\t]*${escapeRegExp(key)}[ \\t]*:`, 'm')) : -1; return i < 0 ? 1 : line(4 + i); };
   const m0 = meta && typeof meta === 'object' ? meta : {};
   const vendor = [m0, m0.metadata?.openclaw, m0.metadata?.clawdbot, m0.metadata?.clawdis].filter(x => x && typeof x === 'object');
   for (const k of OPENCLAW_BAD) {

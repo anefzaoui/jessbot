@@ -57,7 +57,7 @@ export function createApp() {
     const code = err.status || err.statusCode || 500;
     // 4xx messages are written for people ("That account isn’t connected any more"); 5xx details stay in the log (http-errors' rule).
     const expose = err.expose ?? code < 500;
-    if (code >= 500) console.error(`[http] ${req.method} ${req.originalUrl.split('?')[0]} → ${code} (user ${req.user?.id ?? '-'})`, err);
+    if (code >= 500) console.error('[http] %s %s → %d (user %s)', req.method, req.originalUrl.split('?')[0].replace(/[\r\n]/g, ''), code, req.user?.id ?? '-', err);
     if (isAjax(req)) {
       return res.status(code).json({ error: expose ? err.message : 'Something went wrong on our side.', ...(err.errors && { errors: err.errors }),
         ...(expose && err instanceof HttpError && err.code && { code: err.code }) }); // code: a machine-readable reason (e.g. lint_bad)
