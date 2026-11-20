@@ -1,4 +1,4 @@
-// File names that come from a request (a URL segment, a form field) become paths only through here (decision #224,
+// File names that come from a request (a URL segment, a form field) become paths only through here (decision #229,
 // code scanning #22): a plain name (no separators, no "..", no drive letters), resolved inside its folder and checked to
 // still be inside it.
 import fs from 'node:fs';

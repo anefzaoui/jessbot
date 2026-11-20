@@ -40,7 +40,7 @@ export function normalizeFeed(text) {
 
 // ---- Is this a feed? ----------------------------------------------------------------------------------------------------
 // The document element, after a byte-order mark (\s covers it), an XML prolog, comments, doctype or processing instructions (an XSL stylesheet line).
-// Skipped by scanning, not by one nested pattern (that backtracked exponentially on a page of unclosed "<!--": #224).
+// Skipped by scanning, not by one nested pattern (that backtracked exponentially on a page of unclosed "<!--": #229).
 function rootElement(head) {
   let i = 0;
   for (;;) {

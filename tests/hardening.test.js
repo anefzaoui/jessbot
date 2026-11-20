@@ -1,4 +1,4 @@
-// Code-scanning fixes (decision #224, issue #22): linear-time parsing of untrusted text, escapes that cover the escape
+// Code-scanning fixes (decision #229, issue #22): linear-time parsing of untrusted text, escapes that cover the escape
 // character, one-pass entity decoding, safe paths, race-free file access, no open redirects.
 // Run: npm test  (throwaway data dir, no network).
 import { test, after } from 'node:test';

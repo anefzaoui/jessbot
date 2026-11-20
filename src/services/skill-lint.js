@@ -111,7 +111,7 @@ function excerptAt(text, pos, len = 0) {
 const hostOf = u => { try { return new URL(u).hostname.toLowerCase().replace(/\.$/, ''); } catch { return null; } };
 
 // Fenced code blocks (``` or ~~~, closed by the same fence at a line start) and HTML comments, found by scanning rather
-// than with one backtracking pattern: a skill file is untrusted text, and this stays linear whatever it holds (#224).
+// than with one backtracking pattern: a skill file is untrusted text, and this stays linear whatever it holds (#229).
 function fencedBlocks(text) {
   const out = [];
   let pos = 0, open = null;

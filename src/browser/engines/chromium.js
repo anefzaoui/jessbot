@@ -12,12 +12,13 @@ import { spawn } from 'node:child_process';
 import { createRequire } from 'node:module';
 import { paths } from '../../config/index.js'; // first: it sets PLAYWRIGHT_BROWSERS_PATH before playwright-core loads
 import { chromium } from 'playwright-core';
+import { launchViaServer, stopServer } from './server.js';
 
 const require = createRequire(import.meta.url);
 
 export const id = 'chromium';
 export const label = 'Chromium';
-export const summary = 'Open-source Chromium, downloaded once into tools/ (about 200 MB), or a Chrome/Chromium already installed.';
+export const summary = 'Open-source Chromium driven by plain Playwright, downloaded once into tools/ (about 200 MB), or a Chrome/Chromium already installed (JESSBOT_CHROMIUM_PATH). Easier for sites to spot as automated.';
 
 const systemPath = () => (process.env.JESSBOT_CHROMIUM_PATH || '').trim() || null;
 
@@ -82,36 +83,21 @@ const lastLine = s => s.split('\n').map(l => l.trim()).filter(Boolean).at(-1) ||
 
 export const installProgress = () => progress;
 
-/** Launch it: the full Chromium in new headless mode. */
-// Launched as a browser server we hold on to: Chromium's own shutdown can hang on some systems (seen on Windows with
-// Chromium, Chrome and Edge alike), and a server can always be stopped by killing its process (stop() below).
-const servers = new WeakMap();
+/** Launch it: the full Chromium in new headless mode (as a server we can always stop, engines/server.js). */
 export async function launch() {
   const sys = systemPath();
   const version = sys ? null : browsersJsonVersion();
-  const server = await chromium.launchServer({
-    headless: true, ...(sys ? { executablePath: sys } : { channel: 'chromium' }),
-    host: '127.0.0.1', // the control socket stays on this machine (Playwright's default listens on every interface)
-    args: [
-      // No UDP from WebRTC outside a proxy: a page's peer connection or mDNS socket can't reach the network, and no
-      // firewall prompt pops up on a desktop for a browser that has no firewall rule of its own.
-      '--webrtc-ip-handling-policy=disable_non_proxied_udp',
-      // The user agent for the whole browser, workers included (a per-context override leaves "HeadlessChrome" in them).
-      ...(version ? [`--user-agent=${userAgent(version)}`] : []),
-    ],
+  return launchViaServer(chromium, {
+    ...(sys ? { executablePath: sys } : { channel: 'chromium' }),
+    // The user agent for the whole browser, workers included (a per-context override leaves "HeadlessChrome" in them).
+    args: version ? [`--user-agent=${userAgent(version)}`] : [],
   });
-  const browser = await chromium.connect(server.wsEndpoint());
-  servers.set(browser, server);
-  return browser;
 }
 
-/** Stop a browser this engine launched for good (its process, not just our connection to it). */
-export async function stop(browser) {
-  const server = servers.get(browser);
-  servers.delete(browser);
-  await browser.close().catch(() => {}); // a connected browser: this only disconnects
-  await server?.kill().catch(() => {});
-}
+export const stop = stopServer;
+
+// Plain Playwright: console events, bindings and main-world evaluate all work as documented.
+export const caps = { consoleEvents: true, bindings: true };
 
 /** A desktop user agent for this browser's version, without "HeadlessChrome". */
 export function userAgent(version) {

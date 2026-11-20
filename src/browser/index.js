@@ -14,6 +14,7 @@ import { currentEngine, loadEngine, adblockDecision, adblockState, noteAdblockEr
 import { adsAndTrackingLists } from '@ghostery/adblocker';
 
 import { ENGINES, engineId, browserEngine, engineList } from './engines/index.js';
+import * as plainChromium from './engines/chromium.js';
 
 export { engineList };
 export const DEFAULTS = { maxPages: 2, idleMinutes: 5, blockMedia: true, allowPrivate: false, engines: ['duckduckgo', 'brave', 'bing'], searxngUrl: '', blockAds: false };
@@ -153,7 +154,41 @@ async function getBrowser() {
 // asked for it (an engine switch, a restart). Engines that can stop their process for good (stop) do; the rest get a
 // close() with a time limit, finishing in the background.
 const CLOSE_WAIT_MS = 3000;
+const caps = engine => ({ consoleEvents: true, bindings: true, ...(engine.caps || {}) });
+/** What the current engine supports beyond navigation (session.js leaves autoconsent off without bindings). */
+export const engineCaps = () => caps(browserEngine());
+
+/**
+ * Run fn in the page's own JavaScript world: where a reader needs the page's globals (window.ytInitialPlayerResponse).
+ * Patchright evaluates in an isolated world unless the fourth argument is false; plain Playwright ignores it.
+ */
+export const evaluateInPage = (target, fn, arg) => target.evaluate(fn, arg, {}, false);
+
+// The plain Playwright browser for Jessbot's own pages when the engine can't render them (#227): the installed Chrome when
+// the engine is Chrome, else Playwright's Chromium. Closed with the main browser.
+let renderBrowser = null, renderLaunching = null;
+async function getRenderBrowser() {
+  if (renderBrowser?.isConnected()) return renderBrowser;
+  renderLaunching ||= (async () => {
+    const { chromium } = await import('playwright-core');
+    const { launchViaServer } = await import('./engines/server.js');
+    const sys = process.env.JESSBOT_CHROMIUM_PATH;
+    const useChrome = engineId() === 'chrome';
+    if (!useChrome && !sys && !plainChromium.info().installed) {
+      throw new BrowserUnavailable('Jessbot’s own pages (checks, print, export) need Chromium as well: install it in Admin → Browser (npm run browser:install -- --engine chromium).');
+    }
+    const b = await launchViaServer(chromium, useChrome ? { channel: 'chrome' } : sys ? { executablePath: sys } : { channel: 'chromium' });
+    b.on('disconnected', () => { if (renderBrowser === b) renderBrowser = null; });
+    renderBrowser = b;
+    return b;
+  })().finally(() => { renderLaunching = null; });
+  return renderLaunching;
+}
+
 export async function closeBrowser() {
+  const r = renderBrowser;
+  renderBrowser = null;
+  if (r) plainChromium.stop(r).catch(() => {}); // in the background: it never holds anything up
   clearTimeout(idleTimer);
   const b = browser;
   browser = null;
@@ -190,12 +225,14 @@ const abortError = () => Object.assign(new Error('Request was aborted.'), { name
 // person's own cookies, decision #136: read-only). deviceScaleFactor: pixels per CSS pixel (2 for sharp PNG exports; default 1).
 // mobile: a phone (touch, the page's mobile viewport rules; web_screenshot's mobile view, decision #166). Pages opened only to
 // be read ask for reduced motion (#168): no animations to wait for; captures (media) keep the page's normal look.
-export async function withPage(fn, { signal, media = false, viewport = { width: 1280, height: 900 }, profile, storageState, deviceScaleFactor, mobile = false } = {}) {
+// render: Jessbot's own pages (page checks, print, export) — they need console events and plain Playwright behaviour, so
+// when the engine doesn't give them (Patchright, #227) they open in a plain Playwright browser on the same machine.
+export async function withPage(fn, { signal, media = false, viewport = { width: 1280, height: 900 }, profile, storageState, deviceScaleFactor, mobile = false, render = false } = {}) {
   await acquire();
   let ctx;
   try {
     if (signal?.aborted) throw abortError();
-    const b = await getBrowser();
+    const b = render && !caps(browserEngine()).consoleEvents ? await getRenderBrowser() : await getBrowser();
     ctx = await b.newContext({ viewport, locale: 'en-US', serviceWorkers: 'block', acceptDownloads: false, proxy: await guardProxy(), ...(userAgent && !mobile ? { userAgent } : {}),
       storageState: profile ? loadProfile(profile) : storageState, ...(deviceScaleFactor ? { deviceScaleFactor } : {}),
       ...(mobile ? { isMobile: true, hasTouch: true, userAgent: mobileUserAgent(b.version()) } : {}), ...(media ? {} : { reducedMotion: 'reduce' }) });

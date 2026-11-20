@@ -1,4 +1,4 @@
-// Small text helpers that are easy to get subtly wrong, in one place (decision #224, code scanning #22): every pattern
+// Small text helpers that are easy to get subtly wrong, in one place (decision #229, code scanning #22): every pattern
 // here runs in linear time on any input, and every escape covers the escape character itself.
 
 /** A literal string inside a RegExp. */
