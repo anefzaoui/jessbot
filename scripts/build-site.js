@@ -60,7 +60,7 @@ const icons = html => html.replace(/\{\{icon:([a-z0-9-]+)\}\}/g, (_, n) => icon(
 
 // ---- Markdown → HTML, with links rewritten for the site ------------------------------------------------------------
 const md = new MarkdownIt({ html: true, linkify: false, typographer: false });
-const slug = s => s.toLowerCase().replace(/<[^>]+>/g, '').replace(/[^\w\- ]/g, '').trim().replace(/ /g, '-');
+const slug = s => s.toLowerCase().replace(/[^\w\- ]/g, '').trim().replace(/ /g, '-');
 md.core.ruler.push('anchors', state => {
   const seen = new Map();
   state.tokens.forEach((t, i) => {
