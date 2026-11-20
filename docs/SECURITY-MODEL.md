@@ -103,7 +103,9 @@ Each layer assumes the ones before it can fail.
 12. **Sandboxed Library pages** [#47]. Pages Jess builds run in a sandboxed frame with an opaque origin and a content
     security policy that blocks network calls, cookies and storage, so they can't reach the app or its API.
 
-Around all of this sit the ordinary web-app controls: argon2id password hashes, HttpOnly SameSite cookies, a check of
+Around all of this sit the ordinary web-app controls: argon2id password hashes (redone with stronger parameters at
+sign-in), optional two-step sign-in with an authenticator app and one-time recovery codes, sessions replaced when a
+password changes, admin-made one-time password reset links [#230], HttpOnly SameSite cookies, a check of
 the requested host and of the origin of every cookie-authenticated change (which closes DNS rebinding against a local
 install) [#12, #220], rate limits on sign-in, setup, invites and every request, kept in the database so a restart doesn't
 reset them [#228], mail and calendar passwords sealed with a per-install key [#78], a strict content security policy,
