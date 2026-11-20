@@ -257,7 +257,7 @@ The overview (who is trusted, every place outside content enters and how it is h
   two-step sign-in seeds, the model provider's key, the Web Push private key and browser sign-ins (cookies). The key is
   never in the database or the backups: it comes from `JESSBOT_SECRET_FILE` (a file, e.g. a Docker or systemd secret,
   so the data volume holds nothing readable) or `JESSBOT_SECRET` in `.env`, made on first use.
-  - A model key entered in setup or Admin → Model is sealed in the database, never written to `.env`. One set in the
+  - A model key entered in setup or Admin → Models is sealed in the database, never written to `.env`. One set in the
     real environment (`environment:` in compose, `Environment=` in systemd) is the operator's: used, never stored.
   - Existing installs: at start, `OPENROUTER_KEY`, `LLM_API_KEY` and the Web Push keys found in the install's own `.env`
     (the default one, or one inside the data folder) move into the database, sealed, and their lines leave `.env`. A

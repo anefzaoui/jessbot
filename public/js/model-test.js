@@ -1,4 +1,4 @@
-// Model connection form (setup wizard and Admin → Model): save the settings, run one tiny real call, show the result
+// Model connection form (setup wizard and Admin → Models): save the settings, run one tiny real call, show the result
 // inline. <form data-model-test action="…"> with [data-test-button], [data-test-result]; optional [data-continue] is
 // enabled once it connects (setup), [data-key-field] / [data-show-key-field] swap in a new key.
 // Admin → Models (Phase 25 #203): a cancelable `model:before-save` on the form lets admin-models.js hold the save (a fallback

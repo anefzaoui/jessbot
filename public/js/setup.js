@@ -4,7 +4,7 @@ import { toast } from './toast.js';
 import { initModelTest } from './model-test.js';
 
 
-// ---- Brain: test the connection (shared with Admin → Model) -----------------------------
+// ---- Brain: test the connection (shared with Admin → Models) -----------------------------
 initModelTest();
 
 // ---- Identity: live preview ------------------------------------------------------------

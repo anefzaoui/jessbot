@@ -17,6 +17,7 @@ in their chat.
 - It reads the web with its own browser, writes you a daily Feed, and keeps your files in a Library.
 - Mail, calendar, shopping lists, reminders and goals are shared by the household or kept private, person by person.
 - Give it any name and look, and use OpenRouter, Ollama on your own computer, or another AI service.
+- Put it on your phone's home screen like an app.
 
 ### Added
 
@@ -32,6 +33,8 @@ in their chat.
   25,000 tokens) and says what to set on the server (`OLLAMA_CONTEXT_LENGTH=32768`); a task whose prompt Ollama would
   cut stops with the same advice instead of acting on part of its instructions.
 - Docker image and compose file, a systemd unit, install guides for Windows, macOS and Linux.
+- A web app manifest: Jessbot installs on a phone's home screen or as a desktop app, under the assistant's name, with
+  the logo (or its look's portrait) as the icon.
 - The project site, with the user guide and screenshots: https://anefzaoui.github.io/jessbot/. Its home page is "Jess's
   day": Jess in her sky through four hours of a day, what she does at each, one real run with its timeline, and the
   install; the guide, the gallery and the 404 share its look.

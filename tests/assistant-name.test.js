@@ -95,7 +95,7 @@ test('project soul: the prompt section and the stance use the name', () => {
   assert.match(text, /In this project you are Nova, bringing a gardener’s patience/);
 });
 
-test('pages: Admin → Model and Personality name the assistant, never "she"', async () => {
+test('pages: Admin → Models and Personality name the assistant, never "she"', async () => {
   rename('Nova');
   for (const p of ['/admin/model', '/admin/personality', '/admin/personality/lessons']) {
     const res = await fetch(`${base}${p}`, { headers: { Cookie: cookie } });

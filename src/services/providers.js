@@ -70,7 +70,7 @@ export const FEATURES = [
 /** Whether a feature works with a provider: true | false | 'model'. */
 export const supports = (feature, provider) => FEATURES.find(f => f.id === feature)?.on[provider] ?? false;
 
-/** The table for one provider, for the setup step and Admin → Model. */
+/** The table for one provider, for the setup step and Admin → Models. */
 export const featureSupport = provider => FEATURES.map(f => ({ id: f.id, label: f.label, icon: f.icon, on: f.on[provider],
   note: f.on[provider] === true ? null : f.without }));
 

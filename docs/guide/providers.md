@@ -54,8 +54,9 @@ running on a cut prompt, and the server log says why (`[agent] … doesn't fit t
 
 OpenAI itself, LM Studio, a LiteLLM or vLLM server: pick **Another OpenAI-compatible service**, enter its address
 (usually ending in `/v1`), its key if it needs one, and the model's name as the service calls it. Before the first
-setup you can also set `LLM_BASE_URL` (and `LLM_MODEL`) in `.env`. A key you save is used only for the address you saved
-it with: switching to another service asks for that service's key.
+setup you can also set `LLM_BASE_URL` (and `LLM_MODEL`) in `.env`: they fill in the setup page. Once setup or Admin →
+Models has saved a provider, the saved one is used and those two lines are ignored, so change it in Admin → Models. A
+key you save is used only for the address you saved it with: switching to another service asks for that service's key.
 
 A model server on your own network works without opening the local network to the agent's browser: the address you
 configure is allowed, and only that one.
