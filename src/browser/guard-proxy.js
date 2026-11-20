@@ -61,13 +61,20 @@ function onConnect(req, client, head) {
 
 const HOP = new Set(['proxy-authorization', 'proxy-connection', 'connection', 'keep-alive', 'te', 'trailer', 'transfer-encoding', 'upgrade']);
 
+// Raw headers ([name, value, name, value…], as sent) minus the hop-by-hop ones: forwarded as a flat array, never copied
+// onto an object keyed by a name the page chose.
+function endToEnd(raw) {
+  const out = [];
+  for (let i = 0; i + 1 < raw.length; i += 2) if (!HOP.has(raw[i].toLowerCase())) out.push(raw[i], raw[i + 1]);
+  return out;
+}
+
 function onRequest(req, res) {
   if (!authorized(req)) { res.writeHead(407, { 'Proxy-Authenticate': 'Basic realm="jessbot"' }); return res.end(); }
   let url;
   try { url = new URL(req.url); } catch { res.writeHead(400); return res.end(); }
   if (url.protocol !== 'http:') { res.writeHead(400); return res.end(); }
-  const headers = {};
-  for (const [k, v] of Object.entries(req.headers)) if (!HOP.has(k)) headers[k] = v;
+  const headers = endToEnd(req.rawHeaders);
   const allowPrivate = localNetworkAllowed();
   const h = url.hostname.replace(/^\[|\]$/g, '');
   if (!allowPrivate && net.isIP(h) && isPrivateIp(h)) { refused++; res.writeHead(403); return res.end(); } // an IP literal skips the lookup
@@ -76,9 +83,7 @@ function onRequest(req, res) {
     lookup: checkedLookup({ allowPrivate }), agent: false, timeout: CONNECT_TIMEOUT,
   });
   up.on('response', r => {
-    const out = {};
-    for (const [k, v] of Object.entries(r.headers)) if (!HOP.has(k)) out[k] = v;
-    res.writeHead(r.statusCode, r.statusMessage, out);
+    res.writeHead(r.statusCode, r.statusMessage, endToEnd(r.rawHeaders));
     r.pipe(res);
   });
   up.on('timeout', () => up.destroy(new Error('timeout')));
