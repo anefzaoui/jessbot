@@ -4,6 +4,7 @@
 import { get, all, run } from '../db/index.js';
 import { seal, unseal } from '../lib/secrets.js';
 import { invalid, notFound } from '../lib/errors.js';
+import { resolveTarget, outboundFetch } from '../lib/outbound.js';
 
 // App passwords: these providers refuse the normal password for IMAP/CalDAV once two-step sign-in is on (it always should be).
 export const PRESETS = {
@@ -102,14 +103,19 @@ export function connectionView(c) {
 /**
  * Mail/calendar servers must be on the public internet unless the admin allowed the local network (Admin → Browser —
  * the same switch the browser uses): someone's own settings must not become a way to probe this machine or the LAN.
- * Checked when settings are tested and before every connection. (A DNS answer can still change between this check and
- * the connection; this closes the plain cases, the admin switch closes the rest.)
+ * Enforced where the connection is made (lib/outbound.js, decision #221): the host is resolved once, every answer is
+ * checked, and the connection goes to that checked address (no second lookup for a changing DNS answer to slip into).
+ * → { host: the checked address to connect to, servername: the name, for TLS }.
  */
-export async function assertReachable(hostOrUrl) {
-  const { isPrivateUrl, browserSettings } = await import('../browser/index.js');
-  if (browserSettings().allowPrivate) return;
-  const url = /^https?:\/\//.test(hostOrUrl) ? hostOrUrl : `http://${hostOrUrl}`;
-  if (await isPrivateUrl(url)) {
-    throw Object.assign(new Error('That server is on this computer or the local network — only public servers are allowed (the admin can allow the local network in Admin → Browser).'), { status: 400 });
-  }
+export async function reachableTarget(host) {
+  try { return await resolveTarget(host); } catch (err) { throw blockedServer(err); }
 }
+
+const blockedServer = err => (err?.code === 'EBLOCKED'
+  ? Object.assign(new Error('That server is on this computer or the local network — only public servers are allowed (the admin can allow the local network in Admin → Browser).'), { status: 400, code: 'EBLOCKED' })
+  : err);
+
+/** fetch for a calendar server (tsdav): the same rule, every request and redirect. */
+export const serverFetch = ({ allowSelfSigned = false } = {}) => async (input, init) => {
+  try { return await outboundFetch(input, init, { rejectUnauthorized: !allowSelfSigned }); } catch (err) { throw blockedServer(err); }
+};

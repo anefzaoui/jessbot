@@ -8,7 +8,7 @@ import crypto from 'node:crypto';
 import { DAVClient } from 'tsdav';
 import ICAL from 'ical.js';
 import { get, all, run, tx } from '../db/index.js';
-import { passwordOf, markConnection, connectionsOf, assertReachable } from './connections.js';
+import { passwordOf, markConnection, connectionsOf, serverFetch } from './connections.js';
 import { audit } from './audit.js';
 import { tzOf } from '../lib/when.js';
 import { oneLine } from '../lib/untrusted.js';
@@ -19,9 +19,10 @@ const WINDOW_BACK_MS = 864e5;
 const WINDOW_AHEAD_MS = 60 * 864e5;
 
 async function clientFor(c) {
-  await assertReachable(c.config.url);
+  // Every request (and redirect) to the server goes through the outbound rule (decision #221); "allow a self-signed
+  // certificate" now reaches the calendar's connections too (it used to apply to mail only).
   const client = new DAVClient({ serverUrl: c.config.url, credentials: { username: c.config.username, password: passwordOf(c) },
-    authMethod: 'Basic', defaultAccountType: 'caldav' });
+    authMethod: 'Basic', defaultAccountType: 'caldav', fetch: serverFetch({ allowSelfSigned: !!c.config.allowSelfSigned }) });
   await client.login();
   return client;
 }

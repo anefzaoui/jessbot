@@ -10,6 +10,7 @@ import { get, all, settings } from '../db/index.js';
 import { effectivePolicy } from './policy.js';
 import { spentThisWeek, spentOnRuns } from './usage.js';
 import { notify } from './notify.js';
+import { outboundFetch } from '../lib/outbound.js';
 import { llmSettings, onOpenRouter } from './llm.js';
 import { config } from '../config/index.js';
 
@@ -124,8 +125,8 @@ export async function refreshBalance({ force = false, now = new Date() } = {}) {
   const base = baseUrl.replace(/\/+$/, '');
   const fetchJson = async p => {
     try {
-      const res = await fetch(`${base}/${p}`, { headers: { Authorization: `Bearer ${apiKey}`, 'HTTP-Referer': config.publicUrl, 'X-Title': 'Jessbot' },
-        signal: AbortSignal.timeout(8000) });
+      const res = await outboundFetch(`${base}/${p}`, { headers: { Authorization: `Bearer ${apiKey}`, 'HTTP-Referer': config.publicUrl, 'X-Title': 'Jessbot' },
+        signal: AbortSignal.timeout(8000) }, { trustedOrigin: base });
       return res.ok ? (await res.json())?.data || null : null;
     } catch { return null; }
   };

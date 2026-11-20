@@ -10,6 +10,7 @@ import { config } from '../config/index.js';
 import { llmSettings } from './llm.js';
 import { recordUsage } from './usage.js';
 import { badRequest } from '../lib/errors.js';
+import { outboundFetch } from '../lib/outbound.js';
 
 // What Jess uses it for (Admin → Models lists these with their switches).
 export const USES = {
@@ -116,11 +117,11 @@ export async function decide(use, { state, questions, user = null, runId = null,
     const left = timeoutMs - (Date.now() - started);
     if (left < 150) break;
     try {
-      const res = await fetch(ep.url, {
+      const res = await outboundFetch(ep.url, {
         method: 'POST', body,
         headers: { Authorization: `Bearer ${ep.apiKey}`, 'Content-Type': 'application/json', 'HTTP-Referer': config.publicUrl, 'X-Title': 'Jessbot' },
         signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(left)]) : AbortSignal.timeout(left),
-      });
+      }, { trustedOrigin: ep.url });
       const json = await res.json().catch(() => null);
       if (!res.ok || !json?.answers) {
         lastErr = Object.assign(new Error(json?.error?.message || `HTTP ${res.status}`), { status: res.status });

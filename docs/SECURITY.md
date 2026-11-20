@@ -183,6 +183,15 @@ and how, so a reviewer (or a future session) can check each control. Decisions a
 - **SSRF.** The browser refuses loopback, private, link-local and cloud-metadata addresses (every request, redirects
   included). Mail, calendar and push endpoints are held to the same rule — someone's own settings can't be used to probe
   this machine or the local network — unless the admin allows the local network in Admin → Browser. [#43, #86]
+  **Every server-side request goes through one module** (`src/lib/outbound.js`): push delivery, mail (IMAP/SMTP),
+  calendars (CalDAV), the model provider, SearXNG and the price and balance lookups. A host name is resolved once by the
+  connection's own lookup, every answer is checked (a mixed public/private answer is refused whole), and the socket
+  connects to an address from that same answer, so a DNS answer that changes after the check can't move the connection;
+  the peer address is checked again once connected. IPv4 addresses carried inside IPv6 (mapped, NAT64, 6to4) are checked as
+  the IPv4 they reach. Redirects are followed hop by hop under the same rule, and credentials never follow one to another
+  origin. Mail libraries get the checked address to connect to and the server's name for TLS. The endpoints the admin
+  configured (model provider, SearXNG) may be on the local network, but only that exact origin: a redirect away from it is
+  held to the public-only rule. [#221]
   Ad and tracker blocking (off by default) runs inside that same request guard, after the network check, never beside it;
   its filter lists come through the browser too. [#168]
 - **Look-alike sites.** The browser warns (never blocks) on sign-in and password pages whose address looks wrong —
@@ -236,7 +245,8 @@ and how, so a reviewer (or a future session) can check each control. Decisions a
   redaction and backup contents.
 
 ## Known limits
-- The SSRF check resolves a host before connecting; a DNS answer that changes in between is not caught. The admin's
+- Server-side requests connect to the address they checked (above), but the browser still resolves a page's host itself
+  after the request guard checked it, so a DNS answer that changes in between is not caught there. The admin's
   local-network switch is the backstop.
 - Google (mail/calendar) and Microsoft 365 need OAuth, which isn't supported yet — app passwords only.
 - The default browser is open-source Chromium. CloakBrowser, when an admin picks it, is a proprietary binary downloaded
