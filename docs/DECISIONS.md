@@ -3528,6 +3528,15 @@ Note: most of Phase 23 part A landed in commit aa56076, whose message reads "Pha
     never sees a request; a bare context without the request guard still can't reach 127.0.0.1 or localhost), and real
     sites over HTTPS and plain HTTP load through it.
 
+226. **Installs: a container image, a systemd unit, documented Windows and macOS starts.** `Dockerfile`: Node 24 slim,
+    the built assets without dev dependencies, Chromium and its libraries with Noto fonts, run as uid 10001 under tini;
+    `/data` holds everything it writes (`JESSBOT_HOME`, and `JESSBOT_ENV_FILE=/data/.env` so the setup page can save the
+    key on a read-only image); a health check on `/healthz`. `compose.yaml` publishes on 127.0.0.1 only, with a read-only
+    root, a tmpfs `/tmp`, all capabilities dropped and no new privileges. `deploy/jessbot.service`: its own user, a
+    read-only system with only `/var/lib/jessbot` writable. `docs/INSTALL.md` covers each system and a reverse proxy.
+    CI (`docker.yml`) builds and starts the image on pull requests that touch it and publishes amd64 + arm64 images to
+    GHCR on version tags; Dependabot watches the base image.
+
 227. **Where Google Chrome is installed, the browser is that Chrome driven by Patchright.** A comparison of open-source
     alternatives to CloakBrowser (on Windows and in Linux Docker, against the common bot checks) found Patchright
     (`patchright-core`, Apache-2.0: the Playwright API with its automation traces removed) driving the person's own Google

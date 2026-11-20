@@ -1,0 +1,28 @@
+# Jessbot with Docker Compose.
+#   docker compose up -d
+#   docker compose logs jessbot      # the setup code for the first admin account is printed here
+# Then open http://127.0.0.1:3737. It listens on this machine only; to reach it from elsewhere, put a reverse proxy with
+# HTTPS in front (see docs/INSTALL.md) and set PUBLIC_URL, rather than publishing the port on every interface.
+services:
+  jessbot:
+    build: .
+    image: jessbot:local
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${JESSBOT_PORT:-3737}:3737"   # JESSBOT_PORT picks another port on this machine
+    environment:
+      # PUBLIC_URL: https://jessbot.example.org   # the address people use, when behind a reverse proxy
+      # JESSBOT_TIMEZONE: Europe/Berlin           # a fallback for people who haven't set their own
+      TZ: ${TZ:-UTC}
+    volumes:
+      - jessbot-data:/data
+    read_only: true
+    tmpfs:
+      - /tmp:size=512m
+    shm_size: 512m          # Chromium uses /dev/shm for its pages
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+volumes:
+  jessbot-data:
