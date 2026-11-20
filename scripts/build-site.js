@@ -148,7 +148,7 @@ const LABELS = { chat: 'Chat', 'chat-background': 'Work in the background', 'cha
   activity: 'Activity', you: 'You', 'you-memory': 'You → Memory', 'admin-people-real': 'Admin → People (real install)', 'admin-overview': 'Admin → Overview',
   'admin-models': 'Admin → Models', 'admin-skills': 'Admin → Skills', 'admin-usage': 'Admin → Usage', 'setup-account': 'Setup: your account',
   'setup-model': 'Setup: the model', 'setup-browser': 'Setup: the internet', 'setup-identity': 'Setup: who your agent is', 'setup-people': 'Setup: people' };
-const shots = fs.readdirSync(path.join(ROOT, 'docs/images')).filter(f => /-(desktop|phone)-light\.webp$/.test(f));
+const shots = fs.readdirSync(path.join(ROOT, 'docs/images')).filter(f => /-(desktop|phone)-light\.webp$/.test(f) && !f.includes('-main-')); // -main-: the home page's crops
 const fig = f => {
   const [, base, device] = f.match(/^(.+)-(desktop|phone)-light\.webp$/);
   const dark = fs.existsSync(path.join(ROOT, 'docs/images', `${base}-${device}-dark.webp`));
