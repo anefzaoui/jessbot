@@ -244,6 +244,12 @@ async function fireSchedule(s, now) {
   if (schedules.isWatch(s) && s.ends_at && now >= new Date(s.ends_at)) return endWatch(user, s, now);
   const late = now.getTime() - new Date(s.next_run_at).getTime();
   if (late > TASK_GRACE_MS) return missedTask(user, s, now);
+  // Its last run failed with a passing error and its one automatic retry is still pending (issue #57): that retry is this
+  // occurrence's run. Firing both would do the same task twice within minutes (and a test pinned near 07:00 saw it).
+  if (s.kind === 'task' && s.last_run_id
+    && get(`SELECT 1 FROM runs WHERE id = ? AND status = 'error' AND retry_at IS NOT NULL AND hidden = 0`, s.last_run_id)) {
+    return schedules.skipOccurrence(s, now);
+  }
 
   if (s.kind === 'checkin') {
     const policy = effectivePolicy(user);

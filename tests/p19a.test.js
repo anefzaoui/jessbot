@@ -119,11 +119,19 @@ const toolRows = runId => all(`SELECT tool_name, content FROM messages WHERE run
 const notifies = user => all(`SELECT data FROM events WHERE user_id = ? AND type = 'notify' ORDER BY id`, user.id).map(e => JSON.parse(e.data));
 const active = user => all(`SELECT id, status FROM runs WHERE user_id = ? AND status IN ('queued', 'running', 'waiting')`, user.id);
 const reply = runId => { const r = runs.getRun(runId); return r.reply_message_id ? get('SELECT content FROM messages WHERE id = ?', r.reply_message_id).content : null; };
-// A schedule whose next run is due now (or `lateMs` ago).
+// A schedule whose next run is due now (or `lateMs` ago). Its daily time is 12 hours from now in the schedule's own time zone,
+// so the tests that jump the clock ahead by minutes never also reach its next occurrence, whatever time they run (#57).
+// cronAt(tz, date): the daily cron for that wall-clock minute in tz.
+const cronAt = (tz, date) => {
+  const p = Object.fromEntries(new Intl.DateTimeFormat('en-GB', { timeZone: tz, hour: 'numeric', minute: 'numeric', hourCycle: 'h23' })
+    .formatToParts(date).map(x => [x.type, x.value]));
+  return `${Number(p.minute)} ${Number(p.hour)} * * *`;
+};
 function dueSchedule(user, fields = {}, lateMs = 60000) {
   const t = threads.createSideThread(user.id, 'Schedules');
   const s = schedules.createSchedule({ user, title: 'Morning brief', prompt: 'Brief me.', cron: '0 7 * * *', threadId: t.id, ...fields });
-  run('UPDATE schedules SET next_run_at = ? WHERE id = ?', new Date(Date.now() - lateMs).toISOString(), s.id);
+  const cron = fields.cron || cronAt(s.timezone, new Date(Date.now() + 12 * 3600e3));
+  run('UPDATE schedules SET cron = ?, next_run_at = ? WHERE id = ?', cron, new Date(Date.now() - lateMs).toISOString(), s.id);
   return schedules.getSchedule(s.id);
 }
 const runOf = s => runs.getRun(schedules.getSchedule(s.id).last_run_id);
@@ -406,6 +414,30 @@ test('a transient failure gets ONE automatic retry ~10 min later; a second failu
   assert.equal(loop.errorKind({ cause: { code: 'ECONNRESET' } }), 'transient');
   assert.equal(loop.errorKind({ status: 402 }), 'permanent');
   assert.equal(loop.errorKind(new Error('bug')), 'permanent');
+});
+
+test('a pending retry is the only run when the task’s next occurrence falls before it (the 07:00 edge, #57)', async () => {
+  clearUser(alice);
+  // The edge, pinned relative to now: the next occurrence is 5 minutes away, the retry 10 (as at 06:55 for a 07:00 task).
+  const probe = dueSchedule(alice, { title: 'Edge news' });
+  const s = dueSchedule(alice, { title: 'Edge news', cron: cronAt(probe.timezone, new Date(Date.now() + 5 * 60000)) });
+  run('DELETE FROM schedules WHERE id = ?', probe.id);
+  script = [{ error: 502 }];
+  await proactive.runDue(new Date());
+  const first = await settle(runOf(s).id, { statuses: ['error'] });
+  assert.ok(first.retry_at, 'a retry is planned');
+  assert.ok(new Date(schedules.getSchedule(s.id).next_run_at) < new Date(first.retry_at), 'the next occurrence comes before the retry');
+  const before = all('SELECT id FROM runs WHERE schedule_id = ?', s.id).length;
+  script = [{ text: 'Trains are running.' }];
+  await proactive.runDue(new Date(Date.now() + 11 * 60000)); // both are due now
+  const second = runOf(s);
+  assert.equal(second.retry_of, first.id, 'the run is the retry');
+  const started = all('SELECT id FROM runs WHERE schedule_id = ? AND id > ?', s.id, first.id);
+  assert.deepEqual(started.map(r => r.id), [second.id], 'and the only new run: the occurrence was not fired as well');
+  assert.equal(all('SELECT id FROM runs WHERE schedule_id = ?', s.id).length, before + 1);
+  await settle(second.id, { statuses: ['done'] });
+  assert.equal(schedules.getSchedule(s.id).last_status, 'ok');
+  assert.ok(new Date(schedules.getSchedule(s.id).next_run_at) > new Date(Date.now() + 11 * 60000), 'moved on to the occurrence after');
 });
 
 test('a task missed while offline is "skipped" (not ok) and says so once with a way to run it now; check-ins just move on', async () => {
