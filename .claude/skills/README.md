@@ -1,4 +1,9 @@
-# Design skills (vendored)
+# Skills
+
+`verify/` is Jessbot's own: how to check a change for real before it's called done (isolation, tests, a fresh
+instance in a real browser, the e2e and chat checks, Docker, cleanup). The others are vendored design skills.
+
+## Design skills (vendored)
 
 Owner decision (2026-09-26): UI work in Jessbot follows these two skills. Copied here so every session (and every
 agent working on the repo) loads them; see `docs/DESIGN.md` for how they were applied and `docs/DECISIONS.md` #116.

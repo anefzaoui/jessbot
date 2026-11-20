@@ -17,7 +17,10 @@ mode; taste-skill's bans are the checklist; this project's rules win on conflict
 3. **Fix root causes**, never one-off patches. A flaky test gets its cause found, not a retry.
 4. **Cheapest thing that works.** Plain code for deterministic work, the cheapest model that does the job, local or
    self-hosted options first.
-5. **Verify the whole system** after a change, by running it the way a person uses it, not only the unit tests.
+5. **Verify the whole system** after a change, by running it the way a person uses it, not only the unit tests. The
+   `verify` skill (`.claude/skills/verify/SKILL.md`) says how: your own `PORT` and `JESSBOT_HOME` every time, never the
+   default ports or the owner's instance; point every agent brief at it, and fix the skill when a step is missing.
+   Review against [REVIEW.md](REVIEW.md), read from `main`; every pull request says `Verified:` and `Not verified:`.
 6. **Keep contracts aligned.** Producers and consumers of a shape (service, route, template, client JS, API docs) change
    together.
 7. **Don't reinvent the wheel** on the server: look for a maintained library first. In the browser, everything is
