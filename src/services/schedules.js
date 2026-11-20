@@ -115,6 +115,12 @@ export function advance(s, { status = null, runId = null, now = new Date(), chec
   return getSchedule(s.id);
 }
 
+/** Move to the next occurrence without recording anything (its last run, a failed one waiting for its retry, stays). */
+export function skipOccurrence(s, now = new Date()) {
+  run(`UPDATE schedules SET next_run_at = ?, updated_at = datetime('now') WHERE id = ?`, nextRun(s, now), s.id);
+  return getSchedule(s.id);
+}
+
 /** A run of this schedule finished: 'ok' | 'bad' | 'silent' (older runs have no schedule_id: matched by last_run_id). */
 export function recordRunResult(r, status) {
   if (r.schedule_id) run(`UPDATE schedules SET last_status = ?, last_run_id = ?, updated_at = datetime('now') WHERE id = ?`, status, r.id, r.schedule_id);
