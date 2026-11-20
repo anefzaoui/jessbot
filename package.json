@@ -2,6 +2,7 @@
   "name": "jessbot",
   "version": "0.1.0",
   "private": true,
+  "license": "GPL-3.0-or-later",
   "description": "Self-hosted, portable personal AI agent for a household or team.",
   "type": "module",
   "main": "server.js",
