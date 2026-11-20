@@ -57,6 +57,11 @@ and how, so a reviewer (or a future session) can check each control. Decisions a
   offered and allowed in code); a call that would ask is refused (nobody is awake to approve, and no push goes out at night);
   it never gets `ask_user`; its spend is capped per night. Notes left by unattended runs reach the next check-in fenced as
   information, never as instructions. [#197, #199, #200]
+  **A background task's report is reported content.** When it finishes, the line posted back to the chat it came from is
+  the task's words, not Jess's: the model gets it fenced (`background_report`, with where the task read things and a
+  warning when it read text addressed to AI assistants), and her own visible copy is left out of what she reads back.
+  What the task read travels with the report: the report carries the task's taint, and every later run in that chat that
+  sees it is marked the same way, so its approvals count it like a page read there. [#233]
 - **Approval cards show what is actually sent**: the whole email body, calendar description or task instructions, up to
   20,000 characters, and past that an explicit "(cut at 20,000 of N characters)"; secret-looking parts are listed above it
   and masked in it (a card number shows as ••••4242); a line says whether it can be undone and who it reaches ("Can't be

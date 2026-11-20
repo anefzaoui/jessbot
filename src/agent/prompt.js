@@ -6,7 +6,8 @@
 //           hints (a skill, a careful topic) + on long runs "The task you're on" + recalled memories + a correction nudge and lessons that may apply
 // For Anthropic models the tail goes as a labelled user message and two cache breakpoints mark the stable parts (#202).
 // Identity comes from the server (the thread's owner), never from anything inside a message.
-import { get } from '../db/index.js';
+import { get, all } from '../db/index.js';
+import { taintOf, markRunTaint } from './taint.js';
 import { readWorkspaceFile } from '../services/workspace.js';
 import { currentInstructions } from '../services/instructions.js';
 import { groupsOfUser } from '../services/groups.js';
@@ -186,6 +187,18 @@ function missingResult(c, ctx) {
 }
 
 // ctx: { user, run } — whose files are screened, and the run a suspicious file marks.
+const reportRunIds = rows => {
+  const ids = [...new Set(rows.filter(r => r.role === 'assistant' && r.run_id).map(r => r.run_id))];
+  if (!ids.length) return new Set();
+  return new Set(all(`SELECT id FROM runs WHERE origin = 'delegate_report' AND id IN (${ids.map(() => '?').join(',')})`, ...ids).map(x => x.id));
+};
+
+/** A run whose prompt carries a background task's report is marked with what that task read (#233). */
+export function carryReportTaint(rows, runId) {
+  if (!runId) return;
+  for (const id of reportRunIds(rows)) for (const s of taintOf(id).sources) markRunTaint(runId, s.level, { tool: 'delegate_report', label: s.label });
+}
+
 function toChat(rows, ctx = {}) {
   const out = [];
   const turnStart = rows.findLastIndex(r => r.role === 'user');
@@ -201,7 +214,11 @@ function toChat(rows, ctx = {}) {
     const full = i > turnStart ? r.content : (r.stub || r.content);
     return { role: 'tool', tool_call_id: r.tool_call_id, content: i !== lastSnapshot && String(full).includes(SNAP) ? collapseSnapshot(full) : full };
   };
+  // A background task's report (delegate_report, #233) reaches the model fenced, in its system line; the visible copy is
+  // the person's, so the model doesn't read the task's words back as its own.
+  const reportRuns = reportRunIds(rows);
   for (const [i, r] of rows.entries()) {
+    if (r.role === 'assistant' && reportRuns.has(r.run_id)) { out.push({ role: 'assistant', content: '(I posted the background task’s report above for them.)' }); continue; }
     if (r.role === 'user') out.push({ role: 'user', content: userContent(r, i >= recentFrom, ctx) });
     else if (r.role === 'system') out.push({ role: 'system', content: r.content }); // scheduled task / check-in / reminder instructions
     else if (r.role === 'assistant') {
@@ -347,6 +364,7 @@ export function buildPrompt({ user, thread, owner, run = null }) {
 
   const rows = turnsAfter(thread.id, summary.anchor);
   const turns = toChat(rows, { user, run });
+  carryReportTaint(rows, run?.id);
   const lastUserRow = [...rows].reverse().find(r => r.role === 'user');
   const lastUser = lastUserRow?.content || '';
   // The message sense (decision model) chose the memories that matter and the reply language; else keywords and letters.
