@@ -137,8 +137,9 @@ that only speak when something changed, alarms and timers, and everything coming
 
 ### Mail, calendar and memory
 
-IMAP/SMTP and CalDAV accounts (optional), each usable only by its owner; sending mail and changing calendars always asks
-first. Memory has private scopes: what it learns about each person stays theirs unless they share it with a group.
+IMAP/SMTP and CalDAV accounts (optional), each usable only by its owner. Sending mail and changing calendars ask first;
+"always allow" can skip that, but not once the task has read outside content (a web page, an email). Memory has private
+scopes: what it learns about each person stays theirs unless they share it with a group.
 
 ### A real multi-person setup
 
@@ -154,8 +155,8 @@ it may spend a week.
 
 ### On your phone
 
-An installable web app (PWA) with push notifications, light and dark themes, phone and desktop layouts, and
-right-to-left text.
+A web app that works in your phone's browser, with push notifications, light and dark themes, phone and desktop
+layouts, and right-to-left text.
 
 <p align="center">
   <picture>
