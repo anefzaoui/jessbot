@@ -15,6 +15,7 @@ import { adsAndTrackingLists } from '@ghostery/adblocker';
 
 import { ENGINES, engineId, browserEngine, engineList } from './engines/index.js';
 import * as plainChromium from './engines/chromium.js';
+import { sandboxMode, sandboxState } from './engines/server.js';
 
 export { engineList };
 export const DEFAULTS = { maxPages: 2, idleMinutes: 5, blockMedia: true, allowPrivate: false, engines: ['duckduckgo', 'brave', 'bing'], searxngUrl: '', blockAds: false };
@@ -117,6 +118,8 @@ export function browserStatus() {
     progress: installProgress(engine), unsupported: info.unsupported || null,
     running: !!browser, openPages: active, queued: waiters.length, lastUsedAt, blockedCount,
     license: licenseInfo(),
+    // Chromium's sandbox (#37): { mode: auto|on|off, on: true|false|null (not launched yet), reason }
+    sandbox: { mode: sandboxMode(), on: null, reason: null, ...(sandboxState() || {}) },
     searxng: browserSettings().searxngUrl ? { url: browserSettings().searxngUrl, ...searxngState() } : null, // Phase 25: Admin → Browser shows it
     adblock: browserSettings().blockAds ? { ...adblockState(), building: !!adblockBuilding, blocked: adsBlocked } : null, // Phase 25: shown there too
   };
@@ -144,7 +147,8 @@ async function getBrowser() {
     browser = b;
     runningVersion = b.version();
     userAgent = engine.userAgent(runningVersion);
-    console.log(`[browser] launched ${engine.label} ${runningVersion}`);
+    const sb = sandboxState();
+    console.log(`[browser] launched ${engine.label} ${runningVersion}, ${sb?.on ? "sandboxed" : `without its sandbox (${sb?.reason || "unknown"})`}`);
     return b;
   })().finally(() => { launching = null; });
   return launching;
@@ -177,7 +181,7 @@ async function getRenderBrowser() {
     if (!useChrome && !sys && !plainChromium.info().installed) {
       throw new BrowserUnavailable('Jessbot’s own pages (checks, print, export) need Chromium as well: install it in Admin → Browser (npm run browser:install -- --engine chromium).');
     }
-    const b = await launchViaServer(chromium, useChrome ? { channel: 'chrome' } : sys ? { executablePath: sys } : { channel: 'chromium' });
+    const b = await launchViaServer(chromium, useChrome ? { channel: 'chrome' } : sys ? { executablePath: sys } : { channel: 'chromium' }, 'The page renderer');
     b.on('disconnected', () => { if (renderBrowser === b) renderBrowser = null; });
     renderBrowser = b;
     return b;

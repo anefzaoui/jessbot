@@ -3731,9 +3731,34 @@ Note: most of Phase 23 part A landed in commit aa56076, whose message reads "Pha
     `tests/injection-review.test.js` (a multi-line calendar and place name with a fence look-alike and "SYSTEM:"
     instructions comes out as one capped, defanged line; normal names are unchanged).
 
+## 2026-11-20: Chromium's sandbox (#37)
+
+239. **The agent's browser runs in Chromium's sandbox wherever the system allows it.** Playwright and Patchright launch
+    Chromium with `--no-sandbox` unless told otherwise, and CloakBrowser's wrapper adds it to its own defaults, so every
+    engine ran unsandboxed: a page that broke the renderer would have had Jessbot's user's access to the machine. Now
+    `engines/server.js` asks for the sandbox (`chromiumSandbox: true`) for Chromium, Google Chrome and Jessbot's own
+    page renderer, and CloakBrowser launches with its default arguments minus `--no-sandbox` (`getDefaultStealthArgs()`,
+    so its fingerprint flags stay its own). `JESSBOT_BROWSER_SANDBOX`: `auto` (default) starts without the sandbox only
+    when Chromium's error says the sandbox itself couldn't start (no user namespaces, running as root, a container's
+    seccomp profile), logs why and shows it in Admin → Browser and as a warning in Admin → System's security checks;
+    `on` refuses to start without it; `off` is the old behaviour. Any other launch error is never retried unsandboxed.
+    Why auto and not on: Jessbot must keep working on the many hosts where the sandbox can't start (a default Docker
+    seccomp profile, Ubuntu 23.10+ without an AppArmor profile, root), but never silently. The Docker image's
+    `compose.yaml` now runs with `deploy/seccomp-chromium.json`, Docker's own profile plus `chroot`, `clone`, `setns`
+    and `unshare` without capabilities (generated from moby's file by `scripts/seccomp-profile.js`, so it can be
+    regenerated when Docker's changes): Chromium's namespace sandbox then works with every capability still dropped.
+    Rejected: `cap_add: SYS_ADMIN` (far broader than the four calls) and Chromium's setuid helper (needs a root-owned
+    setuid binary, against `no-new-privileges`). `node scripts/sandbox-probe.mjs` starts each installed engine as
+    Jessbot does and prints Chromium's own `chrome://sandbox` verdict. Tested: Windows, Chromium 156 and Chrome 158
+    (renderers at Lockdown/untrusted; with `off`, "Not Sandboxed"); the Docker image with compose ("You are adequately
+    sandboxed": namespaces and seccomp-BPF), with Docker's default seccomp profile (off with the reason, Admin → Browser
+    warns, `on` refuses) and as root (off, "runs as root"); a real page load each time; `tests/browser-sandbox.test.js`
+    (the fallback rules) and the real-browser tests in `npm test` with the sandbox on. Not tested: macOS, an Ubuntu
+    23.10+ host (AppArmor profile documented, not run), CloakBrowser (its binary isn't downloaded here).
+
 ## 2026-11-20: A pending retry is the occurrence's run (issue #57)
 
-241. **A scheduled task whose automatic retry is still pending doesn't also fire its next occurrence.** A task that fails
+240. **A scheduled task whose automatic retry is still pending doesn't also fire its next occurrence.** A task that fails
     with a passing error gets one automatic retry ten minutes later (Phase 19). When its next occurrence fell inside those ten
     minutes (a daily 07:00 task that failed at 06:55), the scheduler fired both: a fresh run of the occurrence and then the
     retry, the same task twice within minutes. The p19a tests found it by accident, failing only when run just before 07:00

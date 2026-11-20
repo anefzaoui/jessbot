@@ -75,7 +75,7 @@ export const installProgress = () => null;
 export async function launch() {
   const version = chromeVersion();
   // The user agent as a launch switch (workers included), without "HeadlessChrome".
-  return launchViaServer(chromium, { channel: 'chrome', args: version ? [`--user-agent=${desktopUserAgent(version)}`] : [] });
+  return launchViaServer(chromium, { channel: 'chrome', args: version ? [`--user-agent=${desktopUserAgent(version)}`] : [] }, label);
 }
 export const stop = stopServer;
 export const userAgent = desktopUserAgent;

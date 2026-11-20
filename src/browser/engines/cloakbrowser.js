@@ -7,6 +7,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { paths } from '../../config/index.js';
 import { outboundFetch } from '../../lib/outbound.js';
+import { withSandbox } from './server.js';
 
 export const id = 'cloakbrowser';
 export const label = 'CloakBrowser';
@@ -61,7 +62,14 @@ export function installProgress() {
   return { downloadedMB: Math.round(downloaded / 1048576), totalMB: total ? Math.round(total / 1048576) : null, pct, unpacking };
 }
 
-export async function launch() { return cb().launch({ headless: true, locale: 'en-US' }); }
+// With Chromium's sandbox where the system allows it (#37, engines/server.js): the wrapper's own defaults add --no-sandbox,
+// so they are passed without it (same fingerprint arguments otherwise) and Playwright is told not to add it either.
+export async function launch() {
+  const m = cb();
+  return withSandbox(sandbox => m.launch({ headless: true, locale: 'en-US',
+    ...(sandbox ? { stealthArgs: false, args: m.getDefaultStealthArgs().filter(a => a !== '--no-sandbox'), launchOptions: { chromiumSandbox: true } } : {}) }),
+  label);
+}
 export const userAgent = () => undefined; // CloakBrowser sets its own
 
 // ---- Licence key (optional; the free keyless binary works) ----------------------------------------------------------
