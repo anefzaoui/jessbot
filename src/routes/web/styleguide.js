@@ -154,8 +154,8 @@ router.all('/sim/admin/*splat', async (req, res, next) => {
 });
 
 router.get('/screens/:page', (req, res, next) => {
-  const make = SCREENS[req.params.page];
-  if (!make) return next();
+  const make = Object.hasOwn(SCREENS, req.params.page) ? SCREENS[req.params.page] : null;
+  if (typeof make !== 'function') return next();
   const { view, ...data } = make(req.query); // a few screens read ?type=, ?reset=1
   res.render(view, { title: `${req.params.page} (demo)`, ...data });
 });

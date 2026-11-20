@@ -7,6 +7,7 @@
 import { get, run } from '../db/index.js';
 import { config } from '../config/index.js';
 import { normalizeUrl } from '../browser/read.js';
+import { escapeMarkdown } from '../lib/text-safe.js';
 
 const MAX_SOURCES = 80;
 export const READ_TOOLS = new Set(['web_read', 'browser_read', 'browser_open', 'open_search']);
@@ -118,7 +119,7 @@ export const hasSourcesSection = md => /^\s{0,3}(?:#{1,6}\s*)?(?:\*\*)?(?:source
 export function sourcesSection(sources) {
   const read = sources.filter(s => s.kind === 'read').slice(0, 12);
   if (!read.length) return null;
-  const esc = s => String(s).replace(/([[\]])/g, '\\$1');
+  const esc = s => escapeMarkdown(s);
   return `## Sources\n${read.map(s => `- [${esc(s.title || s.host)}](${s.url}) · ${s.host}${s.date ? ` · ${s.date}` : ''}`).join('\n')}`;
 }
 

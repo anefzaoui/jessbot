@@ -329,7 +329,7 @@ export function pageList(spec, count) {
   if (!spec || !String(spec).trim()) return [...Array(count).keys()];
   const out = [];
   for (const part of String(spec).split(',').map(s => s.trim()).filter(Boolean)) {
-    const m = /^(\d+)?\s*(-)?\s*(\d+)?$/.exec(part);
+    const m = /^(\d+)?\s*(?:(-)\s*(\d+)?)?$/.exec(part); // the end page only after a dash: no two ways to read "12"
     if (!m) throw Object.assign(new Error(`“${part}” isn’t a page range (like 1-3, 5, 8-).`), { status: 400 });
     const a = m[1] ? Number(m[1]) : 1, b = m[2] ? (m[3] ? Number(m[3]) : count) : a;
     for (let p = Math.max(1, a); p <= Math.min(count, b); p++) out.push(p - 1);

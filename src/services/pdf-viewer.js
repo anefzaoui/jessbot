@@ -6,6 +6,7 @@
 import fs from 'node:fs';
 import { PDFDocument, PDFName, PDFDict } from '@cantoo/pdf-lib';
 import { fileOf } from './library.js';
+import { openRead } from '../lib/safe-path.js';
 
 const MAX_BYTES = 25e6; // bigger files aren't opened just for this
 const CACHE_MAX = 500;
@@ -19,8 +20,10 @@ export async function viewerDrawsAnswers(item) {
   let on = false;
   try {
     const file = fileOf(item, item.version);
-    if (fs.statSync(file).size <= MAX_BYTES) {
-      const doc = await PDFDocument.load(fs.readFileSync(file), { updateMetadata: false, ignoreEncryption: true, throwOnInvalidObject: false });
+    const f = openRead(file);
+    if (f.stat.size > MAX_BYTES) f.close();
+    else {
+      const doc = await PDFDocument.load(f.read(), { updateMetadata: false, ignoreEncryption: true, throwOnInvalidObject: false });
       const form = doc.catalog.lookupMaybe(PDFName.of('AcroForm'), PDFDict);
       on = String(form?.get(PDFName.of('NeedAppearances')) ?? '') === 'true';
     }

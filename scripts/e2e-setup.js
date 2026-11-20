@@ -205,8 +205,10 @@ try {
     expect(!(await owner.isChecked('input[name="blockMedia"]')), 'blockMedia setting not persisted');
 
     // The engine (decision #218): Chromium by default, no licence section; switching keeps the other settings.
-    expect(await owner.isChecked('input[name="engine"][value="chromium"]'), 'Chromium is not the default engine');
-    expect(await owner.locator('form[action="/admin/browser/license"]').count() === 0, 'a licence form shows for Chromium');
+    // The default (#221): the installed Google Chrome through Patchright when there is one, else Chromium.
+    const firstEngine = await owner.getAttribute('input[name="engine"]:checked', 'value');
+    expect(['chrome', 'chromium'].includes(firstEngine), `unexpected default engine ${firstEngine}`);
+    expect(await owner.locator('form[action="/admin/browser/license"]').count() === 0, `a licence form shows for ${firstEngine}`);
     // Switch, then wait for the reloaded page to show the engine as saved (its server-rendered `checked`), not for a
     // navigation event that can come and go before the wait starts.
     const switchEngine = async id => {
@@ -223,8 +225,8 @@ try {
     await owner.fill('#bs-key', 'not-a-key');
     await owner.click('form[action="/admin/browser/license"] button');
     await owner.waitForSelector('form[action="/admin/browser/license"] [data-field-error]');
-    await switchEngine('chromium');
-    expect(await owner.getAttribute('[data-browser-state]', 'data-browser-state') === 'ready', 'Chromium not ready after switching back');
+    await switchEngine(firstEngine);
+    expect(await owner.getAttribute('[data-browser-state]', 'data-browser-state') === 'ready', `${firstEngine} not ready after switching back`);
   });
 
   const maya = await newPage();

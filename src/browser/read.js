@@ -22,6 +22,7 @@ import { looseDate } from '../lib/when.js';
 import { pruneInPage, pruneHiddenDocument } from '../lib/hidden-text.js';
 import { PATTERNS } from '../agent/injection.js';
 import { pdfOptions, fontsReady } from '../services/print.js';
+import { decodeEntities } from '../lib/text-safe.js';
 
 const td = new TurndownService({ headingStyle: 'atx', codeBlockStyle: 'fenced', bulletListMarker: '-', emDelimiter: '_' });
 td.use(strikethrough);
@@ -366,7 +367,7 @@ function ddgUrl(href) {
 function bingUrl(href) {
   try {
     const u = new URL(href);
-    const enc = u.hostname.endsWith('bing.com') && u.searchParams.get('u');
+    const enc = (u.hostname === 'bing.com' || u.hostname.endsWith('.bing.com')) && u.searchParams.get('u');
     if (enc?.startsWith('a1')) return Buffer.from(enc.slice(2).replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString('utf8');
     return u.href;
   } catch { return null; }
@@ -552,7 +553,7 @@ async function searchNews(q, { freshness, lang, country, signal }) {
 }
 
 const wikiLang = l => (/^[a-z]{2,3}$/.test(String(l || '').toLowerCase()) ? String(l).toLowerCase() : 'en');
-const unhtml = s => String(s || '').replace(/<[^>]+>/g, '').replace(/&quot;/g, '"').replace(/&#0?39;/g, "'").replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/\s+/g, ' ').trim();
+const unhtml = s => decodeEntities(String(s || '').replace(/<[^>]+>/g, '')).replace(/\s+/g, ' ').trim(); // plain text; entities decoded once
 
 /** Wikipedia's search API answer → results (the date is the article's last edit). Pure. */
 export function wikipediaResults(json, lang = 'en') {

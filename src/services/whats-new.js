@@ -11,6 +11,7 @@ import { overBudget } from './policy.js';
 import { getUser } from './users.js';
 import { oneLine } from '../lib/untrusted.js';
 import { invalid, notFound, conflict } from '../lib/errors.js';
+import { replaceSpaced } from '../lib/text-safe.js';
 
 export const PENDING_FILE = 'whats-new-pending.json';
 export const MAX_LINES = 6;
@@ -35,7 +36,7 @@ export function importPending() {
 }
 
 /** A line people read: one clean line, no em dash (#116), capped. */
-export const cleanLine = s => oneLine(String(s ?? '').replace(/\s*—\s*/g, ': '), LINE_MAX).trim();
+export const cleanLine = s => oneLine(replaceSpaced(String(s ?? ''), '—', ': '), LINE_MAX).trim();
 
 export const PROMPT = `You write the "What's new" note of a household assistant app for the people who use it (not developers).
 You get the commit subjects of one release. Return JSON only: {"lines":["…"]} with 3 to ${MAX_LINES} short plain-language lines,

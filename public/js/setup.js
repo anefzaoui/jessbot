@@ -29,7 +29,7 @@ if (idForm) {
       // The preview smiles back with the chosen face (falls back to that variant's neutral frame).
       const img = $('[data-preview-portrait]', idForm);
       if (img) {
-        const v = e.target.value;
+        const v = /^[a-z0-9-]+$/.test(e.target.value) ? e.target.value : 'female'; // a variant name, nothing else
         img.onerror = () => { img.onerror = null; img.src = `/img/avatars/${v}/neutral-256.webp`; };
         img.src = `/img/avatars/${v}/happy-256.webp`;
       }
