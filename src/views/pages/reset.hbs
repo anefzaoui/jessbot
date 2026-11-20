@@ -1,0 +1,20 @@
+{{!-- A password reset link (decision #230): made by an admin, works once for 24 hours. valid, minPassword. --}}
+{{#if valid}}
+  {{#> auth-frame heading="Choose a new password" lead="This link works once. Afterwards you’re signed out everywhere and sign in with the new password."}}
+    <form method="post" action="" class="space-y-4" data-ajax data-busy="Saving…">
+      {{> field name="password" label="New password" type="password" autocomplete="new-password" required=true autofocus=true hint=(concat "At least " minPassword " characters.")}}
+      {{> field name="confirm" label="New password again" type="password" autocomplete="new-password" required=true}}
+      {{#if error}}<p class="field-error" role="alert">{{error}}</p>{{/if}}
+      <button class="btn btn-primary btn-lg btn-block mt-2">Save new password {{icon "arrow-right" class="size-4"}}</button>
+    </form>
+  {{/auth-frame}}
+{{else}}
+  <main id="main" class="grid min-h-dvh place-items-center px-6">
+    <div class="max-w-sm text-center">
+      <div class="mx-auto w-fit">{{> avatar size="xl" activity="offline"}}</div>
+      <h1 class="mt-6 text-2xl font-semibold tracking-tight">This link doesn’t work any more</h1>
+      <p class="mt-2 text-ink-2">Reset links work once and last 24 hours. Ask the person who runs this {{bot.name}} for a fresh one.</p>
+      <a href="/login" class="btn btn-secondary mt-6">Go to sign in</a>
+    </div>
+  </main>
+{{/if}}

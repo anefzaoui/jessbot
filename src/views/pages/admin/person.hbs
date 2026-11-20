@@ -91,6 +91,20 @@
       </section>
 
       {{#unless isSelf}}
+        <section class="card p-5" aria-labelledby="h-signin-help">
+          <h2 id="h-signin-help" class="text-sm font-semibold">Signing in</h2>
+          <p class="mt-1 text-xs text-ink-3">Two-step sign-in is {{#if twoFactorOn}}<span class="font-medium text-ink-2">on</span>{{else}}off{{/if}} for {{person.firstName}}.</p>
+          <form method="post" action="/admin/people/{{person.id}}/reset-link" class="mt-3" data-ajax data-stay data-busy="Making the link…" data-reset-link-form>
+            <button class="btn btn-secondary btn-sm">{{icon "key-round" class="size-4"}} Make a password reset link</button>
+          </form>
+          <div class="mt-3" data-reset-link-box></div>
+          {{#if twoFactorOn}}
+            <form method="post" action="/admin/people/{{person.id}}/2fa-off" class="mt-3" data-ajax data-confirm="Turn off two-step sign-in for {{person.firstName}}? Only do this if they lost their phone and their recovery codes; they'll be signed out everywhere.">
+              <button class="btn btn-danger-ghost btn-sm">{{icon "shield-alert" class="size-4"}} Turn off two-step sign-in</button>
+            </form>
+          {{/if}}
+        </section>
+
         <section class="card p-5" aria-labelledby="h-access">
           <h2 id="h-access" class="text-sm font-semibold">Access</h2>
           <form method="post" action="/admin/people/{{person.id}}/status" class="mt-3" data-ajax data-confirm="{{#if (eq person.status 'active')}}Disable {{person.firstName}}? They'll be signed out everywhere.{{/if}}">

@@ -68,6 +68,40 @@ test('limiter: over the limit is a 429 through the error handler, with Retry-Aft
   } finally { server.close(); }
 });
 
+test('the app-wide limiter covers every route, file downloads and sign-in included (code scanning 43–57)', async () => {
+  const { createApp } = await import('../src/app.js');
+  const { createSession } = await import('../src/services/sessions.js');
+  const { run } = await import('../src/db/index.js');
+  const owner = get(`SELECT id FROM users WHERE email = 'owner@ratelimit.test'`);
+  const token = createSession(owner.id, { kind: 'app', device: 'test' });
+  const server = await listen(createApp());
+  const base = `http://127.0.0.1:${server.address().port}`;
+  const as = r => fetch(`${base}${r}`, { headers: { Authorization: `Bearer ${token}` } });
+  // The routes code scanning flagged: Library files, screenshots, favicons, feed covers, voice clips, backups, logs,
+  // admin pages. With this person's bucket full, each one answers 429 before its handler runs.
+  const routes = ['/library/abc/raw', '/library/abc/download', '/library/abc/thumb.jpg', '/library/abc/pages/1.jpg',
+    '/shots/u1-0123456789abcdef.jpg', '/favicons/example.com', '/feed/covers/0123456789abcdef0123.jpg', '/api/v1/voice/abc',
+    '/admin/system/backups/jessbot-manual-2026-01-01T00-00-00.tar.gz', '/admin/system/logs/jessbot-2026-01-01.log', '/admin', '/chat'];
+  try {
+    assert.equal((await as('/api/v1/me')).status, 200, 'not limited before'); // (the routes themselves aren't called unlimited: favicons would go online)
+    run('INSERT OR REPLACE INTO rate_limits (key, hits, reset_at) VALUES (?, ?, ?)', `rl:requests:u${owner.id}`, 1200, Date.now() + 60e3);
+    for (const r of routes) {
+      const res = await as(r);
+      assert.equal(res.status, 429, r);
+      assert.ok(Number(res.headers.get('retry-after')) > 0, r);
+    }
+    // Signed out, the address is the key: GET /login and the API sign-in count against it too.
+    await fetch(`${base}/login`);
+    const key = get(`SELECT key FROM rate_limits WHERE key LIKE 'rl:requests:%' AND key NOT LIKE 'rl:requests:u%' LIMIT 1`).key;
+    run('UPDATE rate_limits SET hits = 1200, reset_at = ? WHERE key = ?', Date.now() + 60e3, key);
+    assert.equal((await fetch(`${base}/login`)).status, 429);
+    assert.equal((await fetch(`${base}/api/v1/auth/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' })).status, 429);
+  } finally {
+    server.close();
+    run(`DELETE FROM rate_limits WHERE key LIKE 'rl:requests:%'`);
+  }
+});
+
 test('sign-in limits survive a real restart of the server', async () => {
   closeDb(); // the server owns the database while it runs
   const port = await (async () => { const s = await listen(express()); const p = s.address().port; await new Promise(r => s.close(r)); return p; })();

@@ -98,6 +98,11 @@ export async function setPassword(id, password) {
   run(`UPDATE users SET password_hash = ?, updated_at = datetime('now') WHERE id = ?`, await hashPassword(password), id);
 }
 
+/** Redo a hash with today's parameters after a successful sign-in (the password was just checked: no strength rules). */
+export async function rehashPassword(id, password) {
+  run(`UPDATE users SET password_hash = ? WHERE id = ?`, await hashPassword(password), id);
+}
+
 export function setStatus(id, status) {
   run(`UPDATE users SET status = ?, updated_at = datetime('now') WHERE id = ?`, status, id);
 }
