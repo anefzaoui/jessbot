@@ -145,7 +145,7 @@ injection detector (stage 1 = patterns only, used where the prompt must stay byt
 | Skills Jess drafts (`skill_propose`) | n/a | linted | refused after taint | linted | Never run before an admin approves. |
 | Page self-check output | n/a | yes | on a hit | yes | On a hit only counts and line numbers are passed on. |
 | A watch's memo, notes from background tasks | yes | yes, one line | n/a | no | Written by Jess's own unattended runs, passed on as information. |
-| Delegated task results | no | n/a | n/a | no | Jess's own one-line summary; the brief is shown on the approval card when the task read outside content. |
+| Delegated task results | yes (`background_report`, with what the task read) | yes | the task's taint, on every run that sees the report | warning when the task read a suspected injection | The person sees the report as before; the model never reads it back as its own words [#236]. The brief is shown on the approval card when the task read outside content. |
 | Voice notes | n/a | n/a | n/a | n/a | The person's own speech, transcribed as their message. |
 | Shared lists, group memories | no | yes, one line | n/a | memories: refused when instruction-like | Written by members (trusted); sharing a memory asks first. |
 | Weather and place names | no | short | no | no | Short structured data from public services. |
