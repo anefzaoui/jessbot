@@ -80,7 +80,8 @@ is that it can't make it act without someone seeing the action and saying yes.
 - **Spending limits.** A weekly budget per person and a cap per task, checked before every model call. See
   [Models and costs](providers.md#budgets-and-spending-limits).
 - **Secrets stay in.** A request that contains the install's keys or a saved password never runs and is never offered
-  for approval. Mail and calendar passwords are stored encrypted with a key kept in this install's `.env`.
+  for approval. Mail and calendar passwords, two-step sign-in codes and the model key are stored encrypted with this
+  install's own key (in `.env`, or a key file).
 - **A record of everything.** The Activity page lists what the assistant did, and admins have an audit log of admin
   actions.
 

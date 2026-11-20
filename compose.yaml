@@ -28,5 +28,13 @@ services:
       - seccomp=./deploy/seccomp-chromium.json
     cap_drop:
       - ALL
+    # The install key outside the data volume (docs/SECURITY.md → Secrets and data): uncomment this, the `secrets:` below,
+    # and put a key in jessbot_key.txt (node -e "console.log(require('crypto').randomBytes(32).toString('base64'))").
+    # Then also set JESSBOT_SECRET_FILE: /run/secrets/jessbot_key under environment.
+    # secrets:
+    #   - jessbot_key
+# secrets:
+#   jessbot_key:
+#     file: ./jessbot_key.txt
 volumes:
   jessbot-data:

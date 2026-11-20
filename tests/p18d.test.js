@@ -375,11 +375,11 @@ test('doctor: the password key check (missing or malformed while passwords are s
   const sealed = seal('app-password'); // makes a key in the test .env
   run(`INSERT INTO connections (user_id, kind, label, provider, config, secret) VALUES (?, 'email', 'Mail', 'custom', '{}', ?)`, alice.id, sealed);
   assert.equal(key().status, 'ok');
-  assert.match(key().detail, /Opens the 1 saved password/);
+  assert.match(key().detail, /Opens the 1 sealed value \(mail and calendar passwords\)/);
   const good = process.env.JESSBOT_SECRET;
   delete process.env.JESSBOT_SECRET;
   assert.equal(key().status, 'bad');
-  assert.match(key().detail, /missing from \.env, but 1 saved password is sealed/);
+  assert.match(key().detail, /missing from \.env, but 1 saved secret is sealed/);
   process.env.JESSBOT_SECRET = 'not-a-key';
   assert.equal(key().status, 'bad');
   process.env.JESSBOT_SECRET = good;

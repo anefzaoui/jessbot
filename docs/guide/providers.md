@@ -7,8 +7,9 @@ keep the bill where you want it.
 ## OpenRouter, the default
 
 Out of the box Jessbot talks to [OpenRouter](https://openrouter.ai), a service that offers many models behind one key.
-You paste the key on the setup page (or put it in `.env` as `OPENROUTER_KEY`), and Jessbot saves it in `.env` on this
-machine, never in the database. The default model is `openai/gpt-6-luna`, a cheap, capable one picked for everyday
+You paste the key on the setup page (or put it in `.env` as `OPENROUTER_KEY`), and Jessbot keeps it on this machine,
+encrypted with the install's own key; a key written in `.env` moves there the next time Jessbot starts. A key set in
+the server's environment (Docker's `environment:`, systemd) is used as it is and never stored. The default model is `openai/gpt-6-luna`, a cheap, capable one picked for everyday
 household use.
 
 ## Any OpenAI-compatible endpoint
@@ -35,7 +36,7 @@ configure is allowed, and only that one. Choose a model that supports tool calls
 
 ## Admin → Models
 
-![Admin → Models: the API key saved in .env, the main model openai/gpt-6-luna, two fallback models tested when added, and a background model](../images/admin-models-desktop-light.webp)
+![Admin → Models: the API key, the main model openai/gpt-6-luna, two fallback models tested when added, and a background model](../images/admin-models-desktop-light.webp)
 
 The tiles at the top say what the assistant **Thinks with**, **Speaks with**, **Listens with** and **Decides with**.
 Below them:

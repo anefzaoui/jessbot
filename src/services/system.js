@@ -18,7 +18,8 @@ import { schedulerHealth } from '../agent/proactive.js';
 import { errorCountSince } from '../lib/log.js';
 import { skillsNeedingReview, brokenSkills, riskyActiveSkills } from './skills.js';
 import { getTool, displayNameOf } from '../agent/tools/registry.js';
-import { unseal } from '../lib/secrets.js';
+import { keySource, unsealData } from '../lib/secrets.js';
+import { sealedValues } from './sealed-inventory.js';
 import { officeRenderStatus } from './office-render.js';
 import { spendSpike, balanceView } from './spend-watch.js';
 import { botName } from './bot.js';
@@ -269,26 +270,26 @@ function alwaysAllowCheck() {
     `/admin/people/${risky[0].user_id}`);
 }
 
-// Saved mail/calendar passwords are sealed with JESSBOT_SECRET (.env, lib/secrets.js). Without it (an install moved
-// without its .env) they can't be opened, and the next save would quietly make a new key.
+// Everything sealed (mail and calendar passwords, two-step seeds, the model and push keys, browser sign-ins:
+// services/sealed-inventory.js) needs the install's key (lib/secrets.js, #10). Without it (an install moved without its
+// .env or key file) nothing sealed opens, and the next save would quietly make a new key. One of each kind is opened.
 function secretKeyCheck() {
-  const b64 = process.env.JESSBOT_SECRET || '';
-  const valid = Buffer.from(b64, 'base64').length === 32;
-  const sealed = all('SELECT secret FROM connections WHERE secret IS NOT NULL ORDER BY id DESC');
-  const n = sealed.length;
-  if (!b64 && !n) return check('secret-key', 'Password key', 'ok', 'No saved passwords yet; the key is made in .env with the first one');
-  if (!valid) {
-    return check('secret-key', 'Password key', 'bad', b64 ? 'JESSBOT_SECRET in .env isn’t a valid key (it must be 32 bytes, base64)'
-      : `JESSBOT_SECRET is missing from .env, but ${n} saved password${n === 1 ? ' is' : 's are'} sealed with it`,
-    'Put back the .env from the original install (it travels with the backup). Otherwise reconnect the mail and calendar accounts.');
+  const src = keySource();
+  const values = sealedValues();
+  const n = values.length;
+  const where = src.source === 'file' ? `JESSBOT_SECRET_FILE (${src.path})` : 'JESSBOT_SECRET in .env';
+  const fix = 'Put back the key from the install that sealed them (its .env or key file; JESSBOT_SECRET_PREVIOUS also works). '
+    + 'Otherwise reconnect the mail and calendar accounts and enter the model key again.';
+  if (src.source === 'none' && !n) return check('secret-key', 'Password key', 'ok', 'Nothing sealed yet; the key is made in .env with the first secret');
+  if (!src.valid) {
+    return check('secret-key', 'Password key', 'bad', src.source === 'none'
+      ? `JESSBOT_SECRET is missing from .env, but ${n} saved secret${n === 1 ? ' is' : 's are'} sealed with it`
+      : `${where} isn’t a valid key (it must be 32 bytes, base64)${src.error ? `: ${src.error}` : ''}`, fix);
   }
-  if (n) {
-    try { unseal(sealed[0].secret); } catch {
-      return check('secret-key', 'Password key', 'bad', `The key in .env doesn’t open the saved passwords (${n})`,
-        'Put back the .env from the install that saved them, or reconnect the mail and calendar accounts.');
-    }
-  }
-  return check('secret-key', 'Password key', 'ok', n ? `Opens the ${n} saved password${n === 1 ? '' : 's'}` : 'Set in .env');
+  const kinds = [...new Set(values.map(v => v.kind))];
+  const failed = kinds.filter(kind => { try { unsealData(values.find(v => v.kind === kind).read()); return false; } catch { return true; } });
+  if (failed.length) return check('secret-key', 'Password key', 'bad', `The key (${where}) doesn’t open: ${failed.join(', ')}`, fix);
+  return check('secret-key', 'Password key', 'ok', n ? `Opens the ${n} sealed value${n === 1 ? '' : 's'} (${kinds.join(', ')}); key from ${where}` : `Set (${where})`);
 }
 
 // A day that cost more than 3× the median of the 14 days before it, and over $0.25: something looping, or a new habit.

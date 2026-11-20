@@ -8,6 +8,7 @@ import { recoverRuns, startApprovalExpiry } from './src/agent/loop.js';
 import { closeBrowser } from './src/browser/index.js';
 import { startScheduler } from './src/agent/proactive.js';
 import { startAutoBackup } from './src/services/system.js';
+import { migrateEnvSecrets } from './src/services/stored-secrets.js';
 
 ensureDirs();
 installLog(paths.logs); // Admin → System → Logs + data/logs/*.log
@@ -18,6 +19,8 @@ try {
   console.error(`\n[db] ${err.message}\n`);
   process.exit(1);
 }
+// Secrets written in .env (the model key, the push key) move into the database, sealed (#10).
+try { migrateEnvSecrets(); } catch (err) { console.error(`[secrets] couldn’t move secrets out of .env: ${err.message}`); }
 
 const app = createApp();
 const server = app.listen(config.port, config.host, () => {
