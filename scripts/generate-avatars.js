@@ -22,7 +22,7 @@
 //
 // Avatars are requested with a transparent background; the raw output is kept as <state>.orig.png and
 // <state>.png gets the deterministic matte cleanup from scripts/clean-avatar-alpha.js.
-// The key is read from .env (OPENROUTER_KEY) and is never printed.
+// The key comes from scripts/lib/model-key.js (the environment, .env, or a local install's sealed key); never printed.
 // Non-neutral states send the variant's neutral.png as a reference image so the identity stays the same.
 // Non-anchor scenes send day-clear.png as a reference so the camera, horizon height and silhouette stay the same.
 import fs from 'node:fs';
@@ -30,6 +30,7 @@ import path from 'node:path';
 import zlib from 'node:zlib';
 import { fileURLToPath } from 'node:url';
 import { cleanAvatarFile, origPathFor } from './clean-avatar-alpha.js';
+import { devModelKey } from './lib/model-key.js';
 
 // ---- Config ----------------------------------------------------------------
 const MODEL = 'openai/gpt-image-2.5-flare';
@@ -403,9 +404,8 @@ function backgroundJobs(args) {
 // ---- Main ----------------------------------------------------------------------
 async function main() {
   const args = parseArgs(process.argv.slice(2));
-  process.loadEnvFile(path.join(ROOT, '.env'));
-  const key = process.env.OPENROUTER_KEY;
-  if (!key) throw new Error('OPENROUTER_KEY is not set in .env');
+  const key = devModelKey();
+  if (!key) throw new Error('No model key: set OPENROUTER_KEY, or add it in a local install (setup or Admin → Model).');
 
   const mode = args.covers ? 'covers' : args.backgrounds ? 'backgrounds' : 'avatars';
   const dir = { covers: COVER_DIR, backgrounds: BG_DIR, avatars: AVATAR_DIR }[mode];

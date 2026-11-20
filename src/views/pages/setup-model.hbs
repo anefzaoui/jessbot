@@ -6,9 +6,9 @@
         <div class="min-w-0 flex-1">
           <p class="text-sm font-semibold">OpenRouter API key</p>
           {{#if llm.hasKey}}
-            <p class="text-xs text-ink-3">Found in <code class="font-mono">.env</code> · <span class="font-mono">{{llm.maskedKey}}</span></p>
+            <p class="text-xs text-ink-3">{{#if (eq llm.keySource 'environment')}}Set in the server’s environment{{else}}Saved encrypted with this install’s key{{/if}} · <span class="font-mono">{{llm.maskedKey}}</span></p>
           {{else}}
-            <p class="text-xs text-ink-3">Paste it once. It's saved to <code class="font-mono">.env</code> on this machine, never in the database.</p>
+            <p class="text-xs text-ink-3">Paste it once. It’s kept on this machine, encrypted with this install’s own key, and never shown again in full.</p>
           {{/if}}
         </div>
       </div>

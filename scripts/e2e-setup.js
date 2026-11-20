@@ -7,6 +7,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { chromium, request, executablePath as exe } from './lib/test-browser.js';
+import { devModelKey } from './lib/model-key.js';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname.replace(/^\/(\w:)/, '$1')), '..');
 const HOME = fs.mkdtempSync(path.join(os.tmpdir(), 'jessbot-e2e-'));
@@ -14,8 +15,11 @@ const PORT = 3900 + Math.floor(Math.random() * 90);
 const BASE = `http://127.0.0.1:${PORT}`;
 const NO_LLM = process.argv.includes('--no-llm');
 
-// Its own copy of .env (the model key comes along; keys the server makes stay in the throwaway folder).
+// Its own copy of .env (keys the server makes stay in the throwaway folder); the model key, now sealed in the app's
+// database (#10), comes as an environment variable the throwaway server uses and never stores (scripts/lib/model-key.js).
 if (fs.existsSync(path.join(ROOT, '.env'))) fs.copyFileSync(path.join(ROOT, '.env'), path.join(HOME, '.env'));
+const modelKey = devModelKey();
+if (modelKey) process.env.OPENROUTER_KEY = modelKey;
 const server = spawn(process.execPath, ['server.js'], { cwd: ROOT, env: { ...process.env, JESSBOT_HOME: HOME, JESSBOT_ENV_FILE: path.join(HOME, '.env'), PORT: String(PORT), NODE_ENV: 'development' } });
 let log = '';
 server.stdout.on('data', d => { log += d; });

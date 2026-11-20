@@ -32,8 +32,8 @@ The overview (who is trusted, every place outside content enters and how it is h
   audited, and everyone is told: on the invite page, under their chat box and on their You page. Off, those things don't
   exist for the admin (404). [#13, #36, #50, #219]
 - **Mail and calendar accounts** are usable only by their owner — not even an admin's chat can reach them. Their
-  passwords are sealed with AES-256-GCM under a per-install key in `.env` (`JESSBOT_SECRET`); a copied database or
-  backup alone does not reveal them. [#78]
+  passwords are sealed with AES-256-GCM under the per-install key (below); a copied database or backup alone does not
+  reveal them. [#78, #240]
 - **Household busy sharing** is off until a person turns on "share when I'm busy with my household". Then, and only for
   people who share a group with them, `calendar_free_slots` counts the times they are busy; titles, places and notes never
   leave `services/calendar.js`, not even to the model. Every lookup by someone else, and every change of the setting, is in
@@ -248,12 +248,31 @@ The overview (who is trusted, every place outside content enters and how it is h
   a Permissions-Policy that only allows the microphone and location to this site. [#86]
 
 ## Secrets and data
-- `.env` holds the model key, the secrets key and the Web Push keys. It is never committed. Tests run on throwaway data
-  folders with their own copy of `.env`. [#86]
+- **Secrets at rest** (`src/lib/secrets.js`, AES-256-GCM, one key per install). Sealed: mail and calendar passwords,
+  two-step sign-in seeds, the model provider's key, the Web Push private key and browser sign-ins (cookies). The key is
+  never in the database or the backups: it comes from `JESSBOT_SECRET_FILE` (a file, e.g. a Docker or systemd secret,
+  so the data volume holds nothing readable) or `JESSBOT_SECRET` in `.env`, made on first use.
+  - A model key entered in setup or Admin → Model is sealed in the database, never written to `.env`. One set in the
+    real environment (`environment:` in compose, `Environment=` in systemd) is the operator's: used, never stored.
+  - Existing installs: at start, `OPENROUTER_KEY`, `LLM_API_KEY` and the Web Push keys found in the install's own `.env`
+    (the default one, or one inside the data folder) move into the database, sealed, and their lines leave `.env`. A
+    `JESSBOT_ENV_FILE` elsewhere may be shared by several copies and is left alone.
+  - **Backups** hold the sealed values, never the key: keep `.env` (or the key file) with them, somewhere else.
+    Restoring on another machine needs the same key; Admin → System's "Password key" check opens one value of each
+    kind and says what doesn't open.
+  - **Rotation:** `npm run secrets:rotate` (Jessbot stopped) makes a new key and seals everything again; the old key
+    is written as `JESSBOT_SECRET_PREVIOUS` first, so a run that stops halfway loses nothing, and removed at the end.
+    The old `.env` is kept as `.env.before-rotate-<time>` for restoring older backups (set its key as
+    `JESSBOT_SECRET_PREVIOUS`); delete it to make the old key useless. With a key file: write the new key there, set
+    the old one as `JESSBOT_SECRET_PREVIOUS`, run `npm run secrets:rotate -- --reseal`, then remove it.
+  - Not sealed: the CloakBrowser licence key (in `tools/cloakbrowser/`, where its own wrapper reads it) and the
+    operator's own environment variables. [#78, #136, #240]
+- `.env` is never committed. Tests run on throwaway data folders with their own copy of `.env`. [#86]
 - The server log redacts API keys, bearer tokens, session cookies and passwords before anything is stored, and every
   registered secret value (below) in any of its forms. [#70, #126]
 - **Outbound guard** (`src/lib/dlp.js`, checked for every tool call in `agent/loop.js`). Registered secrets are the
-  model key, the password key (`JESSBOT_SECRET`), the Web Push private key (read live from the environment) and every
+  model key and the Web Push private key (from the environment, or the moment they are unsealed), the install key
+  (`JESSBOT_SECRET`, `JESSBOT_SECRET_PREVIOUS`, or the key file's) and every
   saved password the moment it is sealed or unsealed (8 characters or more). A tool call that carries one, as typed,
   URL-encoded or base64, never runs and is never offered for approval: Jess is told it was blocked, and the audit log gets
   `secret_blocked` (tool and kind of secret only). Secret *shapes* (API keys, AWS/GitHub/Slack tokens, private keys,
