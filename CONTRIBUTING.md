@@ -58,6 +58,10 @@ The dev server keeps its data in `data/dev`, so it never touches an install you 
 | `npm run test:chat` | The chat core against a real model (a few cheap calls), plus mail and calendar when the test servers are installed | a model key in `.env`; internet |
 | `npm run eval:agent` | Eleven household questions answered end to end by the real agent ([docs/EVAL.md](docs/EVAL.md)) | a model key |
 
+How to run a change for real, in isolation from any install you use, is in the verify skill
+([.claude/skills/verify/SKILL.md](.claude/skills/verify/SKILL.md)); what a reviewer checks, by what a diff touches, is in
+[REVIEW.md](REVIEW.md).
+
 CI runs `npm run lint`, `npm test` (Linux, Windows and macOS) and `npm audit --audit-level=high` on every pull request,
 plus CodeQL; Dependabot opens weekly update pull requests. Run `npm test` yourself for every change, the e2e and UI checks for anything you can see, and `test:chat` for changes to the
 agent, its tools or prompts. A flaky test is a bug: find why it fails, don't re-run it until it passes.
@@ -68,7 +72,8 @@ Mail and calendar tests use two local servers under the git-ignored `tools/test-
 
 ## Pull requests
 
-- One topic per pull request, with a description of what changed and how you checked it. Screenshots for anything
+- One topic per pull request, with a description of what changed and how you checked it, ending with a `Verified:`
+  line (how) and a `Not verified:` line (what wasn't). Screenshots for anything
   visible (light and dark, and a phone width when layout changed).
 - Keep the docs current in the same pull request: the feature list, the API notes, the decision log, and a line under
   `[Unreleased]` in CHANGELOG.md (plus a plain `Highlights` line for anything people would notice; see

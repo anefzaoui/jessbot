@@ -3870,3 +3870,20 @@ Note: most of Phase 23 part A landed in commit aa56076, whose message reads "Pha
     let anyone who sees the server log sign in as the owner. Tested: `tests/setup-resume.test.js` (fails on the code
     before: the redirect chain repeats /setup → /setup/model → /login?next=/setup; passes after), and in Chromium: the
     account made in the wizard, a new browser session lands on the sign-in page and gets back to /setup/model.
+
+## 2026-11-20: Review checklist and the verify skill
+
+247. **A change is verified by running it, written down, and every miss that repeats becomes a review item.** REVIEW.md
+    lists what to check in a pull request by what its diff touches (decision numbers, docs against the code, outside
+    content reaching the model, tests that depend on the clock or a port, fixtures that look like real keys,
+    security-sensitive code, outside contributions); a reviewer reads it from `main`, and a pull request that changes it,
+    CI, tests or the verify skill is judged by `main`'s copy. `.claude/skills/verify/SKILL.md` says how to run a change
+    for real: an instance of its own every time (`PORT`, `JESSBOT_HOME` and `JESSBOT_ENV_FILE` set, never 3737, 3738 or
+    3000, never the owner's install), lint and tests, a fresh instance in a real browser, `test:e2e`, `test:chat` with
+    GreenMail and Radicale for mail and calendar, Docker compose under its own project name for install changes, then
+    `Verified:` / `Not verified:` lines in the pull request, three strikes before asking, and cleanup by process ID. Why:
+    the misses that reached `main` or a review were each visible from a diff (two decisions given numbers already taken,
+    tests that failed only near 07:00 or on a loaded machine, a test server on the default port, outside content reaching
+    the model unfenced, docs describing what the code didn't do), and unit tests alone passed on all of them. Same
+    practice as the maintainer's other projects. An item is added once the same kind of miss shows up in two pull
+    requests; items that stop earning their place are removed.
