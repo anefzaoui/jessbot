@@ -8,7 +8,7 @@
   <div class="wn-head">
     <span class="wn-face" aria-hidden="true">{{> avatar size="sm"}}</span>
     <div class="min-w-0 flex-1">
-      <h2 id="wn-h" class="wn-title">New in {{bot.name}}</h2>
+      <h2 id="wn-h" class="wn-title">New in {{@root.bot.name}}</h2>
       <p class="wn-meta">{{#with (lookup whatsNew 0)}}Since <time datetime="{{iso publishedAt}}">{{date publishedAt}}</time>{{/with}}{{#if (gt whatsNew.length 1)}} · {{whatsNew.length}} updates{{/if}}</p>
     </div>
     <button type="button" class="btn btn-secondary btn-sm wn-seen" data-whats-new-seen>{{icon "check" class="size-3.5"}} Got it</button>
