@@ -2,13 +2,16 @@
 // short connection with the person's own account and closes it (no long-lived sockets per person). Mail content is
 // untrusted: tools fence it like web pages. Nothing is marked read or moved unless asked (email_organize, #157), and
 // nothing is ever deleted: there is no expunge anywhere in here.
-import { ImapFlow } from 'imapflow';
-import { simpleParser } from 'mailparser';
-import nodemailer from 'nodemailer';
 import TurndownService from 'turndown';
 import { parseHTML } from 'linkedom';
 import { passwordOf, markConnection, reachableTarget } from './connections.js';
 import { pruneHiddenDocument } from '../lib/hidden-text.js';
+import { lazy } from '../lib/lazy.js';
+
+// The mail libraries load with the first mail action, not when the server starts (decision #256).
+const imapflow = lazy(() => import('imapflow'));
+const mailparser = lazy(() => import('mailparser'));
+const nodemailerLib = lazy(() => import('nodemailer').then(m => m.default));
 
 const TIMEOUT = 25000;
 const td = new TurndownService({ headingStyle: 'atx', bulletListMarker: '-' });
@@ -18,6 +21,7 @@ td.remove(['style', 'script', 'head']);
 // changes after the check can't move the connection onto this machine or the local network.
 async function imapFor(c) {
   const { host, servername } = await reachableTarget(c.config.imap.host);
+  const { ImapFlow } = await imapflow();
   return new ImapFlow({
     host, servername, port: c.config.imap.port, secure: c.config.imap.secure,
     auth: { user: c.config.username, pass: passwordOf(c) }, logger: false,
@@ -143,7 +147,7 @@ function parsedMail(c, uid, folder) {
     try {
       const msg = await client.fetchOne(String(uid), { source: true }, { uid: true });
       if (!msg?.source) throw Object.assign(new Error('That message isn’t there any more.'), { status: 404 });
-      return simpleParser(msg.source);
+      return (await mailparser()).simpleParser(msg.source);
     } finally { lock.release(); }
   });
 }
@@ -295,6 +299,7 @@ async function transportFor(c, prefix = '') {
     if (err.code === 'EBLOCKED') throw err;
     throw Object.assign(new Error(`${prefix}${friendly(err)}`), { status: 400 });
   }
+  const nodemailer = await nodemailerLib();
   return nodemailer.createTransport({
     host: target.host, servername: target.servername, port: c.config.smtp.port, secure: c.config.smtp.secure,
     auth: { user: c.config.username, pass: passwordOf(c) }, tls: { rejectUnauthorized: !c.config.allowSelfSigned },
@@ -321,6 +326,7 @@ export async function sendMail(c, m, { fromName }) {
   markConnection(c);
   if (c.provider !== 'gmail') {
     try {
+      const nodemailer = await nodemailerLib();
       const raw = await new Promise((resolve, reject) => nodemailer.createTransport({ streamTransport: true, buffer: true, newline: 'unix' })
         .sendMail({ ...mail, messageId: info.messageId, date: new Date() }, (e, r) => (e ? reject(e) : resolve(r.message))));
       await withImap(c, async client => {

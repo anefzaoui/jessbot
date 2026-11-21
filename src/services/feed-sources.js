@@ -2,7 +2,6 @@
 // feed for each site the person named); here the person reviews them per topic, adds their own sites or feeds, removes any,
 // edits a topic's search words, pauses or deletes a topic. Their edits survive a re-tune: their own sources and topics
 // stay, and what they removed stays removed (feed_removed). Admins see every source on the install with its health.
-import { discoverFeeds } from 'feedscout';
 import { parseOpml, generateOpml } from 'feedsmith';
 import { get, all, run, tx } from '../db/index.js';
 import { fetchRaw, decodeBody } from '../browser/read.js';
@@ -10,6 +9,9 @@ import { validHost, iconUrl } from './favicons.js';
 import { toIso } from './chatview.js';
 import { invalid, notFound, badRequest } from '../lib/errors.js';
 import * as feed from './feed.js';
+import { lazy } from '../lib/lazy.js';
+
+const feedscout = lazy(() => import('feedscout')); // feed discovery, on first use (decision #256)
 
 export const MAX_TOPICS = 12;             // Tune picks at most 8; people may add a few of their own
 export const MAX_SOURCES_PER_TOPIC = 10;
@@ -33,6 +35,7 @@ export async function discoverSiteFeed(pageUrl, signal) {
     const r = await fetchRaw(url, { headers: opts.headers, signal, timeout: 15000 });
     return { headers: new Headers(r.headers), body: decodeBody(r.body, r.contentType), url: r.url, status: r.status, statusText: '' };
   };
+  const { discoverFeeds } = await feedscout();
   const found = await Promise.race([
     discoverFeeds(pageUrl, { methods: ['platform', 'html', 'guess'], fetchFn, stopOnFirstResult: true, maxUris: 6, concurrency: 2 }),
     new Promise(resolve => setTimeout(() => resolve([]), 45000)),
