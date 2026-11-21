@@ -891,7 +891,7 @@ here were taken on the maintainer's machine and network.
       never a partial or mixed-up result as the answer; "stop at the payment page" means go all the way there; stop only
       when done, when the next step is theirs, or after real exhaustion — then say exactly what's needed or what was tried).
     - **Soul** — SOUL.md: "Sees things through. Giving up is not an option…" (templates for new installs too).
-    - **Memory** — a pinned preference for the owner: see every task through; stop only when the next step truly needs him.
+    - **Memory** — a pinned preference for the owner: see every task through; stop only when the next step truly needs them.
     Live files were changed through the versioned save (Admin → Personality → History can restore them).
 114. **The same change is never made twice in one task.** The first full run after #113 showed Jess saving an approved
     shared memory a second time with identical arguments (asking the owner again) — the new "check that each one took"
@@ -3964,7 +3964,7 @@ Note: most of Phase 23 part A landed in commit aa56076, whose message reads "Pha
 250. **The site's motion is short, eased and tied to what changes; the words never animate on load.** The owner found
     the new home page (#249) unrefined, above all its headline: it loaded at weight 200 and swelled to 800 over 2.4 s,
     which re-wrapped it from two lines to three and pushed the lead and the install command down as it grew (a type
-    specimen's trick, and a layout shift in the first viewport). He pointed at mausbot.com (OpenMausBot) as the bar.
+    specimen's trick, and a layout shift in the first viewport). They pointed at mausbot.com (OpenMausBot) as the bar.
     Studied in a browser at 1440 and 390 px (screen recordings, computed styles and every animation on the page): its
     headline is still from the first frame, only one accent word in it swaps, briefly, in step with the product shown
     under it; motion clusters at 150, 240 and 420 to 520 ms on strong ease-out curves, no blur; one family in three
@@ -3981,10 +3981,10 @@ Note: most of Phase 23 part A landed in commit aa56076, whose message reads "Pha
 
 ## 2026-11-20: The website's lightbox
 
-251. **The site's pictures open in Vitrine, the owner's own small lightbox, shared with his other sites.** The gallery
+251. **The site's pictures open in Vitrine, the owner's own small lightbox, shared with the owner's other sites.** The gallery
     said "click any picture for the full size" and sent the visitor to a bare image file; the home page's and the
     guide's screenshots didn't open at all. Rule 7 keeps the browser free of front-end libraries, and the owner wanted
-    one lightbox written once for his three sites (Mister Download Manager's, Minecraft Server Manager's and this one),
+    one lightbox written once for all three of their sites (Mister Download Manager's, Minecraft Server Manager's and this one),
     each in its own look. It is published as its own project, [Vitrine](https://github.com/anefzaoui/vitrine)
     (GPL-3.0-or-later, like Jessbot; its dialogs are [anefzaoui/vitrine-modal](https://github.com/anefzaoui/vitrine-modal),
     not needed here). `website/vitrine/` is a copy of the commit `vitrine.lock.json` pins, and `scripts/vitrine-check.mjs`
@@ -4071,3 +4071,23 @@ Note: most of Phase 23 part A landed in commit aa56076, whose message reads "Pha
     now allows playwright-core up to 1.65, ready for the next step) come along. Checked with the full test pass on Node
     26: unit tests, the e2e run, the Docker image, both browser engines end to end.
 
+
+## 2026-11-21: The autopilot's typing model
+
+255. **The autopilot types with Claude Haiku 5.5, and a typing model that fails says so by name.** The browser autopilot
+    (#111) asks a small, fast model for the text of each field it fills (`decide.textModel`, Admin → Models → Quick
+    decisions → "Writes what the autopilot types"). Its default, Inception's `inception/mercury-2.5` (what jev-ultrafast
+    used), is gone from OpenRouter: every call answers `404 … no longer available on OpenRouter`, and no Inception model
+    is listed any more. The autopilot caught any error as "no value", so every field ended in **needs information** and
+    Jess typed by hand; the chat check still passed when Jess did enough steps herself. Four changes. (1) The owner chose
+    `anthropic/claude-haiku-5.5` as the default ($0.10 / $0.50 per million tokens on OpenRouter; with the same request,
+    JSON mode and reasoning off, it answered `{"text": "Zurich"}` in about 0.7 s). (2) A failed call is not "needs
+    information": the run stops as **failed**, and what Jess reads names the model, what the provider said and where an
+    admin changes it; the timeline step says the same in one line, the server log warns, and Admin → Models → recent
+    decisions lists it as failed. The provider's words reach the model as one clean, capped line. (3) Saving the
+    Quick decisions form tries a new typing model with one tiny call first, as the background and fallback models are
+    (#179): a model the provider doesn't serve is refused by name and nothing is saved. (4) A saved choice is kept as
+    it is, but the form used to store the default it showed, so the retired `inception/mercury-2.5` stored that way is
+    read as the default, and from now on a model left at its default is stored as "the default", so a later change of
+    default reaches every install that never chose one. `test:chat`'s autopilot check now also fails when the typing
+    model was never called or failed, since Jess's own typing steps look the same in the timeline.
