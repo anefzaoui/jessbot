@@ -4106,3 +4106,29 @@ Note: most of Phase 23 part A landed in commit aa56076, whose message reads "Pha
     start; they're the next candidates if starts need to be quicker. The test now starts the server, waits for its
     `[jessbot] listening on` line (a latch), fails at once with the server's own output when it exits first, and keeps
     a 3-minute deadline only for a server that hangs.
+
+## 2026-11-21: links:check, live and local
+
+257. **The ready-made search check is proven against local sites; the live run fails only on a broken recipe, and an
+    error on this computer's side is an error.** One `test:chat` run failed its `links:check` check with nothing after
+    "verdicts:". Two causes. (1) The check printed the command's output as its message, the output starts with a
+    blank line, and the chat checks print only a message's first line: whatever the verdicts said was cut, so nobody
+    could tell which site said what. (2) The check needed Google Maps and Crossref to answer **ok** right then, through
+    the internet; anything else failed it. Run alone on the maintainer's machine (Google Maps 6 times, Crossref 61), no
+    recipe was ever broken: the misses were all this computer's — five times the browser didn't start (`connect
+    ETIMEDOUT 127.0.0.1`, the machine's own loopback failing under load), and twice Crossref's address gave no answer
+    within about a second, once shown (after the change below) as the browser failing to reach its own guard proxy,
+    `net::ERR_PROXY_CONNECTION_FAILED`, which the check had recorded as "blocked by the site". Now: `tests/links-check.test.js` runs the whole check in
+    Jess's own browser against a local server — results (**ok**), a recipe gone to the home page (**broken**, switched
+    off), a 429 (**blocked**, left on), a data site with a failing mirror (ok through the second), an error that keeps
+    the last verdict — so every verdict is proven on every `npm test` without the internet (`checkLink`/`checkLinks`
+    take the recipe table and the page opener; the command uses `SITES` and `withPage` as before). The live check in
+    `test:chat` still runs the command on the two sites and checks the printed verdicts against the saved state, and
+    fails on a **broken** recipe, on a site with no verdict and when no sample opened at all; a **blocked** or
+    **error** verdict is noted with its reason, since it is the site or the network that said no that day. Its messages
+    are one line, so the whole output shows. And a data site whose every address failed on this side (the browser's
+    own proxy unreachable, no internet: `failedOnOurSide` in `browser/links.js`) is **error**, keeping the last
+    verdict, with Chromium's reason in the detail instead of a bare "no answer". Found on the way, left for its own
+    change: through the guard proxy with the request guard on, a plain-`http://` page that answers an error status
+    sometimes fails with `net::ERR_HTTP_RESPONSE_CODE_FAILURE` instead of loading (36 of 40 navigations to a local 429
+    page; none over https, none without the request interception); every recipe is https.

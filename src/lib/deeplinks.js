@@ -500,16 +500,17 @@ export const SITE_KEYS = Object.keys(SITES);
 
 /**
  * Build one results address. site: a key of SITES; fields: the search (see the tool's schema); ctx: { today (YYYY-MM-DD,
- * the person's date), homeCountry (ISO-2, for shop domains and Indeed/Eventbrite) }.
+ * the person's date), homeCountry (ISO-2, for shop domains and Indeed/Eventbrite), recipes (the table, SITES unless a test
+ * brings local stand-ins) }.
  * → { site, label, area, kind: 'page'|'json', url, alternates: [same search elsewhere, tried in turn], notes: [], home, domain?,
  *   carrier? }. Throws LinkError(field, message).
  */
-export function buildLink(site, fields = {}, { today = todayIn(), homeCountry = null } = {}) {
-  const def = SITES[site];
-  if (!def) fail('site', `Unknown site “${String(site).slice(0, 40)}”. Known: ${SITE_KEYS.join(', ')}.`);
+export function buildLink(site, fields = {}, { today = todayIn(), homeCountry = null, recipes = SITES } = {}) {
+  const def = Object.hasOwn(recipes, site) ? recipes[site] : null;
+  if (!def) fail('site', `Unknown site “${String(site).slice(0, 40)}”. Known: ${Object.keys(recipes).join(', ')}.`);
   const out = def.build(fields || {}, { today, homeCountry: homeCountry ? String(homeCountry).toUpperCase() : null });
   return { site, label: def.label, area: def.area, kind: def.kind || 'page', home: def.home, notes: [], alternates: [], ...out, url: out.url };
 }
 
 /** The sample search links:check opens for a site (dates relative to today). */
-export const sampleOf = (site, today = todayIn()) => SITES[site].sample(today);
+export const sampleOf = (site, today = todayIn(), recipes = SITES) => recipes[site].sample(today);

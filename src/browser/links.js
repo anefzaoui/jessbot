@@ -56,22 +56,33 @@ export function linkVerdict({ link, finalUrl, status = null, wall = null, title 
   return { status: 'ok', detail: `${String(title).slice(0, 80) || landed.hostname}` };
 }
 
-/** Open one site's sample search and judge it. → { site, url, status, detail, ms } (never throws). */
-export async function checkLink(site, { today = todayIn(), signal } = {}) {
+// A navigation that failed on this machine's side — the browser couldn't reach its own guard proxy, or the computer is
+// offline — says nothing about the site: it is an error (the last verdict stays), not "blocked by the site" (decision #257).
+const OUR_SIDE = /net::ERR_(PROXY_CONNECTION_FAILED|INTERNET_DISCONNECTED|NETWORK_CHANGED|NETWORK_IO_SUSPENDED)\b/;
+export const failedOnOurSide = message => OUR_SIDE.test(String(message || ''));
+const navError = message => (/net::ERR_[A-Z_]+/.exec(message)?.[0] || String(message).slice(0, 120));
+
+/**
+ * Open one site's sample search and judge it. → { site, url, status, detail, ms } (never throws).
+ * recipes: the recipe table (lib/deeplinks.js SITES); open: how a page is opened (withPage: Jess's browser, its guard
+ * proxy and request guard). Tests bring local stand-ins for both.
+ */
+export async function checkLink(site, { today = todayIn(), signal, recipes = SITES, open = withPage } = {}) {
   const t = Date.now();
   let link;
-  try { link = buildLink(site, sampleOf(site, today), { today, homeCountry: null }); } catch (err) {
+  try { link = buildLink(site, sampleOf(site, today, recipes), { today, homeCountry: null, recipes }); } catch (err) {
     return { site, url: null, status: 'error', detail: `the sample didn’t build: ${err.message}`, ms: 0 };
   }
   try {
-    const out = await withPage(async page => {
+    const out = await open(async page => {
       if (link.kind === 'json') {
         // Data recipes may have mirrors (Overpass): the recipe works when any of them answers JSON.
-        const tried = [];
+        const tried = [], ours = [];
         for (const url of [link.url, ...link.alternates]) {
           const res = await page.goto(url, { waitUntil: 'commit', timeout: 20000 }).catch(err => ({ error: err.message.split('\n')[0] }));
           const host = new URL(url).hostname;
-          if (res.error) { tried.push(`${host}: no answer`); continue; }
+          if (res.error) { tried.push(`${host}: no answer (${navError(res.error)})`); ours.push(failedOnOurSide(res.error)); continue; }
+          ours.push(false);
           const body = (await res.body().catch(() => Buffer.alloc(0))).toString('utf8');
           let ok = false;
           try { ok = typeof JSON.parse(body) === 'object'; } catch { /* not JSON */ }
@@ -79,6 +90,7 @@ export async function checkLink(site, { today = todayIn(), signal } = {}) {
           tried.push(`${host}: HTTP ${res.status()}${ok ? '' : ', not JSON'}`);
           if ([403, 429].includes(res.status()) && !link.alternates.length) return { status: 'blocked', detail: `HTTP ${res.status()} (rate limit or block; the recipe may still be fine)` };
         }
+        if (ours.every(Boolean)) return { status: 'error', detail: `this computer couldn’t reach the site (${tried.join('; ')})` };
         return { status: tried.every(t => /no answer|HTTP (403|406|429|5\d\d)/.test(t)) ? 'blocked' : 'broken', detail: tried.join('; ') };
       }
       const res = await page.goto(link.url, { waitUntil: 'domcontentloaded', timeout: 30000 });
@@ -89,7 +101,7 @@ export async function checkLink(site, { today = todayIn(), signal } = {}) {
         await page.waitForTimeout(2500); // results pages fill in after load
         const wall = await probeWall(page, doc.status());
         const seen = await page.evaluate(() => ({ title: document.title, text: (document.body?.innerText || '').slice(0, 20000), len: (document.body?.innerText || '').trim().length })).catch(() => ({ title: '', text: '', len: 0 }));
-        const verdict = linkVerdict({ link, finalUrl: page.url(), status: doc.status(), wall: wall?.label || null, title: seen.title, text: seen.text, textLength: seen.len, expect: SITES[site].expect || null });
+        const verdict = linkVerdict({ link, finalUrl: page.url(), status: doc.status(), wall: wall?.label || null, title: seen.title, text: seen.text, textLength: seen.len, expect: recipes[site].expect || null });
         if (verdict.status !== 'broken' || !/answered|nearly empty/.test(verdict.detail)) return verdict;
         // An error or an empty page: is it the recipe, or does the whole site refuse this browser? Its home page decides.
         const home = await page.goto(link.home, { waitUntil: 'domcontentloaded', timeout: 30000 }).catch(() => null);
@@ -109,11 +121,11 @@ export async function checkLink(site, { today = todayIn(), signal } = {}) {
 }
 
 /** Check sites (default: all) one after another and record the results. Only a broken result switches a recipe off. */
-export async function checkLinks(sites = SITE_KEYS, { today = todayIn(), onResult = () => {} } = {}) {
+export async function checkLinks(sites = SITE_KEYS, { today = todayIn(), onResult = () => {}, recipes = SITES, open = withPage } = {}) {
   const state = loadLinkState();
   const results = [];
   for (const site of sites) {
-    const r = await checkLink(site, { today });
+    const r = await checkLink(site, { today, recipes, open });
     results.push(r);
     // An error (our side: the browser, the network) keeps the last verdict; everything else replaces it.
     if (r.status !== 'error' || !state.sites[site]) state.sites[site] = { status: r.status, at: new Date().toISOString(), url: r.url, detail: r.detail, ms: r.ms };
