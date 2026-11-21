@@ -1,10 +1,10 @@
-# Jessbot in a container: Node 24, the built assets, and open-source Chromium for the agent's browser.
+# Jessbot in a container: Node 26 (LTS), the built assets, and open-source Chromium for the agent's browser.
 # Runs as a non-root user; everything it writes (database, files, the .env the setup page fills in) is in /data.
 #   docker build -t jessbot .
 #   docker compose up -d        (see compose.yaml; the setup code is in `docker compose logs jessbot`)
 
 # ---- Build: install with dev dependencies, build the assets, then drop the dev dependencies ----------------------------
-FROM node:24-bookworm-slim AS build
+FROM node:26-bookworm-slim AS build
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci --no-audit --no-fund
@@ -12,7 +12,7 @@ COPY . .
 RUN npm run build && npm prune --omit=dev --no-audit --no-fund
 
 # ---- Run ----------------------------------------------------------------------------------------------------------------
-FROM node:24-bookworm-slim
+FROM node:26-bookworm-slim
 ENV NODE_ENV=production \
     HOST=0.0.0.0 \
     PORT=3737 \

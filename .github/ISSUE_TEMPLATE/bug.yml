@@ -53,7 +53,7 @@ body:
     attributes:
       label: Node.js version
       description: "`node --version` (not needed with Docker)."
-      placeholder: v24.19.0
+      placeholder: v26.13.1
   - type: dropdown
     id: provider
     attributes:

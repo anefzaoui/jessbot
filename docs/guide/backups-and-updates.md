@@ -98,7 +98,7 @@ That restores the database only; your files stay as they are.
 1. Stop Jessbot.
 2. Copy the whole Jessbot folder, including `data/` and `.env`. With Docker, copy the `jessbot-data` volume, which
    holds the data and the `.env` with the install key (or, if you keep the key in a Docker secret, bring that too).
-3. On the new machine, install Node.js 24.19 or newer (or Docker) and start Jessbot from the copied folder.
+3. On the new machine, install Node.js 26 (or 24.19 or newer, or Docker) and start Jessbot from the copied folder.
 
 If the new machine runs a different operating system, run `npm ci && npm run build` there before the first start, since
 some packages are built for each system. Running `npm run doctor` afterwards checks that the database, the model key,

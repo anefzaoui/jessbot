@@ -92,13 +92,13 @@ Jessbot is an early preview: run it at home or on a private network, not on the 
   approvals page's advice, the doctor's labels ([#55](https://github.com/anefzaoui/jessbot/issues/55))
 - ✅ Jessbot installs on a phone's home screen or as a desktop app (a web app manifest with the logo, under the
   assistant's name) ([#55](https://github.com/anefzaoui/jessbot/issues/55))
+- ✅ Node.js 26 (the current LTS) in the Docker image and in CI next to 24; playwright-core and patchright-core kept in
+  step, moving together when Patchright follows Playwright ([#43](https://github.com/anefzaoui/jessbot/issues/43))
 
 ## Being worked on
 
 - 🔄 The last CodeQL alerts: fix the real ones, explain the rest, then close the issue
   ([#22](https://github.com/anefzaoui/jessbot/issues/22))
-- 🔄 Move playwright-core, patchright-core and Node 26 together, in one coordinated update tested on every system and
-  in the Docker image ([#43](https://github.com/anefzaoui/jessbot/issues/43))
 - 🔄 Translations: a translation layer for the interface and the first languages (the assistant already reads and
   writes many, right to left included) ([#14](https://github.com/anefzaoui/jessbot/issues/14))
 

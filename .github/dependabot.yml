@@ -10,6 +10,12 @@ updates:
     groups:
       minor-and-patch:
         update-types: [minor, patch]
+    # playwright-core and patchright-core move together (decision #254): Patchright is the Playwright API with its
+    # automation traces removed, released after each Playwright minor, and Jessbot's browser code is written once for
+    # both. A new playwright-core minor waits until patchright-core has the same one; patches still come.
+    ignore:
+      - dependency-name: playwright-core
+        update-types: [version-update:semver-minor, version-update:semver-major]
   - package-ecosystem: github-actions
     directory: /
     schedule:

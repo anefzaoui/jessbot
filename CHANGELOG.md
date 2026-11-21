@@ -35,6 +35,7 @@ in their chat.
 - Docker image and compose file, a systemd unit, install guides for Windows, macOS and Linux.
 - A web app manifest: Jessbot installs on a phone's home screen or as a desktop app, under the assistant's name, with
   the logo (or its look's portrait) as the icon.
+- The Docker image runs Node.js 26 (the current LTS); a Node.js install needs 26, or 24.19 or newer.
 - The project site, with the user guide and screenshots: https://anefzaoui.github.io/jessbot/. Its home page is "Jess's
   day": Jess in her sky through four hours of a day, what she does at each, one real run with its timeline, and the
   install; the guide, the gallery and the 404 share its look.

@@ -39,7 +39,7 @@ says so. Details: [SECURITY-MODEL.md → Browser sandbox](SECURITY-MODEL.md#brow
 
 ## Linux: Node.js and a systemd service
 
-You need Node.js 24.19 or newer (from [nodejs.org](https://nodejs.org) or your distribution) and git.
+You need Node.js 26 (the current LTS) or 24.19 or newer (from [nodejs.org](https://nodejs.org) or your distribution) and git.
 
 ```bash
 sudo useradd --system --home /var/lib/jessbot --create-home --shell /usr/sbin/nologin jessbot
@@ -63,7 +63,7 @@ for programs without an AppArmor profile, so Admin → Browser shows the sandbox
 
 ## Windows
 
-Install Node.js 24 LTS from [nodejs.org](https://nodejs.org) and Git, then in PowerShell:
+Install Node.js 26 LTS from [nodejs.org](https://nodejs.org) and Git, then in PowerShell:
 
 ```powershell
 git clone <this repository> jessbot; cd jessbot
@@ -86,7 +86,7 @@ Register-ScheduledTask -TaskName 'Jessbot' -Action $a -Trigger $t -Description '
 
 ## macOS
 
-Install Node.js 24 LTS ([nodejs.org](https://nodejs.org) or `brew install node@24`), then:
+Install Node.js 26 LTS ([nodejs.org](https://nodejs.org) or `brew install node@26`), then:
 
 ```bash
 git clone <this repository> jessbot && cd jessbot

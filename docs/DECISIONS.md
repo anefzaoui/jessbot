@@ -4048,3 +4048,26 @@ Note: most of Phase 23 part A landed in commit aa56076, whose message reads "Pha
     portrait, never an uploaded picture (those are served behind sign-in). `display: standalone`, start and scope `/`.
     The push-only service worker (#85) is unchanged: no offline caching, the app is always served fresh. Browsers offer
     a full install only over HTTPS or on localhost, and the guide says so.
+
+## 2026-11-20: Node 26; playwright-core and patchright-core in step (#43)
+
+254. **The Docker image runs Node 26 (LTS), CI tests 24 and 26, and playwright-core moves only with patchright-core.**
+    Dependabot opened three updates that couldn't land one by one (#21, #41, #42): Node 24 → 26 for the image, and
+    playwright-core 1.64 → 1.65 with express-rate-limit. Node: 26.13 is the Active LTS (24 is in maintenance until April
+    2028), so the image moves to `node:26-bookworm-slim`, `engines` reads `^24.19.0 || >=26.13.0` (both LTS lines, not
+    the odd-numbered 25), and CI runs the unit tests on Linux, Windows and macOS with both (lint, the audit and the site
+    and release jobs on 26). npm 11 on Node 26 blocks dependencies' install scripts unless `allowScripts` in
+    package.json approves them: the only two are `@parcel/watcher` (Tailwind's file watcher; a build-from-source
+    fallback, and the prebuilt binary for each system comes as its own package) and `tesseract.js` (a donation
+    message), so both are denied explicitly and nothing Jessbot runs changes. Browsers: Patchright (`patchright-core`,
+    decision #227) is the Playwright API with its automation traces removed, released some days after each Playwright
+    minor, and Jessbot's browser code (engines/server.js, withPage, the readers) is written once for both libraries,
+    with the plain Playwright one rendering Jessbot's own pages on the same Chrome; so their minors move together.
+    On 2026-11-20 patchright-core's newest is 1.64.3 and there is no 1.65 yet, so in step means playwright-core stays on
+    1.64.1 (the newest 1.64, the Chromium build it downloads unchanged) and Dependabot is told to skip playwright-core
+    minors (patches still come) until patchright-core 1.65 ships; then both move in one change. express-rate-limit
+    8.7.3 → 8.7.5 (fixes to its memory store and to a failing store's decrement; Jessbot's limits run the library over
+    their own SQLite store, decision #228) and the optional CloakBrowser wrapper 0.7.2 → 0.7.3 (its peer range
+    now allows playwright-core up to 1.65, ready for the next step) come along. Checked with the full test pass on Node
+    26: unit tests, the e2e run, the Docker image, both browser engines end to end.
+

@@ -17,7 +17,7 @@ Thanks for wanting to help. Jessbot is an early preview, so bug reports with cle
 
 ## Set up a development copy
 
-You need Node.js 24.19 or newer (`node --version`).
+You need Node.js 26 (the current LTS, and the Docker image's) or 24.19 or newer (`node --version`).
 
 ```bash
 npm install
@@ -32,7 +32,7 @@ The dev server keeps its data in `data/dev`, so it never touches an install you 
 
 ## Project conventions
 
-- Node 24 ESM, Express 5, express-handlebars (`.hbs`), Tailwind v4 CLI, the built-in `node:sqlite`.
+- Node 24/26 ESM, Express 5, express-handlebars (`.hbs`), Tailwind v4 CLI, the built-in `node:sqlite`.
 - Every page is its own Express route. Logic lives in `src/services/`; web routes and `/api/v1` both call services.
 - New interface text goes through the translation layer: `{{t "…"}}` in templates, `t('…')` in the browser, whole
   sentences with `{placeholders}`; then `npm run i18n` (CI runs `npm run i18n:check`). See docs/TRANSLATING.md.
