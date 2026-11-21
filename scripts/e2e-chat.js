@@ -424,16 +424,26 @@ try {
     expect(/^sandbox /.test(raw.headers.get('content-security-policy') || ''), 'raw artifact served without sandbox CSP');
   });
 
-  await test('library: asking for a change makes version 2; the open viewer refreshes itself', async () => {
+  // The version numbers aren't fixed: after library_create the page check may ask Jess to fix a real defect once, with
+  // library_edit (agent/tools/library.js), so the item can already be at version 2 here, and the change below can be
+  // followed by such a fix too. The check is the viewer catching up with the item's newest version, whatever it is.
+  await test('library: asking for a change makes a new version; the open viewer refreshes itself', async () => {
     if (!itemPath) throw new Error('no item from the previous test');
-    await sendAndWait(`Use library_update on the item ${itemPath.split('/').pop()} to add a second button with id "tip20" that writes the 20% tip into #out. Keep everything else.`, 180000);
-    await libPage.waitForFunction(() => document.querySelector('[data-library-item]')?.dataset.version === '2', null, { timeout: 15000 });
+    const id = itemPath.split('/').pop();
+    const before = (await http('GET', `/api/v1/library/${id}`, { cookie: ownerCookie })).json;
+    const shown = await libPage.locator('[data-library-item]').getAttribute('data-version');
+    expect(shown === String(before.item.version), `the viewer shows version ${shown}, the item is at ${before.item.version}`);
+    await sendAndWait(`Use library_update on the item ${id} to add a second button with id "tip20" that writes the 20% tip into #out. Keep everything else.`, 180000);
+    const after = (await http('GET', `/api/v1/library/${id}`, { cookie: ownerCookie })).json;
+    expect(after.item.version > before.item.version, `no new version: still ${after.item.version}`);
+    expect(after.versions.length === before.versions.length + (after.item.version - before.item.version), `versions: ${before.versions.length} → ${after.versions.length}`);
+    await libPage.waitForFunction(v => document.querySelector('[data-library-item]')?.dataset.version === v, String(after.item.version), { timeout: 15000 })
+      .catch(() => { throw new Error(`the open viewer stayed at version ${shown} (the item is at ${after.item.version})`); });
+    console.log(`      (the viewer went from version ${shown} to ${after.item.version} by itself)`);
     const frame = libPage.frameLocator('[data-library-frame]');
     await frame.locator('#bill').fill('50');
     await frame.locator('#tip20').click();
     expect(/10(\.00)?/.test(await frame.locator('#out').innerText()), '20% button missing after update');
-    const api = (await http('GET', `/api/v1/library/${itemPath.split('/').pop()}`, { cookie: ownerCookie })).json;
-    expect(api.versions.length === 2, `versions: ${api.versions.length}`);
   });
 
   await test('time: a timer set in chat rings on every open page; Stop on one stops all', async () => {
