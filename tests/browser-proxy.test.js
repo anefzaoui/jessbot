@@ -134,17 +134,18 @@ test('browser (real): plain-http error pages load through the request guard and 
     res.write(head); res.end(rest);
   }));
   try {
-    const got = await browser.withPage(async page => {
-      const out = [];
-      for (const status of STATUSES) for (const framing of FRAMINGS) {
-        const p = `/${status}/${framing}`;
+    // Each page in a tab of its own: in a shared tab, a failed navigation's chrome-error page (or a page that commits after
+    // its goto gave up) interrupts the next navigation, so one lost connection would read as five failures.
+    const got = [];
+    for (const status of STATUSES) for (const framing of FRAMINGS) {
+      const p = `/${status}/${framing}`;
+      got.push(await browser.withPage(async page => {
         const r = await page.goto(`http://errors.test:${errors.address().port}${p}`, { timeout: 15000 }).catch(e => e);
         // A failure says whether the site got the request at all (if not, the connection to it failed).
-        out.push(r instanceof Error ? `${p}: ${r.message.split('\n')[0]}${seen.includes(p) ? '' : ' (the site never got the request)'}`
-          : `${p}: ${r.status()} ${await page.title()}`);
-      }
-      return out;
-    });
+        return r instanceof Error ? `${p}: ${r.message.split('\n')[0]}${seen.includes(p) ? '' : ' (the site never got the request)'}`
+          : `${p}: ${r.status()} ${await page.title()}`;
+      }));
+    }
     assert.deepEqual(got, STATUSES.flatMap(s => FRAMINGS.map(f => `/${s}/${f}: ${s} Error ${s}`)));
   } finally { errors.close(); }
 });
@@ -158,14 +159,11 @@ test('browser (real): a plain-http site the proxy can\'t reach fails as a connec
     socket.destroy();
   })));
   try {
-    const got = await browser.withPage(async page => {
-      const out = [];
-      for (const p of ['/a', '/b', '/c']) {
-        out.push(await page.goto(`http://gone.test:${hangUp.address().port}${p}`, { timeout: 15000 })
-          .then(r => `loaded ${r.status()}`, e => /net::ERR_\w+/.exec(e.message)?.[0] || e.message.split('\n')[0]));
-      }
-      return out;
-    });
+    const got = []; // a tab of its own for each, as above
+    for (const p of ['/a', '/b', '/c']) {
+      got.push(await browser.withPage(page => page.goto(`http://gone.test:${hangUp.address().port}${p}`, { timeout: 15000 })
+        .then(r => `loaded ${r.status()}`, e => /net::ERR_\w+/.exec(e.message)?.[0] || e.message.split('\n')[0])));
+    }
     assert.deepEqual(got, ['net::ERR_EMPTY_RESPONSE', 'net::ERR_EMPTY_RESPONSE', 'net::ERR_EMPTY_RESPONSE']);
     // Each was tried, and at most once more: Chromium sends a request again when a connection it opened ahead of time
     // closes before answering. Never more (after a reset, it would take the proxy for broken and try yet again).
