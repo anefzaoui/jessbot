@@ -46,6 +46,9 @@ in their chat.
 - A plain-`http://` site the browser couldn't reach reads as "I couldn't connect to that site", not as the site
   answering with an error page that then failed to load (`ERR_HTTP_RESPONSE_CODE_FAILURE`); sites' own error pages
   load through the browser's guard as they are.
+- The command-line tools (`links:check`, `doctor`, `db:status`, `db:backup`, `reset-link`, `secrets:rotate`) pointed
+  at a data folder with no Jessbot set up in it say so, with how to point them at one (`JESSBOT_HOME`), instead of
+  stopping with a stack trace, and leave the folder alone (no database, no folders made there).
 - The project site, with the user guide and screenshots: https://anefzaoui.github.io/jessbot/. Its home page is "Jess's
   day": Jess in her sky through four hours of a day, what she does at each, one real run with its timeline, and the
   install; the guide, the gallery and the 404 share its look.

@@ -83,6 +83,10 @@ function readMigrations() {
   });
 }
 
+/** Whether this database was ever set up (its first migration made the settings table). The command-line tools refuse
+ *  one that wasn't, with a message instead of the first query's "no such table" (scripts/lib/instance.js, #82). */
+export const isSetUp = () => !!db.prepare("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'settings'").get();
+
 export function migrationStatus() {
   const files = readMigrations();
   const applied = db.prepare('SELECT name, checksum, applied_at FROM _migrations ORDER BY name').all();

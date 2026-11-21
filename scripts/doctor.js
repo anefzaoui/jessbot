@@ -1,11 +1,10 @@
 // The health check from a terminal (a server without a browser, or before starting): `npm run doctor`.
 // Same checks as Admin → System, minus the ones only the running server knows (scheduler heartbeat, its error log).
 // Exit code 0 = healthy or warnings, 1 = something needs fixing.
-import { openDb } from '../src/db/index.js';
-import { ensureDirs } from '../src/config/index.js';
+// A data folder that was never set up is refused with a message (scripts/lib/instance.js, #82).
+import { openInstance } from './lib/instance.js';
 
-ensureDirs();
-await openDb(undefined, { migrate: false }).catch(err => { console.error(`\n✗ Database: ${err.message}\n`); process.exit(1); });
+await openInstance();
 await import('../src/agent/tools/index.js'); // the tool registry: security checks name tools and read their risk
 const { doctor, aboutSystem } = await import('../src/services/system.js');
 const h = doctor({ cli: true });

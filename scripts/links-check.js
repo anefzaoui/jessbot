@@ -3,12 +3,12 @@
 // records the verdicts in <data>/deeplinks-state.json. A recipe that is broken is switched off — open_search then opens
 // the site's own search page and Jess uses its form; a later ok switches it back on. A bot wall is recorded as "blocked"
 // (the recipe may be fine). Needs the browser (npm run browser:install) and internet; run it monthly or after a failure.
-// Works with Jessbot running or stopped: the database is only read (browser settings), never migrated.
-import { openDb, closeDb } from '../src/db/index.js';
-import { ensureDirs } from '../src/config/index.js';
+// Works with Jessbot running or stopped: the database is only read (browser settings), never migrated. A data folder
+// that was never set up is refused with a message (scripts/lib/instance.js, #82).
+import { closeDb } from '../src/db/index.js';
+import { openInstance } from './lib/instance.js';
 
-ensureDirs();
-await openDb(undefined, { migrate: false }).catch(err => { console.error(`\n✗ Database: ${err.message}\n`); process.exit(1); });
+await openInstance();
 const { SITE_KEYS } = await import('../src/lib/deeplinks.js');
 const { checkLinks, linkStateFile } = await import('../src/browser/links.js');
 const { browserStatus, closeBrowser } = await import('../src/browser/index.js');

@@ -2,16 +2,16 @@
 // For the person who runs Jessbot when they are the one locked out: being able to run commands on the server is the proof.
 // The link works once, for 24 hours, and is built from PUBLIC_URL (else this machine's address). Nothing is printed to the
 // server log; it is shown here only. Works while Jessbot is running (the database is shared safely).
-import { ensureDirs, config } from '../src/config/index.js';
-import { openDb, closeDb, get } from '../src/db/index.js';
+import { config } from '../src/config/index.js';
+import { closeDb, get } from '../src/db/index.js';
+import { openInstance } from './lib/instance.js';
 
 const email = process.argv.slice(2).find(a => !a.startsWith('-'));
 if (!email) {
   console.error('Usage: npm run reset-link -- <email>');
   process.exit(2);
 }
-ensureDirs();
-await openDb();
+await openInstance({ migrate: true }); // a data folder that was never set up is refused, not set up (#82)
 const { createResetLink } = await import('../src/services/password-reset.js');
 const user = get('SELECT id, name, status FROM users WHERE email = ?', email.trim());
 if (!user) {
