@@ -4132,3 +4132,23 @@ Note: most of Phase 23 part A landed in commit aa56076, whose message reads "Pha
     change: through the guard proxy with the request guard on, a plain-`http://` page that answers an error status
     sometimes fails with `net::ERR_HTTP_RESPONSE_CODE_FAILURE` instead of loading (36 of 40 navigations to a local 429
     page; none over https, none without the request interception); every recipe is https.
+
+## 2026-11-21: Command-line tools on a data folder that was never set up (#82)
+
+259. **The tools that work on an existing Jessbot refuse a data folder that was never set up, with a message, and create
+    nothing there.** `npm run links:check` on such a folder stopped with a stack trace (`no such table: settings`):
+    it opened the database without migrating (it only reads), so the first query met an empty file it had just made.
+    The doctor did the same; `db:status` listed all 50 migrations as pending and `db:backup` saved a copy of an empty file;
+    `reset-link` set the folder up (every migration) only to say there was no such account. Every one of them also
+    made the data folders (`ensureDirs`) and a database file wherever `JESSBOT_HOME` pointed, a typo included. Now
+    links:check, the doctor, db:status, db:backup, reset-link and secrets:rotate open the database through
+    `scripts/lib/instance.js`: no database file, or one whose settings table doesn't exist (the first migration never
+    ran: `isSetUp()` in `src/db/index.js`), is "No Jessbot is set up in <folder> yet", with how to point the command at
+    one (`JESSBOT_HOME`, in the environment or in `.env`) or set this one up (start Jessbot, finish the setup page), and
+    exit code 1, no trace. The folders are made only after the check passes, and the tools that migrated before
+    (reset-link, secrets:rotate) still do on a folder that is set up. Left as they were: `browser:install` (meant for
+    a fresh install, before the first start; it sets the database up as the server would), and the test and eval
+    scripts (their own throwaway folders). Tested: `tests/cli-instance.test.js` runs each tool on a folder that doesn't
+    exist (message, exit 1, no trace, the folder not created), on an empty one and on a database file that was never
+    set up (refused, nothing set up), and on a set-up one (db:status lists the applied migrations, reset-link looks the
+    account up, links:check reads its arguments).

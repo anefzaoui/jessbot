@@ -10,7 +10,8 @@
 import fs from 'node:fs';
 import net from 'node:net';
 import { config, ENV_FILE } from '../src/config/index.js';
-import { openDb, closeDb, tx } from '../src/db/index.js';
+import { closeDb, tx } from '../src/db/index.js';
+import { openInstance } from './lib/instance.js';
 import { keySource, resealWith, newKeyB64, resetKeyCache, unsealData } from '../src/lib/secrets.js';
 import { setEnvVar, removeEnvVar } from '../src/lib/envfile.js';
 import { sealedValues } from '../src/services/sealed-inventory.js';
@@ -32,7 +33,7 @@ if (src.source === 'file' && !reseal) {
 }
 if (!src.valid) die(src.source === 'none' ? 'There is no key yet (nothing has been sealed).' : 'The current key isn’t valid (32 bytes, base64).');
 
-await openDb();
+await openInstance({ migrate: true }); // a data folder that was never set up is refused, not set up (#82)
 const values = sealedValues();
 const counts = {};
 for (const v of values) {

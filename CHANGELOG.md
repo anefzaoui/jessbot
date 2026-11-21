@@ -43,6 +43,9 @@ in their chat.
   discovery load the first time they're needed.
 - `npm run links:check` says **error**, not "blocked by the site", when the browser couldn't reach a data site from
   this computer (its own proxy, no internet), and keeps the last verdict; the reason is in the line it prints.
+- The command-line tools (`links:check`, `doctor`, `db:status`, `db:backup`, `reset-link`, `secrets:rotate`) pointed
+  at a data folder with no Jessbot set up in it say so, with how to point them at one (`JESSBOT_HOME`), instead of
+  stopping with a stack trace, and leave the folder alone (no database, no folders made there).
 - The project site, with the user guide and screenshots: https://anefzaoui.github.io/jessbot/. Its home page is "Jess's
   day": Jess in her sky through four hours of a day, what she does at each, one real run with its timeline, and the
   install; the guide, the gallery and the 404 share its look.

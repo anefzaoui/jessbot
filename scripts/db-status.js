@@ -1,10 +1,10 @@
 // npm run db:status — show applied / pending migrations without changing anything.
 // npm run db:backup — write a snapshot to data/backups/.
-import { ensureDirs } from '../src/config/index.js';
-import { openDb, migrationStatus, backupDb, closeDb } from '../src/db/index.js';
+// A data folder that was never set up is refused with a message (scripts/lib/instance.js, #82).
+import { migrationStatus, backupDb, closeDb } from '../src/db/index.js';
+import { openInstance } from './lib/instance.js';
 
-ensureDirs();
-await openDb(undefined, { migrate: false });
+await openInstance();
 
 if (process.argv.includes('--backup')) {
   console.log(`backup written: ${backupDb('manual')}`);
