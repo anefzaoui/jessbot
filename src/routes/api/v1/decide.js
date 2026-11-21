@@ -1,7 +1,8 @@
 // Quick decisions (docs/JEV.md, docs/API.md): the admin's switches and confidence bar, a playground to try the decision
 // model, and the recent decisions list. Admin only.
 import { Router } from 'express';
-import { decide, choice, noul, score, saveDecideSettings, recentDecisions } from '../../../services/decide.js';
+import { decide, choice, noul, score, saveDecideSettings, decideSettings, MODEL_ID, recentDecisions } from '../../../services/decide.js';
+import { llmState, testConnection } from '../../../services/llm.js';
 import { audit } from '../../../services/audit.js';
 import { forbidden, invalid, tooMany, badRequest } from '../../../lib/errors.js';
 import { hit } from '../../../lib/ratelimit.js';
@@ -11,8 +12,16 @@ const adminOnly = req => { if (req.user.role !== 'admin') throw forbidden('Only 
 const fragment = (res, partial, data) => new Promise((resolve, reject) =>
   res.render('fragment', { layout: false, partial, data, ...data }, (err, html) => (err ? reject(err) : resolve(html))));
 
-router.post('/admin/decide', (req, res) => {
+router.post('/admin/decide', async (req, res) => {
   adminOnly(req);
+  // A new typing model is saved only once it answered a tiny call, as the background and fallback models are (decisions
+  // #179, #255): an id the provider doesn't serve is refused here, by name, instead of failing later in the browser.
+  const textModel = String(req.body?.textModel ?? '').trim();
+  if (MODEL_ID.test(textModel) && textModel !== decideSettings().textModel && llmState().ready) {
+    const t = await testConnection({ model: textModel });
+    if (!t.ok) throw badRequest(t.status === 404 ? `The model provider doesn’t serve “${textModel}”, so it can’t type for the autopilot. Nothing was saved.`
+      : `The typing model “${textModel}” didn’t answer (${String(t.error).replace(/[.\s]+$/, '')}). Nothing was saved.`);
+  }
   const s = saveDecideSettings(req.body || {});
   audit('decide.settings', { actorId: req.user.id, detail: { model: s.model, confidence: s.confidence, off: Object.keys(s.uses).filter(k => !s.uses[k]) } });
   res.json({ ok: true, settings: s });

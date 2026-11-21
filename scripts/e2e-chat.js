@@ -610,6 +610,18 @@ try {
       + 'for one adult in economy (stop when results are visible; do not select or book). Then tell me the cheapest price you can see, in one sentence.', { timeout: 300000 });
     const steps = await lastReply(owner).locator('.tl-step .tl-label').allTextContents(); // collapsed once done
     expect(steps.some(s => /^Autopilot:/.test(s)), `no autopilot step: ${steps.join(' | ')}`);
+    // The autopilot typed with its own typing model (decision #255): Jess's browser_type steps carry the same "Typed" labels,
+    // so the steps alone can't tell a working typing model from one the provider stopped serving.
+    process.env.JESSBOT_HOME = HOME;
+    const { paths } = await import(new URL('../src/config/index.js', import.meta.url).href);
+    const { DEFAULTS } = await import(new URL('../src/services/decide.js', import.meta.url).href);
+    const { DatabaseSync } = await import('node:sqlite');
+    const db = new DatabaseSync(paths.db, { readOnly: true });
+    let typed;
+    try { typed = db.prepare(`SELECT COUNT(*) AS n FROM usage_events WHERE purpose = 'decide' AND model = ?`).get(DEFAULTS.textModel).n; } finally { db.close(); }
+    const failures = (await recentDecisions()).filter(d => /^typing model /.test(d.outcome)).map(d => d.outcome);
+    expect(!failures.length, `the typing model failed: ${failures.join(' | ')}`);
+    expect(typed > 0, `the autopilot's typing model (${DEFAULTS.textModel}) was never called: ${steps.join(' | ')}`);
     expect(steps.filter(s => /^(Typed|Clicked|Chose)/.test(s)).length >= 4, `too few autopilot actions: ${steps.join(' | ')}`);
     expect(/\d/.test(text) && /([A-Z]{3}|€|\$|£|CHF|price|fare)/i.test(text), `reply: ${text}`);
     if (process.env.E2E_SHOTS) await lastReply(owner).screenshot({ path: path.join(process.env.E2E_SHOTS, 'autopilot.png') });
