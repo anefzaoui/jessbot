@@ -46,7 +46,7 @@ const fakeDns = (...answers) => {
   return calls;
 };
 
-/** Talk to the proxy directly, the way the browser does. */
+/** Talk to the proxy directly, the way the browser does. → its answer's status line, or 'closed' (no answer at all). */
 async function proxyRequest(lines, { auth = true } = {}) {
   const p = new URL((await guardProxy()).server);
   const { username, password } = await guardProxy();
@@ -55,7 +55,8 @@ async function proxyRequest(lines, { auth = true } = {}) {
     const s = net.connect(Number(p.port), '127.0.0.1', () => s.write(`${lines.join('\r\n')}\r\n${auth ? `Proxy-Authorization: Basic ${cred}\r\n` : ''}\r\n`));
     let data = '';
     s.on('data', d => { data += d; if (/\r\n\r\n/.test(data)) { s.destroy(); resolve(data.split('\r\n')[0]); } });
-    s.on('error', reject);
+    s.on('close', () => resolve(data.split('\r\n')[0] || 'closed'));
+    s.on('error', err => (err.code === 'ECONNRESET' ? resolve('closed') : reject(err)));
     s.setTimeout(5000, () => { s.destroy(); resolve(data.split('\r\n')[0] || 'timeout'); });
   });
 }
@@ -69,8 +70,9 @@ test('guard proxy: listens on 127.0.0.1 only, needs its credential, refuses the 
   const before = proxyRefused();
   assert.match(await proxyRequest([`CONNECT sneaky.example:${port} HTTP/1.1`, `Host: sneaky.example:${port}`]), / 403 /);
   assert.match(await proxyRequest([`CONNECT 127.0.0.1:${port} HTTP/1.1`, `Host: 127.0.0.1:${port}`]), / 403 /);
-  assert.match(await proxyRequest([`GET http://127.0.0.1:${port}/x HTTP/1.1`, `Host: 127.0.0.1:${port}`]), / 403 /);
-  assert.match(await proxyRequest([`GET http://sneaky.example:${port}/x HTTP/1.1`, `Host: sneaky.example:${port}`]), / 403 /);
+  // Plain http gets no answer at all: a 403 of the proxy's own would pass for the site's (decision #258).
+  assert.equal(await proxyRequest([`GET http://127.0.0.1:${port}/x HTTP/1.1`, `Host: 127.0.0.1:${port}`]), 'closed');
+  assert.equal(await proxyRequest([`GET http://sneaky.example:${port}/x HTTP/1.1`, `Host: sneaky.example:${port}`]), 'closed');
   assert.equal(proxyRefused() - before, 4);
   assert.equal(hits.length, 0, 'nothing reached the local server');
 });
@@ -106,4 +108,68 @@ test('browser (real): loopback addresses are refused even without the request gu
     assert.ok(viaName, 'localhost did not load');
     assert.equal(hits.length, 0);
   } finally { await ctx.close(); await session.close(); }
+});
+
+// Plain-http error pages (issue #81, decision #258). The proxy used to answer a site it couldn't reach with an empty 502 of
+// its own, which Chromium shows as net::ERR_HTTP_RESPONSE_CODE_FAILURE, so a failed connection looked like the site's
+// error page failing to load. A site's own 4xx/5xx page loads, whatever its framing; the proxy's failure is a connection
+// error.
+const STATUSES = [400, 403, 404, 410, 429, 500, 502, 503];
+const FRAMINGS = ['length', 'streamed']; // Content-Length, or written in two parts without one (chunked)
+
+test('browser (real): plain-http error pages load through the request guard and the proxy, with their own status and page', { skip, timeout: 120000 }, async () => {
+  settings.set('browser', { allowPrivate: true });
+  fakeDns('127.0.0.1');
+  const seen = [];
+  const errors = await listen(http.createServer((req, res) => {
+    seen.push(req.url);
+    // The page is built from this test's own constants, never from the request's text.
+    const [status, framing] = STATUSES.flatMap(s => FRAMINGS.map(f => [s, f])).find(([s, f]) => req.url === `/${s}/${f}`) || [404, 'length'];
+    const head = `<title>Error ${status}</title>`, rest = `<p>The site's own ${status} page.</p>`;
+    if (framing === 'length') {
+      res.writeHead(Number(status), { 'content-type': 'text/html; charset=utf-8', 'content-length': Buffer.byteLength(head + rest) });
+      return res.end(head + rest);
+    }
+    res.writeHead(Number(status), { 'content-type': 'text/html; charset=utf-8' });
+    res.write(head); res.end(rest);
+  }));
+  try {
+    // Each page in a tab of its own: in a shared tab, a failed navigation's chrome-error page (or a page that commits after
+    // its goto gave up) interrupts the next navigation, so one lost connection would read as five failures.
+    const got = [];
+    for (const status of STATUSES) for (const framing of FRAMINGS) {
+      const p = `/${status}/${framing}`;
+      got.push(await browser.withPage(async page => {
+        const r = await page.goto(`http://errors.test:${errors.address().port}${p}`, { timeout: 15000 }).catch(e => e);
+        // A failure says whether the site got the request at all (if not, the connection to it failed).
+        return r instanceof Error ? `${p}: ${r.message.split('\n')[0]}${seen.includes(p) ? '' : ' (the site never got the request)'}`
+          : `${p}: ${r.status()} ${await page.title()}`;
+      }));
+    }
+    assert.deepEqual(got, STATUSES.flatMap(s => FRAMINGS.map(f => `/${s}/${f}: ${s} Error ${s}`)));
+  } finally { errors.close(); }
+});
+
+test('browser (real): a plain-http site the proxy can\'t reach fails as a connection error, not as an error page', { skip, timeout: 60000 }, async () => {
+  settings.set('browser', { allowPrivate: true });
+  fakeDns('127.0.0.1');
+  const asked = [];
+  const hangUp = await listen(net.createServer(socket => socket.once('data', d => { // reads the request, closes without a word
+    asked.push(/^GET (\S+)/.exec(String(d))?.[1]);
+    socket.destroy();
+  })));
+  try {
+    const got = []; // a tab of its own for each, as above
+    for (const p of ['/a', '/b', '/c']) {
+      got.push(await browser.withPage(page => page.goto(`http://gone.test:${hangUp.address().port}${p}`, { timeout: 15000 })
+        .then(r => `loaded ${r.status()}`, e => /net::ERR_\w+/.exec(e.message)?.[0] || e.message.split('\n')[0])));
+    }
+    assert.deepEqual(got, ['net::ERR_EMPTY_RESPONSE', 'net::ERR_EMPTY_RESPONSE', 'net::ERR_EMPTY_RESPONSE']);
+    // Each was tried, and at most once more: Chromium sends a request again when a connection it opened ahead of time
+    // closes before answering. Never more (after a reset, it would take the proxy for broken and try yet again).
+    for (const p of ['/a', '/b', '/c']) {
+      const n = asked.filter(a => a === p).length;
+      assert.ok(n >= 1 && n <= 2, `${p} reached the site ${n} times (${asked.join(' ')})`);
+    }
+  } finally { hangUp.close(); }
 });
