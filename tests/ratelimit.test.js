@@ -112,16 +112,22 @@ test('sign-in limits survive a real restart of the server', async () => {
   const start = () => new Promise((resolve, reject) => {
     const child = spawn(process.execPath, ['server.js'], { cwd: path.join(import.meta.dirname, '..'), env, stdio: ['ignore', 'pipe', 'pipe'] });
     let out = '';
-    const fail = why => { clearTimeout(hang); child.kill(); reject(new Error(`${why}\n${out.slice(-2000)}`)); };
+    const fail = why => { clearTimeout(hang); child.off('exit', exited); child.kill(); reject(new Error(`${why}\n${out.slice(-2000)}`)); };
+    const exited = code => fail(`the server exited (code ${code}) before it was listening`);
     const hang = setTimeout(() => fail('the server did not say it was listening within 3 minutes'), 180_000);
     child.stderr.on('data', d => { out += d; });
     child.stdout.on('data', d => {
       out += d;
-      if (/\[jessbot\] listening on /.test(out)) { clearTimeout(hang); child.removeAllListeners('exit'); resolve(child); }
+      if (/\[jessbot\] listening on /.test(out)) { clearTimeout(hang); child.off('exit', exited); resolve(child); }
     });
-    child.once('exit', code => fail(`the server exited (code ${code}) before it was listening`));
+    child.once('exit', exited);
   });
-  const stop = child => new Promise(r => { child.once('exit', r); child.kill(); });
+  // A child that has already exited (a start that failed) resolves at once: waiting for its 'exit' would wait forever.
+  const stop = child => new Promise(r => {
+    if (!child || child.exitCode !== null || child.signalCode !== null) return r();
+    child.once('exit', r);
+    child.kill();
+  });
   const login = () => fetch(`http://127.0.0.1:${port}/api/v1/auth/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email: 'owner@ratelimit.test', password: 'wrong password!' }) }).then(r => r.status);
   let child = await start();
