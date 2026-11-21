@@ -123,7 +123,8 @@ test('browser (real): plain-http error pages load through the request guard and 
   const seen = [];
   const errors = await listen(http.createServer((req, res) => {
     seen.push(req.url);
-    const [, status, framing] = /^\/(\d{3})\/(\w+)$/.exec(req.url) || [null, '404', 'length'];
+    // The page is built from this test's own constants, never from the request's text.
+    const [status, framing] = STATUSES.flatMap(s => FRAMINGS.map(f => [s, f])).find(([s, f]) => req.url === `/${s}/${f}`) || [404, 'length'];
     const head = `<title>Error ${status}</title>`, rest = `<p>The site's own ${status} page.</p>`;
     if (framing === 'length') {
       res.writeHead(Number(status), { 'content-type': 'text/html; charset=utf-8', 'content-length': Buffer.byteLength(head + rest) });
