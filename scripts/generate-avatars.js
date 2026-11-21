@@ -405,7 +405,7 @@ function backgroundJobs(args) {
 async function main() {
   const args = parseArgs(process.argv.slice(2));
   const key = devModelKey();
-  if (!key) throw new Error('No model key: set OPENROUTER_KEY, or add it in a local install (setup or Admin → Model).');
+  if (!key) throw new Error('No model key: set OPENROUTER_KEY, or add it in a local install (setup or Admin → Models).');
 
   const mode = args.covers ? 'covers' : args.backgrounds ? 'backgrounds' : 'avatars';
   const dir = { covers: COVER_DIR, backgrounds: BG_DIR, avatars: AVATAR_DIR }[mode];

@@ -4,6 +4,9 @@
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#faf9f7" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#111113" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/img/app/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-title" content="{{bot.name}}">
 {{#if presence.avatarBase}}<link rel="icon" href="{{presence.avatarBase}}/neutral-256.webp" type="image/webp">{{else}}<link rel="icon" href="/img/favicon.svg" type="image/svg+xml">{{/if}}
 {{!-- Resolve theme + shell state before first paint so nothing flashes or jumps on refresh. --}}
 <script nonce="{{nonce}}">

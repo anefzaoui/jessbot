@@ -77,6 +77,10 @@ only (no model call in prompt assembly), so the same text always renders the sam
 - **Idle:** the cache is cold (idle > 30 min) and the verbatim region is over 60K.
 - **Hard:** the next request would exceed 200K. Compact synchronously first.
 - **Manual:** the "Compact now" button.
+- **A small known window** (Ollama reports the context it loaded the model with; decision #252): the soft trigger is
+  90 % of the window less 2K for the reply, the hard one the window less 2K (counting the tool list too), and the
+  verbatim tail is 8 % of the window with at least 6 messages under 64K. The instructions and the tool list (about 25K)
+  can't be folded, so on a 32K window compaction runs often; a bigger window helps long chats.
 
 **Procedure:**
 1. **Cut.** Keep a verbatim tail of about 30K tokens or at least 20 messages. Align the cut to a turn boundary where no tool call is open and no approval or question is pending.

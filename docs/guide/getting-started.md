@@ -95,6 +95,15 @@ By default Jessbot only answers on this computer (`127.0.0.1`). To reach it from
 
 The layout adapts to a phone screen, with the main sections in a bar at the bottom.
 
+### On the home screen
+
+Jessbot can sit on a phone's home screen, or in a computer's app list, like an app: with the assistant's name, its
+picture as the icon, and a window of its own without the browser's address bar. In Chrome or Edge, use **Install app**
+(or **Add to Home screen**) in the browser's menu; in Safari on an iPhone or iPad, **Share → Add to Home Screen**.
+Browsers only offer a full install over HTTPS (behind a reverse proxy) or on the computer Jessbot runs on; on a plain
+`http://` address on your home network you may only get a shortcut that opens in the browser. It is still the same web
+page: nothing is stored on the phone, and you sign in as usual.
+
 ### Notifications
 
 Alarms, reminders and messages the assistant starts on its own can reach your phone. Turn them on per device in

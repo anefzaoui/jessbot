@@ -8,7 +8,7 @@
     </h2>
     <div class="space-y-3">
       {{#each approvals.pending}}{{> approval-card this}}{{else}}
-        {{> empty-state iconName="shield-check" title="Nothing needs your OK" text="Buying, sending, deleting or visiting unfamiliar sites always stops here first. You can change what needs approval in your profile." compact=true}}
+        {{> empty-state iconName="shield-check" title="Nothing needs your OK" text="Sending, buying, booking, deleting or sharing always stops here first. “Always allow” on a card stops the asking for that action; an admin can take it back on your page in Admin → People." compact=true}}
       {{/each}}
     </div>
   </section>

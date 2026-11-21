@@ -12,6 +12,7 @@ Tick items only when they work end to end. `Phase` refers to the build plan in A
 ## Chat — "one god thread"
 - [x] One main thread per user, messaging-app feel; the agent is visible at the top (avatar + name) [T2][T1] — P3
 - [x] Side chats as exceptions to the main thread (create, rename, delete) [T1] — P3
+- [x] **On the home screen**: a web app manifest (the assistant's name, the logo or its look's portrait), so Jessbot installs on a phone's home screen or as a desktop app where the browser allows it (HTTPS or localhost) [U] — #55 (decision #253)
 - [x] **Off the record** side chats: nothing from them becomes a memory; `remember` only on an explicit ask [U] — P18 server side (#123); the switch in a side chat's header (and its menu on phones) with a chip while it's on — P25 (#175)
 - [~] Talk about anything *and* delegate tasks (buy tickets, plan a family weekend, bookings) [T2][T1] — P3/P5 (research, compare, plan, build pages, schedule; paying/booking stays with the person — spend actions always ask)
 - [x] **Delegate to the background**: "research this in the background" → Jess starts it in its own side chat ("Working on: …", its own browser tab, the same approvals and spending limits, its own Stop) so the chat stays free, and posts a one-line result with a link back when it's done (plus a notification); at most 2 at once per person; never started after a page or email tried to instruct her [R] — P22 server side (#197); the link to the side chat stays visible on the reply, the post-back has its badge, the side chat opens with what it was asked (folded) and a link back to where it started, and the rail marks it — P25 (#212)
@@ -163,7 +164,7 @@ Tick items only when they work end to end. `Phase` refers to the build plan in A
 
 ## Usage
 - [x] Generous, visible usage: per-user budget meter, cost per task [T1][R] — P3/P9 (You → Usage, Admin → Usage)
-- [x] Cheapest model that works; model-agnostic (fixes Muse's "no frontier models") [T1][U] — P3 (Admin → Model: any OpenAI-compatible endpoint)
+- [x] Cheapest model that works; model-agnostic (fixes Muse's "no frontier models") [T1][U] — P3 (Admin → Models: any OpenAI-compatible endpoint)
 - [x] **Fallback models, a background model, the balance**: up to 3 fallback models answer when the main one is down or busy
   (OpenRouter `models`, each tested when saved; usage records the model that answered, "Answered by a fallback N×"); an
   optional cheaper model for summaries, memory, the feed and goals, retried once on the main model when it fails; the
@@ -202,7 +203,7 @@ Tick items only when they work end to end. `Phase` refers to the build plan in A
 - [x] **What's new in Jess**: each release's commits drafted into 3–6 plain lines, edited and published by the admin, shown once
   per person [R] — P23 server side (#210); the editor on Admin → System and the card above the main chat's composer — P25 (#213)
 - [x] First-time setup wizard [U] — P2
-- [~] Onboarding customisation: instance name (knows it is a Jessbot, original name Jess), short description, avatar variant, tone → SOUL.md [U] — P2 (done; portrait images pending P1b)
+- [~] Onboarding customisation: instance name (knows it is a Jessbot, original name Jess), short description, avatar variant, tone → SOUL.md [U] — P2 (done; the portraits too: P1b, #7)
 - [x] Context management: per-message/tool-result summaries, compaction, never-out-of-control context; memory tiers (design from research) [U] — P3
   (the summary's open tasks say done-and-confirmed, only claimed, or still to do: done only when a tool result confirms it — P22, #198)
 - [~] **Memory that works as documented**: recall by meaning and in any language (words + vectors, RRF), no near-duplicate

@@ -1,7 +1,7 @@
 // Secrets Jessbot keeps for itself (#10): the model provider's key and the Web Push private key, sealed with the install's
 // key (lib/secrets.js) in the database, instead of in plain text in .env next to that key. A key the operator sets in the
 // real environment (Docker's `environment`, systemd's `Environment=`) is theirs: it is used as it is and never stored.
-// migrateEnvSecrets() moves the ones written into .env (by setup, Admin → Model, or by hand) into the database at start.
+// migrateEnvSecrets() moves the ones written into .env (by setup, Admin → Models, or by hand) into the database at start.
 import path from 'node:path';
 import { settings } from '../db/index.js';
 import { ENV_FILE, ROOT, paths, config } from '../config/index.js';

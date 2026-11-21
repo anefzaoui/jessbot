@@ -177,7 +177,10 @@ here were taken on the maintainer's machine and network.
       frames": blink, glance-left/right, listening), smooth expression transitions (crossfade, never hard swap).
     - Reacts: listening while the user types; momentary expressions on events (MOMENTS: done→proud,
       thanks→happy, problem→concerned, clarifying→confused); activity drives the base expression; sleepy at
-      night / offline. Respects prefers-reduced-motion (then only gentle crossfades on state change).
+      night / offline. Respects prefers-reduced-motion (then only gentle crossfades on state change). As built
+      (checked for #55): the moments are done → proud, greeting and delighted → happy, clarifying → confused,
+      surprise → surprised (`public/js/activities.js`); there is no thanks moment, and a problem shows through the
+      activity's face instead (error → apologetic, waiting for them → concerned).
     - Lives in a place and time: scene = local time of day × weather; greetings and small remarks grounded in
       the real moment (time, weather, schedule), never generic.
     - Visible inner life: a presence line ("Checking the rain radar for your 5pm run…") + timeline that moves
@@ -3996,6 +3999,55 @@ Note: most of Phase 23 part A landed in commit aa56076, whose message reads "Pha
     version had day white in the light theme; the page showed through and read as clutter) (docs/DESIGN.md →
     Website). A gallery link still opens the picture with no script. The build gives gallery and guide pictures their
     width and height (read from the WebP), so they keep their place while they load and open at the right size.
+
+## 2026-11-20: Ollama's context window (#69)
+
+252. **With Ollama, Jessbot measures the model's context window against its own prompt and says what to set, instead
+    of running on a cut prompt.** Tested with a real Ollama (qwen2.5:7b, an 8 GB RTX 4060): Ollama's default context
+    there is 4,096 tokens, Jessbot's prompt with its tool list about 24,600, and Ollama doesn't refuse a longer prompt:
+    it drops the start (`truncating input prompt limit=2050 prompt=24599`). The model then saw neither its instructions
+    nor most tools, made 41 tool calls in 248 s for "what can you help me with?" and answered "…", while the connection
+    test (a tiny prompt) passed. The context is set on the Ollama server: `num_ctx` sent with a request to the
+    OpenAI-compatible endpoint Jessbot uses (top level or under `options`) changed nothing (Ollama's `/api/ps` still
+    reported the server's context), and a model loaded with a larger `num_ctx` through the native API is reloaded at the
+    server's setting by the next `/v1` request, so Jessbot doesn't send it and the guide says what to set
+    (`OLLAMA_CONTEXT_LENGTH=32768`, or a Modelfile's `num_ctx`; on an 8 GB card also `OLLAMA_FLASH_ATTENTION=1` and
+    `OLLAMA_KV_CACHE_TYPE=q8_0`, which brought the 32K model back onto the GPU: the issue measured about 1,700 prompt and
+    33 reply tokens a second, and the recheck here had the whole model and its context on the card, 5.6 GB). What Jessbot does (`src/services/context-fit.js`): the connection test (setup, Admin → Models) reads the
+    context Ollama loaded the model with (`/api/ps`, right after the test call loaded it; else a Modelfile's `num_ctx`
+    from `/api/show`) and the model's trained length, compares them with this admin's own prompt (instructions and tool
+    list, o200k-counted) plus 2,048 tokens for the reply, and shows a warning under "Connected" with what to set (also
+    when Ollama doesn't say, or the window is under the advised 32,768). Before each model call of a run, a known window
+    too small for the request stops the run with that advice (no model call); after each call, an Ollama that reports
+    reading under half of what was sent (and at least 4,000 tokens were sent) stops the run before any tool it asked for
+    runs. Other providers aren't judged this way: hosted services refuse a too-long prompt with an error, and other
+    tokenizers count differently. Streams to every provider but OpenRouter now ask for their usage
+    (`stream_options.include_usage`), which Ollama otherwise leaves out and which compaction and budgets read too.
+    Compaction follows a small known window (90 % of it less the reply's room, a verbatim tail of 8 %, at least 6
+    messages under 64K; docs/CONTEXT-AND-MEMORY.md). The agent eval takes `--base-url` and `--model`, so it runs against
+    Ollama without the OpenRouter key being read or sent.
+
+## 2026-11-20: The docs and the code agree; a web app manifest (#55)
+
+253. **Where the docs and the code disagreed, the one that was wrong changed; the missing manifest was built.** Found
+    while writing the user guide (#54), checked against the code: (1) the doctor's old advice that the install key
+    "travels with the backup" was already gone (#10's sealing work); the key still isn't in backups, on purpose (a
+    backup file alone can't open saved passwords), and Admin → System → Backups now says so beside **Download**, as the
+    guide and `.env.example` do. (2) The model's address and name live in the database once setup or Admin → Models saves
+    them; `LLM_BASE_URL` / `LLM_MODEL` in `.env` only fill in the setup page. One source of truth, the one the picker
+    (#11) writes; `.env.example` and the guide say so. (3) `HOST=0.0.0.0` is for other devices on the home network (the
+    README and the guide were right); behind a reverse proxy on the same machine the loopback default stays, so
+    `.env.example` changed. (4) The approvals page's empty state pointed at an approvals control "in your profile" that
+    doesn't exist; it now names what does ("Always allow" on a card, which an admin can take back on the person's page).
+    (5) The doctor and the comments say Admin → Models, the tab's name, and the doctor asks for the key of the provider
+    in use, not always OpenRouter's. (6) FEATURES.md no longer calls the portraits pending, and decision #33 notes the
+    moments as built. (7) The manifest: `GET /manifest.webmanifest`, served before setup and sign-in (browsers fetch it
+    without the session cookie), names the assistant (the page title's own default, "Jessbot", before the identity step)
+    and nothing else about the install; its icons are the logo from #39 (`public/img/app/`, copies of
+    docs/images/brand's, since the Docker image doesn't carry docs/) for the default look, or the chosen look's neutral
+    portrait, never an uploaded picture (those are served behind sign-in). `display: standalone`, start and scope `/`.
+    The push-only service worker (#85) is unchanged: no offline caching, the app is always served fresh. Browsers offer
+    a full install only over HTTPS or on localhost, and the guide says so.
 
 ## 2026-11-20: Node 26; playwright-core and patchright-core in step (#43)
 

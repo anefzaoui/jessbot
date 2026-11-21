@@ -18,7 +18,7 @@
     <div class="mb-3 flex flex-wrap items-center gap-3">
       <div class="min-w-0 flex-1">
         <h2 id="h-backups" class="text-sm font-semibold">Backups</h2>
-        <p class="text-xs text-ink-3">Everything people made and saved (conversations, memories, library, goals, feed, settings) in one file. A new one is made every day and kept for a week. Sign-in cookies are never included.</p>
+        <p class="text-xs text-ink-3">Everything people made and saved (conversations, memories, library, goals, feed, settings) in one file. A new one is made every day and kept for a week. Sign-in cookies are never included, and neither is the install key (<span class="font-mono">JESSBOT_SECRET</span> in <span class="font-mono">.env</span>, or its key file): keep a copy of it with your downloads, or a restored install can’t open saved passwords.</p>
       </div>
       <button type="button" class="btn btn-primary btn-sm" data-backup-now>{{icon "archive" class="size-3.5"}} Back up now</button>
     </div>

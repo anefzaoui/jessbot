@@ -1,4 +1,4 @@
-// Model connection form (setup wizard and Admin → Model): save the settings, run one tiny real call, show the result
+// Model connection form (setup wizard and Admin → Models): save the settings, run one tiny real call, show the result
 // inline. <form data-model-test action="…"> with [data-test-button], [data-test-result]; optional [data-continue] is
 // enabled once it connects (setup), [data-key-field] / [data-show-key-field] swap in a new key.
 // Admin → Models (Phase 25 #203): a cancelable `model:before-save` on the form lets admin-models.js hold the save (a fallback
@@ -7,6 +7,7 @@
 import { $, $$, on, api, withBusy, escapeHtml, icon } from './core.js';
 import { toast } from './toast.js';
 import { showErrors, clearErrors } from './forms.js';
+import { t } from './i18n.js';
 
 // The provider picker (#11, partials/setup/provider-fields.hbs): the chosen provider's fields and feature list show, its
 // usual address fills in (unless someone typed another), and with Ollama the installed models fill the model list.
@@ -32,7 +33,7 @@ function initProviderPicker(form) {
     if (!status) return;
     if (r.error) status.textContent = r.error;
     else if (!r.models.length) status.textContent = 'Ollama has no chat models yet. Pull one that can call tools, for example: ollama pull qwen2.5:7b';
-    else status.textContent = `Installed: ${r.models.join(', ')}. Pick one that can call tools, 7B or larger.`;
+    else status.textContent = `Installed: ${r.models.join(', ')}. Pick one that can call tools, 7B or larger, and start Ollama with OLLAMA_CONTEXT_LENGTH=32768.`;
   }
 
   function show(id, picked) {
@@ -59,6 +60,17 @@ function initProviderPicker(form) {
   if (current) show(current, false);
 }
 
+// Ollama's context window against Jessbot's prompt (#69): a too-small one connects fine and then cuts every real prompt, so
+// the test says so beside "Connected", with what to set on the server (the server writes the sentence).
+function contextNote(c) {
+  if (!c?.warning) return '';
+  const bad = c.fits === false;
+  const title = bad ? t('The context window is too small') : t('Check the context window');
+  return `<div class="mt-3 rounded-xl border border-warn/40 bg-warn-soft px-4 py-3 text-sm animate-rise" ${bad ? 'role="alert"' : ''} data-context-warning>
+    <p class="flex items-center gap-2 font-semibold text-warn-text">${icon('triangle-alert')} ${escapeHtml(title)}</p>
+    <p class="mt-1 text-ink-2">${escapeHtml(c.warning)}</p></div>`;
+}
+
 export function initModelTest() {
   const form = $('[data-model-test]');
   if (!form || form.dataset.bound) return; // setup pages load both main.js and setup.js
@@ -80,7 +92,8 @@ export function initModelTest() {
         if (r.ok) {
           result.innerHTML = `<div class="mt-3 rounded-xl border border-ok/30 bg-ok-soft px-4 py-3 text-sm animate-rise">
             <p class="flex items-center gap-2 font-semibold text-ok">${icon('circle-check')} Connected in ${(r.ms / 1000).toFixed(1)}s</p>
-            <p class="mt-1 text-ink-2">${escapeHtml(r.model)} replied “${escapeHtml(r.reply)}”${r.cost != null ? ` · cost $${Number(r.cost).toFixed(5)}` : ''}</p></div>`;
+            <p class="mt-1 text-ink-2">${escapeHtml(r.model)} replied “${escapeHtml(r.reply)}”${r.cost != null ? ` · cost $${Number(r.cost).toFixed(5)}` : ''}</p></div>`
+            + contextNote(r.context);
           if (r.llm?.maskedKey) { const k = $('[data-masked-key]'); if (k) k.textContent = r.llm.maskedKey; }
           const key = $('#f-apiKey', form);
           if (key) key.value = '';

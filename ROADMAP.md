@@ -85,6 +85,13 @@ Jessbot is an early preview: run it at home or on a private network, not on the 
   no layout shift between the hours
 - ✅ The site's screenshots open in [Vitrine](https://github.com/anefzaoui/vitrine), the owner's own lightbox (decision #251): they fly from their place and back, go through
   their group by keys and swipes, zoom and pan, close by Back too; light and dark, reduced motion, no layout shift
+- ✅ Local models: Ollama's context window checked against Jessbot's prompt, with what to set on the server; a cut
+  prompt stops the task instead of driving tools; the agent eval runs against Ollama
+  ([#69](https://github.com/anefzaoui/jessbot/issues/69))
+- ✅ The docs and the app agree: backups and the install key, where the model settings live, the `HOST` advice, the
+  approvals page's advice, the doctor's labels ([#55](https://github.com/anefzaoui/jessbot/issues/55))
+- ✅ Jessbot installs on a phone's home screen or as a desktop app (a web app manifest with the logo, under the
+  assistant's name) ([#55](https://github.com/anefzaoui/jessbot/issues/55))
 - ✅ Node.js 26 (the current LTS) in the Docker image and in CI next to 24; playwright-core and patchright-core kept in
   step, moving together when Patchright follows Playwright ([#43](https://github.com/anefzaoui/jessbot/issues/43))
 
@@ -92,16 +99,12 @@ Jessbot is an early preview: run it at home or on a private network, not on the 
 
 - 🔄 The last CodeQL alerts: fix the real ones, explain the rest, then close the issue
   ([#22](https://github.com/anefzaoui/jessbot/issues/22))
-- 🔄 Small mismatches between the docs and the code found while writing the user guide: backups and the `.env` file,
-  where the model settings live, the `HOST` advice, an empty state's advice and a label ([#55](https://github.com/anefzaoui/jessbot/issues/55))
 - 🔄 Translations: a translation layer for the interface and the first languages (the assistant already reads and
   writes many, right to left included) ([#14](https://github.com/anefzaoui/jessbot/issues/14))
 
 ## Planned
 
 - 📋 The first tagged release, 0.1.0, with its container image
-- 📋 Install Jessbot on a phone's home screen as an app (a web app manifest; the icons are ready), part of
-  [#55](https://github.com/anefzaoui/jessbot/issues/55)
 - 📋 A published container image for every release, and a Windows installer
 - 📋 Prices for model services other than OpenRouter, so budgets can count their spending
 - 📋 Voice and pictures with local models
