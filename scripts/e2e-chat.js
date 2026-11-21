@@ -346,15 +346,24 @@ try {
     } finally { await B.closeSession('t990001'); await closeBrowser(); closeDb(); }
   });
 
-  // Decision #164: npm run links:check opens sample searches and records the verdicts (data/, never git).
+  // Decision #164: npm run links:check opens sample searches and records the verdicts (data/, never git). This is the
+  // live run, against Google Maps and Crossref themselves: a broken recipe fails it, but a site that says no today
+  // (blocked) or a network error on the way (error) is the check doing its job, noted, not a failure (decision #257).
+  // Every verdict, ok or not, is proven against local sites in tests/links-check.test.js.
   await test('links:check (no model): samples open in the browser and the verdicts are saved', async () => {
     const { spawnSync } = await import('node:child_process');
-    const r = spawnSync(process.execPath, [path.join(ROOT, 'scripts', 'links-check.js'), 'google_maps', 'crossref'], {
+    const sites = ['google_maps', 'crossref'];
+    const r = spawnSync(process.execPath, [path.join(ROOT, 'scripts', 'links-check.js'), ...sites], {
       cwd: ROOT, env: { ...process.env, JESSBOT_HOME: HOME, JESSBOT_ENV_FILE: path.join(HOME, '.env') }, encoding: 'utf8', timeout: 180000 });
-    expect(r.status === 0, `exit ${r.status}: ${r.stdout}${r.stderr}`);
-    expect(/✓ google_maps\s+ok/.test(r.stdout) && /✓ crossref\s+ok/.test(r.stdout), `verdicts: ${r.stdout}`);
+    const said = `${r.stdout}${r.stderr}`.trim().replace(/\s*\n\s*/g, ' | '); // one line: test() prints only a message's first
+    expect(r.status === 0, `exit ${r.status}: ${said}`);
+    const verdicts = Object.fromEntries(sites.map(s => [s, new RegExp(`^\\s*\\S ${s}\\s+(ok|broken|blocked|error)\\s+[\\d.]+ s\\s+(.*)$`, 'm').exec(r.stdout)]));
+    expect(sites.every(s => verdicts[s]), `a site without a verdict: ${said}`);
+    expect(!sites.some(s => verdicts[s][1] === 'broken'), `a recipe stopped working (npm run links:check, then fix it in src/lib/deeplinks.js): ${said}`);
+    expect(sites.some(s => verdicts[s][1] !== 'error'), `no sample opened at all: ${said}`);
     const state = JSON.parse(fs.readFileSync(path.join(HOME, 'deeplinks-state.json'), 'utf8'));
-    expect(state.sites.google_maps?.status === 'ok' && state.sites.crossref?.status === 'ok' && state.checkedAt, `state: ${JSON.stringify(state)}`);
+    expect(state.checkedAt && sites.every(s => state.sites[s]?.status === verdicts[s][1]), `state: ${JSON.stringify(state)}`);
+    for (const s of sites.filter(x => verdicts[x][1] !== 'ok')) console.log(`      (${s}: ${verdicts[s][1]} today, ${verdicts[s][2]} — the site or the network, not the recipe)`);
   });
 
   // Decision #138: the local SearXNG (npm run searxng:install) — tested when the admin saves its address, then used first.

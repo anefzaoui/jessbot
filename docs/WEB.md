@@ -126,7 +126,8 @@ purpose — the query carries the home's coordinates).
 **`npm run links:check [-- site …]`** opens one sample search per site in the same browser and records the verdict in
 `<data>/deeplinks-state.json` (never git): **ok**, **broken** (an error status, the home page, an empty page, another site,
 no results) or **blocked** (a bot wall, or a whole site that refuses this browser — its home page fails too: the recipe
-may be fine). Only *broken* switches a recipe off: `open_search` then opens the site's own search page and tells Jess to
+may be fine), or **error** (this side: the browser didn't start, the page timed out, the browser couldn't reach its own
+guard proxy, or the computer is offline; the last verdict stays, decision #257). Only *broken* switches a recipe off: `open_search` then opens the site's own search page and tells Jess to
 use its form; a later *ok* switches it back on. It reads the database without migrating (safe with Jessbot running).
 First run here (2026-09-26): 27 of 34 ok; blocked: Skyscanner (PerimeterX), Google Shopping (bot check), Semantic Scholar
 (429), the Overpass instances (406 / no answer), and Amazon (amazon.fr's soft block, now a wall rule in `walls.js`), Jumia
