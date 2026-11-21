@@ -100,6 +100,9 @@ Jessbot is an early preview: run it at home or on a private network, not on the 
   a clock, so it passes on a slow machine (decision #256)
 - ✅ The ready-made search check is proven against local sites in the unit tests; the live run in the chat checks fails
   only on a recipe that stopped working, and says why in full (decision #257)
+- ✅ Plain-http sites through the browser's guard: their own error pages load, and one that can't be reached is a
+  connection error, never an error page the site didn't send ([#81](https://github.com/anefzaoui/jessbot/issues/81),
+  decision #258)
 - ✅ The command-line tools on a data folder that was never set up: a clear message and how to point them at an
   instance, no stack trace, nothing created there ([#82](https://github.com/anefzaoui/jessbot/issues/82), decision #259)
 

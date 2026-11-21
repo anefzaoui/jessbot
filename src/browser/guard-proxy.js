@@ -4,6 +4,11 @@
 // move the connection onto this machine or the local network. HTTPS and WebSockets arrive as CONNECT tunnels (the proxy
 // sees only host and port, never the content); plain http:// requests are forwarded.
 //
+// The proxy never answers in a site's name (decision #258). When it can't reach or refuses a plain-http site, it closes
+// the browser's connection without an answer (net::ERR_EMPTY_RESPONSE), the way a CONNECT it can't complete fails the
+// tunnel (net::ERR_TUNNEL_CONNECTION_FAILED): an empty 502 or 403 of its own passed for the site's error page, which
+// Chromium replaces with net::ERR_HTTP_RESPONSE_CODE_FAILURE (issue #81).
+//
 // Only this process's browser may use it: it listens on 127.0.0.1, on a port the system picks, and asks for a random
 // per-process credential (Playwright answers the proxy's 407 with it).
 import http from 'node:http';
@@ -73,6 +78,10 @@ function endToEnd(raw) {
 }
 
 function onRequest(req, res) {
+  // A site it can't reach or refuses gets no answer at all, only a closed connection (decision #258; not a reset, which
+  // Chromium takes for a broken proxy and sends again). One request per connection: Chromium sends a request again, once,
+  // when a connection it reused closes before answering, so this leaves only the ones it opened ahead of time.
+  res.shouldKeepAlive = false;
   if (!authorized(req)) { res.writeHead(407, { 'Proxy-Authenticate': 'Basic realm="jessbot"' }); return res.end(); }
   let url;
   try { url = new URL(req.url); } catch { res.writeHead(400); return res.end(); }
@@ -80,7 +89,7 @@ function onRequest(req, res) {
   const headers = endToEnd(req.rawHeaders);
   const allowPrivate = localNetworkAllowed();
   const h = url.hostname.replace(/^\[|\]$/g, '');
-  if (!allowPrivate && net.isIP(h) && isPrivateIp(h)) { refused++; res.writeHead(403); return res.end(); } // an IP literal skips the lookup
+  if (!allowPrivate && net.isIP(h) && isPrivateIp(h)) { refused++; return res.destroy(); } // an IP literal skips the lookup
   const up = http.request({
     host: url.hostname.replace(/^\[|\]$/g, ''), port: url.port || 80, method: req.method, path: `${url.pathname}${url.search}`, headers,
     lookup: checkedLookup({ allowPrivate }), agent: false, timeout: CONNECT_TIMEOUT,
@@ -92,7 +101,7 @@ function onRequest(req, res) {
   up.on('timeout', () => up.destroy(new Error('timeout')));
   up.on('error', err => {
     if (err.code === 'EBLOCKED') refused++;
-    if (!res.headersSent) { res.writeHead(err.code === 'EBLOCKED' ? 403 : 502); res.end(); } else res.destroy();
+    res.destroy(); // before the headers: no answer; after: a cut-off body
   });
   req.pipe(up);
 }

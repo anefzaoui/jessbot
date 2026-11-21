@@ -43,6 +43,9 @@ in their chat.
   discovery load the first time they're needed.
 - `npm run links:check` says **error**, not "blocked by the site", when the browser couldn't reach a data site from
   this computer (its own proxy, no internet), and keeps the last verdict; the reason is in the line it prints.
+- A plain-`http://` site the browser couldn't reach reads as "I couldn't connect to that site", not as the site
+  answering with an error page that then failed to load (`ERR_HTTP_RESPONSE_CODE_FAILURE`); sites' own error pages
+  load through the browser's guard as they are.
 - The command-line tools (`links:check`, `doctor`, `db:status`, `db:backup`, `reset-link`, `secrets:rotate`) pointed
   at a data folder with no Jessbot set up in it say so, with how to point them at one (`JESSBOT_HOME`), instead of
   stopping with a stack trace, and leave the folder alone (no database, no folders made there).

@@ -4133,6 +4133,32 @@ Note: most of Phase 23 part A landed in commit aa56076, whose message reads "Pha
     sometimes fails with `net::ERR_HTTP_RESPONSE_CODE_FAILURE` instead of loading (36 of 40 navigations to a local 429
     page; none over https, none without the request interception); every recipe is https.
 
+## 2026-11-21: The guard proxy never answers in a site's name (#81)
+
+258. **When the guard proxy can't reach or refuses a plain-http site, the browser gets no answer at all, not an empty
+    502 or 403 of the proxy's own.** #257 found plain-`http://` error pages failing through the guard proxy with
+    `net::ERR_HTTP_RESPONSE_CODE_FAILURE` (36 of 40 navigations to a local 429 page). Measured again with the proxy
+    logging each request: every failed navigation was one where the proxy's own connection to the site failed (`connect
+    ETIMEDOUT 127.0.0.1`, about 300 ms, the maintainer's machine dropping loopback connections; a plain Node loop of 500
+    connections, no browser, failed 436 times in the same hour), and the request guard made no difference once
+    measured more than once (24 of 40 failed without it). The site's own error page loads every time the site is
+    reached, whatever its framing. The defect is how the failure looked: for plain http the proxy answered a failed
+    connection with an empty 502 (and a refused one with an empty 403), so the browser took it for the site's answer,
+    and Chromium replaces an empty error answer with its own page and fails the navigation with
+    `ERR_HTTP_RESPONSE_CODE_FAILURE`. A site that couldn't be reached read as a site that answered an error; the next
+    navigation in the same tab was then often "interrupted by another navigation" (the error page arriving). Over https
+    the same failure was already a failed tunnel (`ERR_TUNNEL_CONNECTION_FAILED`). Now `guard-proxy.js` closes the
+    browser's connection without a word for a plain-http site it can't reach or refuses: the navigation fails with
+    `net::ERR_EMPTY_RESPONSE`, which `web_read` reports as "I couldn't connect to that site" (as it now does for
+    `ERR_TUNNEL_CONNECTION_FAILED`), never with a status the site didn't send. Not a reset: Chromium takes `ERR_CONNECTION_RESET` from a proxy for a broken proxy and sends every request
+    twice. Every plain-http answer closes its connection (`Connection: close`), because Chromium also sends a request
+    again when a connection it reused closes before answering; it still does once for a connection it opened ahead of
+    time, so a site can be tried twice, never more. CONNECT tunnels are unchanged. Tested: `tests/browser-proxy.test.js`
+    loads 400, 403, 404, 410, 429, 500, 502 and 503 pages, with a length and streamed, through the request guard and
+    the proxy (each failure says whether the site got the request at all), and a site that takes the connection and
+    says nothing fails as `ERR_EMPTY_RESPONSE`, each address tried once or twice; the proxy's raw answers for refused
+    plain-http requests are no answer at all.
+
 ## 2026-11-21: Command-line tools on a data folder that was never set up (#82)
 
 259. **The tools that work on an existing Jessbot refuse a data folder that was never set up, with a message, and create

@@ -344,7 +344,8 @@ function friendly(err) {
   if (/ERR_NAME_NOT_RESOLVED/.test(m)) return new Error('That site doesn’t exist (the address didn’t resolve).');
   if (/ERR_BLOCKED_BY_CLIENT/.test(m)) return new Error('That address is on a private or local network — I only browse the public web.');
   if (/Timeout|ERR_TIMED_OUT/.test(m)) return new Error('The page took too long to load.');
-  if (/ERR_CONNECTION|ERR_ADDRESS|ERR_SSL|ERR_CERT/.test(m)) return new Error(`I couldn’t connect to that site (${(m.match(/net::(\w+)/) || [])[1] || 'connection error'}).`);
+  // The guard proxy couldn't reach the site: ERR_TUNNEL_CONNECTION_FAILED (https), ERR_EMPTY_RESPONSE (http; decision #258).
+  if (/ERR_CONNECTION|ERR_ADDRESS|ERR_SSL|ERR_CERT|ERR_TUNNEL_CONNECTION_FAILED|ERR_EMPTY_RESPONSE/.test(m)) return new Error(`I couldn’t connect to that site (${(m.match(/net::(\w+)/) || [])[1] || 'connection error'}).`);
   return new Error(m.split('\n')[0]);
 }
 
