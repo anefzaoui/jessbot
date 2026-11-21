@@ -164,6 +164,7 @@ registerTool({
 const PILOT_OUTCOMES = {
   done: 'DONE (its claim — check the page below before telling the person)',
   blocked: 'BLOCKED', unsure: 'HANDED BACK (unsure)', needs_ok: 'NEEDS THE PERSON’S OK', needs_info: 'NEEDS INFORMATION',
+  failed: 'FAILED (its typing model: tell the person which model and where an admin changes it)',
   stuck: 'STUCK', budget: 'OUT OF STEPS', stopped: 'STOPPED',
 };
 registerTool({
@@ -197,7 +198,8 @@ registerTool({
     const text = `AUTOPILOT: ${PILOT_OUTCOMES[out.outcome] || out.outcome} after ${out.history.length} action${out.history.length === 1 ? '' : 's'} `
       + `in ${(out.ms / 1000).toFixed(1)} s. ${oneLine(out.why, 300)}\nWhat it did:\n${steps}\n\nPage: ${oneLine(await page.title(), 160)} — ${page.url()}\n\n${B.SNAPSHOT_MARK}\n${await B.snapshot(s)}`;
     const shown = await done(text, s, ctx, 'browser_autopilot');
-    shown.step.detail = `${out.history.length} steps in ${(out.ms / 1000).toFixed(1)} s · ${PILOT_OUTCOMES[out.outcome]?.split(' (')[0].toLowerCase() || out.outcome}`;
+    shown.step.detail = out.detail ? oneLine(out.detail, 200) // the typing model failed: which one and where to change it (#255)
+      : `${out.history.length} steps in ${(out.ms / 1000).toFixed(1)} s · ${PILOT_OUTCOMES[out.outcome]?.split(' (')[0].toLowerCase() || out.outcome}`;
     return shown;
   }),
 });

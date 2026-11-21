@@ -1387,7 +1387,7 @@ test('md editor: the highlight layer colours markdown and keeps every character 
 test('decisions: settings validate; off means null (callers fall back); the autopilot and fast steps read pages correctly', async () => {
   const D = await import('../src/services/decide.js');
   assert.equal(D.decideSettings().model, 'typesafe/jev-1.13');
-  assert.equal(D.decideSettings().textModel, 'inception/mercury-2.5');
+  assert.equal(D.decideSettings().textModel, 'anthropic/claude-haiku-5.5');
   assert.equal(D.saveDecideSettings({ confidence: '0.7', uses: { checkin: false } }).confidence, 0.7);
   assert.equal(D.decideSettings().uses.checkin, false);
   assert.throws(() => D.saveDecideSettings({ confidence: 0.33 }), /Confidence/);

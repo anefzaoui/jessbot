@@ -40,7 +40,7 @@ off, error, timeout or unsure → exactly what Jess did before. Every call is lo
 | Page state | `browser/session.js` `judgePage` (runs alongside the snapshot) | content / results / form / bot wall / login / cookie panel / paywall / error / confirmation + did the last action progress | the regex checks and the unchanged-page counter |
 | Spend & send check | `agent/tools/browse.js` `riskCheck` → `policy.decide({ raised })` | would this click pay, book or send? (any language, icon buttons; raises at ≥ 60%, and "search" is its own answer — without it a Wikipedia search read 0.51 "send") | the regex; **it can only add an ask** |
 | Fast steps | `agent/fast-steps.js` (loop, before a model step) | the obvious next click/scroll on the page she's working (≤ 4 in a row) | the full model takes the step |
-| Autopilot | `browser_autopilot` tool → `agent/autopilot.js` + `browser/pilot.js` | drives a whole goal: operation + per-operation target each step; Mercury writes typed text | hands back (unsure, stuck, missing value, pays/sends) |
+| Autopilot | `browser_autopilot` tool → `agent/autopilot.js` + `browser/pilot.js` | drives a whole goal: operation + per-operation target each step; the typing model (`decide.textModel`) writes typed text | hands back (unsure, stuck, missing value, pays/sends) |
 | Story relevance | `services/feed-relevance.js` (ticks, digests) → `feed-rank.js` | would they want this story, given what they asked the feed for? | ranking without it |
 | Injection check (Safety, #120) | `agent/injection.js` `detect` (inside `guardOutside`, only after a stage-1 pattern matched visible outside text; one verdict per run and excerpt) | is this excerpt written to instruct an AI (act, change its instructions, hide something from its user), or ordinary text for people (a person asking a person, an article about AI)? A noul; the warning stays unless the answer is a clear no (below 1 − the bar) | the pattern stands: the warning goes in, the run is tainted-high, the audit event is written |
 
@@ -58,12 +58,17 @@ page it hands back.
 - **Decide** (`agent/autopilot.js`, ported `model.py`): one request per page state — `operation` choice (CLICK /
   TYPE_TEXT / SELECT / SCROLL / WAIT / DONE / BLOCKED) plus a speculative target question per operation; instructions
   carry the goal and jev-ultrafast's next-step rules; only the chosen operation's target is used.
-- **Text**: a small LLM (`inception/mercury-2.5`, setting `decide.textModel`) returns `{ "text": … }` for the field, or
-  null when the goal lacks the value (→ hand back "needs information"). Never invents personal data.
+- **Text**: a small LLM (`anthropic/claude-haiku-5.5` by default, setting `decide.textModel`, Admin → Models → Quick
+  decisions → "Writes what the autopilot types") returns `{ "text": … }` for the field, or null when the goal lacks the
+  value (→ hand back "needs information"). Never invents personal data. When the call itself fails (the provider no
+  longer serves the model, a 404; a refusal; a timeout) the run stops as **failed**, naming the model and that setting,
+  and the failure shows in the server log and in Admin → Models → recent decisions; a new typing model is saved only
+  after it answered a tiny call (decision #255). jev-ultrafast used Inception's Mercury, which OpenRouter stopped
+  serving in November 2026.
 - **Act safely**: before input, the target is re-checked (same page key, same node + nearby context, visible, enabled,
   not covered at its centre) and clicked at its current position; fill = click, select-all, insert text. After input:
   two animation frames (autocomplete waits up to 200 ms for options).
 - **Bounds**: 30 actions, 60 decisions, 2 minutes; stops after three no-change actions or three "page changed" retries in a row (#112); hand-back below 35% — a target
   also counts as clear at ≥ 20% and twice the runner-up (the guardrails don't depend on it).
 - Measured 2026-09-25 (CloakBrowser): Google Flights "one-way Zurich → London on October 3, 2026, 1 adult,
-  economy" — 13 actions, **11.6 s**, correct results; ~$0.004 including the two Mercury calls.
+  economy" — 13 actions, **11.6 s**, correct results; ~$0.004 including the two calls to the typing model (Mercury then).

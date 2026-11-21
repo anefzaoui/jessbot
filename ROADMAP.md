@@ -94,6 +94,8 @@ Jessbot is an early preview: run it at home or on a private network, not on the 
   assistant's name) ([#55](https://github.com/anefzaoui/jessbot/issues/55))
 - ✅ Node.js 26 (the current LTS) in the Docker image and in CI next to 24; playwright-core and patchright-core kept in
   step, moving together when Patchright follows Playwright ([#43](https://github.com/anefzaoui/jessbot/issues/43))
+- ✅ The browser autopilot types with Claude Haiku 5.5 now that Inception's Mercury is gone; a typing model that fails
+  is named, with where to change it, instead of passing for a missing value (decision #255)
 - ✅ A faster start (tool-only libraries load on first use), and a restart test that waits for the server instead of
   a clock, so it passes on a slow machine (decision #256)
 

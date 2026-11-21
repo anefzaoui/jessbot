@@ -36,6 +36,9 @@ in their chat.
 - A web app manifest: Jessbot installs on a phone's home screen or as a desktop app, under the assistant's name, with
   the logo (or its look's portrait) as the icon.
 - The Docker image runs Node.js 26 (the current LTS); a Node.js install needs 26, or 24.19 or newer.
+- The browser autopilot types with Claude Haiku 5.5 (Inception's Mercury is no longer offered); when its typing model
+  fails, the task says which model and where an admin changes it, and Admin → Models refuses a typing model the
+  provider doesn't serve.
 - The server starts about a quarter faster: the libraries for spreadsheets, slides, Word files, mail and feed
   discovery load the first time they're needed.
 - The project site, with the user guide and screenshots: https://anefzaoui.github.io/jessbot/. Its home page is "Jess's

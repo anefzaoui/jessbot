@@ -38,29 +38,37 @@ export const USES = {
     hint: 'When a page, email or file seems to talk to AI assistants, is it really trying to instruct your assistant, or just a person writing to a person? If off, every match gets the warning.' },
 };
 export const CONFIDENCES = [0.5, 0.6, 0.7, 0.8, 0.9];
-// textModel: the small, fast LLM that writes what the browser autopilot types (jev-ultrafast used Mercury: ~0.3–0.6 s).
-export const DEFAULTS = { model: 'typesafe/jev-1.13', textModel: 'inception/mercury-2.5', confidence: 0.6, uses: Object.fromEntries(Object.keys(USES).map(k => [k, true])) };
+// textModel: the small, fast LLM that writes what the browser autopilot types. jev-ultrafast used Inception's Mercury
+// (~0.3–0.6 s); OpenRouter stopped serving it in November 2026, so the default is Claude Haiku 5.5 (decision #255).
+export const DEFAULTS = { model: 'typesafe/jev-1.13', textModel: 'anthropic/claude-haiku-5.5', confidence: 0.6, uses: Object.fromEntries(Object.keys(USES).map(k => [k, true])) };
+// Earlier defaults that no provider serves any more. Saving the form used to store the default as it showed it, so a
+// stored one is read as "the default" (decision #255); any other saved choice is kept as it is.
+const RETIRED = { model: [], textModel: ['inception/mercury-2.5'] };
+const chosen = (key, v) => { const id = String(v || '').trim(); return id && !RETIRED[key].includes(id) ? id : DEFAULTS[key]; };
 
 export function decideSettings() {
   const s = settings.get('decide', {}) || {};
   return {
-    model: String(s.model || '').trim() || DEFAULTS.model,
-    textModel: String(s.textModel || '').trim() || DEFAULTS.textModel,
+    model: chosen('model', s.model),
+    textModel: chosen('textModel', s.textModel),
     confidence: CONFIDENCES.includes(Number(s.confidence)) ? Number(s.confidence) : DEFAULTS.confidence,
     uses: { ...DEFAULTS.uses, ...(s.uses || {}) },
   };
 }
 
+export const MODEL_ID = /^~?[\w.-]+\/[\w.:-]+$/; // vendor/model, OpenRouter's shape (a leading ~ for its "latest" aliases)
+
 export function saveDecideSettings(input = {}) {
   const cur = decideSettings();
   const model = String(input.model ?? cur.model).trim();
   const textModel = String(input.textModel ?? cur.textModel).trim();
-  for (const m of [model, textModel]) if (!/^~?[\w.-]+\/[\w.:-]+$/.test(m)) throw badRequest(`"${m}" doesn't look like a model id (vendor/model).`);
+  for (const m of [model, textModel]) if (!MODEL_ID.test(m)) throw badRequest(`"${m}" doesn't look like a model id (vendor/model).`);
   const confidence = input.confidence === undefined ? cur.confidence : Number(input.confidence);
   if (!CONFIDENCES.includes(confidence)) throw badRequest(`Confidence must be one of ${CONFIDENCES.join(', ')}.`);
   const uses = { ...cur.uses };
   for (const k of Object.keys(USES)) if (input.uses && k in input.uses) uses[k] = input.uses[k] === true || input.uses[k] === 'true' || input.uses[k] === 'on';
-  settings.set('decide', { model, textModel, confidence, uses });
+  // A model left at its default is stored as "the default" (empty), so it follows a later change of default (decision #255).
+  settings.set('decide', { model: model === DEFAULTS.model ? '' : model, textModel: textModel === DEFAULTS.textModel ? '' : textModel, confidence, uses });
   return decideSettings();
 }
 

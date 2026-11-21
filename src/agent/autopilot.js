@@ -9,7 +9,8 @@
 // #166): leaving for another site stops it, unless the goal named that site or it is a sign-in or payment hand-off.
 import { getClient } from '../services/llm.js';
 import { recordUsage } from '../services/usage.js';
-import { decide, choice, picked, note, threshold, decideSettings } from '../services/decide.js';
+import { decide, choice, picked, note, threshold, decideSettings, logFallback } from '../services/decide.js';
+import { oneLine } from '../lib/untrusted.js';
 import * as runs from '../services/runs.js';
 import { observe, act, settle, Stale } from '../browser/pilot.js';
 import { riskOfName } from './tools/browse.js';
@@ -103,6 +104,22 @@ export function actionSpace(actions) {
   return { elements, targets, controls };
 }
 
+// Where an admin changes the typing model (Admin → Models, views/pages/admin/model.hbs).
+export const TYPING_MODEL_SETTING = 'Admin → Models → Quick decisions → “Writes what the autopilot types”';
+
+/**
+ * What to say when the typing model failed (decision #255): the model by name, what the provider said and where to change
+ * it, so a model the provider no longer serves can't pass for "the goal lacks a value". Pure.
+ */
+export function typingFailure(err, model) {
+  const status = Number(err?.status || err?.response?.status) || null;
+  const said = oneLine(String(err?.error?.message || err?.message || 'no answer').replace(/^\d{3}\s+/, ''), 200).replace(/[.\s]+$/, '');
+  if (status === 404) return `The typing model “${model}” isn’t available from the model provider (${said}). An admin can choose another in ${TYPING_MODEL_SETTING}.`;
+  if (status === 400) return `The model provider refused the typing model “${model}” (${said}). An admin can check it in ${TYPING_MODEL_SETTING}.`;
+  return `The typing model “${model}” failed${status ? ` (HTTP ${status})` : ''}: ${said}. If it keeps happening, an admin can choose another in ${TYPING_MODEL_SETTING}.`;
+}
+
+// The text for one field from the typing model: a string, or null when the goal lacks the value. A failed call throws.
 async function writeText(user, runId, goal, a, st, history, signal) {
   const { textModel } = decideSettings();
   const context = { goal, field: { label: a.label, role: a.role, value: a.value }, page: { title: st.title, text: st.text.slice(0, 6000) },
@@ -119,7 +136,8 @@ async function writeText(user, runId, goal, a, st, history, signal) {
 }
 
 /**
- * Run a goal on the open page. Returns { outcome: done|blocked|unsure|needs_ok|needs_info|stuck|budget, why, history, ms }.
+ * Run a goal on the open page. Returns { outcome: done|blocked|unsure|needs_ok|needs_info|failed|stuck|budget|stopped, why,
+ * history, ms } (failed: the typing model didn't answer, decision #255; then also detail, a short line for the timeline).
  * Every action shows as a step in the chat timeline (a zap), live.
  */
 export async function autopilot({ page, goal, user, run, signal, maxActions = LIMITS.actions }) {
@@ -189,7 +207,21 @@ export async function autopilot({ page, goal, user, run, signal, maxActions = LI
     }
     let text = null;
     if (action.kind === 'fill') {
-      text = written.get(action.node) ?? await writeText(user, run.id, goal, action, st, history, signal).catch(() => null);
+      text = written.get(action.node);
+      if (text == null) {
+        try { text = await writeText(user, run.id, goal, action, st, history, signal); } catch (err) {
+          if (signal?.aborted) return stop('stopped', 'Stopped.');
+          // Loud, not "needs information" (decision #255): the run says which model failed and where to change it, the
+          // server log and Admin → Models → recent decisions show it too.
+          const { textModel } = decideSettings();
+          const why = typingFailure(err, textModel);
+          console.warn(`[autopilot] ${why}`);
+          logFallback('steps', { userId: user.id, runId: run.id, outcome: `typing model ${textModel}: ${oneLine(err?.message || 'failed', 80)}`, fallback: 'error' });
+          // The timeline's short line: the model, what went wrong and where to change it (the full reason goes to Jess).
+          const status = Number(err?.status) || null;
+          return { ...stop('failed', why), detail: `Typing model “${textModel}” ${status === 404 ? 'isn’t served (404)' : status ? `failed (HTTP ${status})` : 'didn’t answer'} · ${TYPING_MODEL_SETTING}` };
+        }
+      }
       if (text == null) return stop('needs_info', `It needs a value for “${action.label.slice(0, 60)}” that isn’t in the goal.`);
       written.set(action.node, text);
     }
