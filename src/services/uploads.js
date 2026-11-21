@@ -7,13 +7,15 @@
 import path from 'node:path';
 import { fileTypeFromBuffer } from 'file-type';
 import { withPdf } from '../lib/pdfjs.js';
-import mammoth from 'mammoth';
 import TurndownService from 'turndown';
 import { createFileItem, itemView, sizeLabel, DOWNLOADED_FROM, NO_TEXT_MARK, hasReadableText, modelImage } from './library.js';
 import { xlsxSheets, sheetsText, sheetsPreviewHtml, officeText } from './office.js';
 import { invalid } from '../lib/errors.js';
+import { lazy } from '../lib/lazy.js';
 import { captionsToText, captionStats } from '../lib/captions.js';
 import { renderMarkdown } from '../lib/markdown.js';
+
+const mammothLib = lazy(() => import('mammoth').then(m => m.default)); // Word files, on first upload (decision #256)
 
 export const UPLOAD_MAX_BYTES = 25 * 1048576;
 export const UPLOAD_MAX_FILES = 6;
@@ -103,7 +105,7 @@ export async function extract(kind, buffer) {
     return { text: text.slice(0, TEXT_MAX), pages };
   }
   if (kind.type === 'doc') {
-    const { value } = await mammoth.convertToHtml({ buffer });
+    const { value } = await (await mammothLib()).convertToHtml({ buffer });
     return { text: td.turndown(value).slice(0, TEXT_MAX) };
   }
   if (kind.ext === 'xlsx') {

@@ -7,12 +7,11 @@
 //     phrase is found and replaced across runs by our own pass over the XML (linkedom): adjacent runs with the same
 //     formatting are merged first (Word splits text at every edit and spell-check mark), then a phrase inside one run keeps
 //     that run's formatting, and one spanning runs takes the formatting of the run it starts in.
-import ExcelJS from 'exceljs';
 import JSZip from 'jszip';
 import PizZip from 'pizzip';
 import Docxtemplater from 'docxtemplater';
 import { DOMParser } from 'linkedom';
-import { excelFormula, cacheResults } from './office.js';
+import { excelFormula, cacheResults, excelLib } from './office.js';
 
 const bad = message => Object.assign(new Error(message), { status: 400 });
 
@@ -49,6 +48,7 @@ export async function sheetSetCells(buffer, changes, { sheet } = {}) {
   const lost = await unsupportedParts(buffer);
   if (lost.length) throw bad(`This workbook has ${lost.join(', ')}, which I can’t keep when I save it, so I haven’t changed it. `
     + 'I can make a new spreadsheet with the changes instead (make_spreadsheet), or they can edit it in Excel.');
+  const ExcelJS = await excelLib();
   const wb = new ExcelJS.Workbook();
   await wb.xlsx.load(buffer);
   const defaultSheet = sheet ? wb.getWorksheet(String(sheet)) : wb.worksheets[0];
@@ -177,6 +177,7 @@ export async function sheetAppendRows(buffer, rows, { sheet } = {}) {
     + 'I can make a new spreadsheet with the rows added instead (make_spreadsheet), or they can add them in Excel.');
   if (!Array.isArray(rows) || !rows.length) throw bad('Give at least one row to add.');
   if (rows.length > MAX_APPEND) throw bad(`That’s more than ${MAX_APPEND} rows in one go; split them.`);
+  const ExcelJS = await excelLib();
   const wb = new ExcelJS.Workbook();
   await wb.xlsx.load(buffer);
   const ws = sheet ? wb.worksheets.find(w => w.name.toLowerCase() === String(sheet).trim().toLowerCase()) : wb.worksheets[0];

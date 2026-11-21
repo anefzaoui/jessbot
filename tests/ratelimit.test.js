@@ -106,15 +106,28 @@ test('sign-in limits survive a real restart of the server', async () => {
   closeDb(); // the server owns the database while it runs
   const port = await (async () => { const s = await listen(express()); const p = s.address().port; await new Promise(r => s.close(r)); return p; })();
   const env = { ...process.env, PORT: String(port), HOST: '127.0.0.1', NODE_ENV: 'test' };
-  const start = async () => {
-    const child = spawn(process.execPath, ['server.js'], { cwd: path.join(import.meta.dirname, '..'), env, stdio: 'ignore' });
-    for (let i = 0; i < 100; i++) {
-      try { if ((await fetch(`http://127.0.0.1:${port}/healthz`)).ok) return child; } catch { /* not up yet */ }
-      await new Promise(r => setTimeout(r, 200));
-    }
-    child.kill(); throw new Error('server did not start');
-  };
-  const stop = child => new Promise(r => { child.once('exit', r); child.kill(); });
+  // Started is when the server says it listens (a latch, not a polling budget): on a loaded machine a start can take
+  // many seconds, most of it loading modules (decision #256). The deadline only catches a server that hangs; a server
+  // that exits fails at once, with what it printed.
+  const start = () => new Promise((resolve, reject) => {
+    const child = spawn(process.execPath, ['server.js'], { cwd: path.join(import.meta.dirname, '..'), env, stdio: ['ignore', 'pipe', 'pipe'] });
+    let out = '';
+    const fail = why => { clearTimeout(hang); child.off('exit', exited); child.kill(); reject(new Error(`${why}\n${out.slice(-2000)}`)); };
+    const exited = code => fail(`the server exited (code ${code}) before it was listening`);
+    const hang = setTimeout(() => fail('the server did not say it was listening within 3 minutes'), 180_000);
+    child.stderr.on('data', d => { out += d; });
+    child.stdout.on('data', d => {
+      out += d;
+      if (/\[jessbot\] listening on /.test(out)) { clearTimeout(hang); child.off('exit', exited); resolve(child); }
+    });
+    child.once('exit', exited);
+  });
+  // A child that has already exited (a start that failed) resolves at once: waiting for its 'exit' would wait forever.
+  const stop = child => new Promise(r => {
+    if (!child || child.exitCode !== null || child.signalCode !== null) return r();
+    child.once('exit', r);
+    child.kill();
+  });
   const login = () => fetch(`http://127.0.0.1:${port}/api/v1/auth/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email: 'owner@ratelimit.test', password: 'wrong password!' }) }).then(r => r.status);
   let child = await start();

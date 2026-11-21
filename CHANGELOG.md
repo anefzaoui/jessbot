@@ -39,6 +39,8 @@ in their chat.
 - The browser autopilot types with Claude Haiku 5.5 (Inception's Mercury is no longer offered); when its typing model
   fails, the task says which model and where an admin changes it, and Admin → Models refuses a typing model the
   provider doesn't serve.
+- The server starts about a quarter faster: the libraries for spreadsheets, slides, Word files, mail and feed
+  discovery load the first time they're needed.
 - The project site, with the user guide and screenshots: https://anefzaoui.github.io/jessbot/. Its home page is "Jess's
   day": Jess in her sky through four hours of a day, what she does at each, one real run with its timeline, and the
   install; the guide, the gallery and the 404 share its look.

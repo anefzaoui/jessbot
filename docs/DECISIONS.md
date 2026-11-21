@@ -4091,3 +4091,18 @@ Note: most of Phase 23 part A landed in commit aa56076, whose message reads "Pha
     read as the default, and from now on a model left at its default is stored as "the default", so a later change of
     default reaches every install that never chose one. `test:chat`'s autopilot check now also fails when the typing
     model was never called or failed, since Jess's own typing steps look the same in the timeline.
+
+## 2026-11-21: A faster start; the restart test waits for the server's word
+
+256. **Libraries that only a tool or an upload needs load on first use, and tests wait for "listening", not a clock.**
+    The rate-limit test's real restart (#228) gave each start 100 tries 200 ms apart, about 20 s, and timed out under
+    the full parallel test run on a slow machine. Measured on Windows 11: a start was about 3.2 s idle and 10 s with
+    every core busy, and nearly all of it was loading modules: `src/app.js` pulled in about 3,600 files before the
+    server could listen, a third of them for spreadsheets (exceljs), slides (pptxgenjs), Word and office text (mammoth,
+    officeparser), mail (imapflow, mailparser, nodemailer) and feed discovery (feedscout), none of which a start uses.
+    Those now load the first time they're needed, through one helper (`src/lib/lazy.js`: one shared promise, a failed
+    load tried again next time): about 2,400 files and 2.4 s idle. The first spreadsheet, mail or Word upload after a start
+    pays the load once (a few hundred ms). PDF forms (pdf-lib), the feed reader and the page tools still load at the
+    start; they're the next candidates if starts need to be quicker. The test now starts the server, waits for its
+    `[jessbot] listening on` line (a latch), fails at once with the server's own output when it exits first, and keeps
+    a 3-minute deadline only for a server that hangs.

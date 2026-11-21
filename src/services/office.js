@@ -5,18 +5,21 @@
 // right-to-left in every format (bidi.js decides per paragraph / sheet / slide).
 import { Document, Packer, Paragraph, HeadingLevel, TextRun, ExternalHyperlink, Table, TableRow, TableCell, WidthType, AlignmentType, ShadingType, BorderStyle,
   TableLayoutType, Footer, PageNumber, TableOfContents, Bookmark, ImageRun } from 'docx';
-import ExcelJS from 'exceljs';
 import FormulaParser from 'fast-formula-parser';
 import * as formulajs from '@formulajs/formulajs';
-import PptxGenJS from 'pptxgenjs';
 import MarkdownIt from 'markdown-it';
-import { parseOffice } from 'officeparser';
 import { textDir } from '../../public/js/bidi.js';
 import { renderDocument } from '../lib/markdown.js';
 import { documentFontCss, mathFontCss } from './fonts.js';
 import { printPdf } from './print.js';
 import { themeOf, seriesColors } from './themes.js';
 import { escapeMarkdown } from '../lib/text-safe.js';
+import { lazy } from '../lib/lazy.js';
+
+// Loaded when a file is made or read, not when the server starts (decision #256).
+export const excelLib = lazy(() => import('exceljs').then(m => m.default));
+const pptxLib = lazy(() => import('pptxgenjs').then(m => m.default));
+const officeParser = lazy(() => import('officeparser'));
 
 const md = new MarkdownIt({ html: false, linkify: true });
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
@@ -253,6 +256,7 @@ const sheetRef = name => (/^[A-Za-z_][A-Za-z0-9_]*$/.test(name) ? name : `'${nam
  */
 export async function makeWorkbook(sheets, { title = 'Workbook', theme } = {}) {
   const t = themeOf(theme);
+  const ExcelJS = await excelLib();
   const wb = new ExcelJS.Workbook();
   wb.creator = 'Jessbot';
   wb.title = title;
@@ -469,6 +473,7 @@ const decimalsOf = n => { const m = String(Math.abs(n)).match(/\.(\d+)$/); retur
  * 1,542.85 and the model compared them wrongly; now 1,550.20.
  */
 export async function xlsxSheets(buffer, { maxRows = 500 } = {}) {
+  const ExcelJS = await excelLib();
   const wb = new ExcelJS.Workbook();
   await wb.xlsx.load(buffer);
   const valueOf = evaluator(wb);
@@ -569,6 +574,7 @@ const placeImage = (img, box, type) => ({ data: imageData(img), x: box.x, y: box
 export async function pptxFromSlides(slides, { title = 'Presentation', subtitle = '', theme, images = new Map() } = {}) {
   const t = themeOf(theme);
   const head = t.officeFonts.head, body = t.officeFonts.body;
+  const PptxGenJS = await pptxLib();
   const pptx = new PptxGenJS();
   pptx.layout = 'LAYOUT_WIDE';
   pptx.title = title;
@@ -751,6 +757,7 @@ export function slidesText(all) {
 
 /** Text of a .pptx (or other office file) for Jess and search. */
 export async function officeText(buffer) {
+  const { parseOffice } = await officeParser();
   const ast = await parseOffice(buffer, { newlineDelimiter: '\n', ignoreNotes: false });
   const { value } = await ast.to('text'); // officeparser v8: parse → AST → text
   return String(value || '').replace(/\n{3,}/g, '\n\n').trim();
